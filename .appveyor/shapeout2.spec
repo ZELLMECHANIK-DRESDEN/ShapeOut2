@@ -1,7 +1,3 @@
-#!/usr/bin/python
-# -*- mode: python -*-
-# find correct directory
-import codecs
 import os
 from os.path import abspath, exists, join, dirname, relpath
 import platform
@@ -11,14 +7,13 @@ import warnings
 cdir = abspath(".")
 sys.path.insert(0, cdir)
 
-if not exists(join(cdir, "shapeou2t")):
+if not exists(join(cdir, "shapeout2")):
 	warnings.warn("Cannot find 'shapeout2'! Please run pyinstaller "+
                   "from git root folder.")
 
 name = "ShapeOut2"
-appdir = os.path.realpath(cdir+"/shapeout2/")
 pyinstdir = os.path.realpath(cdir+"/.appveyor/")
-script = os.path.join(appdir, name+".py")
+script = os.path.join(pyinstdir, name+".py")
 
 # Icon
 icofile = os.path.join(pyinstdir,"ShapeOut2.ico")

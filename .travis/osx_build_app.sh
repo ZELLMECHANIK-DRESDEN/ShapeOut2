@@ -8,7 +8,7 @@ fi
 NAME=$1
 # append "App" to avoid naming conflicts with python library
 SCRIPT=".travis/${1}App.py"
-APP_DIST="./dist_app/${1}App.app"
+APP_DIST="./dist/${1}App.app"
 APP="./dist_app/${1}App.app"
 DMG="./dist_app/${1}.dmg"
 TMP="./dist_app/pack.temp.dmg"

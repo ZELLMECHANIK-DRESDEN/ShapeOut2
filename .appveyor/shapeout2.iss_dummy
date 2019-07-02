@@ -2,6 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Shape-Out 2"
+#define MyAppNameSimple "Shape-Out"
 #define MyzmAppName "Shape-Out 2"
 #define MyAppVersion "0.1.0"
 #define MyAppPublisher "ZELLMECHANIK DRESDEN"
@@ -25,7 +26,7 @@ DefaultDirName={localappdata}\{#MyAppName}
 DisableDirPage=yes
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-OutputBaseFilename={#MyAppName}_{#MyAppVersion}_{#MyAppPlatform}_setup
+OutputBaseFilename={#MyAppNameSimple}_{#MyAppVersion}_{#MyAppPlatform}_setup
 Compression=lzma
 SolidCompression=yes
 ChangesAssociations=yes

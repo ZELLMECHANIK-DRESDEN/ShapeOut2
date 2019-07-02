@@ -3,8 +3,7 @@ import pkg_resources
 
 import dclab
 from PyQt5 import uic, QtCore, QtWidgets
-
-from ..external import pyqtgraph as pg
+import pyqtgraph as pg
 
 
 class QuickView(QtWidgets.QWidget):

@@ -1,8 +1,7 @@
 import pkg_resources
 
 from PyQt5 import uic, QtWidgets
-
-from ..external import pyqtgraph as pg
+import pyqtgraph as pg
 
 
 class InfoView(QtWidgets.QWidget):

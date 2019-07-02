@@ -5,12 +5,13 @@ import sys
 import traceback
 
 from PyQt5 import uic, QtCore, QtWidgets
+import pyqtgraph as pg
 
 from . import info_view
 from . import quick_view
 
 from .. import settings
-from ..external import pyqtgraph as pg
+
 from .._version import version as __version__
 
 

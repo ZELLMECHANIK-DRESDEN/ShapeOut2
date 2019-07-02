@@ -104,11 +104,13 @@ def excepthook(etype, value, trace):
     """
     Handler for all unhandled exceptions.
 
-    :param `etype`: the exception type (`SyntaxError`, `ZeroDivisionError`, etc...);
+    :param `etype`: the exception type (`SyntaxError`,
+        `ZeroDivisionError`, etc...);
     :type `etype`: `Exception`
     :param string `value`: the exception error message;
-    :param string `trace`: the traceback header, if any (otherwise, it prints the
-     standard Python header: ``Traceback (most recent call last)``.
+    :param string `trace`: the traceback header, if any (otherwise, it
+        prints the standard Python header: ``Traceback (most recent
+        call last)``.
     """
     vinfo = "Unhandled exception in Shape-Out version {}:\n".format(
         __version__)

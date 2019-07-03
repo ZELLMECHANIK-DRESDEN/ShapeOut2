@@ -34,7 +34,8 @@ curl https://bootstrap.pypa.io/get-pip.py -o ${DLD}/get-pip.py
 python ${DLD}/get-pip.py
 
 # install virtualenv
-python -m pip install virtualenv
+# https://github.com/pyinstaller/pyinstaller/issues/4064
+python -m pip install virtualenv==16.1.0
 
 # create virtualenv
 PP="/Library/Frameworks/Python.framework/Versions/${MPV::3}/bin/python${MPV::3}"

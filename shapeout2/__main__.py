@@ -5,8 +5,7 @@ def main(splash=True):
     import time
 
     from PyQt5.QtWidgets import QApplication
-    # required by pyqtgraph
-    QApplication.setGraphicsSystem("raster")
+    import pyqtgraph  # import before creating application
 
     app = QApplication(sys.argv)
     imdir = pkg_resources.resource_filename("shapeout2", "img")

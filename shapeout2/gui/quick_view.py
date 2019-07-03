@@ -12,7 +12,7 @@ class QuickView(QtWidgets.QWidget):
         path_ui = pkg_resources.resource_filename(
             "shapeout2.gui", "quick_view.ui")
         uic.loadUi(path_ui, self)
-        self.setWindowTitle("Quick View")
+        self.setWindowTitle("Quick View (QV)")
         self.scatter_plot = self.widget_scatter.plot
         self.scatter_plot.sigClicked.connect(self.clicked)
 

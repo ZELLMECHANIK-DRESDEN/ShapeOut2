@@ -61,7 +61,8 @@ class MatrixElement(QtWidgets.QWidget):
         if do_quickview:
             color = "#F0A1D6"
             label += "\n(QV)"
-            self.quickview_selected.emit()
+            if quickview:
+                self.quickview_selected.emit()
 
         self.setStyleSheet("background-color:{}".format(color))
         self.label.setStyleSheet("background-color:{}".format(color))

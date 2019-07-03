@@ -28,6 +28,10 @@ DMG="./dist_app/${NAMEVERSION}.dmg"
 TMP="./dist_app/pack.temp.dmg"
 pip install pyinstaller
 
+# cleanup from previous builds
+rm -rf ./build
+rm -rf ./dist_app
+
 # Work in a different directory (./dist_app instead of ./dist),
 # otherwise PyPI deployment on travis-CI tries to upload *.dmg files.
 pyinstaller -w -y --distpath="./dist_app" --additional-hooks-dir=".travis" $SCRIPT

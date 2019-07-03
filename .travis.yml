@@ -30,7 +30,6 @@ script:
 - flake8 tests
 after_success:
 - codecov
-before_deploy:
 - python setup.py sdist bdist_wheel
 - bash ./.travis/${TRAVIS_OS_NAME}_build_app.sh Shape-Out $TRAVIS_TAG
 deploy:

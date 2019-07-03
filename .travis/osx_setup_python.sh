@@ -29,14 +29,12 @@ curl https://www.python.org/ftp/python/${MPV}/${PKG} > ${DLD}/${PKG}
 # install MacPython
 sudo installer -pkg ${DLD}/${PKG} -target /
 
-# install latest version of pip
-curl https://bootstrap.pypa.io/get-pip.py -o ${DLD}/get-pip.py
-python ${DLD}/get-pip.py
-
 # create virtualenv
-PP="/Library/Frameworks/Python.framework/Versions/${MPV::3}/bin/python${MPV::3}"
-$PP -m venv .env
+PYTHON="/Library/Frameworks/Python.framework/Versions/${MPV::3}/bin/python${MPV::3}"
+$PYTHON -m venv .env
 source .env/bin/activate
+
+pip install --upgrade pip
 
 # install ca certificates
 # (resolves [SSL: CERTIFICATE_VERIFY_FAILED])

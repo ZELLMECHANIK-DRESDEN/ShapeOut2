@@ -64,6 +64,7 @@ class MatrixElement(QtWidgets.QWidget):
             self.quickview_selected.emit("peter")
 
         self.setStyleSheet("background-color:{}".format(color))
+        self.label.setStyleSheet("background-color:{}".format(color))
         self.label.setText(label)
         self.setToolTip(tooltip)
         self.label.setToolTip(tooltip)

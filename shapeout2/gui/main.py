@@ -81,7 +81,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.toolButton_quick_view.clicked.connect(sub.setVisible)
         self.subwindows["quick_view"] = sub
         # signals
-        self.data_matrix.quickviewed.connect(self.widget_quick_view.show_rtdc)
+        self.data_matrix.quickviewed.connect(self.on_quickviewed)
         sub.setSystemMenu(None)
         sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
                            | QtCore.Qt.WindowTitleHint
@@ -92,6 +92,12 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.splitter.setSizes([200, 1000])
         else:
             self.splitter.setSizes([0, 1])
+
+    @QtCore.pyqtSlot(pathlib.Path, list)
+    def on_quickviewed(self, path, filters):
+        # update quick view subwindow
+        self.widget_quick_view.show_rtdc(path, filters)
+        # show quick view subwindow
 
     def on_splitter(self):
         if self.splitter.sizes()[0] == 0:

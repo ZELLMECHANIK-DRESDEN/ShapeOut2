@@ -5,7 +5,8 @@ def main(splash=True):
     import time
 
     from PyQt5.QtWidgets import QApplication
-    import pyqtgraph  # import before creating application
+    # import before creating application
+    import pyqtgraph  # noqa: F401
 
     app = QApplication(sys.argv)
     imdir = pkg_resources.resource_filename("shapeout2", "img")

@@ -5,7 +5,7 @@ from PyQt5 import uic, QtWidgets, QtCore
 
 class MatrixElement(QtWidgets.QWidget):
     _quick_view_instance = None
-    quickview_selected = QtCore.pyqtSignal(object)
+    quickview_selected = QtCore.pyqtSignal()
 
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
@@ -61,7 +61,7 @@ class MatrixElement(QtWidgets.QWidget):
         if do_quickview:
             color = "#F0A1D6"
             label += "\n(QV)"
-            self.quickview_selected.emit("peter")
+            self.quickview_selected.emit()
 
         self.setStyleSheet("background-color:{}".format(color))
         self.label.setStyleSheet("background-color:{}".format(color))

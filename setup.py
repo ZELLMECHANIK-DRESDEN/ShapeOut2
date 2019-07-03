@@ -29,8 +29,9 @@ setup(
                       "h5py>=2.8.0",
                       "numpy>=1.9.0",
                       "pyqt5",
-                      #"pyqtgraph>=0.10.0",
-                      "pyqtgraph @ git+https://github.com/pyqtgraph/pyqtgraph.git@1ec175385e31c4e1e8dbe829b4387e4ac560082c",
+                      "pyqtgraph>=0.10.0",
+                      # using this will make it impossible to upload to PyPI:
+                      #"pyqtgraph @ git+https://github.com/pyqtgraph/pyqtgraph.git@1ec175385e31c4e1e8dbe829b4387e4ac560082c",
                       "scipy>=0.13.0"],
     python_requires='>=3.6, <4',
     setup_requires=['pytest-runner'],

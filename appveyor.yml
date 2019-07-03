@@ -27,6 +27,7 @@ install:
   # Install shapeout2 and its dependencies
   - "appveyor-retry python -m pip install --upgrade pip"
   - "appveyor-retry pip install git+git://github.com/ZELLMECHANIK-DRESDEN/dclab.git"
+  - "appveyor-retry pip install git+https://github.com/pyqtgraph/pyqtgraph.git@1ec175385e31c4e1e8dbe829b4387e4ac560082c"
   - "appveyor-retry pip install -e ."
   # Install pyinstaller (includes dependency for pywin32)
   - "appveyor-retry pip install pyinstaller==3.4"

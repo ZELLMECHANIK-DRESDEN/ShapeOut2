@@ -31,7 +31,7 @@ after_success:
 - codecov
 before_deploy:
 - python setup.py sdist bdist_wheel
-- bash ./.travis/${TRAVIS_OS_NAME}_build_app.sh ShapeOut2
+- bash ./.travis/${TRAVIS_OS_NAME}_build_app.sh ShapeOut2 $TRAVIS_TAG
 deploy:
   - provider: pypi
     user: "ci_zmdd"
@@ -47,6 +47,7 @@ deploy:
     file_glob: true
     file: "dist_app/*.dmg"
     skip_cleanup: true
+    draft: true
     on:
       tags: true
 

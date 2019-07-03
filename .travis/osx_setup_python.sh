@@ -33,13 +33,9 @@ sudo installer -pkg ${DLD}/${PKG} -target /
 curl https://bootstrap.pypa.io/get-pip.py -o ${DLD}/get-pip.py
 python ${DLD}/get-pip.py
 
-# install virtualenv
-# https://github.com/pyinstaller/pyinstaller/issues/4064
-python -m pip install virtualenv==16.1.0
-
 # create virtualenv
 PP="/Library/Frameworks/Python.framework/Versions/${MPV::3}/bin/python${MPV::3}"
-python -m virtualenv --no-site-packages -p $PP .env
+$PP -m venv .env
 source .env/bin/activate
 
 # install ca certificates

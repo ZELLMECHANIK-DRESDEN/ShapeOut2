@@ -55,4 +55,6 @@ class MatrixFilter(QtWidgets.QWidget):
         self.label.setToolTip(self.title)
         if len(self.title) > 8:
             title = self.title[:5]+"..."
+        else:
+            title = self.title
         self.label.setText(title)

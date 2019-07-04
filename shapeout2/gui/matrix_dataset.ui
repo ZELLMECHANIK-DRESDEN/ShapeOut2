@@ -106,7 +106,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="pushButton_toggle">
         <property name="text">
          <string>toggle</string>
         </property>
@@ -155,44 +155,29 @@
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>40</width>
+            <width>0</width>
             <height>20</height>
            </size>
           </property>
          </spacer>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox">
+         <widget class="QPushButton" name="pushButton_opt">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="maximumSize">
            <size>
-            <width>20</width>
+            <width>50</width>
             <height>16777215</height>
            </size>
           </property>
-          <property name="frame">
-           <bool>false</bool>
+          <property name="text">
+           <string>opt</string>
           </property>
-          <item>
-           <property name="text">
-            <string>insert anew</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>duplicate</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>remove</string>
-           </property>
-          </item>
          </widget>
         </item>
        </layout>

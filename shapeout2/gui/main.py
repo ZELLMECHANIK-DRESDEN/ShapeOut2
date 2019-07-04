@@ -98,7 +98,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # update quick view subwindow
         self.widget_quick_view.show_rtdc(path, filters)
         # show quick view subwindow
-        self.subwindows["quick_view"].setVisible(True)
+        if not self.subwindows["quick_view"].isVisible():
+            self.toolButton_quick_view.toggle()
+            self.subwindows["quick_view"].setVisible(True)
 
     def on_splitter(self):
         if self.splitter.sizes()[0] == 0:

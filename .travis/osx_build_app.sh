@@ -37,8 +37,8 @@ rm -rf ./dist_app
 pyinstaller -w -y --distpath="./dist_app" --additional-hooks-dir=".travis" $SCRIPT
 
 # add link to Applications
-mkdir ui-release
-cd ui-release
+mkdir ./dist_app/ui-release
+cd ./dist_app/ui-release
 ln -s /Applications
 cd -
 mv ${APP} ./dist_app/ui-release/

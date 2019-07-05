@@ -219,7 +219,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>159</width>
+             <width>166</width>
              <height>569</height>
             </rect>
            </property>
@@ -229,9 +229,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <layout class="QGridLayout" name="gridLayout_3">
+           <layout class="QGridLayout" name="gridLayout_matrix">
             <property name="sizeConstraint">
-             <enum>QLayout::SetNoConstraint</enum>
+             <enum>QLayout::SetMaximumSize</enum>
             </property>
             <property name="leftMargin">
              <number>2</number>
@@ -261,14 +261,14 @@
             <item row="0" column="0">
              <widget class="DataMatrix" name="data_matrix" native="true">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
               <property name="minimumSize">
                <size>
-                <width>20</width>
+                <width>80</width>
                 <height>80</height>
                </size>
               </property>

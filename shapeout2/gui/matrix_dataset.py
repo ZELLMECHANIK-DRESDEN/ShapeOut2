@@ -9,6 +9,7 @@ class MatrixDataset(QtWidgets.QWidget):
     _instance_counter = 0
     active_toggled = QtCore.pyqtSignal()
     enabled_toggled = QtCore.pyqtSignal()
+    option_action = QtCore.pyqtSignal(str)
 
     def __init__(self, path=None):
         """Create a new dataset matrix element
@@ -41,10 +42,6 @@ class MatrixDataset(QtWidgets.QWidget):
         # set tooltip/label
         self.update_content()
 
-        self.setFixedSize(QtCore.QSize(80, 80))
-        self.resize(QtCore.QSize(80, 80))
-        self.setMaximumSize(QtCore.QSize(80, 80))
-
     def __getstate__(self):
         state = {"path": self.path,
                  "identifier": self.identifier,
@@ -57,13 +54,13 @@ class MatrixDataset(QtWidgets.QWidget):
         self.update_content()
 
     def action_duplicate(self):
-        pass
+        self.option_action.emit("duplicate")
 
     def action_insert_anew(self):
-        pass
+        self.option_action.emit("insert_anew")
 
     def action_remove(self):
-        pass
+        self.option_action.emit("remove")
 
     def update_content(self):
         """Reset tool tips and title"""

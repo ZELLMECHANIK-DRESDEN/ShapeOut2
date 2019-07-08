@@ -168,7 +168,8 @@ class DataMatrix(QtWidgets.QWidget):
         for ds in state["datasets"]:
             for f in state["filters"]:
                 if not ds["enabled"] or not f["enabled"]:
-                    me = self.get_matrix_element(ds["identifier"], f["identifier"])
+                    me = self.get_matrix_element(ds["identifier"],
+                                                 f["identifier"])
                     mstate = me.__getstate__()
                     mstate["enabled"] = False
                     me.__setstate__(mstate)

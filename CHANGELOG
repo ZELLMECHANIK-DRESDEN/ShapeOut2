@@ -1,5 +1,6 @@
 2.0.0a17
  - implement data matrix states
+ - implement data matrix logic
 2.0.0a16
  - add documentation (from Shape-Out 1)
  - test deployment for macOS

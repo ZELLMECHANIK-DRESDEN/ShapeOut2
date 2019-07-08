@@ -6,7 +6,8 @@ from PyQt5 import uic, QtCore, QtWidgets
 class MatrixFilter(QtWidgets.QWidget):
     _instance_counter = 0
     active_toggled = QtCore.pyqtSignal()
-    enabled_toggled = QtCore.pyqtSignal()
+    enabled_toggled = QtCore.pyqtSignal(bool)
+    option_action = QtCore.pyqtSignal(str)
 
     def __init__(self, title="FS?"):
         QtWidgets.QWidget.__init__(self)
@@ -36,19 +37,21 @@ class MatrixFilter(QtWidgets.QWidget):
     def __getstate__(self):
         state = {"title": self.title,
                  "identifier": self.identifier,
+                 "enabled": self.checkBox.isChecked(),
                  }
         return state
 
     def __setstate__(self, state):
         self.identifier = state["identifier"]
         self.title = state["title"]
+        self.checkBox.setChecked(state["enabled"])
         self.update_content()
 
     def action_duplicate(self):
-        pass
+        self.option_action.emit("duplicate")
 
     def action_remove(self):
-        pass
+        self.option_action.emit("remove")
 
     def update_content(self):
         """Reset tool tips and title"""

@@ -44,7 +44,7 @@ class MatrixElement(QtWidgets.QWidget):
             label = "active"
             tooltip = "Click to deactivate"
         elif self.active and not self.enabled:
-            color = "#A4D5A7"  # gray-green
+            color = "#C9DAC9"  # gray-green
             label = "active\n(disabled)"
             tooltip = "Click to deactivate"
         elif not self.active and self.enabled:
@@ -52,8 +52,8 @@ class MatrixElement(QtWidgets.QWidget):
             label = "inactive"
             tooltip = "Click to activate"
         else:
-            color = "#C0C1C0"  # gray
-            label = "inactive"
+            color = "#DCDCDC"  # gray
+            label = "inactive\n(disabled)"
             tooltip = "Click to activate"
 
         curinst = MatrixElement._quick_view_instance

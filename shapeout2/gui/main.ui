@@ -491,7 +491,7 @@
   <customwidget>
    <class>DataMatrix</class>
    <extends>QWidget</extends>
-   <header>shapeout2.gui.matrix</header>
+   <header>shapeout2.gui.matrix.data_matrix</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

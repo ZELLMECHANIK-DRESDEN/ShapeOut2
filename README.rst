@@ -44,5 +44,4 @@ Testing
 .. |Coverage Status| image:: https://img.shields.io/codecov/c/github/ZELLMECHANIK-DRESDEN/ShapeOut2/master.svg
    :target: https://codecov.io/gh/ZELLMECHANIK-DRESDEN/ShapeOut2
 .. |Docs Status| image:: https://readthedocs.org/projects/ShapeOut2/badge/?version=latest
-   :target: https://readthedocs.org/projects/ShapeOut2/builds/
-
+   :target: https://readthedocs.org/projects/shapeout2/builds/

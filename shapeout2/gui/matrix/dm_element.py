@@ -10,7 +10,7 @@ class MatrixElement(QtWidgets.QWidget):
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
         path_ui = pkg_resources.resource_filename(
-            "shapeout2.gui", "matrix_element.ui")
+            "shapeout2.gui.matrix", "dm_element.ui")
         uic.loadUi(path_ui, self)
 
         self.active = False

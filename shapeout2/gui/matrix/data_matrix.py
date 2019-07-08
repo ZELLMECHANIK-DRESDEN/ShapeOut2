@@ -4,9 +4,9 @@ import pathlib
 import numpy as np
 from PyQt5 import QtCore, QtWidgets
 
-from .matrix_dataset import MatrixDataset
-from .matrix_filter import MatrixFilter
-from .matrix_element import MatrixElement
+from .dm_dataset import MatrixDataset
+from .dm_filter import MatrixFilter
+from .dm_element import MatrixElement
 
 
 class DataMatrix(QtWidgets.QWidget):

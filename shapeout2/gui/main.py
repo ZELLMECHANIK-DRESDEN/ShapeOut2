@@ -44,6 +44,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.toolButton_new_filter.clicked.connect(self.data_matrix.add_filter)
         self.toolButton_new_dataset.clicked.connect(self.import_dataset)
         self.toolButton_import.clicked.connect(self.import_dataset)
+        self.toolButton_new_plot.clicked.connect(self.plot_matrix.add_plot)
         # settings
         self.settings = settings.SettingsFile()
 

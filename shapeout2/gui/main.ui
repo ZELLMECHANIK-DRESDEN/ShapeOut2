@@ -68,7 +68,7 @@
       <item row="0" column="2">
        <widget class="QToolButton" name="toolButton_dm">
         <property name="text">
-         <string>Data &amp;Matrix</string>
+         <string>Block &amp;Matrix</string>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -285,7 +285,7 @@
              </widget>
             </item>
             <item row="0" column="2">
-             <widget class="QWidget" name="plot_matrix" native="true">
+             <widget class="PlotMatrix" name="plot_matrix" native="true">
               <property name="minimumSize">
                <size>
                 <width>30</width>
@@ -308,7 +308,7 @@
              </spacer>
             </item>
             <item row="0" column="3" alignment="Qt::AlignTop">
-             <widget class="QToolButton" name="toolButton">
+             <widget class="QToolButton" name="toolButton_new_plot">
               <property name="toolTip">
                <string>Add a new plot</string>
               </property>
@@ -492,6 +492,12 @@
    <class>DataMatrix</class>
    <extends>QWidget</extends>
    <header>shapeout2.gui.matrix.data_matrix</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PlotMatrix</class>
+   <extends>QWidget</extends>
+   <header>shapeout2.gui.matrix.plot_matrix</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

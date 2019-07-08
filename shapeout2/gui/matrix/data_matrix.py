@@ -12,7 +12,7 @@ from .dm_element import MatrixElement
 class DataMatrix(QtWidgets.QWidget):
     quickviewed = QtCore.pyqtSignal(pathlib.Path, list)
 
-    def __init__(self, parent=None, analysis=range(3)):
+    def __init__(self, parent=None):
         super(DataMatrix, self).__init__(parent)
 
         self.glo = None
@@ -27,27 +27,21 @@ class DataMatrix(QtWidgets.QWidget):
     def __getstate__(self):
         """Logical states of the current data matrix"""
         # datasets
-        nrows = self.num_datasets
         datasets = []
-        for ii in range(nrows):
-            ds = self.glo.itemAtPosition(ii+1, 0).widget()
+        for ds in self.datasets:
             datasets.append(ds.__getstate__())
         # filters
-        ncols = self.num_filters
         filters = []
-        for jj in range(ncols):
-            f = self.glo.itemAtPosition(0, jj+1).widget()
-            filters.append(f.__getstate__())
+        for fs in self.filters:
+            filters.append(fs.__getstate__())
         # elements
         mestates = {}
-        for si in range(nrows):
-            idds = self.glo.itemAtPosition(si+1, 0).widget().identifier
+        for ds in self.datasets:
             idict = {}
-            for sj in range(ncols):
-                idf = self.glo.itemAtPosition(0, sj+1).widget().identifier
-                me = self.glo.itemAtPosition(si+1, sj+1).widget()
-                idict[idf] = me.__getstate__()
-            mestates[idds] = idict
+            for fs in self.filters:
+                me = self.get_matrix_element(ds.identifier, fs.identifier)
+                idict[fs.identifier] = me.__getstate__()
+            mestates[ds.identifier] = idict
         state = {"elements": mestates,
                  "datasets": datasets,
                  "filters": filters}
@@ -91,6 +85,50 @@ class DataMatrix(QtWidgets.QWidget):
         self.adjust_size()
 
     @property
+    def datasets(self):
+        datasets = []
+        for ii in range(self.glo.rowCount()):
+            item = self.glo.itemAtPosition(ii+1, 0)
+            if item is not None:
+                ds = item.widget()
+                datasets.append(ds)
+        return datasets
+
+    @property
+    def element_width(self):
+        """Data matrix element width (without 2px spacing)"""
+        for jj in range(1, self.glo.columnCount()-1):
+            item = self.glo.itemAtPosition(0, jj)
+            if item is not None:
+                width = item.geometry().width()
+                break
+        else:
+            width = 90
+        return width
+
+    @property
+    def element_height(self):
+        """Data matrix element height (without 2px spacing)"""
+        for ii in range(1, self.glo.rowCount()-1):
+            item = self.glo.itemAtPosition(ii, 0)
+            if item is not None:
+                height = item.geometry().height()
+                break
+        else:
+            height = 90
+        return height
+
+    @property
+    def filters(self):
+        filters = []
+        for jj in range(self.glo.columnCount()):
+            item = self.glo.itemAtPosition(0, jj+1)
+            if item is not None:
+                fs = item.widget()
+                filters.append(fs)
+        return filters
+
+    @property
     def num_datasets(self):
         count = 0
         for ii in range(1, self.glo.rowCount()):
@@ -106,17 +144,29 @@ class DataMatrix(QtWidgets.QWidget):
                 count += 1
         return count
 
+    @property
+    def plot_matrix(self):
+        for ch in self.parent().children():
+            if ch.__class__.__name__ == "PlotMatrix":
+                break
+        else:
+            raise KeyError("PlotMatrix not found!")
+        return ch
+
     def add_dataset(self, path):
         md = MatrixDataset(path)
         self.glo.addWidget(md, self.num_datasets+1, 0)
         md.active_toggled.connect(self.toggle_dataset_active)
         md.enabled_toggled.connect(self.toggle_dataset_enable)
+        md.enabled_toggled.connect(self.plot_matrix.toggle_dataset_enable)
         md.option_action.connect(self.on_option_dataset)
         self.fill_elements()
         self.adjust_size()
+        self.plot_matrix.fill_elements()
+        self.plot_matrix.adjust_size()
         return md
 
-    def add_filter(self, evt=None):
+    def add_filter(self):
         name = "FS{}".format(self.num_filters+1)
         mf = MatrixFilter(name)
         mf.active_toggled.connect(self.toggle_filter_active)
@@ -131,15 +181,15 @@ class DataMatrix(QtWidgets.QWidget):
         QtWidgets.QApplication.processEvents()
         ncols = self.num_filters
         nrows = self.num_datasets
-        if ncols > 1 and nrows > 1:
-            hwidth = self.glo.itemAtPosition(0, 1).geometry().width() + 2
+        if ncols and nrows:
+            hwidth = self.element_width + 2
             hheight = self.glo.itemAtPosition(0, 1).geometry().height()
             dwidth = self.glo.itemAtPosition(1, 0).geometry().width()
-            dheight = self.glo.itemAtPosition(1, 0).geometry().height() + 2
-            self.setMinimumSize((ncols)*hwidth+dwidth,
-                                (nrows)*dheight+hheight)
-            self.setFixedSize((ncols)*hwidth+dwidth,
-                              (nrows)*dheight+hheight)
+            dheight = self.element_height + 2
+            self.setMinimumSize(ncols*hwidth+dwidth,
+                                nrows*dheight+hheight)
+            self.setFixedSize(ncols*hwidth+dwidth,
+                              nrows*dheight+hheight)
 
     def clear(self):
         """Reset layout"""
@@ -175,9 +225,7 @@ class DataMatrix(QtWidgets.QWidget):
                     me.__setstate__(mstate)
 
     def get_dataset(self, dataset_id):
-        nrows = self.glo.rowCount()
-        for ii in range(1, nrows):
-            ds = self.glo.itemAtPosition(ii, 0).widget()
+        for ds in self.datasets:
             if ds.identifier == dataset_id:
                 break
         else:
@@ -186,22 +234,18 @@ class DataMatrix(QtWidgets.QWidget):
 
     def get_dataset_paths(self):
         """Return dataset paths in the order they are shown"""
-        nrows = self.glo.rowCount()
         paths = []
-        for ii in range(1, nrows):
-            item = self.glo.itemAtPosition(ii, 0)
-            paths.append(item.widget().path)
+        for ds in self.datasets:
+            paths.append(ds.path)
         return paths
 
     def get_filter(self, filter_id):
-        ncols = self.glo.columnCount()
-        for jj in range(1, ncols):
-            f = self.glo.itemAtPosition(0, jj).widget()
-            if f.identifier == filter_id:
+        for fs in self.filters:
+            if fs.identifier == filter_id:
                 break
         else:
             raise KeyError("Filter '{}' not found!".format(filter_id))
-        return f
+        return fs
 
     def get_matrix_element(self, dataset_id, filter_id):
         """Return matrix element matching dataset and filter identifiers"""
@@ -229,6 +273,7 @@ class DataMatrix(QtWidgets.QWidget):
         row, _, _, _ = self.glo.getItemPosition(idx)
         state = self.__getstate__()
         ds_state = sender.__getstate__()
+        pstate = self.plot_matrix.__getstate__()
         if option == "insert_anew":
             ds_new = self.add_dataset(path=None)
             ds_state["identifier"] = ds_new.identifier
@@ -245,11 +290,13 @@ class DataMatrix(QtWidgets.QWidget):
         else:  # remove
             state["datasets"].pop(row-1)
             state["elements"].pop(ds_state["identifier"])
+            pstate["elements"].pop(ds_state["identifier"])
         self.__setstate__(state)
+        self.plot_matrix.__setstate__(pstate)
 
     @QtCore.pyqtSlot(str)
     def on_option_filter(self, option):
-        """Filter option logic (remove, insert_anew, duplicate)"""
+        """Filter option logic (remove, duplicate)"""
         sender = self.sender()
         idx = self.glo.indexOf(sender)
         _, column, _, _ = self.glo.getItemPosition(idx)

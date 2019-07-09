@@ -28,7 +28,7 @@ class QuickView(QtWidgets.QWidget):
             cb.addItem("logarithmic", "log")
 
         # Hide settings by default
-        self.widget_settings.setVisible(False)
+        self.tabWidget.setVisible(False)
 
         # initial value
         self.path = None
@@ -105,7 +105,7 @@ class QuickView(QtWidgets.QWidget):
         state = self.__getstate__()
         downsample = state["downsampling enabled"] * \
             state["downsampling value"]
-        x, y = plot_cache.get_downsampled_scatter(
+        x, y, kde = plot_cache.get_scatter_data(
             path=state["path"],
             filters=state["filters"],
             downsample=downsample,
@@ -113,8 +113,23 @@ class QuickView(QtWidgets.QWidget):
             yax=state["axis y"],
             xscale=state["scale x"],
             yscale=state["scale y"])
+        # define colormap
+        # TODO: improve speed?
+        brush = []
+        kde -= kde.min()
+        kde /= kde.max()
+        num_hues = 500
+        for k in kde:
+            color = pg.intColor(int(k*num_hues), num_hues)
+            brush.append(color)
+
         self.scatter_plot.clear()
-        self.scatter_plot.setData(x=x, y=y)
+        self.widget_scatter.plotItem.setLogMode(x=state["scale x"] == "log",
+                                                y=state["scale y"] == "log")
+        self.scatter_plot.setData(x=x, y=y, brush=brush)
+        self.widget_scatter.plotItem.setLabels(
+            left=dclab.dfn.feature_name2label[state["axis y"]],
+            bottom=dclab.dfn.feature_name2label[state["axis x"]])
         # TODO: draw isoelasticity lines
 
     @QtCore.pyqtSlot(pathlib.Path, list)
@@ -154,12 +169,14 @@ class RTDCScatterWidget(pg.PlotWidget):
 
 
 class RTDCScatterPlot(pg.ScatterPlotItem):
-    def __init__(self, size=10, pen=pg.mkPen("k"),
-                 brush=pg.mkBrush(255, 255, 255, 120),
+    def __init__(self, size=3, pen=pg.mkPen(color=(0, 0, 0, 0)),
+                 brush=pg.mkBrush("k"),
                  *args, **kwargs):
         super(RTDCScatterPlot, self).__init__(size=size,
                                               pen=pen,
                                               brush=brush,
-                                              *args, **kwargs)
+                                              symbol="s",
+                                              *args,
+                                              **kwargs)
         self.lastClicked = []
         self.setData(x=range(10), y=range(10))

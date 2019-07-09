@@ -5,9 +5,9 @@ from . import filter
 from . import util
 
 
-def get_downsampled_scatter(path, filters, downsample, xax, yax,
-                            xscale, yscale):
-    tohash = [path, downsample, xax, yax, xscale, yscale]
+def get_scatter_data(path, filters, downsample, xax, yax, xscale, yscale,
+                     kde_type="histogram", kde_kwargs={}):
+    tohash = [path, downsample, xax, yax, xscale, yscale, kde_type, kde_kwargs]
     # compute filter hash
     for fkey in filters:  # order matters
         finst = filter.Filter.get_filter(identifier=fkey)
@@ -15,7 +15,7 @@ def get_downsampled_scatter(path, filters, downsample, xax, yax,
     shash = util.hashobj(tohash)
 
     if shash in cache_data:
-        x, y = cache_data[shash]
+        x, y, kde = cache_data[shash]
     else:
         with dclab.new_dataset(path) as ds:
             # apply filters
@@ -29,10 +29,18 @@ def get_downsampled_scatter(path, filters, downsample, xax, yax,
                 downsample=downsample,
                 xscale=xscale,
                 yscale=yscale)
-            if downsample:
-                # caching only makes sense when downsampling
-                cache_data[shash] = x, y
-    return x, y
+            # kde
+            kde = ds.get_kde_scatter(
+                xax=xax,
+                yax=yax,
+                positions=(x, y),
+                kde_type=kde_type,
+                kde_kwargs=kde_kwargs,
+                xscale=xscale,
+                yscale=yscale)
+            # save in cache
+            cache_data[shash] = x, y, kde
+    return x, y, kde
 
 
 cache_data = {}

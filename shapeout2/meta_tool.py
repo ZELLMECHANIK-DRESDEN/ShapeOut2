@@ -20,8 +20,23 @@ def get_repr(path, append_path=False):
     return rep
 
 
-@functools.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=100)
 def get_rtdc_config(path):
     with dclab.new_dataset(path) as ds:
         config = ds.config.copy()
     return config
+
+
+@functools.lru_cache(maxsize=100)
+def get_rtdc_features(path, scalar=True):
+    """Return available features of a dataset"""
+    if scalar:
+        features = dclab.dfn.scalar_feature_names
+    else:
+        features = dclab.dfn.feature_names
+    av_feat = []
+    with dclab.new_dataset(path) as ds:
+        for feat in features:
+            if feat in ds:
+                av_feat.append(feat)
+    return av_feat

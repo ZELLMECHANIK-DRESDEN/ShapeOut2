@@ -27,12 +27,17 @@ class QuickView(QtWidgets.QWidget):
             cb.addItem("linear", "linear")
             cb.addItem("logarithmic", "log")
 
-        # Hide settings by default
-        self.tabWidget.setVisible(False)
+        # Hide settings/events by default
+        self.widget_event.setVisible(False)
+        self.widget_settings.setVisible(False)
 
         # initial value
         self.path = None
         self.filters = []
+
+        # settings button
+        self.toolButton_settings.toggled.connect(self.on_tool)
+        self.toolButton_event.toggled.connect(self.on_tool)
 
         # value changed signals
         self.signal_widgets = [self.checkBox_downsample,
@@ -101,6 +106,29 @@ class QuickView(QtWidgets.QWidget):
             p.setPen('b', width=2)
         plot.lastClicked = points
 
+    def on_tool(self):
+        # show extra data
+        show_event = False
+        show_settings = False
+        sender = self.sender()
+        if sender == self.toolButton_settings:
+            if self.toolButton_settings.isChecked():
+                show_settings = True
+                self.toolButton_event.setChecked(False)
+        elif sender == self.toolButton_event:
+            if self.toolButton_event.isChecked():
+                show_event = True
+                self.toolButton_settings.setChecked(False)
+        self.widget_event.setVisible(show_event)
+        self.widget_settings.setVisible(show_settings)
+        # set size
+        show = show_event * show_settings
+        mdiwin = self.parent()
+        geom = mdiwin.geometry()
+        geom.setWidth(geom.width() - (-1)**show * 300)
+        mdiwin.setGeometry(geom)
+        mdiwin.adjustSize()
+
     def plot(self):
         state = self.__getstate__()
         downsample = state["downsampling enabled"] * \
@@ -130,6 +158,11 @@ class QuickView(QtWidgets.QWidget):
         self.widget_scatter.plotItem.setLabels(
             left=dclab.dfn.feature_name2label[state["axis y"]],
             bottom=dclab.dfn.feature_name2label[state["axis x"]])
+        # Force updating the plot item size, otherwise axes labels
+        # may have an offset.
+        s = self.widget_scatter.plotItem.size()
+        self.widget_scatter.plotItem.resize(s.width()+1, s.height())
+        self.widget_scatter.plotItem.resize(s)
         # TODO: draw isoelasticity lines
 
     @QtCore.pyqtSlot(pathlib.Path, list)

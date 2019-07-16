@@ -2,6 +2,7 @@ import pathlib
 import pkg_resources
 
 import dclab
+import numpy as np
 from PyQt5 import uic, QtCore, QtWidgets
 import pyqtgraph as pg
 
@@ -152,9 +153,22 @@ class QuickView(QtWidgets.QWidget):
             brush.append(color)
 
         self.scatter_plot.clear()
-        self.widget_scatter.plotItem.setLogMode(x=state["scale x"] == "log",
-                                                y=state["scale y"] == "log")
+        if state["scale x"] == "log":
+            x = np.log(x)
+            logx = True
+        else:
+            logx = False
+
+        if state["scale y"] == "log":
+            y = np.log(y)
+            logy = True
+        else:
+            logy = False
+
         self.scatter_plot.setData(x=x, y=y, brush=brush)
+
+        self.widget_scatter.plotItem.setLogMode(x=logx, y=logy)
+
         self.widget_scatter.plotItem.setLabels(
             left=dclab.dfn.feature_name2label[state["axis y"]],
             bottom=dclab.dfn.feature_name2label[state["axis x"]])

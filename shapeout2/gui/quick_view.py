@@ -19,7 +19,7 @@ class QuickView(QtWidgets.QWidget):
         self.setWindowTitle("Quick View (QV)")
 
         # Scatter plot
-        self.scatter_plot = self.widget_scatter.plot
+        self.scatter_plot = self.widget_scatter.scatter
         self.scatter_plot.sigClicked.connect(self.clicked)
 
         # Set scale options (with data)
@@ -99,15 +99,18 @@ class QuickView(QtWidgets.QWidget):
         for tb in self.signal_widgets:
             tb.blockSignals(False)
 
-    def clicked(self, plot, points):
-        for p in plot.lastClicked:
-            p.resetPen()
-        print("clicked points", points)
-        for p in points:
-            p.setPen('b', width=2)
-        plot.lastClicked = points
+    def clicked(self, plot, point):
+        pos = point.pos()
+        self.widget_scatter.setSelection(pos.x(), pos.y())
+        # `self.on_tool` takes care of this:
+        # self.widget_scatter.select.show()
+        if not self.toolButton_event.isChecked():
+            # emulate mouse toggle
+            self.toolButton_event.setChecked(True)
+            self.toolButton_event.toggled.emit(True)
 
     def on_tool(self):
+        """Show and hide tools when the user selected a tool button"""
         # show extra data
         show_event = False
         show_settings = False
@@ -121,6 +124,8 @@ class QuickView(QtWidgets.QWidget):
                 show_event = True
                 self.toolButton_settings.setChecked(False)
         self.widget_event.setVisible(show_event)
+        self.widget_scatter.select.setVisible(show_event)
+
         self.widget_settings.setVisible(show_settings)
         # set size
         show = show_event * show_settings
@@ -131,6 +136,7 @@ class QuickView(QtWidgets.QWidget):
         mdiwin.adjustSize()
 
     def plot(self):
+        """Update the plot using the current state of the UI"""
         state = self.__getstate__()
         downsample = state["downsampling enabled"] * \
             state["downsampling value"]
@@ -152,22 +158,11 @@ class QuickView(QtWidgets.QWidget):
             color = pg.intColor(int(k*num_hues), num_hues)
             brush.append(color)
 
-        self.scatter_plot.clear()
-        if state["scale x"] == "log":
-            x = np.log(x)
-            logx = True
-        else:
-            logx = False
-
-        if state["scale y"] == "log":
-            y = np.log(y)
-            logy = True
-        else:
-            logy = False
-
-        self.scatter_plot.setData(x=x, y=y, brush=brush)
-
-        self.widget_scatter.plotItem.setLogMode(x=logx, y=logy)
+        self.widget_scatter.setData(x=x,
+                                    y=y,
+                                    brush=brush,
+                                    xscale=state["scale x"],
+                                    yscale=state["scale y"])
 
         self.widget_scatter.plotItem.setLabels(
             left=dclab.dfn.feature_name2label[state["axis y"]],
@@ -181,6 +176,7 @@ class QuickView(QtWidgets.QWidget):
 
     @QtCore.pyqtSlot(pathlib.Path, list)
     def show_rtdc(self, path, filters):
+        """Display an RT-DC measurement given by `path` and `filters`"""
         state = self.__getstate__()
         state["path"] = path
         state["filters"] = filters
@@ -205,14 +201,48 @@ class QuickView(QtWidgets.QWidget):
                         # have set the state to a reasonable value.
                         break
         self.__setstate__(state)
+        self.widget_scatter.select.hide()
         self.plot()
 
 
 class RTDCScatterWidget(pg.PlotWidget):
     def __init__(self, *args, **kwargs):
         super(RTDCScatterWidget, self).__init__(*args, **kwargs)
-        self.plot = RTDCScatterPlot()
-        self.addItem(self.plot)
+        self.scatter = RTDCScatterPlot()
+        self.select = pg.PlotDataItem(x=[1], y=[2], symbol="o")
+        self.addItem(self.scatter)
+        self.addItem(self.select)
+        self.select.hide()
+        self.logx = False
+        self.logy = False
+
+    def setData(self, x, y, brush, xscale="linear", yscale="linear"):
+        if xscale == "log":
+            x = np.log10(x)
+            logx = True
+        else:
+            logx = False
+
+        if yscale == "log":
+            y = np.log10(y)
+            logy = True
+        else:
+            logy = False
+
+        self.scatter.setData(x=x, y=y, brush=brush)
+        self.plotItem.setLogMode(x=logx, y=logy)
+        self.logx = logx
+        self.logy = logy
+
+    def setSelection(self, x, y):
+        # workaround, because ScatterPlotItem does somehow not support
+        # logarithmic scaling. Surprisingly, this works very well when
+        # the log-scaling is changed (data is rescaled).
+        if self.logx:
+            x = 10**x
+        if self.logy:
+            y = 10**y
+        self.select.setData([x], [y])
 
 
 class RTDCScatterPlot(pg.ScatterPlotItem):
@@ -225,5 +255,30 @@ class RTDCScatterPlot(pg.ScatterPlotItem):
                                               symbol="s",
                                               *args,
                                               **kwargs)
-        self.lastClicked = []
         self.setData(x=range(10), y=range(10))
+
+    def pointAt(self, pos):
+        """Unlike `ScatterPlotItem.pointsAt`, return the closest point"""
+        x = pos.x()
+        y = pos.y()
+        pw = self.pixelWidth()
+        ph = self.pixelHeight()
+        p = self.points()[0]
+        d = np.inf
+        for s in self.points():
+            sp = s.pos()
+            di = ((sp.x() - x)/pw)**2 + ((sp.y() - y)/ph)**2
+            if di < d:
+                p = s
+                d = di
+        return p
+
+    def mouseClickEvent(self, ev):
+        """Override that return only a single point using `pointAt`"""
+        if ev.button() == QtCore.Qt.LeftButton:
+            pt = self.pointAt(ev.pos())
+            self.ptClicked = pt
+            self.sigClicked.emit(self, self.ptClicked)
+            ev.accept()
+        else:
+            ev.ignore()

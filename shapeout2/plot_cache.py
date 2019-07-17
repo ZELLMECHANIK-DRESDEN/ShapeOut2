@@ -28,7 +28,8 @@ def get_scatter_data(path, filters, downsample, xax, yax, xscale, yscale,
                 yax=yax,
                 downsample=downsample,
                 xscale=xscale,
-                yscale=yscale)
+                yscale=yscale,
+                remove_invalid=True)
             # kde
             kde = ds.get_kde_scatter(
                 xax=xax,

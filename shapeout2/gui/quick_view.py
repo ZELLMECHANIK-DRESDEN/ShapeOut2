@@ -20,7 +20,6 @@ class QuickView(QtWidgets.QWidget):
 
         # Scatter plot
         self.scatter_plot = self.widget_scatter.scatter
-        self.scatter_plot.sigClicked.connect(self.clicked)
 
         # Set scale options (with data)
         for cb in [self.comboBox_xscale, self.comboBox_yscale]:
@@ -32,15 +31,27 @@ class QuickView(QtWidgets.QWidget):
         self.widget_event.setVisible(False)
         self.widget_settings.setVisible(False)
 
-        # initial value
+        #: Path to the dataset
         self.path = None
+        #: List of filters applied to the dataset
         self.filters = []
+        #: Boolean array identifying the plotted events w.r.t. the full
+        #: dataset
+        self.events_plotted = None
+        #: Unfiltered and not-downsampled x component of current scatter plot
+        self.data_x = None
+        #: Unfiltered and not-downsampled y component of current scatter plot
+        self.data_y = None
 
         # settings button
         self.toolButton_settings.toggled.connect(self.on_tool)
         self.toolButton_event.toggled.connect(self.on_tool)
 
-        # value changed signals
+        # event changed signal
+        self.scatter_plot.sigClicked.connect(self.on_event_scatter_clicked)
+        self.spinBox_event.valueChanged.connect(self.on_event_scatter_spin)
+
+        # value changed signals for plot
         self.signal_widgets = [self.checkBox_downsample,
                                self.spinBox_downsample,
                                self.comboBox_x,
@@ -56,27 +67,33 @@ class QuickView(QtWidgets.QWidget):
                 w.stateChanged.connect(self.plot)
 
     def __getstate__(self):
-        state = {"path": self.path,
-                 "downsampling enabled": self.checkBox_downsample.isChecked(),
-                 "downsampling value": self.spinBox_downsample.value(),
-                 "axis x": self.comboBox_x.currentData(),
-                 "axis y": self.comboBox_y.currentData(),
-                 "scale x": self.comboBox_xscale.currentData(),
-                 "scale y": self.comboBox_yscale.currentData(),
-                 "isoelastics enabled": self.checkBox_isoelastics.isChecked(),
-                 "filters": self.filters,
+        plot = {"path": self.path,
+                "downsampling enabled": self.checkBox_downsample.isChecked(),
+                "downsampling value": self.spinBox_downsample.value(),
+                "axis x": self.comboBox_x.currentData(),
+                "axis y": self.comboBox_y.currentData(),
+                "scale x": self.comboBox_xscale.currentData(),
+                "scale y": self.comboBox_yscale.currentData(),
+                "isoelastics enabled": self.checkBox_isoelastics.isChecked(),
+                "filters": self.filters,
+                }
+        event = {"index": self.spinBox_event.value(),
+                 }
+        state = {"plot": plot,
+                 "event": event,
                  }
         return state
 
     def __setstate__(self, state):
+        plot = state["plot"]
         for tb in self.signal_widgets:
             tb.blockSignals(True)
-        self.path = state["path"]
+        self.path = plot["path"]
         # downsampling
-        self.checkBox_downsample.setChecked(state["downsampling enabled"])
-        self.spinBox_downsample.setValue(state["downsampling value"])
+        self.checkBox_downsample.setChecked(plot["downsampling enabled"])
+        self.spinBox_downsample.setValue(plot["downsampling value"])
         # axes combobox choices
-        ds_features = meta_tool.get_rtdc_features(state["path"])
+        ds_features = meta_tool.get_rtdc_features(plot["path"])
         for cb in [self.comboBox_x, self.comboBox_y]:
             # set features
             cb.clear()
@@ -84,30 +101,63 @@ class QuickView(QtWidgets.QWidget):
                 if feat in ds_features:
                     cb.addItem(dclab.dfn.feature_name2label[feat], feat)
         # axes labels
-        idx = self.comboBox_x.findData(state["axis x"])
+        idx = self.comboBox_x.findData(plot["axis x"])
         self.comboBox_x.setCurrentIndex(idx)
-        idy = self.comboBox_y.findData(state["axis y"])
+        idy = self.comboBox_y.findData(plot["axis y"])
         self.comboBox_y.setCurrentIndex(idy)
         # scaling
-        idxs = self.comboBox_xscale.findData(state["scale x"])
+        idxs = self.comboBox_xscale.findData(plot["scale x"])
         self.comboBox_xscale.setCurrentIndex(idxs)
-        idys = self.comboBox_yscale.findData(state["scale y"])
+        idys = self.comboBox_yscale.findData(plot["scale y"])
         self.comboBox_yscale.setCurrentIndex(idys)
         # isoelastics
-        self.checkBox_isoelastics.setChecked(state["isoelastics enabled"])
-        self.filters = state["filters"]
+        self.checkBox_isoelastics.setChecked(plot["isoelastics enabled"])
+        self.filters = plot["filters"]
         for tb in self.signal_widgets:
             tb.blockSignals(False)
+        if "event" in state:
+            self.spinBox_event.setValue(state["event"]["index"])
 
-    def clicked(self, plot, point):
-        pos = point.pos()
-        self.widget_scatter.setSelection(pos.x(), pos.y())
-        # `self.on_tool` takes care of this:
+    def on_event_scatter_clicked(self, plot, point):
+        """User clicked on scatter plot
+
+        Parameters
+        ----------
+        plot: pg.PlotItem
+            Active plot
+        point: QPoint
+            Selected point (determined by scatter plot widget)
+        """
+        # `self.on_tool` (`self.toolButton_event`) takes care of this:
         # self.widget_scatter.select.show()
         if not self.toolButton_event.isChecked():
             # emulate mouse toggle
             self.toolButton_event.setChecked(True)
             self.toolButton_event.toggled.emit(True)
+        # get corrected index
+        ds_idx = np.where(self.events_plotted)[0][point.index()]
+        self.show_event(ds_idx)
+
+    def on_event_scatter_spin(self, event):
+        """Sping control for event selection changed"""
+        self.show_event(event - 1)
+
+    def show_event(self, event):
+        """Display the event data (image, contour, trace)
+
+        Parameters
+        ----------
+        event: int
+            Event index of the dataset; indices start at 0
+        """
+        # Update spin box data
+        self.spinBox_event.blockSignals(True)
+        self.spinBox_event.setValue(event + 1)
+        self.spinBox_event.blockSignals(False)
+
+        # Update selection point in scatter plot
+        self.widget_scatter.setSelection(self.data_x[event],
+                                         self.data_y[event])
 
     def on_tool(self):
         """Show and hide tools when the user selected a tool button"""
@@ -137,17 +187,21 @@ class QuickView(QtWidgets.QWidget):
 
     def plot(self):
         """Update the plot using the current state of the UI"""
-        state = self.__getstate__()
-        downsample = state["downsampling enabled"] * \
-            state["downsampling value"]
-        x, y, kde = plot_cache.get_scatter_data(
-            path=state["path"],
-            filters=state["filters"],
+        plot = self.__getstate__()["plot"]
+        downsample = plot["downsampling enabled"] * \
+            plot["downsampling value"]
+        x, y, kde, idx = plot_cache.get_scatter_data(
+            path=plot["path"],
+            filters=plot["filters"],
             downsample=downsample,
-            xax=state["axis x"],
-            yax=state["axis y"],
-            xscale=state["scale x"],
-            yscale=state["scale y"])
+            xax=plot["axis x"],
+            yax=plot["axis y"],
+            xscale=plot["scale x"],
+            yscale=plot["scale y"])
+        self.events_plotted = idx
+        with dclab.new_dataset(plot["path"]) as ds:
+            self.data_x = ds[plot["axis x"]]
+            self.data_y = ds[plot["axis y"]]
         # define colormap
         # TODO: improve speed?
         brush = []
@@ -161,12 +215,12 @@ class QuickView(QtWidgets.QWidget):
         self.widget_scatter.setData(x=x,
                                     y=y,
                                     brush=brush,
-                                    xscale=state["scale x"],
-                                    yscale=state["scale y"])
+                                    xscale=plot["scale x"],
+                                    yscale=plot["scale y"])
 
         self.widget_scatter.plotItem.setLabels(
-            left=dclab.dfn.feature_name2label[state["axis y"]],
-            bottom=dclab.dfn.feature_name2label[state["axis x"]])
+            left=dclab.dfn.feature_name2label[plot["axis y"]],
+            bottom=dclab.dfn.feature_name2label[plot["axis x"]])
         # Force updating the plot item size, otherwise axes labels
         # may have an offset.
         s = self.widget_scatter.plotItem.size()
@@ -178,28 +232,41 @@ class QuickView(QtWidgets.QWidget):
     def show_rtdc(self, path, filters):
         """Display an RT-DC measurement given by `path` and `filters`"""
         state = self.__getstate__()
-        state["path"] = path
-        state["filters"] = filters
+        plot = state["plot"]
+        # remove event state (ill-defined for different datasets)
+        state.pop("event")
+        plot["path"] = path
+        plot["filters"] = filters
         # default features (plot axes)
-        if state["axis x"] is None:
-            state["axis x"] = "area_um"
-        if state["axis y"] is None:
-            state["axis y"] = "deform"
+        if plot["axis x"] is None:
+            plot["axis x"] = "area_um"
+        if plot["axis y"] is None:
+            plot["axis y"] = "deform"
         # check whether axes exist in ds and change them if necessary
         ds_features = meta_tool.get_rtdc_features(path)
-        if state["axis x"] not in ds_features:
+        if plot["axis x"] not in ds_features:
             for feat in dclab.dfn.scalar_feature_names:
                 if feat in ds_features:
-                    state["axis x"] = feat
+                    plot["axis x"] = feat
                     break
-        if state["axis y"] not in ds_features:
+        if plot["axis y"] not in ds_features:
             for feat in dclab.dfn.scalar_feature_names:
                 if feat in ds_features:
-                    state["axis y"] = feat
-                    if feat != state["axis y"]:
+                    plot["axis y"] = feat
+                    if feat != plot["axis y"]:
                         # If there is only one feature, at least we
                         # have set the state to a reasonable value.
                         break
+        # set control ranges
+        cfg = meta_tool.get_rtdc_config(path)
+        event_count = cfg["experiment"]["event count"]
+
+        self.spinBox_event.blockSignals(True)
+        self.spinBox_event.setMaximum(event_count)
+        self.spinBox_event.setValue(1)
+        self.spinBox_event.blockSignals(False)
+
+        # set quick view state
         self.__setstate__(state)
         self.widget_scatter.select.hide()
         self.plot()

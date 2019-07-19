@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>857</width>
+    <width>890</width>
     <height>494</height>
    </rect>
   </property>
@@ -263,15 +263,22 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox"/>
+         <widget class="QSpinBox" name="spinBox_event">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>99999999</number>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
       <item>
-       <widget class="QGraphicsView" name="graphicsView_image"/>
+       <widget class="ImageView" name="graphicsView_image"/>
       </item>
       <item>
-       <widget class="QGraphicsView" name="graphicsView_trace"/>
+       <widget class="ImageView" name="graphicsView_trace"/>
       </item>
      </layout>
     </widget>
@@ -284,6 +291,11 @@
    <extends>QWidget</extends>
    <header>shapeout2.gui.quick_view</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ImageView</class>
+   <extends>QGraphicsView</extends>
+   <header>pyqtgraph</header>
   </customwidget>
  </customwidgets>
  <resources/>

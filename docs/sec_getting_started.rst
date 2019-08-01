@@ -12,7 +12,7 @@ Shape-Out 2 can be installed via multiple channels.
    `release page <https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/releases/latest>`__. 
 
 2. **macOS:** Download the latest version
-   (e.g. ``Shape-Out_X.Y.Z.dmg`` for 64bit Windows) from the official
+   (``Shape-Out_X.Y.Z.dmg``) from the official
    `release page <https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/releases/latest>`__. 
 
 3. **Python 3.6 with pip:** Shape-Out can easily be installed with
@@ -22,7 +22,7 @@ Shape-Out 2 can be installed via multiple channels.
 
        pip install shapeout2
 
-   To start Shape-Out, simply run ``python -m shapeout``
+   To start Shape-Out, simply run ``python -m shapeout2``
    in a command shell. 
 
 

@@ -5,6 +5,7 @@ import dclab
 import numpy as np
 from PyQt5 import uic, QtCore, QtWidgets
 import pyqtgraph as pg
+from scipy.ndimage import binary_erosion
 
 from .. import meta_tool
 from .. import plot_cache
@@ -50,6 +51,10 @@ class QuickView(QtWidgets.QWidget):
         # event changed signal
         self.scatter_plot.sigClicked.connect(self.on_event_scatter_clicked)
         self.spinBox_event.valueChanged.connect(self.on_event_scatter_spin)
+        self.checkBox_contour.stateChanged.connect(
+            self.on_event_scatter_update)
+        self.checkBox_zoom_roi.stateChanged.connect(
+            self.on_event_scatter_update)
 
         # value changed signals for plot
         self.signal_widgets = [self.checkBox_downsample,
@@ -66,6 +71,20 @@ class QuickView(QtWidgets.QWidget):
             elif hasattr(w, "stateChanged"):
                 w.stateChanged.connect(self.plot)
 
+        # disable pyqtgraph controls we don't need
+        for vim in [self.imageView_image, self.imageView_trace]:
+            vim.ui.histogram.hide()
+            vim.ui.roiBtn.hide()
+            vim.ui.menuBtn.hide()
+            # disable keyboard shortcuts
+            vim.keyPressEvent = lambda _: None
+            vim.keyReleaseEvent = lambda _: None
+
+        #: default parameters for the event image
+        self.imkw = dict(autoLevels=False,
+                         levels=(0, 254),
+                         )
+
     def __getstate__(self):
         plot = {"path": self.path,
                 "downsampling enabled": self.checkBox_downsample.isChecked(),
@@ -77,7 +96,9 @@ class QuickView(QtWidgets.QWidget):
                 "isoelastics enabled": self.checkBox_isoelastics.isChecked(),
                 "filters": self.filters,
                 }
-        event = {"index": self.spinBox_event.value(),
+        event = {"contour enabled": self.checkBox_contour.isChecked(),
+                 "index": self.spinBox_event.value(),
+                 "zoom": self.checkBox_zoom_roi.isChecked(),
                  }
         state = {"plot": plot,
                  "event": event,
@@ -116,7 +137,9 @@ class QuickView(QtWidgets.QWidget):
         for tb in self.signal_widgets:
             tb.blockSignals(False)
         if "event" in state:
+            self.checkBox_downsample.setChecked(state["contour enabled"])
             self.spinBox_event.setValue(state["event"]["index"])
+            self.checkBox_zoom_roi.setChecked(state["event"]["zoom"])
 
     def on_event_scatter_clicked(self, plot, point):
         """User clicked on scatter plot
@@ -134,12 +157,18 @@ class QuickView(QtWidgets.QWidget):
             # emulate mouse toggle
             self.toolButton_event.setChecked(True)
             self.toolButton_event.toggled.emit(True)
-        # get corrected index
-        ds_idx = np.where(self.events_plotted)[0][point.index()]
-        self.show_event(ds_idx)
+        if self.events_plotted is not None:
+            # get corrected index
+            ds_idx = np.where(self.events_plotted)[0][point.index()]
+            self.show_event(ds_idx)
 
     def on_event_scatter_spin(self, event):
         """Sping control for event selection changed"""
+        self.show_event(event - 1)
+
+    def on_event_scatter_update(self):
+        """Just update the event shown"""
+        event = self.spinBox_event.value()
         self.show_event(event - 1)
 
     def show_event(self, event):
@@ -147,8 +176,10 @@ class QuickView(QtWidgets.QWidget):
 
         Parameters
         ----------
-        event: int
+        event: int or None
             Event index of the dataset; indices start at 0
+            If set to None, the index from `self.spinBox_event`
+            will be used.
         """
         # Update spin box data
         self.spinBox_event.blockSignals(True)
@@ -158,6 +189,46 @@ class QuickView(QtWidgets.QWidget):
         # Update selection point in scatter plot
         self.widget_scatter.setSelection(self.data_x[event],
                                          self.data_y[event])
+
+        # update image
+        state = self.__getstate__()
+        with dclab.new_dataset(state["plot"]["path"]) as ds:
+            if "image" in ds:
+                cellimg = ds["image"][event]
+                # convert to RGB
+                cellimg = cellimg.reshape(
+                    cellimg.shape[0], cellimg.shape[1], 1)
+                cellimg = np.repeat(cellimg, 3, axis=2)
+                # Only load contour data if there is an image column.
+                # We don't know how big the images should be so we
+                # might run into trouble displaying random contours.
+                if (state["event"]["contour enabled"]
+                    and "mask" in ds
+                        and len(ds["mask"]) > event):
+                    # add mask
+                    mask = ds["mask"][event]
+                    # compute contour image from mask
+                    cont = mask ^ binary_erosion(mask)
+                    # set red contour pixel values in original image
+                    cellimg[cont, 0] = 150
+                    cellimg[cont, 1] = 0
+                    cellimg[cont, 2] = 0
+                if state["event"]["zoom"] and "mask" in ds:
+                    xv, yv = np.where(ds["mask"][event])
+                    idminx = xv.min() - 5
+                    idminy = yv.min() - 5
+                    idmaxx = xv.max() + 5
+                    idmaxy = yv.max() + 5
+                    idminx = idminx if idminx >= 0 else 0
+                    idminy = idminy if idminy >= 0 else 0
+                    shx, shy = mask.shape
+                    idmaxx = idmaxx if idmaxx < shx else shx
+                    idmaxy = idmaxy if idmaxy < shy else shy
+                    cellimg = cellimg[idminx:idmaxx, idminy:idmaxy]
+            else:
+                cellimg = np.zeros((50, 50, 3))
+
+            self.imageView_image.setImage(cellimg, **self.imkw)
 
     def on_tool(self):
         """Show and hide tools when the user selected a tool button"""

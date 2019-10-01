@@ -275,10 +275,37 @@
        </layout>
       </item>
       <item>
-       <widget class="ImageView" name="graphicsView_image"/>
+       <widget class="QCheckBox" name="checkBox_contour">
+        <property name="text">
+         <string>Show contour</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
-       <widget class="ImageView" name="graphicsView_trace"/>
+       <widget class="QCheckBox" name="checkBox_zoom_roi">
+        <property name="text">
+         <string>Zoom to ROI</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="ImageView" name="imageView_image">
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="ImageView" name="imageView_trace"/>
       </item>
      </layout>
     </widget>

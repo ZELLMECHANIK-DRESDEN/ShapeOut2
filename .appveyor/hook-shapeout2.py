@@ -7,7 +7,6 @@
 # The full license is in the file COPYING.txt, distributed with this software.
 #-----------------------------------------------------------------------------
 
-# Hook for PyJibe: https://github.com/AFM-analysis/PyJibe
 from PyInstaller.utils.hooks import collect_data_files
 
 # Data files

@@ -202,29 +202,27 @@ class QuickView(QtWidgets.QWidget):
                 # Only load contour data if there is an image column.
                 # We don't know how big the images should be so we
                 # might run into trouble displaying random contours.
-                if (state["event"]["contour enabled"]
-                    and "mask" in ds
-                        and len(ds["mask"]) > event):
-                    # add mask
+                if "mask" in ds and len(ds["mask"]) > event:
                     mask = ds["mask"][event]
-                    # compute contour image from mask
-                    cont = mask ^ binary_erosion(mask)
-                    # set red contour pixel values in original image
-                    cellimg[cont, 0] = 150
-                    cellimg[cont, 1] = 0
-                    cellimg[cont, 2] = 0
-                if state["event"]["zoom"] and "mask" in ds:
-                    xv, yv = np.where(ds["mask"][event])
-                    idminx = xv.min() - 5
-                    idminy = yv.min() - 5
-                    idmaxx = xv.max() + 5
-                    idmaxy = yv.max() + 5
-                    idminx = idminx if idminx >= 0 else 0
-                    idminy = idminy if idminy >= 0 else 0
-                    shx, shy = mask.shape
-                    idmaxx = idmaxx if idmaxx < shx else shx
-                    idmaxy = idmaxy if idmaxy < shy else shy
-                    cellimg = cellimg[idminx:idmaxx, idminy:idmaxy]
+                    if state["event"]["contour enabled"]:
+                        # compute contour image from mask
+                        cont = mask ^ binary_erosion(mask)
+                        # set red contour pixel values in original image
+                        cellimg[cont, 0] = 150
+                        cellimg[cont, 1] = 0
+                        cellimg[cont, 2] = 0
+                    if state["event"]["zoom"]:
+                        xv, yv = np.where(mask)
+                        idminx = xv.min() - 5
+                        idminy = yv.min() - 5
+                        idmaxx = xv.max() + 5
+                        idmaxy = yv.max() + 5
+                        idminx = idminx if idminx >= 0 else 0
+                        idminy = idminy if idminy >= 0 else 0
+                        shx, shy = mask.shape
+                        idmaxx = idmaxx if idmaxx < shx else shx
+                        idmaxy = idmaxy if idmaxy < shy else shy
+                        cellimg = cellimg[idminx:idmaxx, idminy:idmaxy]
             else:
                 cellimg = np.zeros((50, 50, 3))
 

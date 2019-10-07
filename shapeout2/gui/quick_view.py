@@ -251,10 +251,10 @@ class QuickView(QtWidgets.QWidget):
                         idmaxx = idmaxx if idmaxx < shx else shx
                         idmaxy = idmaxy if idmaxy < shy else shy
                         cellimg = cellimg[idminx:idmaxx, idminy:idmaxy]
+                self.imageView_image.setImage(cellimg, **imkw)
+                self.groupBox_image.show()
             else:
-                cellimg = np.zeros((50, 50, 3))
-
-            self.imageView_image.setImage(cellimg, **imkw)
+                self.groupBox_image.hide()
 
             if "trace" in ds:
                 for key in dclab.dfn.FLUOR_TRACES:
@@ -265,12 +265,15 @@ class QuickView(QtWidgets.QWidget):
                         show = True
                     if (key in ds["trace"] and show):
                         # show the trace information
-                        tracey = ds["trace"][key][event]
-                        tracex = np.arange(tracey.size)
+                        tracey = ds["trace"][key][event]  # trace data
+                        tracex = np.arange(tracey.size)  # time data
                         self.trace_plots[key].setData(tracex, tracey)
                         self.trace_plots[key].show()
                     else:
                         self.trace_plots[key].hide()
+                self.groupBox_trace.show()
+            else:
+                self.groupBox_trace.hide()
 
     def on_tool(self):
         """Show and hide tools when the user selected a tool button"""
@@ -376,6 +379,7 @@ class QuickView(QtWidgets.QWidget):
 
         self.spinBox_event.blockSignals(True)
         self.spinBox_event.setMaximum(event_count)
+        self.spinBox_event.setToolTip("total: {}".format(event_count))
         self.spinBox_event.setValue(1)
         self.spinBox_event.blockSignals(False)
 

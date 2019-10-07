@@ -83,6 +83,8 @@ class QuickView(QtWidgets.QWidget):
             # disable keyboard shortcuts
             vim.keyPressEvent = lambda _: None
             vim.keyReleaseEvent = lambda _: None
+        # Defaults for trace plot
+        self.graphicsView_trace.setBackground('w')
         # Set individual plots
         kw0 = dict(x=np.arange(10), y=np.arange(10))
         self.trace_plots = {
@@ -93,7 +95,6 @@ class QuickView(QtWidgets.QWidget):
             "fl2_median": pg.PlotDataItem(pen="#BF8A00", **kw0),  # orange
             "fl3_median": pg.PlotDataItem(pen="#BF0C00", **kw0),  # red
             }
-
         for key in self.trace_plots:
             self.graphicsView_trace.addItem(self.trace_plots[key])
             self.trace_plots[key].hide()
@@ -271,6 +272,8 @@ class QuickView(QtWidgets.QWidget):
                         self.trace_plots[key].show()
                     else:
                         self.trace_plots[key].hide()
+                self.graphicsView_trace.setXRange(0, tracey.size, padding=0)
+                self.graphicsView_trace.setLimits(xMin=0, xMax=tracey.size)
                 self.groupBox_trace.show()
             else:
                 self.groupBox_trace.hide()

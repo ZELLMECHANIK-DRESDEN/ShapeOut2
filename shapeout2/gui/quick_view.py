@@ -57,6 +57,8 @@ class QuickView(QtWidgets.QWidget):
             self.on_event_scatter_update)
         self.checkBox_auto_contrast.stateChanged.connect(
             self.on_event_scatter_update)
+        self.checkBox_raw_trace.stateChanged.connect(
+            self.on_event_scatter_update)
 
         # value changed signals for plot
         self.signal_widgets = [self.checkBox_downsample,
@@ -74,13 +76,27 @@ class QuickView(QtWidgets.QWidget):
                 w.stateChanged.connect(self.plot)
 
         # disable pyqtgraph controls we don't need
-        for vim in [self.imageView_image, self.imageView_trace]:
+        for vim in [self.imageView_image]:
             vim.ui.histogram.hide()
             vim.ui.roiBtn.hide()
             vim.ui.menuBtn.hide()
             # disable keyboard shortcuts
             vim.keyPressEvent = lambda _: None
             vim.keyReleaseEvent = lambda _: None
+        # Set individual plots
+        kw0 = dict(x=np.arange(10), y=np.arange(10))
+        self.trace_plots = {
+            "fl1_raw": pg.PlotDataItem(pen="#6EA068", **kw0),  # green
+            "fl2_raw": pg.PlotDataItem(pen="#8E7A45", **kw0),  # orange
+            "fl3_raw": pg.PlotDataItem(pen="#8F4D48", **kw0),  # red
+            "fl1_median": pg.PlotDataItem(pen="#15BF00", **kw0),  # green
+            "fl2_median": pg.PlotDataItem(pen="#BF8A00", **kw0),  # orange
+            "fl3_median": pg.PlotDataItem(pen="#BF0C00", **kw0),  # red
+            }
+
+        for key in self.trace_plots:
+            self.graphicsView_trace.addItem(self.trace_plots[key])
+            self.trace_plots[key].hide()
 
         #: default parameters for the event image
         self.imkw = dict(autoLevels=False,
@@ -98,10 +114,11 @@ class QuickView(QtWidgets.QWidget):
                 "isoelastics enabled": self.checkBox_isoelastics.isChecked(),
                 "filters": self.filters,
                 }
-        event = {"auto contrast": self.checkBox_auto_contrast.isChecked(),
-                 "contour": self.checkBox_contour.isChecked(),
-                 "index": self.spinBox_event.value(),
-                 "zoom": self.checkBox_zoom_roi.isChecked(),
+        event = {"index": self.spinBox_event.value(),
+                 "image auto contrast": self.checkBox_auto_contrast.isChecked(),
+                 "image contour": self.checkBox_contour.isChecked(),
+                 "image zoom": self.checkBox_zoom_roi.isChecked(),
+                 "trace raw": self.checkBox_raw_trace.isChecked(),
                  }
         state = {"plot": plot,
                  "event": event,
@@ -140,10 +157,11 @@ class QuickView(QtWidgets.QWidget):
         for tb in self.signal_widgets:
             tb.blockSignals(False)
         if "event" in state:
-            self.checkBox_auto_contrast.setChecked(state["auto contrast"])
-            self.checkBox_contour.setChecked(state["contour"])
+            self.checkBox_auto_contrast.setChecked(state["image auto contrast"])
+            self.checkBox_contour.setChecked(state["image contour"])
+            self.checkBox_zoom_roi.setChecked(state["event"]["image zoom"])
             self.spinBox_event.setValue(state["event"]["index"])
-            self.checkBox_zoom_roi.setChecked(state["event"]["zoom"])
+            self.checkBox_raw_trace.setChecked(state["event"]["trace raw"])
 
     def on_event_scatter_clicked(self, plot, point):
         """User clicked on scatter plot
@@ -199,7 +217,7 @@ class QuickView(QtWidgets.QWidget):
         with dclab.new_dataset(state["plot"]["path"]) as ds:
             if "image" in ds:
                 cellimg = ds["image"][event]
-                if state["event"]["auto contrast"]:
+                if state["event"]["image auto contrast"]:
                     imkw["levels"] = cellimg.min(), cellimg.max()
                 # convert to RGB
                 cellimg = cellimg.reshape(
@@ -210,14 +228,14 @@ class QuickView(QtWidgets.QWidget):
                 # might run into trouble displaying random contours.
                 if "mask" in ds and len(ds["mask"]) > event:
                     mask = ds["mask"][event]
-                    if state["event"]["contour"]:
+                    if state["event"]["image contour"]:
                         # compute contour image from mask
                         cont = mask ^ binary_erosion(mask)
                         # set red contour pixel values in original image
                         cellimg[cont, 0] = int(imkw["levels"][1]*.7)
                         cellimg[cont, 1] = 0
                         cellimg[cont, 2] = 0
-                    if state["event"]["zoom"]:
+                    if state["event"]["image zoom"]:
                         xv, yv = np.where(mask)
                         idminx = xv.min() - 5
                         idminy = yv.min() - 5
@@ -233,6 +251,22 @@ class QuickView(QtWidgets.QWidget):
                 cellimg = np.zeros((50, 50, 3))
 
             self.imageView_image.setImage(cellimg, **imkw)
+
+            if "trace" in ds:
+                for key in dclab.dfn.FLUOR_TRACES:
+                    if key.count("raw") and not state["event"]["trace raw"]:
+                        # hide raw trace data if user decided so
+                        show = False
+                    else:
+                        show = True
+                    if (key in ds["trace"] and show):
+                        # show the trace information
+                        tracey = ds["trace"][key][event]
+                        tracex = np.arange(tracey.size) 
+                        self.trace_plots[key].setData(tracex, tracey)
+                        self.trace_plots[key].show()
+                    else:
+                        self.trace_plots[key].hide()
 
     def on_tool(self):
         """Show and hide tools when the user selected a tool button"""

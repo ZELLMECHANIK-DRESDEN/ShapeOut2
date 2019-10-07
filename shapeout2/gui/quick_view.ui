@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1096</width>
-    <height>573</height>
+    <height>847</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,7 +35,17 @@
      <item>
       <widget class="QToolButton" name="toolButton_settings">
        <property name="text">
-        <string>⚙</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../img/gear.svg</normaloff>../img/gear.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
        </property>
        <property name="checkable">
         <bool>true</bool>
@@ -48,7 +58,17 @@
      <item>
       <widget class="QToolButton" name="toolButton_event">
        <property name="text">
-        <string>v</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../img/eye.svg</normaloff>../img/eye.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
        </property>
        <property name="checkable">
         <bool>true</bool>

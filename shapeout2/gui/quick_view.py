@@ -104,25 +104,28 @@ class QuickView(QtWidgets.QWidget):
                          )
 
     def __getstate__(self):
-        plot = {"path": self.path,
-                "downsampling enabled": self.checkBox_downsample.isChecked(),
-                "downsampling value": self.spinBox_downsample.value(),
-                "axis x": self.comboBox_x.currentData(),
-                "axis y": self.comboBox_y.currentData(),
-                "scale x": self.comboBox_xscale.currentData(),
-                "scale y": self.comboBox_yscale.currentData(),
-                "isoelastics enabled": self.checkBox_isoelastics.isChecked(),
-                "filters": self.filters,
-                }
-        event = {"index": self.spinBox_event.value(),
-                 "image auto contrast": self.checkBox_auto_contrast.isChecked(),
-                 "image contour": self.checkBox_contour.isChecked(),
-                 "image zoom": self.checkBox_zoom_roi.isChecked(),
-                 "trace raw": self.checkBox_raw_trace.isChecked(),
-                 }
-        state = {"plot": plot,
-                 "event": event,
-                 }
+        plot = {
+            "path": self.path,
+            "downsampling enabled": self.checkBox_downsample.isChecked(),
+            "downsampling value": self.spinBox_downsample.value(),
+            "axis x": self.comboBox_x.currentData(),
+            "axis y": self.comboBox_y.currentData(),
+            "scale x": self.comboBox_xscale.currentData(),
+            "scale y": self.comboBox_yscale.currentData(),
+            "isoelastics enabled": self.checkBox_isoelastics.isChecked(),
+            "filters": self.filters,
+            }
+        event = {
+            "index": self.spinBox_event.value(),
+            "image auto contrast": self.checkBox_auto_contrast.isChecked(),
+            "image contour": self.checkBox_contour.isChecked(),
+            "image zoom": self.checkBox_zoom_roi.isChecked(),
+            "trace raw": self.checkBox_raw_trace.isChecked(),
+            }
+        state = {
+            "plot": plot,
+            "event": event,
+            }
         return state
 
     def __setstate__(self, state):
@@ -157,7 +160,8 @@ class QuickView(QtWidgets.QWidget):
         for tb in self.signal_widgets:
             tb.blockSignals(False)
         if "event" in state:
-            self.checkBox_auto_contrast.setChecked(state["image auto contrast"])
+            self.checkBox_auto_contrast.setChecked(
+                state["image auto contrast"])
             self.checkBox_contour.setChecked(state["image contour"])
             self.checkBox_zoom_roi.setChecked(state["event"]["image zoom"])
             self.spinBox_event.setValue(state["event"]["index"])
@@ -262,7 +266,7 @@ class QuickView(QtWidgets.QWidget):
                     if (key in ds["trace"] and show):
                         # show the trace information
                         tracey = ds["trace"][key][event]
-                        tracex = np.arange(tracey.size) 
+                        tracex = np.arange(tracey.size)
                         self.trace_plots[key].setData(tracex, tracey)
                         self.trace_plots[key].show()
                     else:

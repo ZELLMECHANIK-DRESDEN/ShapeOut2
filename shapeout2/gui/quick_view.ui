@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>941</width>
-    <height>494</height>
+    <width>1096</width>
+    <height>573</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -275,24 +275,41 @@
        </layout>
       </item>
       <item>
-       <widget class="QCheckBox" name="checkBox_contour">
-        <property name="text">
-         <string>Show contour</string>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <property name="topMargin">
+         <number>0</number>
         </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="checkBox_zoom_roi">
-        <property name="text">
-         <string>Zoom to ROI</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
+        <item row="0" column="0">
+         <widget class="QCheckBox" name="checkBox_contour">
+          <property name="text">
+           <string>Show contour</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QCheckBox" name="checkBox_zoom_roi">
+          <property name="text">
+           <string>Zoom to ROI</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="checkBox_auto_contrast">
+          <property name="text">
+           <string>Auto contrast</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="ImageView" name="imageView_image">

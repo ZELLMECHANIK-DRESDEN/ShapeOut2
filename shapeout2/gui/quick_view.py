@@ -55,6 +55,8 @@ class QuickView(QtWidgets.QWidget):
             self.on_event_scatter_update)
         self.checkBox_zoom_roi.stateChanged.connect(
             self.on_event_scatter_update)
+        self.checkBox_auto_contrast.stateChanged.connect(
+            self.on_event_scatter_update)
 
         # value changed signals for plot
         self.signal_widgets = [self.checkBox_downsample,
@@ -96,7 +98,8 @@ class QuickView(QtWidgets.QWidget):
                 "isoelastics enabled": self.checkBox_isoelastics.isChecked(),
                 "filters": self.filters,
                 }
-        event = {"contour enabled": self.checkBox_contour.isChecked(),
+        event = {"auto contrast": self.checkBox_auto_contrast.isChecked(),
+                 "contour": self.checkBox_contour.isChecked(),
                  "index": self.spinBox_event.value(),
                  "zoom": self.checkBox_zoom_roi.isChecked(),
                  }
@@ -137,7 +140,8 @@ class QuickView(QtWidgets.QWidget):
         for tb in self.signal_widgets:
             tb.blockSignals(False)
         if "event" in state:
-            self.checkBox_downsample.setChecked(state["contour enabled"])
+            self.checkBox_auto_contrast.setChecked(state["auto contrast"])
+            self.checkBox_contour.setChecked(state["contour"])
             self.spinBox_event.setValue(state["event"]["index"])
             self.checkBox_zoom_roi.setChecked(state["event"]["zoom"])
 
@@ -189,12 +193,14 @@ class QuickView(QtWidgets.QWidget):
         # Update selection point in scatter plot
         self.widget_scatter.setSelection(self.data_x[event],
                                          self.data_y[event])
-
+        imkw = self.imkw.copy()
         # update image
         state = self.__getstate__()
         with dclab.new_dataset(state["plot"]["path"]) as ds:
             if "image" in ds:
                 cellimg = ds["image"][event]
+                if state["event"]["auto contrast"]:
+                    imkw["levels"] = cellimg.min(), cellimg.max()
                 # convert to RGB
                 cellimg = cellimg.reshape(
                     cellimg.shape[0], cellimg.shape[1], 1)
@@ -204,11 +210,11 @@ class QuickView(QtWidgets.QWidget):
                 # might run into trouble displaying random contours.
                 if "mask" in ds and len(ds["mask"]) > event:
                     mask = ds["mask"][event]
-                    if state["event"]["contour enabled"]:
+                    if state["event"]["contour"]:
                         # compute contour image from mask
                         cont = mask ^ binary_erosion(mask)
                         # set red contour pixel values in original image
-                        cellimg[cont, 0] = 150
+                        cellimg[cont, 0] = int(imkw["levels"][1]*.7)
                         cellimg[cont, 1] = 0
                         cellimg[cont, 2] = 0
                     if state["event"]["zoom"]:
@@ -226,7 +232,7 @@ class QuickView(QtWidgets.QWidget):
             else:
                 cellimg = np.zeros((50, 50, 3))
 
-            self.imageView_image.setImage(cellimg, **self.imkw)
+            self.imageView_image.setImage(cellimg, **imkw)
 
     def on_tool(self):
         """Show and hide tools when the user selected a tool button"""

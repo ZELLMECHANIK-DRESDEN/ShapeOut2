@@ -7,7 +7,7 @@ import traceback
 from PyQt5 import uic, QtCore, QtWidgets
 import pyqtgraph as pg
 
-from . import info_view
+from . import ana_view
 from . import quick_view
 
 from .. import settings
@@ -36,7 +36,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # Subwindows
         self.subwindows = {}
         self.init_quick_view()
-        self.init_info_view()
+        self.init_ana_view()
         self.mdiArea.cascadeSubWindows()
         self.showMaximized()
         # data matrix
@@ -61,14 +61,14 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.settings.set_path(wd=path.parent, name="rtdc import dataset")
             self.data_matrix.add_dataset(path)
 
-    def init_info_view(self):
+    def init_ana_view(self):
         sub = QtWidgets.QMdiSubWindow()
         sub.hide()
-        self.widget_info_view = info_view.InfoView()
-        sub.setWidget(self.widget_info_view)
+        self.widget_ana_view = ana_view.InfoView()
+        sub.setWidget(self.widget_ana_view)
         self.mdiArea.addSubWindow(sub)
-        self.toolButton_info_view.clicked.connect(sub.setVisible)
-        self.subwindows["info_view"] = sub
+        self.toolButton_ana_view.clicked.connect(sub.setVisible)
+        self.subwindows["ana_view"] = sub
         sub.setSystemMenu(None)
         sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
                            | QtCore.Qt.WindowTitleHint

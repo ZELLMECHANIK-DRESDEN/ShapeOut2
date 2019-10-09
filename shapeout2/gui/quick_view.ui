@@ -70,6 +70,9 @@
      </property>
      <item>
       <widget class="QToolButton" name="toolButton_settings">
+       <property name="toolTip">
+        <string>Plot</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -93,6 +96,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="toolButton_event">
+       <property name="toolTip">
+        <string>Event</string>
+       </property>
        <property name="text">
         <string/>
        </property>

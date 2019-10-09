@@ -292,6 +292,10 @@ class QuickView(QtWidgets.QWidget):
             if self.toolButton_event.isChecked():
                 show_event = True
                 self.toolButton_settings.setChecked(False)
+        else:
+            # keep everything as-is but update the sizes
+            show_event = self.widget_event.isVisible()
+            show_settings = self.widget_settings.isVisible()
         self.widget_event.setVisible(show_event)
         self.widget_scatter.select.setVisible(show_event)
 
@@ -388,8 +392,13 @@ class QuickView(QtWidgets.QWidget):
 
         # set quick view state
         self.__setstate__(state)
-        self.widget_scatter.select.hide()
+        # scatter plot
         self.plot()
+        # select first event in event viewer (also updates selection point)
+        self.show_event(0)
+        # this only updates the size of the tools (because there is no
+        # sender)
+        self.on_tool()
 
 
 class RTDCScatterWidget(pg.PlotWidget):
@@ -416,7 +425,12 @@ class RTDCScatterWidget(pg.PlotWidget):
         else:
             logy = False
 
+        # set data
         self.scatter.setData(x=x, y=y, brush=brush)
+        # reset range (in case user modified it manually)
+        self.plotItem.setAutoPan()
+        self.plotItem.autoRange()
+        # set log mode
         self.plotItem.setLogMode(x=logx, y=logy)
         self.logx = logx
         self.logy = logy

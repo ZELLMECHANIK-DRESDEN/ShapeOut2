@@ -11,6 +11,7 @@ from . import ana_view
 from . import quick_view
 
 from .. import settings
+from .. import pipeline
 
 from .._version import version as __version__
 
@@ -95,10 +96,16 @@ class ShapeOut2(QtWidgets.QMainWindow):
         else:
             self.splitter.setSizes([0, 1])
 
-    @QtCore.pyqtSlot(pathlib.Path, list)
-    def on_quickviewed(self, path, filters):
+    @QtCore.pyqtSlot(int, int)
+    def on_quickviewed(self, slot_index, filt_index):
+        # get state of data matrix
+        state = self.data_matrix.__getstate__()
+        pl = pipeline.Pipeline(state=state)
+        ds = pl.get_dataset(slot_index=slot_index,
+                            filt_index=filt_index,
+                            apply_filter=True)
         # update quick view subwindow
-        self.widget_quick_view.show_rtdc(path, filters)
+        self.widget_quick_view.show_rtdc(ds)
         # show quick view subwindow
         if not self.subwindows["quick_view"].isVisible():
             self.toolButton_quick_view.toggle()

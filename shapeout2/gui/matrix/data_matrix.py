@@ -1,5 +1,4 @@
 import copy
-import pathlib
 
 import numpy as np
 from PyQt5 import QtCore, QtWidgets
@@ -10,7 +9,7 @@ from .dm_element import MatrixElement
 
 
 class DataMatrix(QtWidgets.QWidget):
-    quickviewed = QtCore.pyqtSignal(pathlib.Path, list)
+    quickviewed = QtCore.pyqtSignal(int, int)
 
     def __init__(self, parent=None):
         super(DataMatrix, self).__init__(parent)
@@ -446,7 +445,4 @@ class DataMatrix(QtWidgets.QWidget):
         # decrement by header row/column
         row -= 1  # enumerates the dataset
         column -= 1  # enumerates the filter
-
-        paths = self.get_dataset_paths()
-        filters = []
-        self.quickviewed.emit(paths[row], filters)
+        self.quickviewed.emit(row, column)

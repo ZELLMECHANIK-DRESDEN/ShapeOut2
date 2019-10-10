@@ -9,7 +9,7 @@ class MatrixFilter(QtWidgets.QWidget):
     enabled_toggled = QtCore.pyqtSignal(bool)
     option_action = QtCore.pyqtSignal(str)
 
-    def __init__(self, title="FS?"):
+    def __init__(self, name="FS?"):
         QtWidgets.QWidget.__init__(self)
         path_ui = pkg_resources.resource_filename(
             "shapeout2.gui.matrix", "dm_filter.ui")
@@ -17,7 +17,7 @@ class MatrixFilter(QtWidgets.QWidget):
 
         MatrixFilter._instance_counter += 1
         self.identifier = "f{}".format(MatrixFilter._instance_counter)
-        self.title = title
+        self.name = name
 
         # options button
         menu = QtWidgets.QMenu()
@@ -35,15 +35,15 @@ class MatrixFilter(QtWidgets.QWidget):
         self.update_content()
 
     def __getstate__(self):
-        state = {"title": self.title,
-                 "identifier": self.identifier,
+        state = {"identifier": self.identifier,
                  "enabled": self.checkBox.isChecked(),
+                 "name": self.name,
                  }
         return state
 
     def __setstate__(self, state):
         self.identifier = state["identifier"]
-        self.title = state["title"]
+        self.name = state["name"]
         self.checkBox.setChecked(state["enabled"])
         self.update_content()
 
@@ -55,9 +55,9 @@ class MatrixFilter(QtWidgets.QWidget):
 
     def update_content(self):
         """Reset tool tips and title"""
-        self.label.setToolTip(self.title)
-        if len(self.title) > 8:
-            title = self.title[:5]+"..."
+        self.label.setToolTip(self.name)
+        if len(self.name) > 8:
+            title = self.name[:5]+"..."
         else:
-            title = self.title
+            title = self.name
         self.label.setText(title)

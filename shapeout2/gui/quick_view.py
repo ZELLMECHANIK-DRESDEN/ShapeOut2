@@ -1,4 +1,3 @@
-import pathlib
 import pkg_resources
 
 import dclab
@@ -7,7 +6,6 @@ from PyQt5 import uic, QtCore, QtWidgets
 import pyqtgraph as pg
 from scipy.ndimage import binary_erosion
 
-from .. import meta_tool
 from .. import plot_cache
 
 
@@ -32,10 +30,6 @@ class QuickView(QtWidgets.QWidget):
         self.widget_event.setVisible(False)
         self.widget_settings.setVisible(False)
 
-        #: Path to the dataset
-        self.path = None
-        #: List of filters applied to the dataset
-        self.filters = []
         #: Boolean array identifying the plotted events w.r.t. the full
         #: dataset
         self.events_plotted = None
@@ -94,7 +88,7 @@ class QuickView(QtWidgets.QWidget):
             "fl1_median": pg.PlotDataItem(pen="#15BF00", **kw0),  # green
             "fl2_median": pg.PlotDataItem(pen="#BF8A00", **kw0),  # orange
             "fl3_median": pg.PlotDataItem(pen="#BF0C00", **kw0),  # red
-            }
+        }
         for key in self.trace_plots:
             self.graphicsView_trace.addItem(self.trace_plots[key])
             self.trace_plots[key].hide()
@@ -106,7 +100,6 @@ class QuickView(QtWidgets.QWidget):
 
     def __getstate__(self):
         plot = {
-            "path": self.path,
             "downsampling enabled": self.checkBox_downsample.isChecked(),
             "downsampling value": self.spinBox_downsample.value(),
             "axis x": self.comboBox_x.currentData(),
@@ -114,31 +107,29 @@ class QuickView(QtWidgets.QWidget):
             "scale x": self.comboBox_xscale.currentData(),
             "scale y": self.comboBox_yscale.currentData(),
             "isoelastics enabled": self.checkBox_isoelastics.isChecked(),
-            "filters": self.filters,
-            }
+        }
         event = {
             "index": self.spinBox_event.value(),
             "image auto contrast": self.checkBox_auto_contrast.isChecked(),
             "image contour": self.checkBox_contour.isChecked(),
             "image zoom": self.checkBox_zoom_roi.isChecked(),
             "trace raw": self.checkBox_raw_trace.isChecked(),
-            }
+        }
         state = {
             "plot": plot,
             "event": event,
-            }
+        }
         return state
 
     def __setstate__(self, state):
         plot = state["plot"]
         for tb in self.signal_widgets:
             tb.blockSignals(True)
-        self.path = plot["path"]
         # downsampling
         self.checkBox_downsample.setChecked(plot["downsampling enabled"])
         self.spinBox_downsample.setValue(plot["downsampling value"])
         # axes combobox choices
-        ds_features = meta_tool.get_rtdc_features(plot["path"])
+        ds_features = self.rtdc_ds.features
         for cb in [self.comboBox_x, self.comboBox_y]:
             # set features
             cb.clear()
@@ -157,7 +148,6 @@ class QuickView(QtWidgets.QWidget):
         self.comboBox_yscale.setCurrentIndex(idys)
         # isoelastics
         self.checkBox_isoelastics.setChecked(plot["isoelastics enabled"])
-        self.filters = plot["filters"]
         for tb in self.signal_widgets:
             tb.blockSignals(False)
         if "event" in state:
@@ -219,64 +209,64 @@ class QuickView(QtWidgets.QWidget):
         imkw = self.imkw.copy()
         # update image
         state = self.__getstate__()
-        with dclab.new_dataset(state["plot"]["path"]) as ds:
-            if "image" in ds:
-                cellimg = ds["image"][event]
-                if state["event"]["image auto contrast"]:
-                    imkw["levels"] = cellimg.min(), cellimg.max()
-                # convert to RGB
-                cellimg = cellimg.reshape(
-                    cellimg.shape[0], cellimg.shape[1], 1)
-                cellimg = np.repeat(cellimg, 3, axis=2)
-                # Only load contour data if there is an image column.
-                # We don't know how big the images should be so we
-                # might run into trouble displaying random contours.
-                if "mask" in ds and len(ds["mask"]) > event:
-                    mask = ds["mask"][event]
-                    if state["event"]["image contour"]:
-                        # compute contour image from mask
-                        cont = mask ^ binary_erosion(mask)
-                        # set red contour pixel values in original image
-                        cellimg[cont, 0] = int(imkw["levels"][1]*.7)
-                        cellimg[cont, 1] = 0
-                        cellimg[cont, 2] = 0
-                    if state["event"]["image zoom"]:
-                        xv, yv = np.where(mask)
-                        idminx = xv.min() - 5
-                        idminy = yv.min() - 5
-                        idmaxx = xv.max() + 5
-                        idmaxy = yv.max() + 5
-                        idminx = idminx if idminx >= 0 else 0
-                        idminy = idminy if idminy >= 0 else 0
-                        shx, shy = mask.shape
-                        idmaxx = idmaxx if idmaxx < shx else shx
-                        idmaxy = idmaxy if idmaxy < shy else shy
-                        cellimg = cellimg[idminx:idmaxx, idminy:idmaxy]
-                self.imageView_image.setImage(cellimg, **imkw)
-                self.groupBox_image.show()
-            else:
-                self.groupBox_image.hide()
+        ds = self.rtdc_ds
+        if "image" in ds:
+            cellimg = ds["image"][event]
+            if state["event"]["image auto contrast"]:
+                imkw["levels"] = cellimg.min(), cellimg.max()
+            # convert to RGB
+            cellimg = cellimg.reshape(
+                cellimg.shape[0], cellimg.shape[1], 1)
+            cellimg = np.repeat(cellimg, 3, axis=2)
+            # Only load contour data if there is an image column.
+            # We don't know how big the images should be so we
+            # might run into trouble displaying random contours.
+            if "mask" in ds and len(ds["mask"]) > event:
+                mask = ds["mask"][event]
+                if state["event"]["image contour"]:
+                    # compute contour image from mask
+                    cont = mask ^ binary_erosion(mask)
+                    # set red contour pixel values in original image
+                    cellimg[cont, 0] = int(imkw["levels"][1]*.7)
+                    cellimg[cont, 1] = 0
+                    cellimg[cont, 2] = 0
+                if state["event"]["image zoom"]:
+                    xv, yv = np.where(mask)
+                    idminx = xv.min() - 5
+                    idminy = yv.min() - 5
+                    idmaxx = xv.max() + 5
+                    idmaxy = yv.max() + 5
+                    idminx = idminx if idminx >= 0 else 0
+                    idminy = idminy if idminy >= 0 else 0
+                    shx, shy = mask.shape
+                    idmaxx = idmaxx if idmaxx < shx else shx
+                    idmaxy = idmaxy if idmaxy < shy else shy
+                    cellimg = cellimg[idminx:idmaxx, idminy:idmaxy]
+            self.imageView_image.setImage(cellimg, **imkw)
+            self.groupBox_image.show()
+        else:
+            self.groupBox_image.hide()
 
-            if "trace" in ds:
-                for key in dclab.dfn.FLUOR_TRACES:
-                    if key.count("raw") and not state["event"]["trace raw"]:
-                        # hide raw trace data if user decided so
-                        show = False
-                    else:
-                        show = True
-                    if (key in ds["trace"] and show):
-                        # show the trace information
-                        tracey = ds["trace"][key][event]  # trace data
-                        tracex = np.arange(tracey.size)  # time data
-                        self.trace_plots[key].setData(tracex, tracey)
-                        self.trace_plots[key].show()
-                    else:
-                        self.trace_plots[key].hide()
-                self.graphicsView_trace.setXRange(0, tracey.size, padding=0)
-                self.graphicsView_trace.setLimits(xMin=0, xMax=tracey.size)
-                self.groupBox_trace.show()
-            else:
-                self.groupBox_trace.hide()
+        if "trace" in ds:
+            for key in dclab.dfn.FLUOR_TRACES:
+                if key.count("raw") and not state["event"]["trace raw"]:
+                    # hide raw trace data if user decided so
+                    show = False
+                else:
+                    show = True
+                if (key in ds["trace"] and show):
+                    # show the trace information
+                    tracey = ds["trace"][key][event]  # trace data
+                    tracex = np.arange(tracey.size)  # time data
+                    self.trace_plots[key].setData(tracex, tracey)
+                    self.trace_plots[key].show()
+                else:
+                    self.trace_plots[key].hide()
+            self.graphicsView_trace.setXRange(0, tracey.size, padding=0)
+            self.graphicsView_trace.setLimits(xMin=0, xMax=tracey.size)
+            self.groupBox_trace.show()
+        else:
+            self.groupBox_trace.hide()
 
     def on_tool(self):
         """Show and hide tools when the user selected a tool button"""
@@ -314,17 +304,15 @@ class QuickView(QtWidgets.QWidget):
         downsample = plot["downsampling enabled"] * \
             plot["downsampling value"]
         x, y, kde, idx = plot_cache.get_scatter_data(
-            path=plot["path"],
-            filters=plot["filters"],
+            rtdc_ds=self.rtdc_ds,
             downsample=downsample,
             xax=plot["axis x"],
             yax=plot["axis y"],
             xscale=plot["scale x"],
             yscale=plot["scale y"])
         self.events_plotted = idx
-        with dclab.new_dataset(plot["path"]) as ds:
-            self.data_x = ds[plot["axis x"]]
-            self.data_y = ds[plot["axis y"]]
+        self.data_x = self.rtdc_ds[plot["axis x"]]
+        self.data_y = self.rtdc_ds[plot["axis y"]]
         # define colormap
         # TODO: improve speed?
         brush = []
@@ -351,22 +339,21 @@ class QuickView(QtWidgets.QWidget):
         self.widget_scatter.plotItem.resize(s)
         # TODO: draw isoelasticity lines
 
-    @QtCore.pyqtSlot(pathlib.Path, list)
-    def show_rtdc(self, path, filters):
+    @QtCore.pyqtSlot(dclab.rtdc_dataset.RTDCBase)
+    def show_rtdc(self, rtdc_ds):
         """Display an RT-DC measurement given by `path` and `filters`"""
         state = self.__getstate__()
         plot = state["plot"]
         # remove event state (ill-defined for different datasets)
         state.pop("event")
-        plot["path"] = path
-        plot["filters"] = filters
+        self.rtdc_ds = rtdc_ds
         # default features (plot axes)
         if plot["axis x"] is None:
             plot["axis x"] = "area_um"
         if plot["axis y"] is None:
             plot["axis y"] = "deform"
         # check whether axes exist in ds and change them if necessary
-        ds_features = meta_tool.get_rtdc_features(path)
+        ds_features = rtdc_ds.features
         if plot["axis x"] not in ds_features:
             for feat in dclab.dfn.scalar_feature_names:
                 if feat in ds_features:
@@ -381,8 +368,7 @@ class QuickView(QtWidgets.QWidget):
                         # have set the state to a reasonable value.
                         break
         # set control ranges
-        cfg = meta_tool.get_rtdc_config(path)
-        event_count = cfg["experiment"]["event count"]
+        event_count = rtdc_ds.config["experiment"]["event count"]
 
         self.spinBox_event.blockSignals(True)
         self.spinBox_event.setMaximum(event_count)

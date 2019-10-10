@@ -32,6 +32,9 @@ class Filter(object):
         #: polygon filter list; each item is an instance of
         #: :class:`dclab.PolygonFilter`
         self.polylist = []
+        if identifier in Filter._instances:
+            raise ValueError("Filter with identifier "
+                             + "'{}' already exists!".format(identifier))
         Filter._instances[identifier] = self
 
     @staticmethod

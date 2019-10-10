@@ -28,10 +28,18 @@ class MatrixElement(QtWidgets.QWidget):
         self.enabled = state["enabled"]
         self.update_content()
 
+    def has_quickview(self):
+        curinst = MatrixElement._quick_view_instance
+        if curinst is self:
+            quickview = True
+        else:
+            quickview = False
+        return quickview
+
     def mousePressEvent(self, event):
         # toggle selection
         if event.modifiers() == QtCore.Qt.ShiftModifier:
-            quickview = True
+            quickview = not self.has_quickview()
         else:
             self.active = not self.active
             quickview = False
@@ -56,10 +64,10 @@ class MatrixElement(QtWidgets.QWidget):
             label = "inactive\n(disabled)"
             tooltip = "Click to activate"
 
-        curinst = MatrixElement._quick_view_instance
-        if curinst is self:
+        if self.has_quickview():
             do_quickview = True
         elif quickview:
+            curinst = MatrixElement._quick_view_instance
             # reset color of old quick view instance
             if curinst is not None and self is not curinst:
                 MatrixElement._quick_view_instance = None

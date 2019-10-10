@@ -3,15 +3,15 @@ import pkg_resources
 from PyQt5 import uic, QtWidgets, QtCore
 
 from ... import meta_tool
+from ... import dataslot
 
 
 class MatrixDataset(QtWidgets.QWidget):
-    _instance_counter = 0
     active_toggled = QtCore.pyqtSignal()
     enabled_toggled = QtCore.pyqtSignal(bool)
     option_action = QtCore.pyqtSignal(str)
 
-    def __init__(self, path=None):
+    def __init__(self, path=None, identifier=None, state=None):
         """Create a new dataset matrix element
 
         If `path` is None, a dummy element is inserted which needs
@@ -21,10 +21,6 @@ class MatrixDataset(QtWidgets.QWidget):
         path_ui = pkg_resources.resource_filename(
             "shapeout2.gui.matrix", "dm_dataset.ui")
         uic.loadUi(path_ui, self)
-
-        MatrixDataset._instance_counter += 1
-        self.identifier = "ds{}".format(MatrixDataset._instance_counter)
-        self.path = path
 
         # options button
         menu = QtWidgets.QMenu()
@@ -39,8 +35,16 @@ class MatrixDataset(QtWidgets.QWidget):
         # toggle enabled/disabled state
         self.checkBox.clicked.connect(self.enabled_toggled.emit)
 
-        # set tooltip/label
-        self.update_content()
+        if state is None:
+            if identifier is None:
+                # get the identifier from the dataslot class
+                identifier = dataslot.Dataslot(path).identifier
+            self.identifier = identifier
+            self.path = path
+            # set tooltip/label
+            self.update_content()
+        else:
+            self.__setstate__(state)
 
     def __getstate__(self):
         state = {"path": self.path,

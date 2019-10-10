@@ -2,22 +2,19 @@ import pkg_resources
 
 from PyQt5 import uic, QtCore, QtWidgets
 
+from ... import filter
+
 
 class MatrixFilter(QtWidgets.QWidget):
-    _instance_counter = 0
     active_toggled = QtCore.pyqtSignal()
     enabled_toggled = QtCore.pyqtSignal(bool)
     option_action = QtCore.pyqtSignal(str)
 
-    def __init__(self, name="FS?"):
+    def __init__(self, name=None, identifier=None, state=None):
         QtWidgets.QWidget.__init__(self)
         path_ui = pkg_resources.resource_filename(
             "shapeout2.gui.matrix", "dm_filter.ui")
         uic.loadUi(path_ui, self)
-
-        MatrixFilter._instance_counter += 1
-        self.identifier = "f{}".format(MatrixFilter._instance_counter)
-        self.name = name
 
         # options button
         menu = QtWidgets.QMenu()
@@ -31,8 +28,18 @@ class MatrixFilter(QtWidgets.QWidget):
         # toggle enabled/disabled state
         self.checkBox.clicked.connect(self.enabled_toggled.emit)
 
-        # set tooltip/label
-        self.update_content()
+        if state is None:
+            if identifier is None:
+                # get the identifier from the dataslot class
+                identifier = filter.Filter().identifier
+            self.identifier = identifier
+            if name is None:
+                name = identifier
+            self.name = name
+            # set tooltip/label
+            self.update_content()
+        else:
+            self.__setstate__(state)
 
     def __getstate__(self):
         state = {"identifier": self.identifier,

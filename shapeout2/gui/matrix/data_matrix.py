@@ -23,6 +23,9 @@ class DataMatrix(QtWidgets.QWidget):
         self.semi_states_dataset = {}
         self.semi_states_filter = {}
 
+        # used for remembering quickview element
+        self._old_quickview_instance = None
+
     def __getstate__(self):
         """Logical states of the current data matrix"""
         # datasets
@@ -35,36 +38,44 @@ class DataMatrix(QtWidgets.QWidget):
             filters.append(fs.__getstate__())
         # elements
         mestates = {}
+        quickview_element = None
         for ds in self.datasets:
             idict = {}
             for fs in self.filters:
                 me = self.get_matrix_element(ds.identifier, fs.identifier)
                 idict[fs.identifier] = me.__getstate__()
+                # find quickview element
+                if me.has_quickview():
+                    quickview_element = (ds.identifier, fs.identifier)
+
             mestates[ds.identifier] = idict
         state = {"elements": mestates,
                  "datasets": datasets,
-                 "filters": filters}
+                 "filters": filters,
+                 "quickview": quickview_element}
         return state
 
     def __setstate__(self, state):
         self.clear()
         # dataset states
         for ii in range(len(state["datasets"])):
-            ds = self.add_dataset(path=None)
-            ds.__setstate__(state["datasets"][ii])
+            self.add_dataset(state=state["datasets"][ii])
         # filter states
         for jj in range(len(state["filters"])):
-            f = self.add_filter()
-            f.__setstate__(state["filters"][jj])
+            self.add_filter(state=state["filters"][jj])
         # make sure elements exist
         self.fill_elements()
         # element states
+        MatrixElement._quick_view_instance = None
         for ds_key in state["elements"]:
             ds_state = state["elements"][ds_key]
             for f_key in ds_state:
-                el_state = ds_state[f_key]
-                el = self.get_matrix_element(ds_key, f_key)
-                el.__setstate__(el_state)
+                me_state = ds_state[f_key]
+                me = self.get_matrix_element(ds_key, f_key)
+                if state["quickview"] == (ds_key, f_key):
+                    MatrixElement._quick_view_instance = me
+                me.__setstate__(me_state)
+
         self.adjust_size()
 
     def _reset_layout(self):
@@ -152,8 +163,8 @@ class DataMatrix(QtWidgets.QWidget):
             raise KeyError("PlotMatrix not found!")
         return ch
 
-    def add_dataset(self, path):
-        md = MatrixDataset(path)
+    def add_dataset(self, path=None, identifier=None, state=None):
+        md = MatrixDataset(path=path, identifier=identifier, state=state)
         self.glo.addWidget(md, self.num_datasets+1, 0)
         md.active_toggled.connect(self.toggle_dataset_active)
         md.enabled_toggled.connect(self.toggle_dataset_enable)
@@ -165,9 +176,8 @@ class DataMatrix(QtWidgets.QWidget):
         self.plot_matrix.adjust_size()
         return md
 
-    def add_filter(self):
-        name = "FS{}".format(self.num_filters+1)
-        mf = MatrixFilter(name)
+    def add_filter(self, name=None, identifier=None, state=None):
+        mf = MatrixFilter(name=name, identifier=identifier, state=state)
         mf.active_toggled.connect(self.toggle_filter_active)
         mf.enabled_toggled.connect(self.toggle_filter_enable)
         mf.option_action.connect(self.on_option_filter)
@@ -203,6 +213,14 @@ class DataMatrix(QtWidgets.QWidget):
     def dropEvent(self, event):
         print("drag drop event on data matrix")
         event.ignore()
+
+    def enable_quickview(self, b=True):
+        if b:
+            MatrixElement._quick_view_instance = self._old_quickview_instance
+        else:
+            self._old_quickview_instance = MatrixElement._quick_view_instance
+            MatrixElement._quick_view_instance = None
+        self.update_content()
 
     def fill_elements(self):
         # add widgets
@@ -274,13 +292,13 @@ class DataMatrix(QtWidgets.QWidget):
         ds_state = sender.__getstate__()
         pstate = self.plot_matrix.__getstate__()
         if option == "insert_anew":
-            ds_new = self.add_dataset(path=None)
+            ds_new = self.add_dataset()
             ds_state["identifier"] = ds_new.identifier
             # enable by default
             ds_state["enabled"] = True
             state["datasets"].insert(row, ds_state)
         elif option == "duplicate":
-            ds_new = self.add_dataset(path=None)
+            ds_new = self.add_dataset()
             # also set element states
             state["elements"][ds_new.identifier] = \
                 state["elements"][ds_state["identifier"]]
@@ -304,7 +322,7 @@ class DataMatrix(QtWidgets.QWidget):
         if option == "duplicate":
             f_new = self.add_filter()
             f_state["identifier"] = f_new.identifier
-            f_state["title"] += "({})".format(f_new.identifier)
+            f_state["name"] = f_new.name
             state["filters"].insert(column, f_state)
         else:  # remove
             state["filters"].pop(column-1)

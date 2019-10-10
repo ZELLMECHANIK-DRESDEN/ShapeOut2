@@ -24,8 +24,9 @@ class Filter(object):
         #: :class:`dclab.filter.Filter`
         self.general = {"remove invalid events": False,  # removes nan/inf
                         "enable filters": True,  # whether to use the filter
-                        "limit events": 0,  # "0" means disabled
                         }
+        #: filter for limiting number of events
+        self.limit_events = [False, 5000]
         #: box filters with features as keys; each item is a
         #: dictionary with the keys "min", "max", "active"
         self.boxdict = {}
@@ -36,6 +37,23 @@ class Filter(object):
             raise ValueError("Filter with identifier "
                              + "'{}' already exists!".format(identifier))
         Filter._instances[identifier] = self
+
+    def __getstate__(self):
+        state = {
+            "enable filters": self.general["enable filters"],
+            "limit events bool": self.limit_events[0],
+            "limit events num": self.limit_events[1],
+            "name": self.name,
+            "remove invalid events": self.general["remove invalid events"],
+        }
+        return state
+
+    def __setstate__(self, state):
+        self.general["enable filters"] = state["enable filters"]
+        self.limit_events = [state["limit events bool"],
+                             state["limit events num"]]
+        self.name = state["name"]
+        self.general["remove invalid events"] = state["remove invalid events"]
 
     @staticmethod
     def get_filter(identifier):
@@ -50,6 +68,10 @@ class Filter(object):
         else:
             f = Filter(identifier=identifier)
         return f
+
+    @staticmethod
+    def get_instances():
+        return Filter._instances
 
     @property
     def hash(self):
@@ -101,6 +123,7 @@ class Filter(object):
 
         # set general options
         cfgfilt.update(self.general)
+        cfgfilt["limit events"] = self.limit_events[0] * self.limit_events[1]
 
         # set box filters
         for feat in self.boxdict:

@@ -43,14 +43,14 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # data matrix
         self.toolButton_dm.clicked.connect(self.on_data_matrix)
         self.splitter.splitterMoved.connect(self.on_splitter)
-        self.toolButton_new_filter.clicked.connect(self.data_matrix.add_filter)
-        self.toolButton_new_dataset.clicked.connect(self.import_dataset)
-        self.toolButton_import.clicked.connect(self.import_dataset)
+        self.toolButton_new_filter.clicked.connect(self.add_filter)
+        self.toolButton_new_dataset.clicked.connect(self.add_dataslot)
+        self.toolButton_import.clicked.connect(self.add_dataslot)
         self.toolButton_new_plot.clicked.connect(self.plot_matrix.add_plot)
         # settings
         self.settings = settings.SettingsFile()
 
-    def import_dataset(self):
+    def add_dataslot(self):
         fnames, _ = QtWidgets.QFileDialog.getOpenFileNames(
             parent=self,
             caption="Select an RT-DC measurement",
@@ -61,6 +61,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
             path = pathlib.Path(fn)
             self.settings.set_path(wd=path.parent, name="rtdc import dataset")
             self.data_matrix.add_dataset(path)
+
+    def add_filter(self):
+        self.data_matrix.add_filter()
+        self.widget_ana_view.widget_filter.update_content()
 
     def init_ana_view(self):
         sub = QtWidgets.QMdiSubWindow()
@@ -81,7 +85,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_quick_view = quick_view.QuickView()
         sub.setWidget(self.widget_quick_view)
         self.mdiArea.addSubWindow(sub)
-        self.toolButton_quick_view.clicked.connect(sub.setVisible)
+        self.toolButton_quick_view.clicked.connect(self.on_quickview)
         self.subwindows["quick_view"] = sub
         # signals
         self.data_matrix.quickviewed.connect(self.on_quickviewed)
@@ -95,6 +99,15 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.splitter.setSizes([200, 1000])
         else:
             self.splitter.setSizes([0, 1])
+
+    @QtCore.pyqtSlot(bool)
+    def on_quickview(self, view):
+        if self.subwindows["quick_view"].isVisible():
+            self.subwindows["quick_view"].setVisible(False)
+            self.data_matrix.enable_quickview(False)
+        else:
+            self.subwindows["quick_view"].setVisible(True)
+            self.data_matrix.enable_quickview(True)
 
     @QtCore.pyqtSlot(int, int)
     def on_quickviewed(self, slot_index, filt_index):
@@ -110,6 +123,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         if not self.subwindows["quick_view"].isVisible():
             self.toolButton_quick_view.toggle()
             self.subwindows["quick_view"].setVisible(True)
+        # update FilterPanel
+        filt_id = pl.filters[filt_index].identifier
+        self.widget_ana_view.widget_filter.show_filter(filt_id=filt_id)
 
     def on_splitter(self):
         if self.splitter.sizes()[0] == 0:

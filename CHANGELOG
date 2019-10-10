@@ -2,6 +2,7 @@
  - implement data/plot matrix states
  - implement data/plot matrix logic
  - implement basic Quick View functionalities
+ - implement basic filtering functionalities
 2.0.0a16
  - add documentation (from Shape-Out 1)
  - test deployment for macOS

@@ -12,6 +12,7 @@ class Pipeline(object):
             self.__setstate__(state)
 
     def __setstate__(self, state):
+        Pipeline._reduce_state(state)
         if self._old_state == state:
             # Nothing changed
             return
@@ -36,6 +37,15 @@ class Pipeline(object):
             self.add_slot(slot)
         self.construct_matrix()
         self.element_states = state["elements"]
+
+    @staticmethod
+    def _reduce_state(state):
+        """Reduce a state from DataMatrix to something we can work with"""
+        for slot_id in state["elements"]:
+            for filt_id in state["elements"][slot_id]:
+                active = state["elements"][slot_id][filt_id]["active"]
+                enabled = state["elements"][slot_id][filt_id]["enabled"]
+                state["elements"][slot_id][filt_id] = active and enabled
 
     def add_filter(self, filt=None):
         """Add a filter to the pipeline
@@ -118,7 +128,7 @@ class Pipeline(object):
             filt = self.filters[ii]
             filt_id = filt.identifier
             # these are the element states in gui.matrix.dm_element
-            if fstates[filt_id]["active"] and fstates[filt_id]["enabled"]:
+            if fstates[filt_id]:
                 filt.update_dataset(row[ii])
         dsend = row[filt_index]
         if apply_filter:

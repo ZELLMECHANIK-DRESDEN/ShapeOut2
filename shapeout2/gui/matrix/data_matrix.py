@@ -10,6 +10,7 @@ from .dm_element import MatrixElement
 
 class DataMatrix(QtWidgets.QWidget):
     quickviewed = QtCore.pyqtSignal(int, int)
+    matrix_changed = QtCore.pyqtSignal(int, int)
 
     def __init__(self, parent=None):
         super(DataMatrix, self).__init__(parent)
@@ -192,6 +193,23 @@ class DataMatrix(QtWidgets.QWidget):
             self.setFixedSize(ncols*hwidth+dwidth,
                               nrows*dheight+hheight)
 
+    @QtCore.pyqtSlot()
+    def changed_element(self):
+        idx = self.glo.indexOf(self.sender())
+        row, column, _, _ = self.glo.getItemPosition(idx)
+        # decrement by header row/column
+        slot_index = row - 1  # enumerates the dataset
+        filt_index = column - 1  # enumerates the filter
+        slot_index_qv, filt_index_qv = self.get_quickview_indices()
+        self.matrix_changed.emit(slot_index, filt_index)
+        if slot_index_qv == slot_index and filt_index_qv >= filt_index:
+            self.quickviewed.emit(slot_index_qv, filt_index_qv)
+
+    @QtCore.pyqtSlot()
+    def changed_quickview(self):
+        slot_index_qv, filt_index_qv = self.get_quickview_indices()
+        self.quickviewed.emit(slot_index_qv, filt_index_qv)
+
     def clear(self):
         """Reset layout"""
         self._reset_layout()
@@ -220,7 +238,8 @@ class DataMatrix(QtWidgets.QWidget):
             for jj in range(self.num_filters):
                 if self.glo.itemAtPosition(ii+1, jj+1) is None:
                     me = MatrixElement()
-                    me.quickview_selected.connect(self.update_quickview)
+                    me.quickview_selected.connect(self.changed_quickview)
+                    me.element_changed.connect(self.changed_element)
                     self.glo.addWidget(me, ii+1, jj+1)
         # make sure enabled/disabled is honored
         state = self.__getstate__()
@@ -258,6 +277,10 @@ class DataMatrix(QtWidgets.QWidget):
 
     def get_matrix_element(self, dataset_id, filter_id):
         """Return matrix element matching dataset and filter identifiers"""
+        ii, jj = self.get_matrix_indices(dataset_id, filter_id)
+        return self.glo.itemAtPosition(ii, jj).widget()
+
+    def get_matrix_indices(self, dataset_id, filter_id):
         ncols = self.glo.columnCount()
         nrows = self.glo.rowCount()
         for ii in range(1, nrows):
@@ -272,7 +295,7 @@ class DataMatrix(QtWidgets.QWidget):
                 break
         else:
             raise KeyError("Dataset '{}' not found!".format(dataset_id))
-        return self.glo.itemAtPosition(ii, jj).widget()
+        return ii, jj
 
     def get_quickview_ids(self):
         current = MatrixElement._quick_view_instance
@@ -284,6 +307,14 @@ class DataMatrix(QtWidgets.QWidget):
                     me = self.get_matrix_element(ds_key, f_key)
                     if current == me:
                         return ds_key, f_key
+        else:
+            return None, None
+
+    def get_quickview_indices(self):
+        ds_key, f_key = self.get_quickview_ids()
+        if ds_key is not None:
+            ii, jj = self.get_matrix_indices(ds_key, f_key)
+            return ii - 1, jj - 1
         else:
             return None, None
 
@@ -480,12 +511,3 @@ class DataMatrix(QtWidgets.QWidget):
                 item = self.glo.itemAtPosition(ii, jj)
                 if item is not None:
                     item.widget().update_content()
-
-    @QtCore.pyqtSlot()
-    def update_quickview(self):
-        idx = self.glo.indexOf(self.sender())
-        row, column, _, _ = self.glo.getItemPosition(idx)
-        # decrement by header row/column
-        row -= 1  # enumerates the dataset
-        column -= 1  # enumerates the filter
-        self.quickviewed.emit(row, column)

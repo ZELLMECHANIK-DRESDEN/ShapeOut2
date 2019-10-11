@@ -67,6 +67,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     def add_filter(self):
         mf = self.data_matrix.add_filter()
+        # connect "modify" button to analysis view
         mf.pushButton_modify.clicked.connect(self.on_analysis_view)
         self.widget_ana_view.widget_filter.update_content()
 
@@ -77,6 +78,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         sub.setWidget(self.widget_ana_view)
         self.mdiArea.addSubWindow(sub)
         self.toolButton_ana_view.clicked.connect(self.on_analysis_view)
+        self.widget_ana_view.widget_filter.pushButton_update.clicked.connect(
+            self.on_quickview_refresh)
         self.subwindows["analysis_view"] = sub
         sub.setSystemMenu(None)
         sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
@@ -92,7 +95,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.toolButton_quick_view.clicked.connect(self.on_quickview)
         self.subwindows["quick_view"] = sub
         # signals
-        self.data_matrix.quickviewed.connect(self.on_quickviewed)
+        self.data_matrix.quickviewed.connect(self.on_quickview_show_dataset)
         sub.setSystemMenu(None)
         sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
                            | QtCore.Qt.WindowTitleHint
@@ -110,9 +113,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
             filt_id = sender.parent().parent().__getstate__()["identifier"]
             self.widget_ana_view.widget_filter.show_filter(filt_id)
         self.subwindows["analysis_view"].setVisible(view)
-        # update filter view
-        if view:
-            pass
 
     def on_data_matrix(self):
         """Show/hide data matrix (User clicked Data Matrix button)"""
@@ -127,8 +127,14 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.subwindows["quick_view"].setVisible(view)
         self.data_matrix.enable_quickview(view)
 
+    def on_quickview_refresh(self):
+        """Refresh quickview with the currently shown dataset"""
+        slot_index, filt_index = self.data_matrix.get_quickview_indices()
+        if slot_index is not None:
+            self.on_quickview_show_dataset(slot_index, filt_index)
+
     @QtCore.pyqtSlot(int, int)
-    def on_quickviewed(self, slot_index, filt_index):
+    def on_quickview_show_dataset(self, slot_index, filt_index):
         """Update QuickView dataset (User selected new dataset)"""
         # get state of data matrix
         state = self.data_matrix.__getstate__()

@@ -6,6 +6,7 @@ from PyQt5 import uic, QtWidgets, QtCore
 class MatrixElement(QtWidgets.QWidget):
     _quick_view_instance = None
     quickview_selected = QtCore.pyqtSignal()
+    element_changed = QtCore.pyqtSignal()
 
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
@@ -43,6 +44,7 @@ class MatrixElement(QtWidgets.QWidget):
         else:
             self.active = not self.active
             quickview = False
+            self.element_changed.emit()
         self.update_content(quickview)
         event.accept()
 

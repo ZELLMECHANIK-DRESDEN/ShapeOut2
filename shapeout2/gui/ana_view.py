@@ -3,7 +3,7 @@ import pkg_resources
 from PyQt5 import uic, QtWidgets
 
 
-class InfoView(QtWidgets.QWidget):
+class AnalysisView(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self)
         path_ui = pkg_resources.resource_filename(

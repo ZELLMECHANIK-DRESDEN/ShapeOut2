@@ -8,6 +8,7 @@ from PyQt5 import uic, QtCore, QtWidgets
 import pyqtgraph as pg
 
 from . import ana_view
+from . import matrix
 from . import quick_view
 
 from .. import settings
@@ -37,7 +38,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # Subwindows
         self.subwindows = {}
         self.init_quick_view()
-        self.init_ana_view()
+        self.init_analysis_view()
         self.mdiArea.cascadeSubWindows()
         self.showMaximized()
         # data matrix
@@ -47,7 +48,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.toolButton_new_dataset.clicked.connect(self.add_dataslot)
         self.toolButton_import.clicked.connect(self.add_dataslot)
         self.toolButton_new_plot.clicked.connect(self.plot_matrix.add_plot)
-        # settings
+        #: Shape-Out settings
         self.settings = settings.SettingsFile()
         #: Analysis pipeline
         self.pipeline = pipeline.Pipeline()
@@ -65,17 +66,18 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.data_matrix.add_dataset(path)
 
     def add_filter(self):
-        self.data_matrix.add_filter()
+        mf = self.data_matrix.add_filter()
+        mf.pushButton_modify.clicked.connect(self.on_analysis_view)
         self.widget_ana_view.widget_filter.update_content()
 
-    def init_ana_view(self):
+    def init_analysis_view(self):
         sub = QtWidgets.QMdiSubWindow()
         sub.hide()
-        self.widget_ana_view = ana_view.InfoView()
+        self.widget_ana_view = ana_view.AnalysisView()
         sub.setWidget(self.widget_ana_view)
         self.mdiArea.addSubWindow(sub)
-        self.toolButton_ana_view.clicked.connect(sub.setVisible)
-        self.subwindows["ana_view"] = sub
+        self.toolButton_ana_view.clicked.connect(self.on_analysis_view)
+        self.subwindows["analysis_view"] = sub
         sub.setSystemMenu(None)
         sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
                            | QtCore.Qt.WindowTitleHint
@@ -96,23 +98,38 @@ class ShapeOut2(QtWidgets.QMainWindow):
                            | QtCore.Qt.WindowTitleHint
                            | QtCore.Qt.Tool)
 
+    @QtCore.pyqtSlot(bool)
+    def on_analysis_view(self, view=True):
+        sender = self.sender()
+        if isinstance(sender.parent().parent(), matrix.MatrixFilter):
+            # override view
+            view = True
+            # we want to display the analysis view...
+            self.widget_ana_view.tabWidget.setCurrentIndex(1)
+            # ...and the current filter
+            filt_id = sender.parent().parent().__getstate__()["identifier"]
+            self.widget_ana_view.widget_filter.show_filter(filt_id)
+        self.subwindows["analysis_view"].setVisible(view)
+        # update filter view
+        if view:
+            pass
+
     def on_data_matrix(self):
+        """Show/hide data matrix (User clicked Data Matrix button)"""
         if self.toolButton_dm.isChecked():
             self.splitter.setSizes([200, 1000])
         else:
             self.splitter.setSizes([0, 1])
 
     @QtCore.pyqtSlot(bool)
-    def on_quickview(self, view):
-        if self.subwindows["quick_view"].isVisible():
-            self.subwindows["quick_view"].setVisible(False)
-            self.data_matrix.enable_quickview(False)
-        else:
-            self.subwindows["quick_view"].setVisible(True)
-            self.data_matrix.enable_quickview(True)
+    def on_quickview(self, view=True):
+        """Show/Hide QuickView (User clicked the QuickView button)"""
+        self.subwindows["quick_view"].setVisible(view)
+        self.data_matrix.enable_quickview(view)
 
     @QtCore.pyqtSlot(int, int)
     def on_quickviewed(self, slot_index, filt_index):
+        """Update QuickView dataset (User selected new dataset)"""
         # get state of data matrix
         state = self.data_matrix.__getstate__()
         self.pipeline.__setstate__(state)

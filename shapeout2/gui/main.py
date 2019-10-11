@@ -112,6 +112,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
             # ...and the current filter
             filt_id = sender.parent().parent().__getstate__()["identifier"]
             self.widget_ana_view.widget_filter.show_filter(filt_id)
+            # finally, check the button
+            self.toolButton_ana_view.setChecked(True)
         self.subwindows["analysis_view"].setVisible(view)
 
     def on_data_matrix(self):

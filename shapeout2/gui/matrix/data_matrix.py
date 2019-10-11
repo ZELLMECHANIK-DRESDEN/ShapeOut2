@@ -426,6 +426,7 @@ class DataMatrix(QtWidgets.QWidget):
         for fid in state:
             me = self.get_matrix_element(sid, fid)
             me.__setstate__(state[fid])
+        self.changed_quickview()
 
     @QtCore.pyqtSlot(bool)
     def toggle_dataset_enable(self, enabled):
@@ -441,6 +442,7 @@ class DataMatrix(QtWidgets.QWidget):
             mstate = me.__getstate__()
             mstate["enabled"] = np.logical_and(enabled, fenabled)
             me.__setstate__(mstate)
+        self.changed_quickview()
 
     @QtCore.pyqtSlot()
     def toggle_filter_active(self):
@@ -487,6 +489,7 @@ class DataMatrix(QtWidgets.QWidget):
         for dsid in state:
             me = self.get_matrix_element(dsid, sid)
             me.__setstate__(state[dsid])
+        self.changed_quickview()
 
     @QtCore.pyqtSlot(bool)
     def toggle_filter_enable(self, enabled):
@@ -502,6 +505,7 @@ class DataMatrix(QtWidgets.QWidget):
             mstate = me.__getstate__()
             mstate["enabled"] = np.logical_and(enabled, denabled)
             me.__setstate__(mstate)
+        self.changed_quickview()
 
     def update_content(self):
         ncols = self.glo.columnCount()

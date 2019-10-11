@@ -413,13 +413,18 @@ class RTDCScatterWidget(pg.PlotWidget):
 
         # set data
         self.scatter.setData(x=x, y=y, brush=brush)
-        # reset range (in case user modified it manually)
-        self.plotItem.setAutoPan()
-        self.plotItem.autoRange()
         # set log mode
         self.plotItem.setLogMode(x=logx, y=logy)
         self.logx = logx
         self.logy = logy
+        # reset range (in case user modified it manually)
+        # (For some reason, we have to do this twice...)
+        self.plotItem.setRange(xRange=(x.min(), x.max()),
+                               yRange=(y.min(), y.max()),
+                               padding=.05)
+        self.plotItem.setRange(xRange=(x.min(), x.max()),
+                               yRange=(y.min(), y.max()),
+                               padding=.05)
 
     def setSelection(self, x, y):
         # workaround, because ScatterPlotItem does somehow not support

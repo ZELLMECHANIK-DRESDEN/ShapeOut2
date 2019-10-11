@@ -7,10 +7,16 @@ from .dataslot import Dataslot
 class Pipeline(object):
     def __init__(self, state=None):
         self.reset()
+        self._old_state = {}
         if state is not None:
             self.__setstate__(state)
 
     def __setstate__(self, state):
+        if self._old_state == state:
+            # Nothing changed
+            return
+        self._old_state = state
+        self.reset()
         for ff in state["filters"]:
             if ff["identifier"] in Filter._instances:
                 filt = Filter._instances[ff["identifier"]]
@@ -108,7 +114,7 @@ class Pipeline(object):
         slot_id = self.slots[slot_index].identifier
         fstates = self.element_states[slot_id]
         # set all necessary filters
-        for ii in range(filt_index):
+        for ii in range(filt_index + 1):
             filt = self.filters[ii]
             filt_id = filt.identifier
             # these are the element states in gui.matrix.dm_element

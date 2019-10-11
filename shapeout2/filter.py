@@ -124,7 +124,6 @@ class Filter(object):
         # set general options
         cfgfilt.update(self.general)
         cfgfilt["limit events"] = self.limit_events[0] * self.limit_events[1]
-
         # set box filters
         for feat in self.boxdict:
             if self.boxdict[feat]["active"]:

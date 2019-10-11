@@ -49,6 +49,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.toolButton_new_plot.clicked.connect(self.plot_matrix.add_plot)
         # settings
         self.settings = settings.SettingsFile()
+        #: Analysis pipeline
+        self.pipeline = pipeline.Pipeline()
 
     def add_dataslot(self):
         fnames, _ = QtWidgets.QFileDialog.getOpenFileNames(
@@ -113,10 +115,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
     def on_quickviewed(self, slot_index, filt_index):
         # get state of data matrix
         state = self.data_matrix.__getstate__()
-        pl = pipeline.Pipeline(state=state)
-        ds = pl.get_dataset(slot_index=slot_index,
-                            filt_index=filt_index,
-                            apply_filter=True)
+        self.pipeline.__setstate__(state)
+        ds = self.pipeline.get_dataset(slot_index=slot_index,
+                                       filt_index=filt_index,
+                                       apply_filter=True)
         # update quick view subwindow
         self.widget_quick_view.show_rtdc(ds)
         # show quick view subwindow
@@ -124,7 +126,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.toolButton_quick_view.toggle()
             self.subwindows["quick_view"].setVisible(True)
         # update FilterPanel
-        filt_id = pl.filters[filt_index].identifier
+        filt_id = self.pipeline.filters[filt_index].identifier
         self.widget_ana_view.widget_filter.show_filter(filt_id=filt_id)
 
     def on_splitter(self):

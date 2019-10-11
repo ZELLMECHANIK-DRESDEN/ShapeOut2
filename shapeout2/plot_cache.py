@@ -4,13 +4,15 @@ from . import util
 
 def get_scatter_data(rtdc_ds, downsample, xax, yax, xscale, yscale,
                      kde_type="histogram", kde_kwargs={}):
-    tohash = [rtdc_ds.identifier, downsample, xax, yax, xscale, yscale,
+    tohash = [rtdc_ds.identifier, rtdc_ds.filter.all, downsample,
+              xax, yax, xscale, yscale,
               kde_type, kde_kwargs]
     shash = util.hashobj(tohash)
 
     if shash in cache_data:
         x, y, kde, idx = cache_data[shash]
     else:
+        rtdc_ds.apply_filter()
         # compute scatter plot data
         x, y, idx = rtdc_ds.get_downsampled_scatter(
             xax=xax,

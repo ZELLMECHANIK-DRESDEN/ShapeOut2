@@ -188,6 +188,77 @@ class QuickView(QtWidgets.QWidget):
         event = self.spinBox_event.value()
         self.show_event(event - 1)
 
+    def on_tool(self):
+        """Show and hide tools when the user selected a tool button"""
+        # show extra data
+        show_event = False
+        show_settings = False
+        sender = self.sender()
+        if sender == self.toolButton_settings:
+            if self.toolButton_settings.isChecked():
+                show_settings = True
+                self.toolButton_event.setChecked(False)
+        elif sender == self.toolButton_event:
+            if self.toolButton_event.isChecked():
+                show_event = True
+                self.toolButton_settings.setChecked(False)
+        else:
+            # keep everything as-is but update the sizes
+            show_event = self.widget_event.isVisible()
+            show_settings = self.widget_settings.isVisible()
+        self.widget_event.setVisible(show_event)
+        self.widget_scatter.select.setVisible(show_event)
+
+        self.widget_settings.setVisible(show_settings)
+        # set size
+        show = show_event * show_settings
+        mdiwin = self.parent()
+        geom = mdiwin.geometry()
+        geom.setWidth(geom.width() - (-1)**show * 300)
+        mdiwin.setGeometry(geom)
+        mdiwin.adjustSize()
+
+    def plot(self):
+        """Update the plot using the current state of the UI"""
+        plot = self.__getstate__()["plot"]
+        downsample = plot["downsampling enabled"] * \
+            plot["downsampling value"]
+        x, y, kde, idx = plot_cache.get_scatter_data(
+            rtdc_ds=self.rtdc_ds,
+            downsample=downsample,
+            xax=plot["axis x"],
+            yax=plot["axis y"],
+            xscale=plot["scale x"],
+            yscale=plot["scale y"])
+        self.events_plotted = idx
+        self.data_x = self.rtdc_ds[plot["axis x"]]
+        self.data_y = self.rtdc_ds[plot["axis y"]]
+        # define colormap
+        # TODO: improve speed?
+        brush = []
+        kde -= kde.min()
+        kde /= kde.max()
+        num_hues = 500
+        for k in kde:
+            color = pg.intColor(int(k*num_hues), num_hues)
+            brush.append(color)
+
+        self.widget_scatter.setData(x=x,
+                                    y=y,
+                                    brush=brush,
+                                    xscale=plot["scale x"],
+                                    yscale=plot["scale y"])
+
+        self.widget_scatter.plotItem.setLabels(
+            left=dclab.dfn.feature_name2label[plot["axis y"]],
+            bottom=dclab.dfn.feature_name2label[plot["axis x"]])
+        # Force updating the plot item size, otherwise axes labels
+        # may have an offset.
+        s = self.widget_scatter.plotItem.size()
+        self.widget_scatter.plotItem.resize(s.width()+1, s.height())
+        self.widget_scatter.plotItem.resize(s)
+        # TODO: draw isoelasticity lines
+
     def show_event(self, event):
         """Display the event data (image, contour, trace)
 
@@ -267,77 +338,6 @@ class QuickView(QtWidgets.QWidget):
             self.groupBox_trace.show()
         else:
             self.groupBox_trace.hide()
-
-    def on_tool(self):
-        """Show and hide tools when the user selected a tool button"""
-        # show extra data
-        show_event = False
-        show_settings = False
-        sender = self.sender()
-        if sender == self.toolButton_settings:
-            if self.toolButton_settings.isChecked():
-                show_settings = True
-                self.toolButton_event.setChecked(False)
-        elif sender == self.toolButton_event:
-            if self.toolButton_event.isChecked():
-                show_event = True
-                self.toolButton_settings.setChecked(False)
-        else:
-            # keep everything as-is but update the sizes
-            show_event = self.widget_event.isVisible()
-            show_settings = self.widget_settings.isVisible()
-        self.widget_event.setVisible(show_event)
-        self.widget_scatter.select.setVisible(show_event)
-
-        self.widget_settings.setVisible(show_settings)
-        # set size
-        show = show_event * show_settings
-        mdiwin = self.parent()
-        geom = mdiwin.geometry()
-        geom.setWidth(geom.width() - (-1)**show * 300)
-        mdiwin.setGeometry(geom)
-        mdiwin.adjustSize()
-
-    def plot(self):
-        """Update the plot using the current state of the UI"""
-        plot = self.__getstate__()["plot"]
-        downsample = plot["downsampling enabled"] * \
-            plot["downsampling value"]
-        x, y, kde, idx = plot_cache.get_scatter_data(
-            rtdc_ds=self.rtdc_ds,
-            downsample=downsample,
-            xax=plot["axis x"],
-            yax=plot["axis y"],
-            xscale=plot["scale x"],
-            yscale=plot["scale y"])
-        self.events_plotted = idx
-        self.data_x = self.rtdc_ds[plot["axis x"]]
-        self.data_y = self.rtdc_ds[plot["axis y"]]
-        # define colormap
-        # TODO: improve speed?
-        brush = []
-        kde -= kde.min()
-        kde /= kde.max()
-        num_hues = 500
-        for k in kde:
-            color = pg.intColor(int(k*num_hues), num_hues)
-            brush.append(color)
-
-        self.widget_scatter.setData(x=x,
-                                    y=y,
-                                    brush=brush,
-                                    xscale=plot["scale x"],
-                                    yscale=plot["scale y"])
-
-        self.widget_scatter.plotItem.setLabels(
-            left=dclab.dfn.feature_name2label[plot["axis y"]],
-            bottom=dclab.dfn.feature_name2label[plot["axis x"]])
-        # Force updating the plot item size, otherwise axes labels
-        # may have an offset.
-        s = self.widget_scatter.plotItem.size()
-        self.widget_scatter.plotItem.resize(s.width()+1, s.height())
-        self.widget_scatter.plotItem.resize(s)
-        # TODO: draw isoelasticity lines
 
     @QtCore.pyqtSlot(dclab.rtdc_dataset.RTDCBase)
     def show_rtdc(self, rtdc_ds):

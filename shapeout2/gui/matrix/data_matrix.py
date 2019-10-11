@@ -38,21 +38,15 @@ class DataMatrix(QtWidgets.QWidget):
             filters.append(fs.__getstate__())
         # elements
         mestates = {}
-        quickview_element = None
         for ds in self.datasets:
             idict = {}
             for fs in self.filters:
                 me = self.get_matrix_element(ds.identifier, fs.identifier)
                 idict[fs.identifier] = me.__getstate__()
-                # find quickview element
-                if me.has_quickview():
-                    quickview_element = (ds.identifier, fs.identifier)
-
             mestates[ds.identifier] = idict
         state = {"elements": mestates,
                  "datasets": datasets,
-                 "filters": filters,
-                 "quickview": quickview_element}
+                 "filters": filters}
         return state
 
     def __setstate__(self, state):
@@ -72,8 +66,6 @@ class DataMatrix(QtWidgets.QWidget):
             for f_key in ds_state:
                 me_state = ds_state[f_key]
                 me = self.get_matrix_element(ds_key, f_key)
-                if state["quickview"] == (ds_key, f_key):
-                    MatrixElement._quick_view_instance = me
                 me.__setstate__(me_state)
 
         self.adjust_size()
@@ -282,6 +274,19 @@ class DataMatrix(QtWidgets.QWidget):
             raise KeyError("Dataset '{}' not found!".format(dataset_id))
         return self.glo.itemAtPosition(ii, jj).widget()
 
+    def get_quickview_ids(self):
+        current = MatrixElement._quick_view_instance
+        if current is not None:
+            state = self.__getstate__()
+            for ds_key in state["elements"]:
+                ds_state = state["elements"][ds_key]
+                for f_key in ds_state:
+                    me = self.get_matrix_element(ds_key, f_key)
+                    if current == me:
+                        return ds_key, f_key
+        else:
+            return None, None
+
     @QtCore.pyqtSlot(str)
     def on_option_dataset(self, option):
         """Dataset option logic (remove, insert_anew, duplicate)"""
@@ -291,14 +296,16 @@ class DataMatrix(QtWidgets.QWidget):
         state = self.__getstate__()
         ds_state = sender.__getstate__()
         pstate = self.plot_matrix.__getstate__()
+        # remember current quickview element ids
+        qv_ds, qv_f = self.get_quickview_ids()
         if option == "insert_anew":
-            ds_new = self.add_dataset()
+            ds_new = self.add_dataset(path=ds_state["path"])
             ds_state["identifier"] = ds_new.identifier
             # enable by default
             ds_state["enabled"] = True
             state["datasets"].insert(row, ds_state)
         elif option == "duplicate":
-            ds_new = self.add_dataset()
+            ds_new = self.add_dataset(path=ds_state["path"])
             # also set element states
             state["elements"][ds_new.identifier] = \
                 state["elements"][ds_state["identifier"]]
@@ -310,6 +317,14 @@ class DataMatrix(QtWidgets.QWidget):
             pstate["elements"].pop(ds_state["identifier"])
         self.__setstate__(state)
         self.plot_matrix.__setstate__(pstate)
+        # re-apply current quickview ids
+        try:
+            meqv = self.get_matrix_element(qv_ds, qv_f)
+        except KeyError:
+            pass
+        else:
+            MatrixElement._quick_view_instance = meqv
+            self.update_content()
 
     @QtCore.pyqtSlot(str)
     def on_option_filter(self, option):
@@ -319,6 +334,8 @@ class DataMatrix(QtWidgets.QWidget):
         _, column, _, _ = self.glo.getItemPosition(idx)
         state = self.__getstate__()
         f_state = sender.__getstate__()
+        # remember current quickview element ids
+        qv_ds, qv_f = self.get_quickview_ids()
         if option == "duplicate":
             f_new = self.add_filter()
             f_state["identifier"] = f_new.identifier
@@ -329,6 +346,14 @@ class DataMatrix(QtWidgets.QWidget):
             for ds_key in state["elements"]:
                 state["elements"][ds_key].pop(f_state["identifier"])
         self.__setstate__(state)
+        # re-apply current quickview ids
+        try:
+            meqv = self.get_matrix_element(qv_ds, qv_f)
+        except KeyError:
+            pass
+        else:
+            MatrixElement._quick_view_instance = meqv
+            self.update_content()
 
     @QtCore.pyqtSlot()
     def toggle_dataset_active(self):

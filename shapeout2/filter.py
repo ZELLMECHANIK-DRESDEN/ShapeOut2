@@ -28,7 +28,7 @@ class Filter(object):
         #: filter for limiting number of events
         self.limit_events = [False, 5000]
         #: box filters with features as keys; each item is a
-        #: dictionary with the keys "min", "max", "active"
+        #: dictionary with the keys "start", "end", "active"
         self.boxdict = {}
         #: polygon filter list; each item is an instance of
         #: :class:`dclab.PolygonFilter`
@@ -45,6 +45,7 @@ class Filter(object):
             "limit events num": self.limit_events[1],
             "name": self.name,
             "remove invalid events": self.general["remove invalid events"],
+            "box filters": self.boxdict.copy(),
         }
         return state
 
@@ -54,6 +55,7 @@ class Filter(object):
                              state["limit events num"]]
         self.name = state["name"]
         self.general["remove invalid events"] = state["remove invalid events"]
+        self.boxdict = state["box filters"].copy()
 
     @staticmethod
     def get_filter(identifier):
@@ -79,13 +81,13 @@ class Filter(object):
         warnings.warn("Filter hashing not implemented yet!")
         return self.identifier
 
-    def add_box_filter(self, feature, min, max, active=True):
+    def add_box_filter(self, feature, start, end, active=True):
         """Add a box filter"""
         if feature not in dclab.dfn.scalar_feature_names:
             raise ValueError("Unknown scalar feature: {}".format(feature))
         self.boxdict[feature] = {
-            "min": min,
-            "max": max,
+            "start": start,
+            "end": end,
             "active": active}
 
     def apply_to_dataset(self, dataset):
@@ -127,8 +129,8 @@ class Filter(object):
         # set box filters
         for feat in self.boxdict:
             if self.boxdict[feat]["active"]:
-                cfgfilt["{} min".format(feat)] = self.boxdict[feat]["min"]
-                cfgfilt["{} max".format(feat)] = self.boxdict[feat]["max"]
+                cfgfilt["{} min".format(feat)] = self.boxdict[feat]["start"]
+                cfgfilt["{} max".format(feat)] = self.boxdict[feat]["end"]
 
         # set polygon filters
         for poly in self.polylist:

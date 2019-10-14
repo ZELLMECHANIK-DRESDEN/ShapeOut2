@@ -11,6 +11,7 @@ from . import ana_view
 from . import matrix
 from . import quick_view
 
+from .. import meta_tool
 from .. import settings
 from .. import pipeline
 
@@ -64,6 +65,13 @@ class ShapeOut2(QtWidgets.QMainWindow):
             path = pathlib.Path(fn)
             self.settings.set_path(wd=path.parent, name="rtdc import dataset")
             self.data_matrix.add_dataset(path)
+
+        # Update box filter limits
+        paths = self.data_matrix.get_dataset_paths()
+        features = self.widget_ana_view.widget_filter.visible_box_features
+        mmdict = meta_tool.get_rtdc_features_minmax_bulk(paths,
+                                                         features=features)
+        self.widget_ana_view.widget_filter.update_box_filters(mmdict=mmdict)
 
     def add_filter(self):
         mf = self.data_matrix.add_filter()

@@ -17,6 +17,10 @@ class QuickView(QtWidgets.QWidget):
         uic.loadUi(path_ui, self)
         self.setWindowTitle("Quick View (QV)")
 
+        # Initially, only show the info about how QuickView works
+        self.widget_tool.setEnabled(False)
+        self.widget_scatter.hide()
+
         # Scatter plot
         self.scatter_plot = self.widget_scatter.scatter
 
@@ -369,6 +373,11 @@ class QuickView(QtWidgets.QWidget):
     @QtCore.pyqtSlot(dclab.rtdc_dataset.RTDCBase)
     def show_rtdc(self, rtdc_ds):
         """Display an RT-DC measurement given by `path` and `filters`"""
+        # make things visible
+        self.label_howto.hide()
+        self.widget_scatter.show()
+        self.widget_tool.setEnabled(True)
+        # get the state
         state = self.__getstate__()
         plot = state["plot"]
         # remove event state (ill-defined for different datasets)

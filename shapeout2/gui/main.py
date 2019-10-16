@@ -33,6 +33,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.setWindowTitle("Shape-Out {}".format(__version__))
         # Disable native menubar (e.g. on Mac)
         self.menubar.setNativeMenuBar(False)
+        # File menu
+        self.action_Quit.triggered.connect(self.on_action_quit)
         # Initially hide buttons
         self.pushButton_preset_load.hide()
         self.pushButton_preset_save.hide()
@@ -108,6 +110,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
         sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
                            | QtCore.Qt.WindowTitleHint
                            | QtCore.Qt.Tool)
+
+    def on_action_quit(self):
+        """Determine what happens when the user wants to quit"""
+        QtCore.QCoreApplication.quit()
 
     @QtCore.pyqtSlot(bool)
     def on_analysis_view(self, view=True):

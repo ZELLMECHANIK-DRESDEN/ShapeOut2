@@ -95,6 +95,9 @@ class QuickView(QtWidgets.QWidget):
             self.graphicsView_trace.addItem(self.trace_plots[key])
             self.trace_plots[key].hide()
 
+        self.graphicsView_trace.plotItem.setLabels(
+            left="Fluorescence [a.u.]", bottom="Event time [µs]")
+
         #: default parameters for the event image
         self.imkw = dict(autoLevels=False,
                          levels=(0, 254),
@@ -322,22 +325,43 @@ class QuickView(QtWidgets.QWidget):
             self.groupBox_image.hide()
 
         if "trace" in ds:
+            # time axis
+            flsamples = ds.config["fluorescence"]["samples per event"]
+            flrate = ds.config["fluorescence"]["sample rate"]
+            fltime = np.arange(flsamples) / flrate * 1e6
+            # temporal range (min, max, fl-peak-maximum)
+            range_t = [fltime[0], fltime[-1], 0]
+            # fluorescence intensity
+            range_fl = [0, 0]
             for key in dclab.dfn.FLUOR_TRACES:
                 if key.count("raw") and not state["event"]["trace raw"]:
                     # hide raw trace data if user decided so
                     show = False
                 else:
                     show = True
+                flid = key.split("_")[0]
                 if (key in ds["trace"] and show):
                     # show the trace information
                     tracey = ds["trace"][key][event]  # trace data
-                    tracex = np.arange(tracey.size)  # time data
-                    self.trace_plots[key].setData(tracex, tracey)
+                    range_fl[0] = min(range_fl[0], tracey.min())
+                    range_fl[1] = max(range_fl[1], tracey.max())
+                    self.trace_plots[key].setData(fltime, tracey)
                     self.trace_plots[key].show()
+                    if state["event"]["trace zoom"]:
+                        flpos = ds["{}_pos".format(flid)][event]
+                        flwidth = ds["{}_width".format(flid)][event]
+                        flmax = ds["{}_max".format(flid)][event]
+                        # use the peak maximum to decide which range to use
+                        if flmax > range_t[2]:
+                            range_t[0] = flpos - 1.5 * flwidth
+                            range_t[1] = flpos + 1.5 * flwidth
+                            range_t[2] = flmax
                 else:
                     self.trace_plots[key].hide()
-            self.graphicsView_trace.setXRange(0, tracey.size, padding=0)
-            self.graphicsView_trace.setLimits(xMin=0, xMax=tracey.size)
+            self.graphicsView_trace.setXRange(*range_t[:2], padding=0)
+            if range_fl[0] != range_fl[1]:
+                self.graphicsView_trace.setYRange(*range_fl, padding=.01)
+            self.graphicsView_trace.setLimits(xMin=0, xMax=fltime[-1])
             self.groupBox_trace.show()
         else:
             self.groupBox_trace.hide()

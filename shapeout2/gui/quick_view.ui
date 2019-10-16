@@ -509,10 +509,10 @@
               <item row="0" column="1">
                <widget class="QCheckBox" name="checkBox_trace_zoom">
                 <property name="text">
-                 <string>Zoom to event</string>
+                 <string>Zoom (experimental)</string>
                 </property>
                 <property name="checked">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>

@@ -78,7 +78,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
     def add_filter(self):
         mf = self.data_matrix.add_filter()
         # connect "modify" button to analysis view
-        mf.pushButton_modify.clicked.connect(self.on_analysis_view)
+        mf.toolButton_modify.clicked.connect(self.on_analysis_view)
         self.widget_ana_view.widget_filter.update_content()
 
     def init_analysis_view(self):

@@ -27,10 +27,10 @@ class MatrixDataset(QtWidgets.QWidget):
         menu.addAction('insert anew', self.action_insert_anew)
         menu.addAction('duplicate', self.action_duplicate)
         menu.addAction('remove', self.action_remove)
-        self.pushButton_opt.setMenu(menu)
+        self.toolButton_opt.setMenu(menu)
 
         # toggle all active, all inactive, semi state
-        self.pushButton_toggle.clicked.connect(self.active_toggled.emit)
+        self.toolButton_toggle.clicked.connect(self.active_toggled.emit)
 
         # toggle enabled/disabled state
         self.checkBox.clicked.connect(self.enabled_toggled.emit)

@@ -208,7 +208,8 @@ class DataMatrix(QtWidgets.QWidget):
     @QtCore.pyqtSlot()
     def changed_quickview(self):
         slot_index_qv, filt_index_qv = self.get_quickview_indices()
-        self.quickviewed.emit(slot_index_qv, filt_index_qv)
+        if slot_index_qv is not None and filt_index_qv is not None:
+            self.quickviewed.emit(slot_index_qv, filt_index_qv)
 
     def clear(self):
         """Reset layout"""

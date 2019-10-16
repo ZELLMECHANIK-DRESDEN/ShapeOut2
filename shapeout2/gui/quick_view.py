@@ -45,13 +45,15 @@ class QuickView(QtWidgets.QWidget):
         # event changed signal
         self.scatter_plot.sigClicked.connect(self.on_event_scatter_clicked)
         self.spinBox_event.valueChanged.connect(self.on_event_scatter_spin)
-        self.checkBox_contour.stateChanged.connect(
+        self.checkBox_image_contour.stateChanged.connect(
             self.on_event_scatter_update)
-        self.checkBox_zoom_roi.stateChanged.connect(
+        self.checkBox_image_contrast.stateChanged.connect(
             self.on_event_scatter_update)
-        self.checkBox_auto_contrast.stateChanged.connect(
+        self.checkBox_image_zoom.stateChanged.connect(
             self.on_event_scatter_update)
-        self.checkBox_raw_trace.stateChanged.connect(
+        self.checkBox_trace_raw.stateChanged.connect(
+            self.on_event_scatter_update)
+        self.checkBox_trace_zoom.stateChanged.connect(
             self.on_event_scatter_update)
 
         # value changed signals for plot
@@ -110,10 +112,11 @@ class QuickView(QtWidgets.QWidget):
         }
         event = {
             "index": self.spinBox_event.value(),
-            "image auto contrast": self.checkBox_auto_contrast.isChecked(),
-            "image contour": self.checkBox_contour.isChecked(),
-            "image zoom": self.checkBox_zoom_roi.isChecked(),
-            "trace raw": self.checkBox_raw_trace.isChecked(),
+            "image auto contrast": self.checkBox_image_contrast.isChecked(),
+            "image contour": self.checkBox_image_contour.isChecked(),
+            "image zoom": self.checkBox_image_zoom.isChecked(),
+            "trace raw": self.checkBox_trace_raw.isChecked(),
+            "trace zoom": self.checkBox_trace_zoom.isChecked(),
         }
         state = {
             "plot": plot,
@@ -151,12 +154,12 @@ class QuickView(QtWidgets.QWidget):
         for tb in self.signal_widgets:
             tb.blockSignals(False)
         if "event" in state:
-            self.checkBox_auto_contrast.setChecked(
+            self.checkBox_image_contrast.setChecked(
                 state["image auto contrast"])
-            self.checkBox_contour.setChecked(state["image contour"])
-            self.checkBox_zoom_roi.setChecked(state["event"]["image zoom"])
+            self.checkBox_image_contour.setChecked(state["image contour"])
+            self.checkBox_image_zoom.setChecked(state["event"]["image zoom"])
             self.spinBox_event.setValue(state["event"]["index"])
-            self.checkBox_raw_trace.setChecked(state["event"]["trace raw"])
+            self.checkBox_trace_raw.setChecked(state["event"]["trace raw"])
 
     def on_event_scatter_clicked(self, plot, point):
         """User clicked on scatter plot

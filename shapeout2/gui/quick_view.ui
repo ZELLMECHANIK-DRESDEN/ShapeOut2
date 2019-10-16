@@ -396,7 +396,7 @@
                <number>0</number>
               </property>
               <item row="0" column="0">
-               <widget class="QCheckBox" name="checkBox_contour">
+               <widget class="QCheckBox" name="checkBox_image_contour">
                 <property name="text">
                  <string>Show contour</string>
                 </property>
@@ -406,9 +406,9 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QCheckBox" name="checkBox_zoom_roi">
+               <widget class="QCheckBox" name="checkBox_image_zoom">
                 <property name="text">
-                 <string>Zoom to ROI</string>
+                 <string>Zoom to event</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -416,7 +416,7 @@
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QCheckBox" name="checkBox_auto_contrast">
+               <widget class="QCheckBox" name="checkBox_image_contrast">
                 <property name="text">
                  <string>Auto contrast</string>
                 </property>
@@ -492,14 +492,31 @@
              <number>9</number>
             </property>
             <item>
-             <widget class="QCheckBox" name="checkBox_raw_trace">
-              <property name="text">
-               <string>Show raw data</string>
+             <layout class="QGridLayout" name="gridLayout_4">
+              <property name="topMargin">
+               <number>0</number>
               </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
+              <item row="0" column="0">
+               <widget class="QCheckBox" name="checkBox_trace_raw">
+                <property name="text">
+                 <string>Show raw data</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QCheckBox" name="checkBox_trace_zoom">
+                <property name="text">
+                 <string>Zoom to event</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item>
              <widget class="PlotWidget" name="graphicsView_trace">

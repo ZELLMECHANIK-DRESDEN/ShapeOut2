@@ -338,6 +338,9 @@
         <property name="text">
          <string>Show isoelasticity lines</string>
         </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>

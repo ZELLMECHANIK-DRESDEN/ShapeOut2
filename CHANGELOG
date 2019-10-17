@@ -2,6 +2,7 @@
  - fix plot matrix: size and buttons of elements
  - populate help menu
  - refactor scatter plot
+ - show isoelastics in QuickView
  - introduce style sheets
  - fix box filter view not updated with filter data
  - add list of features to QuickView/Event as a new tab

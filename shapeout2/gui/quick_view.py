@@ -246,6 +246,8 @@ class QuickView(QtWidgets.QWidget):
                                       xscale=plot["scale x"],
                                       yscale=plot["scale y"],
                                       isoelastics=plot["isoelastics enabled"])
+        # make sure the correct plot items are visible (e.g. scatter select)
+        self.on_tool()
 
     def show_event(self, event):
         """Display the event data (image, contour, trace)
@@ -448,6 +450,8 @@ class RTDCScatterWidget(pg.PlotWidget):
         super(RTDCScatterWidget, self).__init__(*args, **kwargs)
         self.scatter = RTDCScatterPlot()
         self.select = pg.PlotDataItem(x=[1], y=[2], symbol="o")
+        #: List of isoelasticity line plots
+        self.isoelastics = []
         self.addItem(self.scatter)
         self.addItem(self.select)
         self.select.hide()
@@ -513,6 +517,34 @@ class RTDCScatterWidget(pg.PlotWidget):
         s = self.plotItem.size()
         self.plotItem.resize(s.width()+1, s.height())
         self.plotItem.resize(s)
+
+        # Isoelastics
+        # remove old isoelastics
+        for lp in self.isoelastics:
+            self.removeItem(lp)
+        if isoelastics:
+            # add new isoelastics
+            isodef = dclab.isoelastics.get_default()
+            # We do not use isodef.get_with_rtdcbase, because then the
+            # isoelastics would be shifted according to flow rate and.
+            # viscosity. We could do it, but for visualization there is
+            # really no need and also, the plots then look the same as
+            # in Shape-Out 1.
+            iso = isodef.get(
+                method="numerical",
+                channel_width=self.rtdc_ds.config["setup"]["channel width"],
+                flow_rate=None,
+                viscosity=None,
+                col1=self.xax,
+                col2=self.yax,
+                add_px_err=True,
+                px_um=self.rtdc_ds.config["imaging"]["pixel size"])
+            for ss in iso:
+                iline = pg.PlotDataItem(x=ss[:, 0], y=ss[:, 1])
+                self.addItem(iline)
+                self.isoelastics.append(iline)
+                # send them to the back
+                iline.setZValue(-1)
 
     def setSelection(self, event_index):
         x = self.data_x[event_index]

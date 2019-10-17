@@ -4,6 +4,7 @@
  - refactor scatter plot
  - introduce style sheets
  - fix box filter view not updated with filter data
+ - add list of features to QuickView/Event as a new tab
 2.0.0a18
  - replace push buttons with tool buttons
    (try to overcome ugly rendering on macOS)

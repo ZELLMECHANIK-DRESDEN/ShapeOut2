@@ -7,20 +7,7 @@ import dclab
 from ..filter import Filter
 
 from . import rangecontrol
-
-
-# integer-valued features
-INT_FEATURES = [
-    "fl1_max",
-    "fl1_npeaks",
-    "fl2_max",
-    "fl2_npeaks",
-    "fl3_max",
-    "fl3_npeaks",
-    "frame",
-    "index",
-    "nevents",
-]
+from . import idiom
 
 # features shown by default
 SHOW_FEATURES = ["deform", "area_um", "index"]
@@ -44,7 +31,7 @@ class FilterPanel(QtWidgets.QWidget):
     def _init_box_filters(self, show_features=SHOW_FEATURES):
         self._box_range_controls = {}
         for feat in dclab.dfn.scalar_feature_names:
-            integer = True if feat in INT_FEATURES else False
+            integer = True if feat in idiom.INTEGER_FEATURES else False
             rc = rangecontrol.RangeControl(
                 checkbox=True,
                 integer=integer,

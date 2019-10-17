@@ -9,6 +9,8 @@ from scipy.ndimage import binary_erosion
 
 from .. import plot_cache
 
+from . import idiom
+
 
 class QuickView(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
@@ -340,6 +342,45 @@ class QuickView(QtWidgets.QWidget):
             self.groupBox_trace.show()
         else:
             self.groupBox_trace.hide()
+
+        # update features tab
+        # Disable updates which look ugly when the user switches quickly
+        self.tableWidget_feats.setUpdatesEnabled(False)
+        # only use innate features (speed)...
+        fcands = ds.features_innate
+        # ...add easily computed features
+        fcands += [f for f in ds.features if f in idiom.QUICK_FEATURES]
+        # restrict to scalar features
+        feats = [f for f in fcands if f in dclab.dfn.scalar_feature_names]
+        lf = sorted([(dclab.dfn.feature_name2label[f], f) for f in feats])
+        self.tableWidget_feats.setRowCount(len(feats))
+        self.tableWidget_feats.setColumnCount(2)
+        self.tableWidget_feats.setVerticalHeaderLabels(feats)
+        for ii, (lii, fii) in enumerate(lf):
+            name_vis = lii if len(lii) < 20 else lii[:17] + "..."
+            label_name = QtWidgets.QLabel(name_vis)
+            label_name.setToolTip(lii)
+            value = ds[fii][event]
+            if np.isnan(value) or np.isinf(value):
+                fmt = "{}"
+            elif fii in idiom.INTEGER_FEATURES:
+                fmt = "{:.0f}"
+            elif value == 0:
+                fmt = "{:.1f}"
+            else:
+                dec = -int(np.ceil(np.log(np.abs(value)))) + 3
+                if dec <= 0:
+                    dec = 1
+                fmt = "{:." + "{}".format(dec) + "f}"
+            label_value = QtWidgets.QLabel(fmt.format(value))
+            label_value.setToolTip(lii)
+            self.tableWidget_feats.setCellWidget(ii, 0, label_name)
+            self.tableWidget_feats.setCellWidget(ii, 1, label_value)
+        header = self.tableWidget_feats.horizontalHeader()
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        # enable updates again
+        self.tableWidget_feats.setUpdatesEnabled(True)
 
     @QtCore.pyqtSlot(dclab.rtdc_dataset.RTDCBase)
     def show_rtdc(self, rtdc_ds):

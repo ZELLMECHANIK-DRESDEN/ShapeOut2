@@ -21,9 +21,6 @@ class QuickView(QtWidgets.QWidget):
         self.widget_tool.setEnabled(False)
         self.widget_scatter.hide()
 
-        # Scatter plot
-        self.scatter_plot = self.widget_scatter.scatter
-
         # Set scale options (with data)
         for cb in [self.comboBox_xscale, self.comboBox_yscale]:
             cb.clear()
@@ -34,20 +31,13 @@ class QuickView(QtWidgets.QWidget):
         self.widget_event.setVisible(False)
         self.widget_settings.setVisible(False)
 
-        #: Boolean array identifying the plotted events w.r.t. the full
-        #: dataset
-        self.events_plotted = None
-        #: Unfiltered and not-downsampled x component of current scatter plot
-        self.data_x = None
-        #: Unfiltered and not-downsampled y component of current scatter plot
-        self.data_y = None
-
         # settings button
         self.toolButton_settings.toggled.connect(self.on_tool)
         self.toolButton_event.toggled.connect(self.on_tool)
 
         # event changed signal
-        self.scatter_plot.sigClicked.connect(self.on_event_scatter_clicked)
+        self.widget_scatter.scatter.sigClicked.connect(
+            self.on_event_scatter_clicked)
         self.spinBox_event.valueChanged.connect(self.on_event_scatter_spin)
         self.checkBox_image_contour.stateChanged.connect(
             self.on_event_scatter_update)
@@ -184,9 +174,11 @@ class QuickView(QtWidgets.QWidget):
             # emulate mouse toggle
             self.toolButton_event.setChecked(True)
             self.toolButton_event.toggled.emit(True)
-        if self.events_plotted is not None:
+        if self.widget_scatter.events_plotted is not None:
+            # plotted events
+            plotted = self.widget_scatter.events_plotted
             # get corrected index
-            ds_idx = np.where(self.events_plotted)[0][point.index()]
+            ds_idx = np.where(plotted)[0][point.index()]
             self.show_event(ds_idx)
 
     def on_event_scatter_spin(self, event):
@@ -233,41 +225,14 @@ class QuickView(QtWidgets.QWidget):
         plot = self.__getstate__()["plot"]
         downsample = plot["downsampling enabled"] * \
             plot["downsampling value"]
-        x, y, kde, idx = plot_cache.get_scatter_data(
-            rtdc_ds=self.rtdc_ds,
-            downsample=downsample,
-            xax=plot["axis x"],
-            yax=plot["axis y"],
-            xscale=plot["scale x"],
-            yscale=plot["scale y"])
-        self.events_plotted = idx
-        self.data_x = self.rtdc_ds[plot["axis x"]]
-        self.data_y = self.rtdc_ds[plot["axis y"]]
-        # define colormap
-        # TODO: improve speed?
-        brush = []
-        kde -= kde.min()
-        kde /= kde.max()
-        num_hues = 500
-        for k in kde:
-            color = pg.intColor(int(k*num_hues), num_hues)
-            brush.append(color)
 
-        self.widget_scatter.setData(x=x,
-                                    y=y,
-                                    brush=brush,
-                                    xscale=plot["scale x"],
-                                    yscale=plot["scale y"])
-
-        self.widget_scatter.plotItem.setLabels(
-            left=dclab.dfn.feature_name2label[plot["axis y"]],
-            bottom=dclab.dfn.feature_name2label[plot["axis x"]])
-        # Force updating the plot item size, otherwise axes labels
-        # may have an offset.
-        s = self.widget_scatter.plotItem.size()
-        self.widget_scatter.plotItem.resize(s.width()+1, s.height())
-        self.widget_scatter.plotItem.resize(s)
-        # TODO: draw isoelasticity lines
+        self.widget_scatter.plot_data(rtdc_ds=self.rtdc_ds,
+                                      downsample=downsample,
+                                      xax=plot["axis x"],
+                                      yax=plot["axis y"],
+                                      xscale=plot["scale x"],
+                                      yscale=plot["scale y"],
+                                      isoelastics=plot["isoelastics enabled"])
 
     def show_event(self, event):
         """Display the event data (image, contour, trace)
@@ -285,8 +250,7 @@ class QuickView(QtWidgets.QWidget):
         self.spinBox_event.blockSignals(False)
 
         # Update selection point in scatter plot
-        self.widget_scatter.setSelection(self.data_x[event],
-                                         self.data_y[event])
+        self.widget_scatter.setSelection(event)
         imkw = self.imkw.copy()
         # update image
         state = self.__getstate__()
@@ -431,28 +395,50 @@ class RTDCScatterWidget(pg.PlotWidget):
         self.addItem(self.scatter)
         self.addItem(self.select)
         self.select.hide()
-        self.logx = False
-        self.logy = False
+        self.xscale = "linear"
+        self.yscale = "linear"
+        #: Boolean array identifying the plotted events w.r.t. the full
+        #: dataset
+        self.events_plotted = None
+        #: Unfiltered and not-downsampled x component of current scatter plot
+        self.data_x = None
+        #: Unfiltered and not-downsampled y component of current scatter plot
+        self.data_y = None
 
-    def setData(self, x, y, brush, xscale="linear", yscale="linear"):
+    def plot_data(self, rtdc_ds, xax="area_um", yax="deform", downsample=False,
+                  xscale="linear", yscale="linear", isoelastics=False):
+        self.rtdc_ds = rtdc_ds
+        self.xax = xax
+        self.yax = yax
+        x, y, kde, idx = plot_cache.get_scatter_data(
+            rtdc_ds=self.rtdc_ds,
+            downsample=downsample,
+            xax=self.xax,
+            yax=self.yax,
+            xscale=self.xscale,
+            yscale=self.yscale)
+        self.events_plotted = idx
+        self.data_x = self.rtdc_ds[self.xax]
+        self.data_y = self.rtdc_ds[self.yax]
+        # define colormap
+        # TODO: improve speed?
+        brush = []
+        kde -= kde.min()
+        kde /= kde.max()
+        num_hues = 500
+        for k in kde:
+            color = pg.intColor(int(k*num_hues), num_hues)
+            brush.append(color)
+        # convert to log-scale if applicable
         if xscale == "log":
             x = np.log10(x)
-            logx = True
-        else:
-            logx = False
-
         if yscale == "log":
             y = np.log10(y)
-            logy = True
-        else:
-            logy = False
-
         # set data
         self.scatter.setData(x=x, y=y, brush=brush)
         # set log mode
-        self.plotItem.setLogMode(x=logx, y=logy)
-        self.logx = logx
-        self.logy = logy
+        self.plotItem.setLogMode(x=xscale == "log",
+                                 y=yscale == "log")
         # reset range (in case user modified it manually)
         # (For some reason, we have to do this twice...)
         self.plotItem.setRange(xRange=(x.min(), x.max()),
@@ -462,13 +448,25 @@ class RTDCScatterWidget(pg.PlotWidget):
                                yRange=(y.min(), y.max()),
                                padding=.05)
 
-    def setSelection(self, x, y):
+        self.plotItem.setLabels(
+            left=dclab.dfn.feature_name2label[self.yax],
+            bottom=dclab.dfn.feature_name2label[self.xax])
+
+        # Force updating the plot item size, otherwise axes labels
+        # may have an offset.
+        s = self.plotItem.size()
+        self.plotItem.resize(s.width()+1, s.height())
+        self.plotItem.resize(s)
+
+    def setSelection(self, event_index):
+        x = self.data_x[event_index]
+        y = self.data_y[event_index]
         # workaround, because ScatterPlotItem does somehow not support
         # logarithmic scaling. Surprisingly, this works very well when
         # the log-scaling is changed (data is rescaled).
-        if self.logx:
+        if self.xscale == "log":
             x = 10**x
-        if self.logy:
+        if self.yscale == "log":
             y = 10**y
         self.select.setData([x], [y])
 

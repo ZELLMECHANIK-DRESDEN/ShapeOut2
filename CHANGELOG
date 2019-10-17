@@ -1,5 +1,8 @@
 2.0.0a19
  - fix plot matrix: size and buttons of elements
+ - populate help menu
+ - refactor scatter plot
+ - fix box filter view not updated with filter data
 2.0.0a18
  - replace push buttons with tool buttons
    (try to overcome ugly rendering on macOS)

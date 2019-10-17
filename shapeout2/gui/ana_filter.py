@@ -91,6 +91,7 @@ class FilterPanel(QtWidgets.QWidget):
             rc = self._box_range_controls[feat]
             if feat in box:
                 rc.show()
+                rc.__setstate__(box[feat])
             elif not rc.isHidden():
                 # update range to limits
                 rc.reset_range()

@@ -73,6 +73,8 @@ class QuickView(QtWidgets.QWidget):
                 w.currentIndexChanged.connect(self.plot)
             elif hasattr(w, "stateChanged"):
                 w.stateChanged.connect(self.plot)
+            elif hasattr(w, "valueChanged"):
+                w.valueChanged.connect(self.plot)
 
         # disable pyqtgraph controls we don't need
         for vim in [self.imageView_image]:

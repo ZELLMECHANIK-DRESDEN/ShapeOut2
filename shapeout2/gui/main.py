@@ -3,6 +3,13 @@ import pkg_resources
 import signal
 import sys
 import traceback
+import webbrowser
+
+import appdirs
+import dclab
+import h5py
+import numpy
+import scipy
 
 from PyQt5 import uic, QtCore, QtWidgets
 import pyqtgraph as pg
@@ -35,6 +42,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.menubar.setNativeMenuBar(False)
         # File menu
         self.action_Quit.triggered.connect(self.on_action_quit)
+        # Help menu
+        self.action_Documentation.triggered.connect(self.on_action_docs)
+        self.action_Software.triggered.connect(self.on_action_software)
+        self.action_About.triggered.connect(self.on_action_about)
         # Initially hide buttons
         self.pushButton_preset_load.hide()
         self.pushButton_preset_save.hide()
@@ -111,9 +122,43 @@ class ShapeOut2(QtWidgets.QMainWindow):
                            | QtCore.Qt.WindowTitleHint
                            | QtCore.Qt.Tool)
 
+    def on_action_docs(self):
+        webbrowser.open("https://shapeout2.readthedocs.io")
+
     def on_action_quit(self):
         """Determine what happens when the user wants to quit"""
         QtCore.QCoreApplication.quit()
+
+    def on_action_about(self):
+        about_text = "Shape-Out 2 is the successor of Shape-Out, " \
+            + "a graphical user interface for the analysis and " \
+            + "visualization of RT-DC data sets.\n\n" \
+            + "Author: Paul Müller\n" \
+            + "Code: https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2\n" \
+            + "Documentation: https://shapeout2.readthedocs.io"
+        QtWidgets.QMessageBox.about(self,
+                                    "Shape-Out {}".format(__version__),
+                                    about_text)
+
+    def on_action_software(self):
+        libs = [appdirs,
+                dclab,
+                h5py,
+                numpy,
+                pg,
+                scipy,
+                ]
+        sw_text = "PyJibe {}\n\n".format(__version__)
+        sw_text += "Python {}\n\n".format(sys.version)
+        sw_text += "Modules:\n"
+        for lib in libs:
+            sw_text += "- {} {}\n".format(lib.__name__, lib.__version__)
+        sw_text += "- PyQt5 {}\n".format(QtCore.QT_VERSION_STR)
+        if hasattr(sys, 'frozen'):
+            sw_text += "\nThis executable has been created using PyInstaller."
+        QtWidgets.QMessageBox.information(self,
+                                          "Software",
+                                          sw_text)
 
     @QtCore.pyqtSlot(bool)
     def on_analysis_view(self, view=True):

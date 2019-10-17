@@ -43,7 +43,7 @@ class RangeControl(QtWidgets.QWidget):
             "active": self.checkBox.isChecked(),
             "start": self.doubleSpinBox_min.value(),
             "end": self.doubleSpinBox_max.value(),
-            }
+        }
         return state
 
     def __setstate__(self, state):

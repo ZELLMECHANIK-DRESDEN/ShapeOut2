@@ -2,6 +2,7 @@
  - fix plot matrix: size and buttons of elements
  - populate help menu
  - refactor scatter plot
+ - introduce style sheets
  - fix box filter view not updated with filter data
 2.0.0a18
  - replace push buttons with tool buttons

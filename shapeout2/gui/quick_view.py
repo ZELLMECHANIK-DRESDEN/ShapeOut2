@@ -1,3 +1,4 @@
+import pathlib
 import pkg_resources
 
 import dclab
@@ -15,6 +16,12 @@ class QuickView(QtWidgets.QWidget):
         path_ui = pkg_resources.resource_filename(
             "shapeout2.gui", "quick_view.ui")
         uic.loadUi(path_ui, self)
+        path_css = pkg_resources.resource_filename(
+            "shapeout2.gui", "quick_view.css")
+        stylesheet = pathlib.Path(path_css).read_text()
+        self.groupBox_image.setStyleSheet(stylesheet)
+        self.groupBox_trace.setStyleSheet(stylesheet)
+
         self.setWindowTitle("Quick View (QV)")
 
         # Initially, only show the info about how QuickView works

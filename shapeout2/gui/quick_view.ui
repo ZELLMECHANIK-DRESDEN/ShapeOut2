@@ -406,177 +406,217 @@
        </layout>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox_image">
-        <property name="title">
-         <string>Brightfield image</string>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="currentIndex">
+         <number>0</number>
         </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QWidget" name="widget_2" native="true">
-           <property name="styleSheet">
-            <string notr="true">background-color:#FFFFFF</string>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_7">
-            <item>
-             <layout class="QGridLayout" name="gridLayout_3">
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <item row="0" column="0">
-               <widget class="QCheckBox" name="checkBox_image_contour">
-                <property name="text">
-                 <string>Show contour</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QCheckBox" name="checkBox_image_zoom">
-                <property name="text">
-                 <string>Zoom to event</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QCheckBox" name="checkBox_image_contrast">
-                <property name="text">
-                 <string>Auto contrast</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="ImageView" name="imageView_image">
-              <property name="minimumSize">
-               <size>
-                <width>300</width>
-                <height>200</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="groupBox_trace">
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
-        <property name="title">
-         <string>Fluorescence traces</string>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QWidget" name="widget" native="true">
-           <property name="styleSheet">
-            <string notr="true">background-color:#FFFFFF</string>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_6">
-            <property name="spacing">
-             <number>6</number>
+        <widget class="QWidget" name="tab_view">
+         <attribute name="title">
+          <string>View</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_8">
+          <property name="spacing">
+           <number>12</number>
+          </property>
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
+           <number>9</number>
+          </property>
+          <item>
+           <widget class="QGroupBox" name="groupBox_image">
+            <property name="styleSheet">
+             <string notr="true"/>
             </property>
-            <property name="leftMargin">
-             <number>9</number>
+            <property name="title">
+             <string>Brightfield image</string>
             </property>
-            <property name="topMargin">
-             <number>9</number>
+            <property name="flat">
+             <bool>true</bool>
             </property>
-            <property name="rightMargin">
-             <number>9</number>
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QWidget" name="widget_2" native="true">
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_7">
+                <item>
+                 <layout class="QGridLayout" name="gridLayout_3">
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QCheckBox" name="checkBox_image_contour">
+                    <property name="text">
+                     <string>Show contour</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QCheckBox" name="checkBox_image_zoom">
+                    <property name="text">
+                     <string>Zoom to event</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QCheckBox" name="checkBox_image_contrast">
+                    <property name="text">
+                     <string>Auto contrast</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="ImageView" name="imageView_image">
+                  <property name="minimumSize">
+                   <size>
+                    <width>300</width>
+                    <height>200</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_trace">
+            <property name="styleSheet">
+             <string notr="true"/>
             </property>
-            <property name="bottomMargin">
-             <number>9</number>
+            <property name="title">
+             <string>Fluorescence traces</string>
             </property>
-            <item>
-             <layout class="QGridLayout" name="gridLayout_4">
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <item row="0" column="0">
-               <widget class="QCheckBox" name="checkBox_trace_raw">
-                <property name="text">
-                 <string>Show raw data</string>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QWidget" name="widget" native="true">
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_6">
+                <property name="spacing">
+                 <number>6</number>
                 </property>
-                <property name="checked">
-                 <bool>true</bool>
+                <property name="leftMargin">
+                 <number>9</number>
                 </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QCheckBox" name="checkBox_trace_zoom">
-                <property name="text">
-                 <string>Zoom (experimental)</string>
+                <property name="topMargin">
+                 <number>9</number>
                 </property>
-                <property name="checked">
-                 <bool>false</bool>
+                <property name="rightMargin">
+                 <number>9</number>
                 </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="PlotWidget" name="graphicsView_trace">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>200</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
+                <property name="bottomMargin">
+                 <number>9</number>
+                </property>
+                <item>
+                 <layout class="QGridLayout" name="gridLayout_4">
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QCheckBox" name="checkBox_trace_raw">
+                    <property name="text">
+                     <string>Show raw data</string>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QCheckBox" name="checkBox_trace_zoom">
+                    <property name="text">
+                     <string>Zoom (experimental)</string>
+                    </property>
+                    <property name="checked">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="PlotWidget" name="graphicsView_trace">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>200</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_features">
+         <attribute name="title">
+          <string>Features</string>
+         </attribute>
+        </widget>
        </widget>
       </item>
      </layout>

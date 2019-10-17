@@ -1,0 +1,12 @@
+QGroupBox {
+  border: 1px solid #E0E0E0;
+  background-color: white;
+  border-radius: 0px;
+  margin-top: 1em;
+}
+
+QGroupBox::title {
+  background-color: transparent;
+  padding-top: -2.5em;
+  padding-left: 0px;
+}

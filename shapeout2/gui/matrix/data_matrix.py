@@ -106,7 +106,7 @@ class DataMatrix(QtWidgets.QWidget):
                 width = item.geometry().width()
                 break
         else:
-            width = 90
+            width = 67
         return width
 
     @property
@@ -118,7 +118,7 @@ class DataMatrix(QtWidgets.QWidget):
                 height = item.geometry().height()
                 break
         else:
-            height = 90
+            height = 73
         return height
 
     @property

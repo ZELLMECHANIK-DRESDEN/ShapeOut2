@@ -22,10 +22,10 @@ class MatrixPlot(QtWidgets.QWidget):
         menu = QtWidgets.QMenu()
         menu.addAction('duplicate', self.action_duplicate)
         menu.addAction('remove', self.action_remove)
-        self.pushButton_opt.setMenu(menu)
+        self.toolButton_opt.setMenu(menu)
 
         # toggle all active, all inactive, semi state
-        self.pushButton_toggle.clicked.connect(self.active_toggled.emit)
+        self.toolButton_toggle.clicked.connect(self.active_toggled.emit)
 
         # set tooltip/label
         self.update_content()

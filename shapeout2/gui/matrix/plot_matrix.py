@@ -127,7 +127,7 @@ class PlotMatrix(QtWidgets.QWidget):
         QtWidgets.QApplication.processEvents()
         ncols = self.num_plots
         nrows = self.data_matrix.num_datasets
-        if ncols > 1 and nrows > 1:
+        if ncols and nrows:
             hwidth = self.element_width + 2
             hheight = self.glo.itemAtPosition(0, 1).geometry().height()
             dheight = self.element_height + 2

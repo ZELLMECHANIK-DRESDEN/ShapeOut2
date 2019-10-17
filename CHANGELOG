@@ -1,3 +1,5 @@
+2.0.0a19
+ - fix plot matrix: size and buttons of elements
 2.0.0a18
  - replace push buttons with tool buttons
    (try to overcome ugly rendering on macOS)

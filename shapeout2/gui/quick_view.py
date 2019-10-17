@@ -213,6 +213,8 @@ class QuickView(QtWidgets.QWidget):
             if self.toolButton_event.isChecked():
                 show_event = True
                 self.toolButton_settings.setChecked(False)
+                # update event plot (maybe axes changed)
+                self.on_event_scatter_update()
         else:
             # keep everything as-is but update the sizes
             show_event = self.widget_event.isVisible()
@@ -348,8 +350,12 @@ class QuickView(QtWidgets.QWidget):
         self.tableWidget_feats.setUpdatesEnabled(False)
         # only use innate features (speed)...
         fcands = ds.features_innate
-        # ...add easily computed features
+        # ...add easily computed features...
         fcands += [f for f in ds.features if f in idiom.QUICK_FEATURES]
+        # ...and features that already have been computed (emodulus etc).
+        fcands += sorted(ds._ancillaries.keys())
+        # remove doublets
+        fcands = list(set(fcands))
         # restrict to scalar features
         feats = [f for f in fcands if f in dclab.dfn.scalar_feature_names]
         lf = sorted([(dclab.dfn.feature_name2label[f], f) for f in feats])

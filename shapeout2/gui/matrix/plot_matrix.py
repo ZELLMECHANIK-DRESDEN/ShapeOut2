@@ -91,6 +91,18 @@ class PlotMatrix(QtWidgets.QWidget):
         return self.data_matrix.element_height
 
     @property
+    def header_height(self):
+        """Data matrix horizontal header height"""
+        for jj in range(self.glo.columnCount()):
+            item = self.glo.itemAtPosition(0, jj)
+            if item is not None:
+                height = item.geometry().height()
+                break
+        else:
+            height = 99
+        return height
+
+    @property
     def num_datasets(self):
         dm = self.data_matrix
         return dm.num_datasets
@@ -129,7 +141,7 @@ class PlotMatrix(QtWidgets.QWidget):
         nrows = self.data_matrix.num_datasets
         if ncols and nrows:
             hwidth = self.element_width + 2
-            hheight = self.glo.itemAtPosition(0, 1).geometry().height()
+            hheight = self.header_height + 2
             dheight = self.element_height + 2
             self.setMinimumSize(ncols*hwidth,
                                 nrows*dheight+hheight)

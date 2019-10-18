@@ -84,6 +84,11 @@ class DataMatrix(QtWidgets.QWidget):
         self.glo = QtWidgets.QGridLayout()
         self.glo.setSpacing(2)
         self.glo.setContentsMargins(0, 0, 0, 0)
+        # add dummy corner element
+        cl = QtWidgets.QLabel("Block\nMatrix")
+        cl.setAlignment(QtCore.Qt.AlignCenter)
+        cl.setMinimumSize(67, self.header_height)
+        self.glo.addWidget(cl, 0, 0)
         self.setLayout(self.glo)
         self.adjust_size()
 
@@ -130,6 +135,18 @@ class DataMatrix(QtWidgets.QWidget):
                 fs = item.widget()
                 filters.append(fs)
         return filters
+
+    @property
+    def header_height(self):
+        """Data matrix horizontal header height"""
+        for jj in range(1, self.glo.columnCount()):
+            item = self.glo.itemAtPosition(0, jj)
+            if item is not None:
+                height = item.geometry().height()
+                break
+        else:
+            height = 99
+        return height
 
     @property
     def num_datasets(self):
@@ -513,6 +530,9 @@ class DataMatrix(QtWidgets.QWidget):
         nrows = self.glo.rowCount()
         for ii in range(nrows):
             for jj in range(ncols):
+                if ii == 0 and jj == 0:
+                    # block matrix label
+                    continue
                 item = self.glo.itemAtPosition(ii, jj)
                 if item is not None:
                     item.widget().update_content()

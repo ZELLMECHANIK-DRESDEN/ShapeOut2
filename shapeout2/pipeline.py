@@ -10,6 +10,17 @@ from . import util
 class Pipeline(object):
     def __init__(self, state=None):
         self.reset()
+        #: Analysis matrix with dataset hierarchies. The first index
+        #: identifies the slot and the second index identifies the
+        #: filter
+        self.matrix = []
+        #: used for detecting changes in the matrix
+        self._matrix_hash = "None"
+        #: holds the slot identifiers of the current matrix
+        self._matrix_slots = []
+        #: holds the filter identifiers of the current matrix
+        self._matrix_filters = []
+        #: previous state (see __setstate__)
         self._old_state = {}
         if state is not None:
             self.__setstate__(state)
@@ -115,21 +126,54 @@ class Pipeline(object):
         """
         # TODO:
         # - incremental updates
-        matrix_hash = util.hashobj([
-            [slot.identifier for slot in self.slots],
-            [filt.identifier for filt in self.filters],
-            ])
+        matrix_filters = [filt.identifier for filt in self.filters]
+        matrix_slots = [slot.identifier for slot in self.slots]
+        matrix_hash = util.hashobj([matrix_slots, matrix_filters])
+        n_filt_then = len(self._matrix_filters)
         if self._matrix_hash != matrix_hash:
+            matrix = []
+            if self._matrix_filters == matrix_filters:
+                # only a slot was added/removed
+                for sl in self.slots:
+                    # find it in the old matrix
+                    for row in self.matrix:
+                        if row[0].identifier == sl.identifier:
+                            # use this row
+                            break
+                    else:
+                        # new dataset
+                        ds = dclab.new_dataset(sl.path,
+                                               identifier=sl.identifier)
+                        row = [ds]
+                        for _ in self.filters:
+                            # generate hierarchy children
+                            ds = dclab.new_dataset(ds)
+                            row.append(ds)
+                    matrix.append(row)
+            elif (self._matrix_slots == matrix_slots
+                  and self._matrix_filters == matrix_filters[:n_filt_then]):
+                # only a filter was added
+                matrix = self.matrix
+                for ii, sl in enumerate(self.slots):
+                    row = matrix[ii]
+                    for _ in self.filters[n_filt_then:]:
+                        ds = dclab.new_dataset(row[-1])
+                        row.append(ds)
+            else:
+                # everything changed
+                for sl in self.slots:
+                    ds = dclab.new_dataset(sl.path, identifier=sl.identifier)
+                    row = [ds]
+                    for _ in self.filters:
+                        # generate hierarchy children
+                        ds = dclab.new_dataset(ds)
+                        row.append(ds)
+                    matrix.append(row)
+
+            self.matrix = matrix
             self._matrix_hash = matrix_hash
-            self.matrix = []
-            for sl in self.slots:
-                ds = dclab.new_dataset(sl.path)
-                row = [ds]
-                for _ in self.filters:
-                    # generate hierarchy children
-                    ds = dclab.new_dataset(ds)
-                    row.append(ds)
-                self.matrix.append(row)
+            self._matrix_slots = matrix_slots
+            self._matrix_filters = matrix_filters
             # TODO:
             # - if `self.elements_dict` is not complete, autocomplete it
             #   (as it is done in gui.matrix.dm_dataset)
@@ -156,9 +200,15 @@ class Pipeline(object):
         for ii in range(filt_index + 1):
             filt = self.filters[ii]
             filt_id = filt.identifier
+            # TODO:
+            # - cache previously filter states and compare to new filter
+            #   states to avoid recomputation when `apply_filter`
+            #   is called.
             # these are the element states in gui.matrix.dm_element
             if fstates[filt_id]:
                 filt.update_dataset(row[ii])
+            else:
+                row[ii].config["filtering"]["enable filters"] = False
         dsend = row[filt_index]
         if apply_filter:
             dsend.apply_filter()
@@ -183,12 +233,6 @@ class Pipeline(object):
         self.filters = []
         #: Slots are instances of :class:`shapeout2.dataslot.Dataslot`
         self.slots = []
-        #: Analysis matrix with dataset hierarchies. The first index
-        #: identifies the slot and the second index identifies the
-        #: filter
-        self.matrix = []
-        #: used for detecting changes in the matrix
-        self._matrix_hash = "None"
         #: individual element states
         self.element_states = {}
 

@@ -26,11 +26,11 @@ class MatrixFilter(QtWidgets.QWidget):
         self.toolButton_toggle.clicked.connect(self.active_toggled.emit)
 
         # toggle enabled/disabled state
-        self.checkBox.clicked.connect(self.enabled_toggled.emit)
+        self.checkBox.clicked.connect(self.on_enabled_toggled)
 
         if state is None:
             if identifier is None:
-                # get the identifier from the dataslot class
+                # get the identifier from the filter class
                 identifier = filter.Filter().identifier
             self.identifier = identifier
             if name is None:
@@ -41,17 +41,40 @@ class MatrixFilter(QtWidgets.QWidget):
         else:
             self.__setstate__(state)
 
+    @property
+    def enabled(self):
+        filt = filter.Filter._instances[self.identifier]
+        return filt.general["enable filters"]
+
+    @enabled.setter
+    def enabled(self, b):
+        filt = filter.Filter._instances[self.identifier]
+        filt.general["enable filters"] = b
+
+    @property
+    def name(self):
+        filt = filter.Filter._instances[self.identifier]
+        return filt.name
+
+    @name.setter
+    def name(self, text):
+        filt = filter.Filter._instances[self.identifier]
+        filt.name = text
+
     def __getstate__(self):
-        state = {"identifier": self.identifier,
-                 "enabled": self.checkBox.isChecked(),
+        state = {"enabled": self.enabled,
+                 "identifier": self.identifier,
                  "name": self.name,
                  }
         return state
 
     def __setstate__(self, state):
+        if state["identifier"] not in filter.Filter._instances:
+            # Create a new filter with the identifier
+            filter.Filter(identifier=state["identifier"])
         self.identifier = state["identifier"]
+        self.enabled = state["enabled"]
         self.name = state["name"]
-        self.checkBox.setChecked(state["enabled"])
         self.update_content()
 
     def action_duplicate(self):
@@ -60,6 +83,11 @@ class MatrixFilter(QtWidgets.QWidget):
     def action_remove(self):
         self.option_action.emit("remove")
 
+    def on_enabled_toggled(self, b):
+        self.enabled = b
+        self.enabled_toggled.emit(b)
+
+    @QtCore.pyqtSlot()
     def update_content(self):
         """Reset tool tips and title"""
         self.label.setToolTip(self.name)
@@ -67,4 +95,8 @@ class MatrixFilter(QtWidgets.QWidget):
             title = self.name[:5]+"..."
         else:
             title = self.name
+        self.checkBox.blockSignals(True)
+        self.checkBox.setChecked(self.enabled)
+        self.checkBox.blockSignals(False)
+        self.enabled_toggled.emit(self.enabled)
         self.label.setText(title)

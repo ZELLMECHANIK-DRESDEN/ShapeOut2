@@ -1,6 +1,6 @@
 import pkg_resources
 
-from PyQt5 import uic, QtWidgets
+from PyQt5 import uic, QtCore, QtWidgets
 
 import dclab
 
@@ -14,6 +14,9 @@ SHOW_FEATURES = ["deform", "area_um", "index"]
 
 
 class FilterPanel(QtWidgets.QWidget):
+    #: Emitted when a shapeout2.filter.Filter modified
+    filters_changed = QtCore.pyqtSignal()
+
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self)
         path_ui = pkg_resources.resource_filename(
@@ -159,3 +162,4 @@ class FilterPanel(QtWidgets.QWidget):
         filt = Filter.get_filter(identifier=self.filter_names[filt_index])
         state = self.get_filter_state()
         filt.__setstate__(state)
+        self.filters_changed.emit()

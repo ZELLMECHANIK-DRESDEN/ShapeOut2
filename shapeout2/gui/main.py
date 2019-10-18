@@ -91,6 +91,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # connect "modify" button to analysis view
         mf.toolButton_modify.clicked.connect(self.on_analysis_view)
         self.widget_ana_view.widget_filter.update_content()
+        self.widget_ana_view.widget_filter.filters_changed.connect(
+            mf.update_content)
 
     def init_analysis_view(self):
         sub = QtWidgets.QMdiSubWindow()

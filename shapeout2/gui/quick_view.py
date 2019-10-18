@@ -352,14 +352,8 @@ class QuickView(QtWidgets.QWidget):
         # update features tab
         # Disable updates which look ugly when the user switches quickly
         self.tableWidget_feats.setUpdatesEnabled(False)
-        # only use innate features (speed)...
-        fcands = ds.features_innate
-        # ...add easily computed features...
-        fcands += [f for f in ds.features if f in idiom.QUICK_FEATURES]
-        # ...and features that already have been computed (emodulus etc).
-        fcands += sorted(ds._ancillaries.keys())
-        # remove doublets
-        fcands = list(set(fcands))
+        # only use computed features (speed)
+        fcands = ds.features_loaded
         # restrict to scalar features
         feats = [f for f in fcands if f in dclab.dfn.scalar_feature_names]
         lf = sorted([(dclab.dfn.feature_name2label[f], f) for f in feats])

@@ -1,3 +1,5 @@
+from dclab.rtdc_dataset import ancillaries
+
 #: integer-valued features
 INTEGER_FEATURES = [
     "fl1_max",
@@ -12,11 +14,4 @@ INTEGER_FEATURES = [
 ]
 
 #: ancillary features that are easily computed
-QUICK_FEATURES = [
-    "area_ratio",
-    "area_um",
-    "aspec",
-    "deform",
-    "index",
-    "time",
-]
+QUICK_FEATURES = ancillaries.FEATURES_RAPID

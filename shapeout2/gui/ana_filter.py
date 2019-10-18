@@ -47,18 +47,23 @@ class FilterPanel(QtWidgets.QWidget):
 
     @property
     def current_filter(self):
-        if self.filter_names:
+        if self.filter_ids:
             filt_index = self.comboBox_filters.currentIndex()
-            filt_name = self.filter_names[filt_index]
-            filt = Filter.get_instances()[filt_name]
+            filt_id = self.filter_ids[filt_index]
+            filt = Filter.get_instances()[filt_id]
         else:
             filt = None
         return filt
 
     @property
-    def filter_names(self):
+    def filter_ids(self):
         """List of filter names"""
         return sorted(Filter.get_instances().keys())
+
+    @property
+    def filter_names(self):
+        """List of filter names"""
+        return [Filter._instances[f].name for f in self.filter_ids]
 
     @property
     def visible_box_features(self):
@@ -104,24 +109,24 @@ class FilterPanel(QtWidgets.QWidget):
         return state
 
     def show_filter(self, filt_id):
-        self.update_content(filt_index=self.filter_names.index(filt_id))
+        self.update_content(filt_index=self.filter_ids.index(filt_id))
 
     def update_content(self, event=None, filt_index=None):
-        if self.filter_names:
+        if self.filter_ids:
             self.setEnabled(True)
             # update combobox
             self.comboBox_filters.blockSignals(True)
             # this also updates the combobox
             if filt_index is None:
                 filt_index = self.comboBox_filters.currentIndex()
-                if filt_index > len(self.filter_names) - 1 or filt_index < 0:
-                    filt_index = len(self.filter_names) - 1
+                if filt_index > len(self.filter_ids) - 1 or filt_index < 0:
+                    filt_index = len(self.filter_ids) - 1
             self.comboBox_filters.clear()
             self.comboBox_filters.addItems(self.filter_names)
             self.comboBox_filters.setCurrentIndex(filt_index)
             self.comboBox_filters.blockSignals(False)
             # populate content
-            filt = Filter.get_filter(identifier=self.filter_names[filt_index])
+            filt = Filter.get_filter(identifier=self.filter_ids[filt_index])
             state = filt.__getstate__()
             self.set_filter_state(state)
             self.update_box_filters()

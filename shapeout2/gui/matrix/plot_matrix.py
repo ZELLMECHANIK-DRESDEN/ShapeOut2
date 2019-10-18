@@ -126,6 +126,7 @@ class PlotMatrix(QtWidgets.QWidget):
         return plots
 
     def add_plot(self):
+        self.setUpdatesEnabled(False)
         name = "PS{}".format(self.num_plots+1)
         mp = MatrixPlot(name)
         mp.option_action.connect(self.on_option_plot)
@@ -133,6 +134,7 @@ class PlotMatrix(QtWidgets.QWidget):
         self.glo.addWidget(mp, 0, self.num_plots)
         self.fill_elements()
         self.adjust_size()
+        self.setUpdatesEnabled(True)
         return mp
 
     def adjust_size(self):

@@ -6,11 +6,14 @@ from PyQt5 import QtCore, QtWidgets
 from .dm_dataset import MatrixDataset
 from .dm_filter import MatrixFilter
 from .dm_element import MatrixElement
+from ... import filter
+from ... import dataslot
 
 
 class DataMatrix(QtWidgets.QWidget):
     quickviewed = QtCore.pyqtSignal(int, int)
-    matrix_changed = QtCore.pyqtSignal(int, int)
+    matrix_changed = QtCore.pyqtSignal(dict)
+    filter_modify_clicked = QtCore.pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(DataMatrix, self).__init__(parent)
@@ -51,6 +54,8 @@ class DataMatrix(QtWidgets.QWidget):
         return state
 
     def __setstate__(self, state):
+        self.blockSignals(True)
+        self.setUpdatesEnabled(False)
         self.clear()
         # dataset states
         for ii in range(len(state["datasets"])):
@@ -68,7 +73,8 @@ class DataMatrix(QtWidgets.QWidget):
                 me_state = ds_state[f_key]
                 me = self.get_matrix_element(ds_key, f_key)
                 me.__setstate__(me_state)
-
+        self.blockSignals(False)
+        self.setUpdatesEnabled(True)
         self.adjust_size()
 
     def _reset_layout(self):
@@ -174,6 +180,7 @@ class DataMatrix(QtWidgets.QWidget):
         return ch
 
     def add_dataset(self, identifier=None, state=None):
+        self.setUpdatesEnabled(False)
         md = MatrixDataset(identifier=identifier, state=state)
         self.glo.addWidget(md, self.num_datasets+1, 0)
         md.active_toggled.connect(self.toggle_dataset_active)
@@ -184,16 +191,22 @@ class DataMatrix(QtWidgets.QWidget):
         self.adjust_size()
         self.plot_matrix.fill_elements()
         self.plot_matrix.adjust_size()
+        self.publish_matrix()
+        self.setUpdatesEnabled(True)
         return md
 
     def add_filter(self, identifier=None, state=None):
+        self.setUpdatesEnabled(False)
         mf = MatrixFilter(identifier=identifier, state=state)
         mf.active_toggled.connect(self.toggle_filter_active)
         mf.enabled_toggled.connect(self.toggle_filter_enable)
         mf.option_action.connect(self.on_option_filter)
+        mf.modify_clicked.connect(self.filter_modify_clicked.emit)
         self.glo.addWidget(mf, 0, self.num_filters+1)
         self.fill_elements()
         self.adjust_size()
+        self.setUpdatesEnabled(True)
+        self.publish_matrix()
         return mf
 
     def adjust_size(self):
@@ -212,15 +225,7 @@ class DataMatrix(QtWidgets.QWidget):
 
     @QtCore.pyqtSlot()
     def changed_element(self):
-        idx = self.glo.indexOf(self.sender())
-        row, column, _, _ = self.glo.getItemPosition(idx)
-        # decrement by header row/column
-        slot_index = row - 1  # enumerates the dataset
-        filt_index = column - 1  # enumerates the filter
-        slot_index_qv, filt_index_qv = self.get_quickview_indices()
-        self.matrix_changed.emit(slot_index, filt_index)
-        if slot_index_qv == slot_index and filt_index_qv >= filt_index:
-            self.quickviewed.emit(slot_index_qv, filt_index_qv)
+        self.publish_matrix()
 
     @QtCore.pyqtSlot()
     def changed_quickview(self):
@@ -348,17 +353,17 @@ class DataMatrix(QtWidgets.QWidget):
         # remember current quickview element ids
         qv_ds, qv_f = self.get_quickview_ids()
         if option == "insert_anew":
-            ds_new = self.add_dataset(path=ds_state["path"])
-            ds_state["identifier"] = ds_new.identifier
+            slot = dataslot.Dataslot(path=ds_state["path"])
+            ds_state["identifier"] = slot.identifier
             # enable by default
             ds_state["enabled"] = True
             state["datasets"].insert(row, ds_state)
         elif option == "duplicate":
-            ds_new = self.add_dataset(path=ds_state["path"])
+            slot = dataslot.Dataslot(path=ds_state["path"])
             # also set element states
-            state["elements"][ds_new.identifier] = \
+            state["elements"][slot.identifier] = \
                 state["elements"][ds_state["identifier"]]
-            ds_state["identifier"] = ds_new.identifier
+            ds_state["identifier"] = slot.identifier
             state["datasets"].insert(row, ds_state)
         else:  # remove
             state["datasets"].pop(row-1)
@@ -374,6 +379,7 @@ class DataMatrix(QtWidgets.QWidget):
         else:
             MatrixElement._quick_view_instance = meqv
             self.update_content()
+        self.publish_matrix()
 
     @QtCore.pyqtSlot(str)
     def on_option_filter(self, option):
@@ -386,9 +392,9 @@ class DataMatrix(QtWidgets.QWidget):
         # remember current quickview element ids
         qv_ds, qv_f = self.get_quickview_ids()
         if option == "duplicate":
-            f_new = self.add_filter()
-            f_state["identifier"] = f_new.identifier
-            f_state["name"] = f_new.name
+            filt = filter.Filter()
+            f_state["identifier"] = filt.identifier
+            f_state["name"] = filt.name
             state["filters"].insert(column, f_state)
         else:  # remove
             state["filters"].pop(column-1)
@@ -403,6 +409,20 @@ class DataMatrix(QtWidgets.QWidget):
         else:
             MatrixElement._quick_view_instance = meqv
             self.update_content()
+        self.publish_matrix()
+
+    def publish_matrix(self):
+        """Publish state via self.matrix_changed signal for Pipeline"""
+        state = self.__getstate__()
+        # Reduce a state from DataMatrix to something Pipeline can work with
+        for slot_id in state["elements"]:
+            for filt_id in state["elements"][slot_id]:
+                active = state["elements"][slot_id][filt_id]["active"]
+                enabled = state["elements"][slot_id][filt_id]["enabled"]
+                state["elements"][slot_id][filt_id] = active and enabled
+        if not self.signalsBlocked():
+            self.matrix_changed.emit(state)
+            self.changed_quickview()
 
     @QtCore.pyqtSlot()
     def toggle_dataset_active(self):
@@ -444,7 +464,7 @@ class DataMatrix(QtWidgets.QWidget):
         for fid in state:
             me = self.get_matrix_element(sid, fid)
             me.__setstate__(state[fid])
-        self.changed_quickview()
+        self.publish_matrix()
 
     @QtCore.pyqtSlot(bool)
     def toggle_dataset_enable(self, enabled):
@@ -460,7 +480,7 @@ class DataMatrix(QtWidgets.QWidget):
             mstate = me.__getstate__()
             mstate["enabled"] = np.logical_and(enabled, fenabled)
             me.__setstate__(mstate)
-        self.changed_quickview()
+        self.publish_matrix()
 
     @QtCore.pyqtSlot()
     def toggle_filter_active(self):
@@ -507,7 +527,7 @@ class DataMatrix(QtWidgets.QWidget):
         for dsid in state:
             me = self.get_matrix_element(dsid, sid)
             me.__setstate__(state[dsid])
-        self.changed_quickview()
+        self.publish_matrix()
 
     @QtCore.pyqtSlot(bool)
     def toggle_filter_enable(self, enabled):
@@ -523,7 +543,7 @@ class DataMatrix(QtWidgets.QWidget):
             mstate = me.__getstate__()
             mstate["enabled"] = np.logical_and(enabled, denabled)
             me.__setstate__(mstate)
-        self.changed_quickview()
+        self.publish_matrix()
 
     def update_content(self):
         ncols = self.glo.columnCount()

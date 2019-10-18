@@ -9,6 +9,7 @@ class MatrixFilter(QtWidgets.QWidget):
     active_toggled = QtCore.pyqtSignal()
     enabled_toggled = QtCore.pyqtSignal(bool)
     option_action = QtCore.pyqtSignal(str)
+    modify_clicked = QtCore.pyqtSignal(str)
 
     def __init__(self, identifier=None, state=None):
         QtWidgets.QWidget.__init__(self)
@@ -27,6 +28,7 @@ class MatrixFilter(QtWidgets.QWidget):
 
         # toggle enabled/disabled state
         self.checkBox.clicked.connect(self.on_enabled_toggled)
+        self.toolButton_modify.clicked.connect(self.on_modify)
 
         if state is None:
             filt = filter.Filter._instances[identifier]
@@ -82,6 +84,9 @@ class MatrixFilter(QtWidgets.QWidget):
     def on_enabled_toggled(self, b):
         self.enabled = b
         self.enabled_toggled.emit(b)
+
+    def on_modify(self):
+        self.modify_clicked.emit(self.identifier)
 
     @QtCore.pyqtSlot()
     def update_content(self):

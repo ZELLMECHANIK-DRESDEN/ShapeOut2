@@ -15,7 +15,6 @@ class Pipeline(object):
             self.__setstate__(state)
 
     def __setstate__(self, state):
-        Pipeline._reduce_state(state)
         if self._old_state == state:
             # Nothing changed
             return
@@ -40,17 +39,7 @@ class Pipeline(object):
                 slot = Dataslot(path=dd["path"],
                                 identifier=dd["identifier"])
             self.add_slot(slot=slot)
-        self.construct_matrix()
         self.element_states = state["elements"]
-
-    @staticmethod
-    def _reduce_state(state):
-        """Reduce a state from DataMatrix to something we can work with"""
-        for slot_id in state["elements"]:
-            for filt_id in state["elements"][slot_id]:
-                active = state["elements"][slot_id][filt_id]["active"]
-                enabled = state["elements"][slot_id][filt_id]["enabled"]
-                state["elements"][slot_id][filt_id] = active and enabled
 
     @property
     def num_filters(self):
@@ -124,6 +113,8 @@ class Pipeline(object):
         This generates dataset hierarchies and updates
         the filters.
         """
+        # TODO:
+        # - incremental updates
         matrix_hash = util.hashobj([
             [slot.identifier for slot in self.slots],
             [filt.identifier for filt in self.filters],
@@ -176,12 +167,14 @@ class Pipeline(object):
     def get_min_max(self, feat):
         fmin = np.inf
         fmax = -np.inf
-        for ii in range(self.num_slots):
-            ds = self.get_dataset(slot_index=ii,
+        for slot_index in range(self.num_slots):
+            ds = self.get_dataset(slot_index=slot_index,
                                   filt_index=0,
                                   apply_filter=False)
-            fmin = np.min([fmin, np.nanmin(ds[feat])])
-            fmax = np.max([fmax, np.nanmax(ds[feat])])
+            vmin = np.nanmin(ds[feat])
+            vmax = np.nanmax(ds[feat])
+            fmin = np.min([fmin, vmin])
+            fmax = np.max([fmax, vmax])
         return fmin, fmax
 
     def reset(self):

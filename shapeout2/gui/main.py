@@ -15,7 +15,6 @@ from PyQt5 import uic, QtCore, QtWidgets
 import pyqtgraph as pg
 
 from . import ana_view
-from . import matrix
 from . import quick_view
 
 from .. import settings
@@ -55,6 +54,11 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.mdiArea.cascadeSubWindows()
         self.showMaximized()
         # data matrix
+        self.data_matrix.matrix_changed.connect(self.update_pipeline)
+        self.data_matrix.filter_modify_clicked.connect(
+            self.on_modify_filter)
+        self.widget_ana_view.widget_filter.filters_changed.connect(
+            self.data_matrix.update_content)
         self.toolButton_dm.clicked.connect(self.on_data_matrix)
         self.splitter.splitterMoved.connect(self.on_splitter)
         self.toolButton_new_filter.clicked.connect(self.add_filter)
@@ -90,12 +94,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     def add_filter(self):
         filt_id = self.pipeline.add_filter()
-        mf = self.data_matrix.add_filter(identifier=filt_id)
-        # connect "modify" button to analysis view
-        mf.toolButton_modify.clicked.connect(self.on_analysis_view)
+        self.data_matrix.add_filter(identifier=filt_id)
         self.widget_ana_view.widget_filter.update_content()
-        self.widget_ana_view.widget_filter.filters_changed.connect(
-            mf.update_content)
 
     def init_analysis_view(self):
         sub = QtWidgets.QMdiSubWindow()
@@ -103,7 +103,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view = ana_view.AnalysisView()
         sub.setWidget(self.widget_ana_view)
         self.mdiArea.addSubWindow(sub)
-        self.toolButton_ana_view.clicked.connect(self.on_analysis_view)
+        self.toolButton_ana_view.clicked.connect(sub.setVisible)
         self.widget_ana_view.widget_filter.pushButton_update.clicked.connect(
             self.on_quickview_refresh)
         self.subwindows["analysis_view"] = sub
@@ -165,27 +165,20 @@ class ShapeOut2(QtWidgets.QMainWindow):
                                           "Software",
                                           sw_text)
 
-    @QtCore.pyqtSlot(bool)
-    def on_analysis_view(self, view=True):
-        sender = self.sender()
-        if isinstance(sender.parent().parent(), matrix.MatrixFilter):
-            # override view
-            view = True
-            # we want to display the analysis view...
-            self.widget_ana_view.tabWidget.setCurrentIndex(1)
-            # ...and the current filter
-            filt_id = sender.parent().parent().__getstate__()["identifier"]
-            self.widget_ana_view.widget_filter.show_filter(filt_id)
-            # finally, check the button
-            self.toolButton_ana_view.setChecked(True)
-        self.subwindows["analysis_view"].setVisible(view)
-
     def on_data_matrix(self):
         """Show/hide data matrix (User clicked Data Matrix button)"""
         if self.toolButton_dm.isChecked():
             self.splitter.setSizes([200, 1000])
         else:
             self.splitter.setSizes([0, 1])
+
+    @QtCore.pyqtSlot(str)
+    def on_modify_filter(self, filt_id):
+        self.widget_ana_view.tabWidget.setCurrentIndex(1)
+        self.widget_ana_view.widget_filter.show_filter(filt_id)
+        # finally, check the button
+        self.toolButton_ana_view.setChecked(True)
+        self.subwindows["analysis_view"].setVisible(True)
 
     @QtCore.pyqtSlot(bool)
     def on_quickview(self, view=True):
@@ -202,10 +195,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot(int, int)
     def on_quickview_show_dataset(self, slot_index, filt_index):
         """Update QuickView dataset (User selected new dataset)"""
-        state = self.data_matrix.__getstate__()
-        pipeline.Pipeline._reduce_state(state)
-        # TODO: refactor this into something nicer in Pipeline
-        self.pipeline.element_states = state["elements"]
         ds = self.pipeline.get_dataset(slot_index=slot_index,
                                        filt_index=filt_index,
                                        apply_filter=True)
@@ -228,10 +217,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def update_ana_filter_box_ranges(self):
         """Update the ranges and limits of the box filters"""
-        state = self.data_matrix.__getstate__()
-        pipeline.Pipeline._reduce_state(state)
-        # TODO: refactor this into something nicer in Pipeline
-        self.pipeline.element_states = state["elements"]
         # get the currently used box filter names
         features = self.widget_ana_view.widget_filter.active_box_features
         # compute min/max values
@@ -240,6 +225,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
             mmdict[feat] = self.pipeline.get_min_max(feat=feat)
         # apply to box filters
         self.widget_ana_view.widget_filter.update_box_filters(mmdict)
+
+    @QtCore.pyqtSlot(dict)
+    def update_pipeline(self, state):
+        self.pipeline.__setstate__(state)
 
 
 def excepthook(etype, value, trace):

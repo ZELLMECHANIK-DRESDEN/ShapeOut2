@@ -1,4 +1,5 @@
 import dclab
+from dclab.rtdc_dataset.fmt_hierarchy import RTDC_Hierarchy
 import numpy as np
 
 from .dataslot import Dataslot
@@ -147,7 +148,8 @@ class Pipeline(object):
                         row = [ds]
                         for _ in self.filters:
                             # generate hierarchy children
-                            ds = dclab.new_dataset(ds)
+                            ds = RTDC_Hierarchy(hparent=ds,
+                                                apply_filter=False)
                             row.append(ds)
                     matrix.append(row)
             elif (self._matrix_slots == matrix_slots
@@ -157,7 +159,8 @@ class Pipeline(object):
                 for ii, sl in enumerate(self.slots):
                     row = matrix[ii]
                     for _ in self.filters[n_filt_then:]:
-                        ds = dclab.new_dataset(row[-1])
+                        ds = RTDC_Hierarchy(hparent=row[-1],
+                                            apply_filter=False)
                         row.append(ds)
             else:
                 # everything changed
@@ -166,7 +169,8 @@ class Pipeline(object):
                     row = [ds]
                     for _ in self.filters:
                         # generate hierarchy children
-                        ds = dclab.new_dataset(ds)
+                        ds = RTDC_Hierarchy(hparent=ds,
+                                            apply_filter=False)
                         row.append(ds)
                     matrix.append(row)
 

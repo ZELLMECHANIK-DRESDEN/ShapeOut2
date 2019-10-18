@@ -10,12 +10,14 @@ from . import rangecontrol
 from . import idiom
 
 # features shown by default
-SHOW_FEATURES = ["deform", "area_um", "index"]
+SHOW_FEATURES = ["deform", "area_um", "bright_avg"]
 
 
 class FilterPanel(QtWidgets.QWidget):
     #: Emitted when a shapeout2.filter.Filter modified
     filters_changed = QtCore.pyqtSignal()
+    #: Emitted when box filter ranges might be out of date
+    request_box_range_update = QtCore.pyqtSignal()
 
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self)
@@ -28,22 +30,37 @@ class FilterPanel(QtWidgets.QWidget):
         self.pushButton_update.clicked.connect(self.write_filter)
         self.pushButton_reset.clicked.connect(self.update_content)
         self.comboBox_filters.currentIndexChanged.connect(self.update_content)
+        self.toolButton_moreless.clicked.connect(self.on_moreless)
+        self._box_edit_view = False
 
         self.update_content()
 
     def _init_box_filters(self, show_features=SHOW_FEATURES):
         self._box_range_controls = {}
-        for feat in dclab.dfn.scalar_feature_names:
+        feats = dclab.dfn.scalar_feature_names
+        labs = [dclab.dfn.feature_name2label[f] for f in feats]
+
+        for lab, feat in sorted(zip(labs, feats)):
             integer = True if feat in idiom.INTEGER_FEATURES else False
             rc = rangecontrol.RangeControl(
-                checkbox=True,
+                checkbox=False,  # checkbox is used in on_moreless
                 integer=integer,
-                label=dclab.dfn.feature_name2label[feat],
+                label=lab,
                 data=feat)
             self.verticalLayout_box.addWidget(rc)
             if feat not in show_features:
-                rc.hide()
+                rc.checkBox.setChecked(False)
+                rc.setVisible(False)
             self._box_range_controls[feat] = rc
+
+    @property
+    def active_box_features(self):
+        """List of box-filtered features that are active"""
+        act = []
+        for feat, item in self._box_range_controls.items():
+            if item.__getstate__()["active"]:
+                act.append(feat)
+        return act
 
     @property
     def current_filter(self):
@@ -64,15 +81,6 @@ class FilterPanel(QtWidgets.QWidget):
     def filter_names(self):
         """List of filter names"""
         return [Filter._instances[f].name for f in self.filter_ids]
-
-    @property
-    def visible_box_features(self):
-        """List of box-filtered features that are visible"""
-        vis = []
-        for feat in self._box_range_controls:
-            if not self._box_range_controls[feat].isHidden():
-                vis.append(feat)
-        return vis
 
     def set_filter_state(self, state):
         self.checkBox_enable.setChecked(state["enable filters"])
@@ -108,6 +116,31 @@ class FilterPanel(QtWidgets.QWidget):
         state["box filters"] = box
         return state
 
+    def on_moreless(self):
+        """User wants to select filters"""
+        if not self._box_edit_view:
+            # Show all filters to the user
+            for _, rc in self._box_range_controls.items():
+                rc.setVisible(True)
+                rc.checkBox.setVisible(True)
+                rc.doubleSpinBox_min.setEnabled(False)
+                rc.doubleSpinBox_max.setEnabled(False)
+                rc.range_slider.setEnabled(False)
+            self.toolButton_moreless.setText("...Finish editing")
+            self._box_edit_view = True
+        else:
+            # Hide all filters that are not active
+            for _, rc in self._box_range_controls.items():
+                if not rc.__getstate__()["active"]:
+                    rc.setVisible(False)
+                rc.checkBox.setVisible(False)
+                rc.doubleSpinBox_min.setEnabled(True)
+                rc.doubleSpinBox_max.setEnabled(True)
+                rc.range_slider.setEnabled(True)
+            self.toolButton_moreless.setText("Choose filters...")
+            self._box_edit_view = False
+            self.request_box_range_update.emit()
+
     def show_filter(self, filt_id):
         self.update_content(filt_index=self.filter_ids.index(filt_id))
 
@@ -133,7 +166,7 @@ class FilterPanel(QtWidgets.QWidget):
         else:
             self.setEnabled(False)
 
-    def update_box_filters(self, show_features=None, mmdict={}):
+    def update_box_filters(self, mmdict={}):
         """Update the box plot filters
 
         Parameters
@@ -150,8 +183,6 @@ class FilterPanel(QtWidgets.QWidget):
         # update used features
         for feat in self._box_range_controls:
             rc = self._box_range_controls[feat]
-            if show_features is not None:
-                rc.setVisible(feat in show_features)
             if feat in mmdict:
                 rc.setLimits(*mmdict[feat])
             if self.current_filter is not None:

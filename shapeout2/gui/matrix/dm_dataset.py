@@ -11,11 +11,11 @@ class MatrixDataset(QtWidgets.QWidget):
     enabled_toggled = QtCore.pyqtSignal(bool)
     option_action = QtCore.pyqtSignal(str)
 
-    def __init__(self, path=None, identifier=None, state=None):
+    def __init__(self, identifier=None, state=None):
         """Create a new dataset matrix element
 
-        If `path` is None, a dummy element is inserted which needs
-        to be updated with :func:`MatrixDataset.__setstate__`.
+        Specify either an existing Dataslot identifier or a
+        Dataslot state
         """
         QtWidgets.QWidget.__init__(self)
         path_ui = pkg_resources.resource_filename(
@@ -36,11 +36,9 @@ class MatrixDataset(QtWidgets.QWidget):
         self.checkBox.clicked.connect(self.enabled_toggled.emit)
 
         if state is None:
-            if identifier is None:
-                # get the identifier from the dataslot class
-                identifier = dataslot.Dataslot(path).identifier
+            slot = dataslot.Dataslot._instances[identifier]
             self.identifier = identifier
-            self.path = path
+            self.path = slot.path
             # set tooltip/label
             self.update_content()
         else:

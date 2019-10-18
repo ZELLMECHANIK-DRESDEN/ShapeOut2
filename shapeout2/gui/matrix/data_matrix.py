@@ -173,8 +173,8 @@ class DataMatrix(QtWidgets.QWidget):
             raise KeyError("PlotMatrix not found!")
         return ch
 
-    def add_dataset(self, path=None, identifier=None, state=None):
-        md = MatrixDataset(path=path, identifier=identifier, state=state)
+    def add_dataset(self, identifier=None, state=None):
+        md = MatrixDataset(identifier=identifier, state=state)
         self.glo.addWidget(md, self.num_datasets+1, 0)
         md.active_toggled.connect(self.toggle_dataset_active)
         md.enabled_toggled.connect(self.toggle_dataset_enable)
@@ -186,8 +186,8 @@ class DataMatrix(QtWidgets.QWidget):
         self.plot_matrix.adjust_size()
         return md
 
-    def add_filter(self, name=None, identifier=None, state=None):
-        mf = MatrixFilter(name=name, identifier=identifier, state=state)
+    def add_filter(self, identifier=None, state=None):
+        mf = MatrixFilter(identifier=identifier, state=state)
         mf.active_toggled.connect(self.toggle_filter_active)
         mf.enabled_toggled.connect(self.toggle_filter_enable)
         mf.option_action.connect(self.on_option_filter)

@@ -28,7 +28,7 @@ def get_rtdc_config(path):
 
 
 @functools.lru_cache(maxsize=100)
-def get_rtdc_features(path, scalar=True):
+def get_rtdc_features(path, scalar=True, only_loaded=False):
     """Return available features in a dataset"""
     if scalar:
         features = dclab.dfn.scalar_feature_names
@@ -37,8 +37,12 @@ def get_rtdc_features(path, scalar=True):
     av_feat = []
     with dclab.new_dataset(path) as ds:
         for feat in features:
-            if feat in ds:
-                av_feat.append(feat)
+            if only_loaded:
+                if feat in ds.features_loaded:
+                    av_feat.append(feat)
+            else:
+                if feat in ds:
+                    av_feat.append(feat)
     return av_feat
 
 
@@ -47,6 +51,8 @@ def get_rtdc_features_minmax(path, *features):
     """Return dict with min/max of scalar features in a dataset"""
     mmdict = {}
     with dclab.new_dataset(path) as ds:
+        if len(features) == 0:
+            features = ds.features_loaded
         for feat in features:
             assert feat in dclab.dfn.scalar_feature_names
             if feat in ds:
@@ -54,8 +60,17 @@ def get_rtdc_features_minmax(path, *features):
     return mmdict
 
 
-def get_rtdc_features_minmax_bulk(paths, features=["deform", "area_um"]):
-    """Perform `get_rtdc_features_minmax` on a list of paths"""
+def get_rtdc_features_minmax_bulk(paths, features=[]):
+    """Perform `get_rtdc_features_minmax` on a list of paths
+
+    Parameters
+    ----------
+    paths: list of str or list of pathlib.Path
+        Paths to measurement files
+    features: list of str or empty list
+        Names of the features to compute the min/max values for.
+        If empty, all loaded features will be used.
+    """
     mmdict = {}
     for pp in paths:
         mmdi = get_rtdc_features_minmax(pp, *features)

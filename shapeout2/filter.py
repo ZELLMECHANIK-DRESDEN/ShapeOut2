@@ -14,6 +14,10 @@ class Filter(object):
         Filter._instance_counter += 1
         if identifier is None:
             identifier = "Filter_{}".format(Filter._instance_counter)
+            while identifier in Filter._instances:
+                Filter._instance_counter += 1
+                identifier = "Filter_{}".format(Filter._instance_counter)
+
         if name is None:
             name = identifier
         #: unique identifier of the filter

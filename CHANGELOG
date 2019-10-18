@@ -6,6 +6,7 @@
  - introduce style sheets
  - fix box filter view not updated with filter data
  - add list of features to QuickView/Event as a new tab
+ - allow to choose box filters
  - other minor fixes
 2.0.0a18
  - replace push buttons with tool buttons

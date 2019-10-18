@@ -1,12 +1,16 @@
 import dclab
+import numpy as np
 
-from .filter import Filter
 from .dataslot import Dataslot
+from .filter import Filter
+from . import meta_tool
+from . import util
 
 
 class Pipeline(object):
     def __init__(self, state=None):
         self.reset()
+        self._matrix_hash = "None"
         self._old_state = {}
         if state is not None:
             self.__setstate__(state)
@@ -30,11 +34,13 @@ class Pipeline(object):
 
         for dd in state["datasets"]:
             if dd["identifier"] in Dataslot._instances:
+                # use existing slot
                 slot = Dataslot._instances[dd["identifier"]]
             else:
+                # create new slot
                 slot = Dataslot(path=dd["path"],
                                 identifier=dd["identifier"])
-            self.add_slot(slot)
+            self.add_slot(slot=slot)
         self.construct_matrix()
         self.element_states = state["elements"]
 
@@ -46,6 +52,18 @@ class Pipeline(object):
                 active = state["elements"][slot_id][filt_id]["active"]
                 enabled = state["elements"][slot_id][filt_id]["enabled"]
                 state["elements"][slot_id][filt_id] = active and enabled
+
+    @property
+    def num_filters(self):
+        return len(self.filters)
+
+    @property
+    def num_slots(self):
+        return len(self.slots)
+
+    @property
+    def paths(self):
+        return [ds.path for ds in self.slots]
 
     def add_filter(self, filt=None):
         """Add a filter to the pipeline
@@ -64,28 +82,42 @@ class Pipeline(object):
         if filt is None:
             filt = Filter()
         self.filters.append(filt)
-        return len(self.filters)
+        return filt.identifier
 
-    def add_slot(self, slot=None):
+    def add_slot(self, slot=None, path=None):
         """Add a slot (experiment) to the pipeline
 
         Parameters
         ----------
-        path: str or pathlib.Path
-            path to the experimental data
-        descr: str
-            description of the slot
+        slot: Dataslot
+            Dataslot representing an experimental dataset
 
         Returns
         -------
         index: int
             index of the slot in the pipeline;
             indexing starts at "0".
+        identifier: str
+            identifier of the slot
         """
-        if slot is None:
-            slot = Dataslot()
+        if slot is None and path is not None:
+            slot = Dataslot(path=path)
+        elif isinstance(slot, Dataslot) and path is None:
+            pass
+        else:
+            raise ValueError("Please check arguments")
         self.slots.append(slot)
-        return len(self.slots)
+        # check that the features are all the same
+        f0 = meta_tool.get_rtdc_features(self.slots[0].path)
+        fi = meta_tool.get_rtdc_features(slot.path)
+        if f0 != fi:
+            # This is important for updating the filter min/max values
+            # TODO:
+            # - ignore features that are not shared among all datasets
+            raise ValueError("Currently, only RT-DC measurements with the "
+                             + "same scalar features are allowed - Sorry. "
+                             + "Please create an issue if you need this.")
+        return slot.identifier
 
     def construct_matrix(self):
         """Construct the pipeline matrix
@@ -93,18 +125,24 @@ class Pipeline(object):
         This generates dataset hierarchies and updates
         the filters.
         """
-        self.matrix = []
-        for sl in self.slots:
-            ds = dclab.new_dataset(sl.path)
-            row = [ds]
-            for _ in self.filters:
-                # generate hierarchy children
-                ds = dclab.new_dataset(ds)
-                row.append(ds)
-            self.matrix.append(row)
-        # TODO:
-        # - if `self.elements_dict` is not complete, autocomplete it
-        #   (as it is done in gui.matrix.dm_dataset)
+        matrix_hash = util.hashobj([
+            [slot.identifier for slot in self.slots],
+            [filt.identifier for filt in self.filters],
+            ])
+        if self._matrix_hash != matrix_hash:
+            self._matrix_hash = matrix_hash
+            self.matrix = []
+            for sl in self.slots:
+                ds = dclab.new_dataset(sl.path)
+                row = [ds]
+                for _ in self.filters:
+                    # generate hierarchy children
+                    ds = dclab.new_dataset(ds)
+                    row.append(ds)
+                self.matrix.append(row)
+            # TODO:
+            # - if `self.elements_dict` is not complete, autocomplete it
+            #   (as it is done in gui.matrix.dm_dataset)
 
     def get_dataset(self, slot_index, filt_index, apply_filter=True):
         """Return dataset with all filters updated (optionally applied)
@@ -120,6 +158,7 @@ class Pipeline(object):
             if set to `False`, only the filtering configuration
             of the dataset and its hierarchy parents are updated
         """
+        self.construct_matrix()
         row = self.matrix[slot_index]
         slot_id = self.slots[slot_index].identifier
         fstates = self.element_states[slot_id]
@@ -135,6 +174,17 @@ class Pipeline(object):
             dsend.apply_filter()
         return dsend
 
+    def get_min_max(self, feat):
+        fmin = np.inf
+        fmax = -np.inf
+        for ii in range(self.num_slots):
+            ds = self.get_dataset(slot_index=ii,
+                                  filt_index=0,
+                                  apply_filter=False)
+            fmin = np.min([fmin, np.nanmin(ds[feat])])
+            fmax = np.max([fmax, np.nanmax(ds[feat])])
+        return fmin, fmax
+
     def reset(self):
         """Reset the pipeline"""
         #: Filters are instances of :class:`shapeout2.filter.Filter`
@@ -145,6 +195,7 @@ class Pipeline(object):
         #: identifies the slot and the second index identifies the
         #: filter
         self.matrix = []
+        self._matrix_hash = "None"
         #: individual element states
         self.element_states = {}
 

@@ -29,9 +29,7 @@ class RangeControl(QtWidgets.QWidget):
         self.is_integer = integer
 
         # signals
-        self.checkBox.clicked.connect(self.on_checkbox_enable_control)
-        self.range_slider.rangeChanged.connect(
-            self.map_range_slider_to_spin_values)
+        self.range_slider.rangeChanged.connect(self.on_range)
         self.doubleSpinBox_min.valueChanged.connect(self.on_spinbox)
         self.doubleSpinBox_max.valueChanged.connect(self.on_spinbox)
 
@@ -67,9 +65,11 @@ class RangeControl(QtWidgets.QWidget):
         # compute values
         dr = rmax - rmin
         dl = lmax - lmin
-        hmin = rmin + (vmin - lmin) / dl * dr
-        hmax = rmax - (lmax - vmax) / dl * dr
-
+        if dl * dr == 0:
+            hmin = hmax = 0
+        else:
+            hmin = rmin + (vmin - lmin) / dl * dr
+            hmax = rmax - (lmax - vmax) / dl * dr
         self.range_slider.blockSignals(True)
         self.range_slider.setRange(hmin, hmax)
         self.range_slider.blockSignals(False)
@@ -111,10 +111,8 @@ class RangeControl(QtWidgets.QWidget):
 
         return vmin, vmax
 
-    def on_checkbox_enable_control(self, enable=True):
-        self.doubleSpinBox_min.setEnabled(enable)
-        self.doubleSpinBox_max.setEnabled(enable)
-        self.range_slider.setEnabled(enable)
+    def on_range(self):
+        self.map_range_slider_to_spin_values()
 
     def on_spinbox(self):
         self.map_spin_values_to_range_slider()

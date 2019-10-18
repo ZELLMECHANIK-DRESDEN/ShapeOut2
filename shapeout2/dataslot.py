@@ -8,6 +8,10 @@ class Dataslot(object):
         self.path = path
         if identifier is None:
             identifier = "Dataslot_{}".format(Dataslot._instance_counter)
+            while identifier in Dataslot._instances:
+                Dataslot._instance_counter += 1
+                identifier = "Dataslot_{}".format(Dataslot._instance_counter)
+
         if name is None:
             name = identifier
         #: unique identifier of the filter

@@ -10,7 +10,7 @@ class MatrixFilter(QtWidgets.QWidget):
     enabled_toggled = QtCore.pyqtSignal(bool)
     option_action = QtCore.pyqtSignal(str)
 
-    def __init__(self, name=None, identifier=None, state=None):
+    def __init__(self, identifier=None, state=None):
         QtWidgets.QWidget.__init__(self)
         path_ui = pkg_resources.resource_filename(
             "shapeout2.gui.matrix", "dm_filter.ui")
@@ -29,13 +29,9 @@ class MatrixFilter(QtWidgets.QWidget):
         self.checkBox.clicked.connect(self.on_enabled_toggled)
 
         if state is None:
-            if identifier is None:
-                # get the identifier from the filter class
-                identifier = filter.Filter().identifier
+            filt = filter.Filter._instances[identifier]
             self.identifier = identifier
-            if name is None:
-                name = identifier
-            self.name = name
+            self.name = filt.name
             # set tooltip/label
             self.update_content()
         else:

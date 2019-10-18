@@ -18,7 +18,6 @@ from . import ana_view
 from . import matrix
 from . import quick_view
 
-from .. import meta_tool
 from .. import settings
 from .. import pipeline
 
@@ -62,6 +61,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.toolButton_new_dataset.clicked.connect(self.add_dataslot)
         self.toolButton_import.clicked.connect(self.add_dataslot)
         self.toolButton_new_plot.clicked.connect(self.plot_matrix.add_plot)
+        # analysis view
+        self.widget_ana_view.widget_filter.request_box_range_update.connect(
+            self.update_ana_filter_box_ranges)
         #: Shape-Out settings
         self.settings = settings.SettingsFile()
         #: Analysis pipeline
@@ -77,17 +79,18 @@ class ShapeOut2(QtWidgets.QMainWindow):
         for fn in fnames:
             path = pathlib.Path(fn)
             self.settings.set_path(wd=path.parent, name="rtdc import dataset")
-            self.data_matrix.add_dataset(path)
+            # add a filter if we don't have one already
+            if self.pipeline.num_filters == 0:
+                self.add_filter()
+            slot_id = self.pipeline.add_slot(path=path)
+            self.data_matrix.add_dataset(identifier=slot_id)
 
         # Update box filter limits
-        paths = self.data_matrix.get_dataset_paths()
-        features = self.widget_ana_view.widget_filter.visible_box_features
-        mmdict = meta_tool.get_rtdc_features_minmax_bulk(paths,
-                                                         features=features)
-        self.widget_ana_view.widget_filter.update_box_filters(mmdict=mmdict)
+        self.update_ana_filter_box_ranges()
 
     def add_filter(self):
-        mf = self.data_matrix.add_filter()
+        filt_id = self.pipeline.add_filter()
+        mf = self.data_matrix.add_filter(identifier=filt_id)
         # connect "modify" button to analysis view
         mf.toolButton_modify.clicked.connect(self.on_analysis_view)
         self.widget_ana_view.widget_filter.update_content()
@@ -220,6 +223,22 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.toolButton_dm.setChecked(False)
         else:
             self.toolButton_dm.setChecked(True)
+
+    @QtCore.pyqtSlot()
+    def update_ana_filter_box_ranges(self):
+        """Update the ranges and limits of the box filters"""
+        state = self.data_matrix.__getstate__()
+        pipeline.Pipeline._reduce_state(state)
+        # TODO: refactor this into something nicer in Pipeline
+        self.pipeline.element_states = state["elements"]
+        # get the currently used box filter names
+        features = self.widget_ana_view.widget_filter.active_box_features
+        # compute min/max values
+        mmdict = {}
+        for feat in features:
+            mmdict[feat] = self.pipeline.get_min_max(feat=feat)
+        # apply to box filters
+        self.widget_ana_view.widget_filter.update_box_filters(mmdict)
 
 
 def excepthook(etype, value, trace):

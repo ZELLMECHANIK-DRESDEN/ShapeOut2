@@ -524,21 +524,26 @@ class RTDCScatterWidget(pg.PlotWidget):
             # viscosity. We could do it, but for visualization there is
             # really no need and also, the plots then look the same as
             # in Shape-Out 1.
-            iso = isodef.get(
-                method="numerical",
-                channel_width=self.rtdc_ds.config["setup"]["channel width"],
-                flow_rate=None,
-                viscosity=None,
-                col1=self.xax,
-                col2=self.yax,
-                add_px_err=True,
-                px_um=self.rtdc_ds.config["imaging"]["pixel size"])
-            for ss in iso:
-                iline = pg.PlotDataItem(x=ss[:, 0], y=ss[:, 1])
-                self.addItem(iline)
-                self.isoelastics.append(iline)
-                # send them to the back
-                iline.setZValue(-1)
+            try:
+                cfg = self.rtdc_ds.config
+                iso = isodef.get(
+                    method="numerical",
+                    channel_width=cfg["setup"]["channel width"],
+                    flow_rate=None,
+                    viscosity=None,
+                    col1=self.xax,
+                    col2=self.yax,
+                    add_px_err=True,
+                    px_um=cfg["imaging"]["pixel size"])
+            except KeyError:
+                pass
+            else:
+                for ss in iso:
+                    iline = pg.PlotDataItem(x=ss[:, 0], y=ss[:, 1])
+                    self.addItem(iline)
+                    self.isoelastics.append(iline)
+                    # send them to the back
+                    iline.setZValue(-1)
 
     def setSelection(self, event_index):
         x = self.data_x[event_index]

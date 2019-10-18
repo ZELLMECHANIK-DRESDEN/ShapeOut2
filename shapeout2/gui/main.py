@@ -202,9 +202,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot(int, int)
     def on_quickview_show_dataset(self, slot_index, filt_index):
         """Update QuickView dataset (User selected new dataset)"""
-        # get state of data matrix
         state = self.data_matrix.__getstate__()
-        self.pipeline.__setstate__(state)
+        pipeline.Pipeline._reduce_state(state)
+        # TODO: refactor this into something nicer in Pipeline
+        self.pipeline.element_states = state["elements"]
         ds = self.pipeline.get_dataset(slot_index=slot_index,
                                        filt_index=filt_index,
                                        apply_filter=True)

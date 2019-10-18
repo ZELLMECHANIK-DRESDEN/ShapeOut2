@@ -10,7 +10,6 @@ from . import util
 class Pipeline(object):
     def __init__(self, state=None):
         self.reset()
-        self._matrix_hash = "None"
         self._old_state = {}
         if state is not None:
             self.__setstate__(state)
@@ -195,6 +194,7 @@ class Pipeline(object):
         #: identifies the slot and the second index identifies the
         #: filter
         self.matrix = []
+        #: used for detecting changes in the matrix
         self._matrix_hash = "None"
         #: individual element states
         self.element_states = {}

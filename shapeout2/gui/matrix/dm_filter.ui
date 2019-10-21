@@ -119,6 +119,9 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="toolTip">
+         <string>Modify this filter</string>
+        </property>
         <property name="text">
          <string>modify</string>
         </property>
@@ -131,6 +134,9 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Activate/Deactivate filter for all datasets</string>
         </property>
         <property name="text">
          <string>toggle</string>
@@ -158,6 +164,9 @@
             <width>20</width>
             <height>20</height>
            </size>
+          </property>
+          <property name="toolTip">
+           <string>Use this filter</string>
           </property>
           <property name="layoutDirection">
            <enum>Qt::LeftToRight</enum>
@@ -205,6 +214,9 @@
           </property>
           <property name="popupMode">
            <enum>QToolButton::InstantPopup</enum>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextOnly</enum>
           </property>
           <property name="arrowType">
            <enum>Qt::NoArrow</enum>

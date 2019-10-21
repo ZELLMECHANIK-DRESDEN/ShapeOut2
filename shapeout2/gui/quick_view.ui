@@ -310,6 +310,9 @@
         </item>
         <item>
          <widget class="QSpinBox" name="spinBox_downsample">
+          <property name="suffix">
+           <string> events</string>
+          </property>
           <property name="minimum">
            <number>10</number>
           </property>
@@ -321,13 +324,6 @@
           </property>
           <property name="value">
            <number>2000</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>events</string>
           </property>
          </widget>
         </item>

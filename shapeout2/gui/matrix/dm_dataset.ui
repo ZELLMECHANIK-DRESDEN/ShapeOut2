@@ -119,6 +119,9 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="toolTip">
+         <string>Enable/Disable all filters and plots for this dataset</string>
+        </property>
         <property name="text">
          <string>toggle</string>
         </property>
@@ -145,6 +148,9 @@
             <width>20</width>
             <height>20</height>
            </size>
+          </property>
+          <property name="toolTip">
+           <string>Use this dataset</string>
           </property>
           <property name="layoutDirection">
            <enum>Qt::LeftToRight</enum>
@@ -192,6 +198,9 @@
           </property>
           <property name="popupMode">
            <enum>QToolButton::InstantPopup</enum>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextOnly</enum>
           </property>
          </widget>
         </item>

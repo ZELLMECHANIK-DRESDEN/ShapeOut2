@@ -119,6 +119,9 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="toolTip">
+         <string>Modify this plot</string>
+        </property>
         <property name="text">
          <string>modify</string>
         </property>
@@ -131,6 +134,9 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Include/Exclude all Datasets for this plot</string>
         </property>
         <property name="text">
          <string>toggle</string>
@@ -183,6 +189,9 @@
           </property>
           <property name="popupMode">
            <enum>QToolButton::InstantPopup</enum>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextOnly</enum>
           </property>
          </widget>
         </item>

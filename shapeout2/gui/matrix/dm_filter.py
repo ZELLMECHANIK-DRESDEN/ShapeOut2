@@ -2,7 +2,7 @@ import pkg_resources
 
 from PyQt5 import uic, QtCore, QtWidgets
 
-from ... import filter
+from ... import pipeline
 
 
 class MatrixFilter(QtWidgets.QWidget):
@@ -31,7 +31,7 @@ class MatrixFilter(QtWidgets.QWidget):
         self.toolButton_modify.clicked.connect(self.on_modify)
 
         if state is None:
-            filt = filter.Filter._instances[identifier]
+            filt = pipeline.Filter._instances[identifier]
             self.identifier = identifier
             self.name = filt.name
             # set tooltip/label
@@ -41,22 +41,22 @@ class MatrixFilter(QtWidgets.QWidget):
 
     @property
     def enabled(self):
-        filt = filter.Filter._instances[self.identifier]
+        filt = pipeline.Filter._instances[self.identifier]
         return filt.general["enable filters"]
 
     @enabled.setter
     def enabled(self, b):
-        filt = filter.Filter._instances[self.identifier]
+        filt = pipeline.Filter._instances[self.identifier]
         filt.general["enable filters"] = b
 
     @property
     def name(self):
-        filt = filter.Filter._instances[self.identifier]
+        filt = pipeline.Filter._instances[self.identifier]
         return filt.name
 
     @name.setter
     def name(self, text):
-        filt = filter.Filter._instances[self.identifier]
+        filt = pipeline.Filter._instances[self.identifier]
         filt.name = text
 
     def __getstate__(self):
@@ -67,9 +67,9 @@ class MatrixFilter(QtWidgets.QWidget):
         return state
 
     def __setstate__(self, state):
-        if state["identifier"] not in filter.Filter._instances:
+        if state["identifier"] not in pipeline.Filter._instances:
             # Create a new filter with the identifier
-            filter.Filter(identifier=state["identifier"])
+            pipeline.Filter(identifier=state["identifier"])
         self.identifier = state["identifier"]
         self.enabled = state["enabled"]
         self.name = state["name"]

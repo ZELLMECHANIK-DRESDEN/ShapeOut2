@@ -4,7 +4,7 @@ from PyQt5 import uic, QtCore, QtWidgets
 
 import dclab
 
-from ..filter import Filter
+from ..pipeline import Filter
 
 from . import rangecontrol
 from . import idiom

@@ -2,10 +2,11 @@ import dclab
 from dclab.rtdc_dataset.fmt_hierarchy import RTDC_Hierarchy
 import numpy as np
 
+from .. import meta_tool
+from .. import util
+
 from .dataslot import Dataslot
 from .filter import Filter
-from . import meta_tool
-from . import util
 
 
 class Pipeline(object):

@@ -3,7 +3,7 @@ import pkg_resources
 from PyQt5 import uic, QtWidgets, QtCore
 
 from ... import meta_tool
-from ... import dataslot
+from ... import pipeline
 
 
 class MatrixDataset(QtWidgets.QWidget):
@@ -36,7 +36,7 @@ class MatrixDataset(QtWidgets.QWidget):
         self.checkBox.clicked.connect(self.enabled_toggled.emit)
 
         if state is None:
-            slot = dataslot.Dataslot._instances[identifier]
+            slot = pipeline.Dataslot._instances[identifier]
             self.identifier = identifier
             self.path = slot.path
             # set tooltip/label

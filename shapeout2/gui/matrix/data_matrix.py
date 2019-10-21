@@ -6,8 +6,7 @@ from PyQt5 import QtCore, QtWidgets
 from .dm_dataset import MatrixDataset
 from .dm_filter import MatrixFilter
 from .dm_element import MatrixElement
-from ... import filter
-from ... import dataslot
+from ... import pipeline
 
 
 class DataMatrix(QtWidgets.QWidget):
@@ -353,13 +352,13 @@ class DataMatrix(QtWidgets.QWidget):
         # remember current quickview element ids
         qv_ds, qv_f = self.get_quickview_ids()
         if option == "insert_anew":
-            slot = dataslot.Dataslot(path=ds_state["path"])
+            slot = pipeline.Dataslot(path=ds_state["path"])
             ds_state["identifier"] = slot.identifier
             # enable by default
             ds_state["enabled"] = True
             state["datasets"].insert(row, ds_state)
         elif option == "duplicate":
-            slot = dataslot.Dataslot(path=ds_state["path"])
+            slot = pipeline.Dataslot(path=ds_state["path"])
             # also set element states
             state["elements"][slot.identifier] = \
                 state["elements"][ds_state["identifier"]]
@@ -392,7 +391,7 @@ class DataMatrix(QtWidgets.QWidget):
         # remember current quickview element ids
         qv_ds, qv_f = self.get_quickview_ids()
         if option == "duplicate":
-            filt = filter.Filter()
+            filt = pipeline.Filter()
             f_state["identifier"] = filt.identifier
             f_state["name"] = filt.name
             state["filters"].insert(column, f_state)

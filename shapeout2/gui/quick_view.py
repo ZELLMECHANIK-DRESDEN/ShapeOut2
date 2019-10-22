@@ -110,13 +110,13 @@ class QuickView(QtWidgets.QWidget):
 
     def __getstate__(self):
         plot = {
-            "downsampling enabled": self.checkBox_downsample.isChecked(),
+            "downsampling": self.checkBox_downsample.isChecked(),
             "downsampling value": self.spinBox_downsample.value(),
             "axis x": self.comboBox_x.currentData(),
             "axis y": self.comboBox_y.currentData(),
             "scale x": self.comboBox_xscale.currentData(),
             "scale y": self.comboBox_yscale.currentData(),
-            "isoelastics enabled": self.checkBox_isoelastics.isChecked(),
+            "isoelastics": self.checkBox_isoelastics.isChecked(),
         }
         event = {
             "index": self.spinBox_event.value(),
@@ -137,7 +137,7 @@ class QuickView(QtWidgets.QWidget):
         for tb in self.signal_widgets:
             tb.blockSignals(True)
         # downsampling
-        self.checkBox_downsample.setChecked(plot["downsampling enabled"])
+        self.checkBox_downsample.setChecked(plot["downsampling"])
         self.spinBox_downsample.setValue(plot["downsampling value"])
         # axes combobox choices
         ds_features = self.rtdc_ds.features
@@ -158,7 +158,7 @@ class QuickView(QtWidgets.QWidget):
         idys = self.comboBox_yscale.findData(plot["scale y"])
         self.comboBox_yscale.setCurrentIndex(idys)
         # isoelastics
-        self.checkBox_isoelastics.setChecked(plot["isoelastics enabled"])
+        self.checkBox_isoelastics.setChecked(plot["isoelastics"])
         for tb in self.signal_widgets:
             tb.blockSignals(False)
         if "event" in state:
@@ -236,8 +236,7 @@ class QuickView(QtWidgets.QWidget):
     def plot(self):
         """Update the plot using the current state of the UI"""
         plot = self.__getstate__()["plot"]
-        downsample = plot["downsampling enabled"] * \
-            plot["downsampling value"]
+        downsample = plot["downsampling"] * plot["downsampling value"]
 
         self.widget_scatter.plot_data(rtdc_ds=self.rtdc_ds,
                                       downsample=downsample,
@@ -245,7 +244,7 @@ class QuickView(QtWidgets.QWidget):
                                       yax=plot["axis y"],
                                       xscale=plot["scale x"],
                                       yscale=plot["scale y"],
-                                      isoelastics=plot["isoelastics enabled"])
+                                      isoelastics=plot["isoelastics"])
         # make sure the correct plot items are visible (e.g. scatter select)
         self.on_tool()
 

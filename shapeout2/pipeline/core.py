@@ -7,6 +7,7 @@ from .. import util
 
 from .dataslot import Dataslot
 from .filter import Filter
+from .plot import Plot
 
 
 class Pipeline(object):
@@ -71,7 +72,7 @@ class Pipeline(object):
 
         Parameters
         ----------
-        filt: shapeout2.filter.Filter
+        filt: shapeout2.pipeline.Filter
             filter to apply
 
         Returns
@@ -84,6 +85,25 @@ class Pipeline(object):
             filt = Filter()
         self.filters.append(filt)
         return filt.identifier
+
+    def add_plot(self, plot=None):
+        """Add a filter to the pipeline
+
+        Parameters
+        ----------
+        plot: shapeout2.pipeline.Plot
+            plot to generate
+
+        Returns
+        -------
+        index: int
+            index of the plot in the pipeline;
+            indexing starts at "0".
+        """
+        if plot is None:
+            plot = Plot()
+        self.plots.append(plot)
+        return plot.identifier
 
     def add_slot(self, slot=None, path=None):
         """Add a slot (experiment) to the pipeline
@@ -232,11 +252,26 @@ class Pipeline(object):
             fmax = np.max([fmax, vmax])
         return fmin, fmax
 
+    def get_features(self, scalar=False):
+        """Return a list of features that all slots share"""
+        if scalar:
+            features = dclab.dfn.scalar_feature_names
+        else:
+            features = dclab.dfn.feature_names
+        for slot_index in range(self.num_slots):
+            ds = self.get_dataset(slot_index=slot_index,
+                                  filt_index=0,
+                                  apply_filter=False)
+            features = sorted(set(ds.features) & set(features))
+        return features
+
     def reset(self):
         """Reset the pipeline"""
-        #: Filters are instances of :class:`shapeout2.filter.Filter`
+        #: Filters are instances of :class:`shapeout2.pipeline.Filter`
         self.filters = []
-        #: Slots are instances of :class:`shapeout2.dataslot.Dataslot`
+        #: Plots are instances of :class:`shapeout2.pipeline.Plot`
+        self.plots = []
+        #: Slots are instances of :class:`shapeout2.pipeline.Dataslot`
         self.slots = []
         #: individual element states
         self.element_states = {}

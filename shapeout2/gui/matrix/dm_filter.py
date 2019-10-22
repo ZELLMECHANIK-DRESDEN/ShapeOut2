@@ -39,6 +39,22 @@ class MatrixFilter(QtWidgets.QWidget):
         else:
             self.__setstate__(state)
 
+    def __getstate__(self):
+        state = {"enabled": self.enabled,
+                 "identifier": self.identifier,
+                 "name": self.name,
+                 }
+        return state
+
+    def __setstate__(self, state):
+        if state["identifier"] not in pipeline.Filter._instances:
+            # Create a new filter with the identifier
+            pipeline.Filter(identifier=state["identifier"])
+        self.identifier = state["identifier"]
+        self.enabled = state["enabled"]
+        self.name = state["name"]
+        self.update_content()
+
     @property
     def enabled(self):
         filt = pipeline.Filter._instances[self.identifier]
@@ -58,22 +74,6 @@ class MatrixFilter(QtWidgets.QWidget):
     def name(self, text):
         filt = pipeline.Filter._instances[self.identifier]
         filt.name = text
-
-    def __getstate__(self):
-        state = {"enabled": self.enabled,
-                 "identifier": self.identifier,
-                 "name": self.name,
-                 }
-        return state
-
-    def __setstate__(self, state):
-        if state["identifier"] not in pipeline.Filter._instances:
-            # Create a new filter with the identifier
-            pipeline.Filter(identifier=state["identifier"])
-        self.identifier = state["identifier"]
-        self.enabled = state["enabled"]
-        self.name = state["name"]
-        self.update_content()
 
     def action_duplicate(self):
         self.option_action.emit("duplicate")

@@ -16,8 +16,6 @@ SHOW_FEATURES = ["deform", "area_um", "bright_avg"]
 class FilterPanel(QtWidgets.QWidget):
     #: Emitted when a shapeout2.filter.Filter modified
     filters_changed = QtCore.pyqtSignal()
-    #: Emitted when box filter ranges might be out of date
-    request_box_range_update = QtCore.pyqtSignal()
 
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self)
@@ -27,13 +25,14 @@ class FilterPanel(QtWidgets.QWidget):
 
         self._init_box_filters()
 
-        self.pushButton_update.clicked.connect(self.write_filter)
+        self.pushButton_apply.clicked.connect(self.write_filter)
         self.pushButton_reset.clicked.connect(self.update_content)
         self.comboBox_filters.currentIndexChanged.connect(self.update_content)
         self.toolButton_moreless.clicked.connect(self.on_moreless)
         self._box_edit_view = False
-
         self.update_content()
+        # current Shape-Out 2 pipeline
+        self._pipeline = None
 
     def _init_box_filters(self, show_features=SHOW_FEATURES):
         self._box_range_controls = {}
@@ -52,6 +51,39 @@ class FilterPanel(QtWidgets.QWidget):
                 rc.checkBox.setChecked(False)
                 rc.setVisible(False)
             self._box_range_controls[feat] = rc
+
+    def __getstate__(self):
+        state = {
+            "enable filters": self.checkBox_enable.isChecked(),
+            "name": self.lineEdit_name.text(),
+            "limit events bool": self.checkBox_limit.isChecked(),
+            "limit events num": self.spinBox_limit.value(),
+            "remove invalid events": self.checkBox_invalid.isChecked(),
+        }
+        # box filters
+        box = {}
+        for feat in self.active_box_features:
+            rc = self._box_range_controls[feat]
+            box[feat] = rc.__getstate__()
+        state["box filters"] = box
+        return state
+
+    def __setstate__(self, state):
+        self.checkBox_enable.setChecked(state["enable filters"])
+        self.lineEdit_name.setText(state["name"])
+        self.checkBox_limit.setChecked(state["limit events bool"])
+        self.spinBox_limit.setValue(state["limit events num"])
+        self.checkBox_invalid.setChecked(state["remove invalid events"])
+        # box filters
+        box = state["box filters"]
+        for feat in self._box_range_controls:
+            rc = self._box_range_controls[feat]
+            if feat in box:
+                rc.show()
+                rc.__setstate__(box[feat])
+            elif not rc.isHidden():
+                # update range to limits
+                rc.reset_range()
 
     @property
     def active_box_features(self):
@@ -82,42 +114,12 @@ class FilterPanel(QtWidgets.QWidget):
         """List of filter names"""
         return [Filter._instances[f].name for f in self.filter_ids]
 
-    def set_filter_state(self, state):
-        self.checkBox_enable.setChecked(state["enable filters"])
-        self.lineEdit_name.setText(state["name"])
-        self.checkBox_limit.setChecked(state["limit events bool"])
-        self.spinBox_limit.setValue(state["limit events num"])
-        self.checkBox_invalid.setChecked(state["remove invalid events"])
-        # box filters
-        box = state["box filters"]
-        for feat in self._box_range_controls:
-            rc = self._box_range_controls[feat]
-            if feat in box:
-                rc.show()
-                rc.__setstate__(box[feat])
-            elif not rc.isHidden():
-                # update range to limits
-                rc.reset_range()
-
-    def get_filter_state(self):
-        state = {
-            "enable filters": self.checkBox_enable.isChecked(),
-            "name": self.lineEdit_name.text(),
-            "limit events bool": self.checkBox_limit.isChecked(),
-            "limit events num": self.spinBox_limit.value(),
-            "remove invalid events": self.checkBox_invalid.isChecked(),
-        }
-        # box filters
-        box = {}
-        for feat in self._box_range_controls:
-            rc = self._box_range_controls[feat]
-            if rc.isVisible():
-                box[feat] = rc.__getstate__()
-        state["box filters"] = box
-        return state
+    @property
+    def pipeline(self):
+        return self._pipeline
 
     def on_moreless(self):
-        """User wants to select filters"""
+        """User wants to choose box filters"""
         if not self._box_edit_view:
             # Show all filters to the user
             for _, rc in self._box_range_controls.items():
@@ -139,7 +141,11 @@ class FilterPanel(QtWidgets.QWidget):
                 rc.range_slider.setEnabled(True)
             self.toolButton_moreless.setText("Choose filters...")
             self._box_edit_view = False
-            self.request_box_range_update.emit()
+            # Update box filter ranges
+            self.update_box_ranges()
+
+    def set_pipeline(self, pipeline):
+        self._pipeline = pipeline
 
     def show_filter(self, filt_id):
         self.update_content(filt_index=self.filter_ids.index(filt_id))
@@ -161,13 +167,13 @@ class FilterPanel(QtWidgets.QWidget):
             # populate content
             filt = Filter.get_filter(identifier=self.filter_ids[filt_index])
             state = filt.__getstate__()
-            self.set_filter_state(state)
-            self.update_box_filters()
+            self.__setstate__(state)
+            self.update_box_ranges()
         else:
             self.setEnabled(False)
 
-    def update_box_filters(self, mmdict={}):
-        """Update the box plot filters
+    def update_box_ranges(self):
+        """Update the box plot filter ranges
 
         Parameters
         ----------
@@ -180,22 +186,27 @@ class FilterPanel(QtWidgets.QWidget):
             Each key is a feature name; each item is a tuple
             of min/max values for that feature.
         """
-        # update used features
-        for feat in self._box_range_controls:
-            rc = self._box_range_controls[feat]
-            if feat in mmdict:
-                rc.setLimits(*mmdict[feat])
-            if self.current_filter is not None:
-                state = self.current_filter.__getstate__()
-                if feat not in state["box filters"]:
-                    # reset range to limits
-                    rc.reset_range()
+        if self.pipeline is not None and self.pipeline.num_slots:
+            # compute min/max values
+            mmdict = {}
+            for feat in self.active_box_features:
+                mmdict[feat] = self.pipeline.get_min_max(feat=feat)
+            # update used features
+            for feat in self._box_range_controls:
+                rc = self._box_range_controls[feat]
+                if feat in mmdict:
+                    rc.setLimits(*mmdict[feat])
+                if self.current_filter is not None:
+                    state = self.current_filter.__getstate__()
+                    if feat not in state["box filters"]:
+                        # reset range to limits
+                        rc.reset_range()
 
     def write_filter(self):
-        """Update the shapeout2.filter.Filter instance"""
+        """Update the shapeout2.pipeline.Filter instance"""
         # get current index
         filt_index = self.comboBox_filters.currentIndex()
         filt = Filter.get_filter(identifier=self.filter_names[filt_index])
-        state = self.get_filter_state()
+        state = self.__getstate__()
         filt.__setstate__(state)
         self.filters_changed.emit()

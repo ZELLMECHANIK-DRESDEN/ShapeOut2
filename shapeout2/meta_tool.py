@@ -46,6 +46,14 @@ def get_rtdc_features(path, scalar=True, only_loaded=False):
     return av_feat
 
 
+def get_rtdc_features_bulk(paths, scalar=True):
+    """Return available features for a list of dataset paths"""
+    features = []
+    for pp in paths:
+        features += get_rtdc_features(path=pp, scalar=scalar)
+    return sorted(set(features))
+
+
 @functools.lru_cache(maxsize=10000)
 def get_rtdc_features_minmax(path, *features):
     """Return dict with min/max of scalar features in a dataset"""

@@ -24,7 +24,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="comboBox"/>
+      <widget class="QComboBox" name="comboBox_plots"/>
      </item>
      <item>
       <spacer name="horizontalSpacer">
@@ -143,7 +143,7 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="comboBox_x"/>
+        <widget class="QComboBox" name="comboBox_axis_x"/>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_7">
@@ -153,7 +153,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QComboBox" name="comboBox_y"/>
+        <widget class="QComboBox" name="comboBox_axis_y"/>
        </item>
        <item row="1" column="2">
         <widget class="QComboBox" name="comboBox_yscale">
@@ -631,7 +631,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_4">
+        <widget class="QPushButton" name="pushButton_reset">
          <property name="text">
           <string>Reset</string>
          </property>
@@ -654,7 +654,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_3">
+        <widget class="QPushButton" name="pushButton_apply">
          <property name="text">
           <string>Apply</string>
          </property>

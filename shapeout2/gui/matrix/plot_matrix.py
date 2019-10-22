@@ -2,6 +2,8 @@ import copy
 
 from PyQt5 import QtCore, QtWidgets
 
+from ... import pipeline
+
 from .pm_element import MatrixElement
 from .pm_plot import MatrixPlot
 
@@ -125,10 +127,9 @@ class PlotMatrix(QtWidgets.QWidget):
                 plots.append(ps)
         return plots
 
-    def add_plot(self):
+    def add_plot(self, identifier=None, state=None):
         self.setUpdatesEnabled(False)
-        name = "PS{}".format(self.num_plots+1)
-        mp = MatrixPlot(name)
+        mp = MatrixPlot(identifier=identifier, state=state)
         mp.option_action.connect(self.on_option_plot)
         mp.active_toggled.connect(self.toggle_plot_active)
         self.glo.addWidget(mp, 0, self.num_plots)
@@ -201,9 +202,9 @@ class PlotMatrix(QtWidgets.QWidget):
         state = self.__getstate__()
         p_state = sender.__getstate__()
         if option == "duplicate":
-            p_new = self.add_plot()
-            p_state["identifier"] = p_new.identifier
-            p_state["title"] += "({})".format(p_new.identifier)
+            plot = pipeline.Plot()
+            p_state["identifier"] = plot.identifier
+            p_state["name"] = plot.name
             state["plots"].insert(column+1, p_state)
         else:  # remove
             state["plots"].pop(column)

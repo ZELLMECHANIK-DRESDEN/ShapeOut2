@@ -35,6 +35,11 @@ class ShapeOut2(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self)
         path_ui = pkg_resources.resource_filename("shapeout2.gui", "main.ui")
         uic.loadUi(path_ui, self)
+        #: Shape-Out settings
+        self.settings = settings.SettingsFile()
+        #: Analysis pipeline
+        self.pipeline = pipeline.Pipeline()
+        # GUI
         self.setWindowTitle("Shape-Out {}".format(__version__))
         # Disable native menubar (e.g. on Mac)
         self.menubar.setNativeMenuBar(False)
@@ -64,14 +69,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.toolButton_new_filter.clicked.connect(self.add_filter)
         self.toolButton_new_dataset.clicked.connect(self.add_dataslot)
         self.toolButton_import.clicked.connect(self.add_dataslot)
-        self.toolButton_new_plot.clicked.connect(self.plot_matrix.add_plot)
+        self.toolButton_new_plot.clicked.connect(self.add_plot)
         # analysis view
-        self.widget_ana_view.widget_filter.request_box_range_update.connect(
-            self.update_ana_filter_box_ranges)
-        #: Shape-Out settings
-        self.settings = settings.SettingsFile()
-        #: Analysis pipeline
-        self.pipeline = pipeline.Pipeline()
+        self.widget_ana_view.widget_filter.set_pipeline(self.pipeline)
+        self.widget_ana_view.widget_plot.set_pipeline(self.pipeline)
 
     def add_dataslot(self):
         fnames, _ = QtWidgets.QFileDialog.getOpenFileNames(
@@ -90,12 +91,17 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.data_matrix.add_dataset(identifier=slot_id)
 
         # Update box filter limits
-        self.update_ana_filter_box_ranges()
+        self.widget_ana_view.widget_filter.update_box_ranges()
 
     def add_filter(self):
         filt_id = self.pipeline.add_filter()
         self.data_matrix.add_filter(identifier=filt_id)
         self.widget_ana_view.widget_filter.update_content()
+
+    def add_plot(self):
+        plot_id = self.pipeline.add_plot()
+        self.plot_matrix.add_plot(identifier=plot_id)
+        self.widget_ana_view.widget_plot.update_content()
 
     def init_analysis_view(self):
         sub = QtWidgets.QMdiSubWindow()
@@ -104,7 +110,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         sub.setWidget(self.widget_ana_view)
         self.mdiArea.addSubWindow(sub)
         self.toolButton_ana_view.clicked.connect(sub.setVisible)
-        self.widget_ana_view.widget_filter.pushButton_update.clicked.connect(
+        # applying a new filter triggers updating QuickView
+        self.widget_ana_view.widget_filter.pushButton_apply.clicked.connect(
             self.on_quickview_refresh)
         self.subwindows["analysis_view"] = sub
         sub.setSystemMenu(None)
@@ -213,18 +220,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.toolButton_dm.setChecked(False)
         else:
             self.toolButton_dm.setChecked(True)
-
-    @QtCore.pyqtSlot()
-    def update_ana_filter_box_ranges(self):
-        """Update the ranges and limits of the box filters"""
-        # get the currently used box filter names
-        features = self.widget_ana_view.widget_filter.active_box_features
-        # compute min/max values
-        mmdict = {}
-        for feat in features:
-            mmdict[feat] = self.pipeline.get_min_max(feat=feat)
-        # apply to box filters
-        self.widget_ana_view.widget_filter.update_box_filters(mmdict)
 
     @QtCore.pyqtSlot(dict)
     def update_pipeline(self, state):

@@ -15,18 +15,20 @@ DEFAULT_STATE = {
         "name": "no default",  # overridden by __init__
         "scale x": "linear",
         "scale y": "linear",
-        "size x": float,
-        "size y": float,
+        "size x": 500,
+        "size y": 400,
     },
     "scatter": {
         "downsampling": True,
         "downsampling value": 5000,
+        "enabled": True,
         "marker hue": "kde",  # hue defined by: kde, dataset, feature, none
         "marker size": 1.0,  # marker size [pt]
-        "hue feature": "emodulus",  # which feature to use, if set
+        "hue feature": "bright_avg",  # which feature to use, if set
         "colormap": "jet",  # only applies when hue is "kde" or "feature"
     },
     "contour": {
+        "enabled": True,
         "percentiles": [50.0, 95.0],
         "line widths": [3.0, 1.5],  # contour line widths [pt]
         "line styles": ["solid", "dashed"],
@@ -41,21 +43,25 @@ STATE_OPTIONS = {
         "axis y": dclab.dfn.scalar_feature_names,
         "event count": [False, True],
         "isoelastics": [False, True],
-        "kde": list(dclab.kde_methods.methods.keys()),
+        "kde": sorted(dclab.kde_methods.methods.keys()),
         "legend": [False, True],
         "name": str,
         "scale x": ["linear", "logarithmic"],
         "scale y": ["linear", "logarithmic"],
+        "size x": float,
+        "size y": float,
     },
     "scatter": {
         "downsampling": [False, True],
         "downsampling value": int,
+        "enabled":  [False, True],
         "marker hue": ["dataset", "kde", "feature", "none"],
         "marker size": float,
         "hue feature": dclab.dfn.scalar_feature_names,
         "colormap": ["jet"],
     },
     "contour": {
+        "enabled":  [False, True],
         "percentiles": (float,),
         "line widths": (float,),
         "line styles": (["solid", "dashed"],),

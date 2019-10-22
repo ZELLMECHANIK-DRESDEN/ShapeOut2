@@ -73,9 +73,9 @@ class DataMatrix(QtWidgets.QWidget):
                 me_state = ds_state[f_key]
                 me = self.get_matrix_element(ds_key, f_key)
                 me.__setstate__(me_state)
+        self.adjust_size()
         self.blockSignals(False)
         self.setUpdatesEnabled(True)
-        self.adjust_size()
 
     def _reset_layout(self):
         if self.glo is not None:

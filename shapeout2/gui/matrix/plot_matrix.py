@@ -9,6 +9,7 @@ from .pm_plot import MatrixPlot
 
 
 class PlotMatrix(QtWidgets.QWidget):
+    plot_modify_clicked = QtCore.pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(PlotMatrix, self).__init__(parent)
@@ -39,11 +40,12 @@ class PlotMatrix(QtWidgets.QWidget):
         return state
 
     def __setstate__(self, state):
+        self.blockSignals(True)
+        self.setUpdatesEnabled(False)
         self.clear()
         # plot states
         for jj in range(len(state["plots"])):
-            ps = self.add_plot()
-            ps.__setstate__(state["plots"][jj])
+            self.add_plot(state=state["plots"][jj])
         # make sure elements exist
         self.fill_elements()
         # element states
@@ -54,6 +56,8 @@ class PlotMatrix(QtWidgets.QWidget):
                 el = self.get_matrix_element(ds_key, p_key)
                 el.__setstate__(el_state)
         self.adjust_size()
+        self.blockSignals(False)
+        self.setUpdatesEnabled(True)
 
     def _reset_layout(self, init=False):
         if self.glo is not None:
@@ -132,6 +136,7 @@ class PlotMatrix(QtWidgets.QWidget):
         mp = MatrixPlot(identifier=identifier, state=state)
         mp.option_action.connect(self.on_option_plot)
         mp.active_toggled.connect(self.toggle_plot_active)
+        mp.modify_clicked.connect(self.plot_modify_clicked.emit)
         self.glo.addWidget(mp, 0, self.num_plots)
         self.fill_elements()
         self.adjust_size()

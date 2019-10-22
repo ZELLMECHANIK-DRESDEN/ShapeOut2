@@ -14,7 +14,7 @@ SHOW_FEATURES = ["deform", "area_um", "bright_avg"]
 
 
 class FilterPanel(QtWidgets.QWidget):
-    #: Emitted when a shapeout2.filter.Filter modified
+    #: Emitted when a shapeout2.pipeline.Filter is modified
     filters_changed = QtCore.pyqtSignal()
 
     def __init__(self, *args, **kwargs):

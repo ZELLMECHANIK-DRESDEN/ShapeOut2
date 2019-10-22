@@ -8,6 +8,7 @@ from ... import pipeline
 class MatrixPlot(QtWidgets.QWidget):
     active_toggled = QtCore.pyqtSignal()
     option_action = QtCore.pyqtSignal(str)
+    modify_clicked = QtCore.pyqtSignal(str)
 
     def __init__(self, identifier=None, state=None):
         QtWidgets.QWidget.__init__(self)
@@ -23,6 +24,7 @@ class MatrixPlot(QtWidgets.QWidget):
 
         # toggle all active, all inactive, semi state
         self.toolButton_toggle.clicked.connect(self.active_toggled.emit)
+        self.toolButton_modify.clicked.connect(self.on_modify)
 
         if state is None:
             plot = pipeline.Plot._instances[identifier]
@@ -49,6 +51,9 @@ class MatrixPlot(QtWidgets.QWidget):
 
     def action_remove(self):
         self.option_action.emit("remove")
+
+    def on_modify(self):
+        self.modify_clicked.emit(self.identifier)
 
     @QtCore.pyqtSlot()
     def update_content(self):

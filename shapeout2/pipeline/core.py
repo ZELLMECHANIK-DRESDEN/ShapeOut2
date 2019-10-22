@@ -252,7 +252,7 @@ class Pipeline(object):
             fmax = np.max([fmax, vmax])
         return fmin, fmax
 
-    def get_features(self, scalar=False):
+    def get_features(self, scalar=False, label_sort=False):
         """Return a list of features that all slots share"""
         if scalar:
             features = dclab.dfn.scalar_feature_names
@@ -263,6 +263,10 @@ class Pipeline(object):
                                   filt_index=0,
                                   apply_filter=False)
             features = sorted(set(ds.features) & set(features))
+        if label_sort:
+            labs = [dclab.dfn.feature_name2label[f] for f in features]
+            lf = sorted(zip(labs, features))
+            features = [it[1] for it in lf]
         return features
 
     def reset(self):

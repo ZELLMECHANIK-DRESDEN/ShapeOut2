@@ -113,7 +113,7 @@
         </widget>
        </item>
        <item row="0" column="2">
-        <widget class="QComboBox" name="comboBox_xscale">
+        <widget class="QComboBox" name="comboBox_scale_x">
          <item>
           <property name="text">
            <string>linear</string>
@@ -127,10 +127,10 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QComboBox" name="comboBox_5">
+        <widget class="QComboBox" name="comboBox_kde">
          <item>
           <property name="text">
-           <string>Historgram</string>
+           <string>Histogram</string>
           </property>
          </item>
         </widget>
@@ -156,7 +156,7 @@
         <widget class="QComboBox" name="comboBox_axis_y"/>
        </item>
        <item row="1" column="2">
-        <widget class="QComboBox" name="comboBox_yscale">
+        <widget class="QComboBox" name="comboBox_scale_y">
          <item>
           <property name="text">
            <string>linear</string>
@@ -197,7 +197,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="checkBox_event_count">
          <property name="text">
           <string>Number of events</string>
          </property>
@@ -207,7 +207,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_2">
+        <widget class="QCheckBox" name="checkBox_legend">
          <property name="text">
           <string>Legend</string>
          </property>
@@ -241,7 +241,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="spinBox_2">
+        <widget class="QSpinBox" name="spinBox_size_x">
          <property name="suffix">
           <string> pt</string>
          </property>
@@ -267,7 +267,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QSpinBox" name="spinBox_3">
+        <widget class="QSpinBox" name="spinBox_size_y">
          <property name="suffix">
           <string> pt</string>
          </property>
@@ -301,7 +301,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBox">
+      <widget class="QGroupBox" name="groupBox_scatter">
        <property name="title">
         <string>Scatter plot</string>
        </property>
@@ -358,7 +358,7 @@
         <item>
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="1" column="2">
-           <widget class="QComboBox" name="comboBox_4">
+           <widget class="QComboBox" name="comboBox_marker_feature">
             <item>
              <property name="text">
               <string>Area [µm]</string>
@@ -381,7 +381,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QComboBox" name="comboBox_marker_color">
+           <widget class="QComboBox" name="comboBox_marker_hue">
             <item>
              <property name="text">
               <string>KDE</string>
@@ -405,7 +405,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QSpinBox" name="spinBox">
+           <widget class="QSpinBox" name="spinBox_marker_size">
             <property name="suffix">
              <string> pt</string>
             </property>
@@ -418,7 +418,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QComboBox" name="comboBox_6"/>
+           <widget class="QComboBox" name="comboBox_colormap"/>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_3">
@@ -446,7 +446,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBox_2">
+      <widget class="QGroupBox" name="groupBox_contour">
        <property name="title">
         <string>Contour plot</string>
        </property>
@@ -476,7 +476,7 @@
            </spacer>
           </item>
           <item row="1" column="3">
-           <widget class="QComboBox" name="comboBox_2">
+           <widget class="QComboBox" name="comboBox_ls_1">
             <property name="currentIndex">
              <number>0</number>
             </property>
@@ -493,10 +493,10 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_4"/>
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_spacing_x"/>
           </item>
           <item row="2" column="3">
-           <widget class="QComboBox" name="comboBox_3">
+           <widget class="QComboBox" name="comboBox_ls_2">
             <property name="currentIndex">
              <number>1</number>
             </property>
@@ -513,7 +513,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_perc_1">
             <property name="prefix">
              <string/>
             </property>
@@ -529,7 +529,7 @@
            </widget>
           </item>
           <item row="1" column="2">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_lw_1">
             <property name="suffix">
              <string> pt</string>
             </property>
@@ -569,10 +569,10 @@
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_5"/>
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_spacing_y"/>
           </item>
           <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_perc_2">
             <property name="suffix">
              <string>th percentile</string>
             </property>
@@ -592,7 +592,7 @@
            </widget>
           </item>
           <item row="2" column="2">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_lw_2">
             <property name="suffix">
              <string> pt</string>
             </property>
@@ -667,5 +667,22 @@
   </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>checkBox_downsample</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinBox_downsample</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>93</x>
+     <y>290</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>240</x>
+     <y>290</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

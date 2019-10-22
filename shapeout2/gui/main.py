@@ -62,8 +62,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.data_matrix.matrix_changed.connect(self.update_pipeline)
         self.data_matrix.filter_modify_clicked.connect(
             self.on_modify_filter)
-        self.widget_ana_view.widget_filter.filters_changed.connect(
-            self.data_matrix.update_content)
+        self.plot_matrix.plot_modify_clicked.connect(
+            self.on_modify_plot)
         self.toolButton_dm.clicked.connect(self.on_data_matrix)
         self.splitter.splitterMoved.connect(self.on_splitter)
         self.toolButton_new_filter.clicked.connect(self.add_filter)
@@ -73,6 +73,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # analysis view
         self.widget_ana_view.widget_filter.set_pipeline(self.pipeline)
         self.widget_ana_view.widget_plot.set_pipeline(self.pipeline)
+        self.widget_ana_view.widget_filter.filters_changed.connect(
+            self.data_matrix.update_content)
+        self.widget_ana_view.widget_plot.plots_changed.connect(
+            self.data_matrix.update_content)
 
     def add_dataslot(self):
         fnames, _ = QtWidgets.QFileDialog.getOpenFileNames(
@@ -183,6 +187,14 @@ class ShapeOut2(QtWidgets.QMainWindow):
     def on_modify_filter(self, filt_id):
         self.widget_ana_view.tabWidget.setCurrentIndex(1)
         self.widget_ana_view.widget_filter.show_filter(filt_id)
+        # finally, check the button
+        self.toolButton_ana_view.setChecked(True)
+        self.subwindows["analysis_view"].setVisible(True)
+
+    @QtCore.pyqtSlot(str)
+    def on_modify_plot(self, plot_id):
+        self.widget_ana_view.tabWidget.setCurrentIndex(2)
+        self.widget_ana_view.widget_plot.show_plot(plot_id)
         # finally, check the button
         self.toolButton_ana_view.setChecked(True)
         self.subwindows["analysis_view"].setVisible(True)

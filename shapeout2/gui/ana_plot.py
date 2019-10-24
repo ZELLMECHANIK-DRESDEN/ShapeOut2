@@ -49,7 +49,7 @@ class PlotPanel(QtWidgets.QWidget):
                 "size y": self.spinBox_size_y.value(),
             },
             "scatter": {
-                "downsampling": self.checkBox_downsample.isChecked(),
+                "downsample": self.checkBox_downsample.isChecked(),
                 "downsampling value": self.spinBox_downsample.value(),
                 "enabled": self.groupBox_scatter.isChecked(),
                 "marker hue": self.comboBox_marker_hue.currentData(),
@@ -96,7 +96,7 @@ class PlotPanel(QtWidgets.QWidget):
 
         # Scatter
         sca = state["scatter"]
-        self.checkBox_downsample.setChecked(sca["downsampling"])
+        self.checkBox_downsample.setChecked(sca["downsample"])
         self.spinBox_downsample.setValue(sca["downsampling value"])
         self.groupBox_scatter.setChecked(sca["enabled"])
         hue_index = self.comboBox_marker_hue.findData(sca["marker hue"])

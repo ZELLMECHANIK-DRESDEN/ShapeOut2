@@ -82,6 +82,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.data_matrix.update_content)
         self.widget_ana_view.widget_plot.plots_changed.connect(
             self.plot_matrix.update_content)
+        self.widget_ana_view.widget_plot.plots_changed.connect(
+            self.plots_changed)
 
     def add_dataslot(self):
         fnames, _ = QtWidgets.QFileDialog.getOpenFileNames(

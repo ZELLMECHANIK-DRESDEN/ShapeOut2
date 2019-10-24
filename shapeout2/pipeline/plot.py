@@ -19,11 +19,11 @@ DEFAULT_STATE = {
         "size y": 400,
     },
     "scatter": {
-        "downsampling": True,
+        "downsample": True,
         "downsampling value": 5000,
         "enabled": True,
         "marker hue": "kde",  # hue defined by: kde, dataset, feature, none
-        "marker size": 1.0,  # marker size [pt]
+        "marker size": 3.0,  # marker size [pt]
         "hue feature": "bright_avg",  # which feature to use, if set
         "colormap": "jet",  # only applies when hue is "kde" or "feature"
     },
@@ -37,13 +37,16 @@ DEFAULT_STATE = {
     }
 }
 
+_kde_methods = sorted(dclab.kde_methods.methods.keys())
+_kde_methods.remove("none")  # does not make sense here
+
 STATE_OPTIONS = {
     "general": {
         "axis x": dclab.dfn.scalar_feature_names,
         "axis y": dclab.dfn.scalar_feature_names,
         "event count": [False, True],
         "isoelastics": [False, True],
-        "kde": sorted(dclab.kde_methods.methods.keys()),
+        "kde": _kde_methods,
         "legend": [False, True],
         "name": str,
         "scale x": ["linear", "logarithmic"],

@@ -107,6 +107,9 @@
       <layout class="QGridLayout" name="gridLayout">
        <item row="2" column="0">
         <widget class="QLabel" name="label_9">
+         <property name="toolTip">
+          <string>Kernel Density Estimator</string>
+         </property>
          <property name="text">
           <string>KDE</string>
          </property>
@@ -176,7 +179,7 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>40</width>
+           <width>0</width>
            <height>20</height>
           </size>
          </property>
@@ -223,7 +226,7 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>40</width>
+           <width>0</width>
            <height>20</height>
           </size>
          </property>
@@ -292,7 +295,7 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>40</width>
+           <width>0</width>
            <height>20</height>
           </size>
          </property>
@@ -420,7 +423,7 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>40</width>
+              <width>0</width>
               <height>20</height>
              </size>
             </property>
@@ -475,7 +478,7 @@
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>40</width>
+              <width>0</width>
               <height>20</height>
              </size>
             </property>

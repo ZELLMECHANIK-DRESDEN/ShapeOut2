@@ -1,3 +1,5 @@
+2.0.0a20
+ - fix missing source files in previous release
 2.0.0a19
  - fix plot matrix: size and buttons of elements
  - populate help menu

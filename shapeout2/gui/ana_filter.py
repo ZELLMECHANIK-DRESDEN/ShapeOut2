@@ -22,8 +22,8 @@ class FilterPanel(QtWidgets.QWidget):
         path_ui = pkg_resources.resource_filename(
             "shapeout2.gui", "ana_filter.ui")
         uic.loadUi(path_ui, self)
+        self.setUpdatesEnabled(False)
         self._init_box_filters()
-
         self.pushButton_apply.clicked.connect(self.write_filter)
         self.pushButton_reset.clicked.connect(self.update_content)
         self.comboBox_filters.currentIndexChanged.connect(self.update_content)
@@ -32,6 +32,7 @@ class FilterPanel(QtWidgets.QWidget):
         self.update_content()
         # current Shape-Out 2 pipeline
         self._pipeline = None
+        self.setUpdatesEnabled(True)
 
     def _init_box_filters(self, show_features=SHOW_FEATURES):
         self._box_range_controls = {}

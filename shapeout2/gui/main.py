@@ -15,6 +15,7 @@ from PyQt5 import uic, QtCore, QtWidgets
 import pyqtgraph as pg
 
 from . import ana_view
+from . import pipeline_plot
 from . import quick_view
 
 from .. import settings
@@ -31,6 +32,8 @@ pg.setConfigOption("imageAxisOrder", "row-major")
 
 
 class ShapeOut2(QtWidgets.QMainWindow):
+    plots_changed = QtCore.pyqtSignal()
+
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
         path_ui = pkg_resources.resource_filename("shapeout2.gui", "main.ui")
@@ -62,13 +65,15 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.data_matrix.matrix_changed.connect(self.update_pipeline)
         self.data_matrix.filter_modify_clicked.connect(
             self.on_modify_filter)
-        self.plot_matrix.plot_modify_clicked.connect(
-            self.on_modify_plot)
         self.toolButton_dm.clicked.connect(self.on_data_matrix)
         self.splitter.splitterMoved.connect(self.on_splitter)
         self.toolButton_new_filter.clicked.connect(self.add_filter)
         self.toolButton_new_dataset.clicked.connect(self.add_dataslot)
         self.toolButton_import.clicked.connect(self.add_dataslot)
+        # plot matrix
+        self.plot_matrix.matrix_changed.connect(self.update_pipeline)
+        self.plot_matrix.plot_modify_clicked.connect(
+            self.on_modify_plot)
         self.toolButton_new_plot.clicked.connect(self.add_plot)
         # analysis view
         self.widget_ana_view.widget_filter.set_pipeline(self.pipeline)
@@ -106,6 +111,19 @@ class ShapeOut2(QtWidgets.QMainWindow):
         plot_id = self.pipeline.add_plot()
         self.plot_matrix.add_plot(identifier=plot_id)
         self.widget_ana_view.widget_plot.update_content()
+        # create subwindow
+        sub = QtWidgets.QMdiSubWindow()
+        pw = pipeline_plot.PipelinePlot(pipeline=self.pipeline,
+                                        plot_id=plot_id)
+        self.plots_changed.connect(pw.update_content)
+        sub.setWidget(pw)
+        self.mdiArea.addSubWindow(sub)
+        self.subwindows[plot_id] = sub
+        sub.setSystemMenu(None)
+        sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
+                           | QtCore.Qt.WindowTitleHint
+                           | QtCore.Qt.Tool)
+        sub.setVisible(True)
 
     def init_analysis_view(self):
         sub = QtWidgets.QMdiSubWindow()
@@ -233,9 +251,22 @@ class ShapeOut2(QtWidgets.QMainWindow):
         else:
             self.toolButton_dm.setChecked(True)
 
-    @QtCore.pyqtSlot(dict)
-    def update_pipeline(self, state):
+    @QtCore.pyqtSlot()
+    def update_pipeline(self):
+        state = self.data_matrix.__getstate__()
+        statep = self.plot_matrix.__getstate__()
+        state["plots"] = statep["plots"]
+        for slot in statep["elements"]:
+            for plot in statep["elements"][slot]:
+                state["elements"][slot][plot] = statep["elements"][slot][plot]
+        # Reduce a state from DataMatrix to something Pipeline can work with
+        for slot_id in state["elements"]:
+            for fp_id in state["elements"][slot_id]:
+                active = state["elements"][slot_id][fp_id]["active"]
+                enabled = state["elements"][slot_id][fp_id]["enabled"]
+                state["elements"][slot_id][fp_id] = active and enabled
         self.pipeline.__setstate__(state)
+        self.plots_changed.emit()
 
 
 def excepthook(etype, value, trace):

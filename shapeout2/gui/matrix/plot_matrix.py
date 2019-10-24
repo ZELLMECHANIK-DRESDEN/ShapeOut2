@@ -10,6 +10,7 @@ from .pm_plot import MatrixPlot
 
 class PlotMatrix(QtWidgets.QWidget):
     plot_modify_clicked = QtCore.pyqtSignal(str)
+    matrix_changed = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super(PlotMatrix, self).__init__(parent)
@@ -141,6 +142,7 @@ class PlotMatrix(QtWidgets.QWidget):
         self.fill_elements()
         self.adjust_size()
         self.setUpdatesEnabled(True)
+        self.publish_matrix()
         return mp
 
     def adjust_size(self):
@@ -156,6 +158,10 @@ class PlotMatrix(QtWidgets.QWidget):
             self.setFixedSize(ncols*hwidth,
                               nrows*dheight+hheight)
 
+    @QtCore.pyqtSlot()
+    def changed_element(self):
+        self.publish_matrix()
+
     def clear(self):
         """Reset layout"""
         self._reset_layout()
@@ -167,11 +173,12 @@ class PlotMatrix(QtWidgets.QWidget):
             for jj in range(self.num_plots):
                 if self.glo.itemAtPosition(ii+1, jj) is None:
                     me = MatrixElement()
+                    me.element_changed.connect(self.changed_element)
                     self.glo.addWidget(me, ii+1, jj)
         # make sure enabled/disabled is honored
         dstate = self.data_matrix.__getstate__()
         pstate = self.__getstate__()
-        for ds in dstate["datasets"]:
+        for ds in dstate["slots"]:
             for ps in pstate["plots"]:
                 if not ds["enabled"]:
                     me = self.get_matrix_element(ds["identifier"],
@@ -216,6 +223,12 @@ class PlotMatrix(QtWidgets.QWidget):
             for ds_key in state["elements"]:
                 state["elements"][ds_key].pop(p_state["identifier"])
         self.__setstate__(state)
+        self.publish_matrix()
+
+    def publish_matrix(self):
+        """Publish state via self.matrix_changed signal for Pipeline"""
+        if not self.signalsBlocked():
+            self.matrix_changed.emit()
 
     @QtCore.pyqtSlot(bool)
     def toggle_dataset_enable(self, enabled):
@@ -228,6 +241,7 @@ class PlotMatrix(QtWidgets.QWidget):
             mstate = me.__getstate__()
             mstate["enabled"] = enabled
             me.__setstate__(mstate)
+        self.publish_matrix()
 
     @QtCore.pyqtSlot()
     def toggle_plot_active(self):
@@ -274,3 +288,4 @@ class PlotMatrix(QtWidgets.QWidget):
         for dsid in state:
             me = self.get_matrix_element(dsid, sid)
             me.__setstate__(state[dsid])
+        self.publish_matrix()

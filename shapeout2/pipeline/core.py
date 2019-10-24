@@ -43,8 +43,7 @@ class Pipeline(object):
             filt.general["enable filters"] = ff["enabled"]
             filt.name = ff["name"]
             self.add_filter(filt)
-
-        for dd in state["datasets"]:
+        for dd in state["slots"]:
             if dd["identifier"] in Dataslot._instances:
                 # use existing slot
                 slot = Dataslot._instances[dd["identifier"]]
@@ -53,10 +52,23 @@ class Pipeline(object):
                 slot = Dataslot(path=dd["path"],
                                 identifier=dd["identifier"])
             self.add_slot(slot=slot)
+        for pp in state["plots"]:
+            if pp["identifier"] in Plot._instances:
+                # use existing slot
+                plot = Plot._instances[pp["identifier"]]
+            else:
+                # create new slot
+                plot = Plot(path=pp["path"],
+                            identifier=pp["identifier"])
+            self.add_plot(plot=plot)
         self.element_states = state["elements"]
 
     @property
     def num_filters(self):
+        return len(self.filters)
+
+    @property
+    def num_plots(self):
         return len(self.filters)
 
     @property
@@ -239,19 +251,6 @@ class Pipeline(object):
             dsend.apply_filter()
         return dsend
 
-    def get_min_max(self, feat):
-        fmin = np.inf
-        fmax = -np.inf
-        for slot_index in range(self.num_slots):
-            ds = self.get_dataset(slot_index=slot_index,
-                                  filt_index=0,
-                                  apply_filter=False)
-            vmin = np.nanmin(ds[feat])
-            vmax = np.nanmax(ds[feat])
-            fmin = np.min([fmin, vmin])
-            fmax = np.max([fmax, vmax])
-        return fmin, fmax
-
     def get_features(self, scalar=False, label_sort=False):
         """Return a list of features that all slots share"""
         if scalar:
@@ -268,6 +267,33 @@ class Pipeline(object):
             lf = sorted(zip(labs, features))
             features = [it[1] for it in lf]
         return features
+
+    def get_min_max(self, feat):
+        fmin = np.inf
+        fmax = -np.inf
+        for slot_index in range(self.num_slots):
+            ds = self.get_dataset(slot_index=slot_index,
+                                  filt_index=0,
+                                  apply_filter=False)
+            vmin = np.nanmin(ds[feat])
+            vmax = np.nanmax(ds[feat])
+            fmin = np.min([fmin, vmin])
+            fmax = np.max([fmax, vmax])
+        return fmin, fmax
+
+    def get_plot_datasets(self, plot_id):
+        """Return a list of datasets that belong to a plot"""
+        datasets = []
+        filt_index = self.num_filters - 1
+        # keep the same order as in self.slots
+        for slot_index in range(len(self.slots)):
+            slot_id = self.slots[slot_index].identifier
+            if self.element_states[slot_id][plot_id]:
+                ds = self.get_dataset(slot_index=slot_index,
+                                      filt_index=filt_index,
+                                      apply_filter=True)
+                datasets.append(ds)
+        return datasets
 
     def reset(self):
         """Reset the pipeline"""

@@ -12,7 +12,7 @@ from .dm_element import MatrixElement
 
 class DataMatrix(QtWidgets.QWidget):
     quickviewed = QtCore.pyqtSignal(int, int)
-    matrix_changed = QtCore.pyqtSignal(dict)
+    matrix_changed = QtCore.pyqtSignal()
     filter_modify_clicked = QtCore.pyqtSignal(str)
 
     def __init__(self, parent=None):
@@ -32,7 +32,7 @@ class DataMatrix(QtWidgets.QWidget):
 
     def __getstate__(self):
         """Logical states of the current data matrix"""
-        # datasets
+        # slots
         datasets = []
         for ds in self.datasets:
             datasets.append(ds.__getstate__())
@@ -49,8 +49,9 @@ class DataMatrix(QtWidgets.QWidget):
                 idict[fs.identifier] = me.__getstate__()
             mestates[ds.identifier] = idict
         state = {"elements": mestates,
-                 "datasets": datasets,
-                 "filters": filters}
+                 "filters": filters,
+                 "slots": datasets,
+                 }
         return state
 
     def __setstate__(self, state):
@@ -58,8 +59,8 @@ class DataMatrix(QtWidgets.QWidget):
         self.setUpdatesEnabled(False)
         self.clear()
         # dataset states
-        for ii in range(len(state["datasets"])):
-            self.add_dataset(state=state["datasets"][ii])
+        for ii in range(len(state["slots"])):
+            self.add_dataset(state=state["slots"][ii])
         # filter states
         for jj in range(len(state["filters"])):
             self.add_filter(state=state["filters"][jj])
@@ -266,7 +267,7 @@ class DataMatrix(QtWidgets.QWidget):
                     self.glo.addWidget(me, ii+1, jj+1)
         # make sure enabled/disabled is honored
         state = self.__getstate__()
-        for ds in state["datasets"]:
+        for ds in state["slots"]:
             for f in state["filters"]:
                 if not ds["enabled"] or not f["enabled"]:
                     me = self.get_matrix_element(ds["identifier"],
@@ -357,16 +358,16 @@ class DataMatrix(QtWidgets.QWidget):
             ds_state["identifier"] = slot.identifier
             # enable by default
             ds_state["enabled"] = True
-            state["datasets"].insert(row, ds_state)
+            state["slots"].insert(row, ds_state)
         elif option == "duplicate":
             slot = pipeline.Dataslot(path=ds_state["path"])
             # also set element states
             state["elements"][slot.identifier] = \
                 state["elements"][ds_state["identifier"]]
             ds_state["identifier"] = slot.identifier
-            state["datasets"].insert(row, ds_state)
+            state["slots"].insert(row, ds_state)
         else:  # remove
-            state["datasets"].pop(row-1)
+            state["slots"].pop(row-1)
             state["elements"].pop(ds_state["identifier"])
             pstate["elements"].pop(ds_state["identifier"])
         self.__setstate__(state)
@@ -413,15 +414,8 @@ class DataMatrix(QtWidgets.QWidget):
 
     def publish_matrix(self):
         """Publish state via self.matrix_changed signal for Pipeline"""
-        state = self.__getstate__()
-        # Reduce a state from DataMatrix to something Pipeline can work with
-        for slot_id in state["elements"]:
-            for filt_id in state["elements"][slot_id]:
-                active = state["elements"][slot_id][filt_id]["active"]
-                enabled = state["elements"][slot_id][filt_id]["enabled"]
-                state["elements"][slot_id][filt_id] = active and enabled
         if not self.signalsBlocked():
-            self.matrix_changed.emit(state)
+            self.matrix_changed.emit()
             self.changed_quickview()
 
     @QtCore.pyqtSlot()

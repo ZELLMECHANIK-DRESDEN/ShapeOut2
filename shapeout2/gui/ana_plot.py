@@ -181,10 +181,18 @@ class PlotPanel(QtWidgets.QWidget):
 
     def on_hue_select(self):
         """Show/hide options for feature-based hue selection"""
+        # Only show feature selection if needed
         if self.comboBox_marker_hue.currentData() == "feature":
             self.comboBox_marker_feature.show()
         else:
             self.comboBox_marker_feature.hide()
+        # Only show colormap selection if needed
+        if self.comboBox_marker_hue.currentData() in ["dataset", "none"]:
+            self.comboBox_colormap.hide()
+            self.label_colormap.hide()
+        else:
+            self.comboBox_colormap.show()
+            self.label_colormap.show()
 
     def show_plot(self, plot_id):
         self.update_content(plot_index=self.plot_ids.index(plot_id))

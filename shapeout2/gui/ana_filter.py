@@ -210,3 +210,4 @@ class FilterPanel(QtWidgets.QWidget):
         state = self.__getstate__()
         filt.__setstate__(state)
         self.filters_changed.emit()
+        self.update_content()  # update filter selection combobox

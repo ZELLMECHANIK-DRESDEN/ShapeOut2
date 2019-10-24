@@ -46,6 +46,16 @@ class MatrixPlot(QtWidgets.QWidget):
         self.name = state["name"]
         self.update_content()
 
+    @property
+    def name(self):
+        plot = pipeline.Plot._instances[self.identifier]
+        return plot.name
+
+    @name.setter
+    def name(self, text):
+        plot = pipeline.Plot._instances[self.identifier]
+        plot.name = text
+
     def action_duplicate(self):
         self.option_action.emit("duplicate")
 

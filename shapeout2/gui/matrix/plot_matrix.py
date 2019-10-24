@@ -289,3 +289,12 @@ class PlotMatrix(QtWidgets.QWidget):
             me = self.get_matrix_element(dsid, sid)
             me.__setstate__(state[dsid])
         self.publish_matrix()
+
+    def update_content(self):
+        ncols = self.glo.columnCount()
+        nrows = self.glo.rowCount()
+        for ii in range(nrows):
+            for jj in range(ncols):
+                item = self.glo.itemAtPosition(ii, jj)
+                if item is not None:
+                    item.widget().update_content()

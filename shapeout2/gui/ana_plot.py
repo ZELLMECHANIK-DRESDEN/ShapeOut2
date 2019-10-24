@@ -242,8 +242,9 @@ class PlotPanel(QtWidgets.QWidget):
     def write_plot(self):
         """Update the shapeout2.pipeline.Plot instance"""
         # get current index
-        filt_index = self.comboBox_plots.currentIndex()
-        filt = Plot.get_plot(identifier=self.plot_names[filt_index])
+        plot_index = self.comboBox_plots.currentIndex()
+        plot = Plot.get_plot(identifier=self.plot_names[plot_index])
         state = self.__getstate__()
-        filt.__setstate__(state)
+        plot.__setstate__(state)
         self.plots_changed.emit()
+        self.update_content()  # update plot selection combobox

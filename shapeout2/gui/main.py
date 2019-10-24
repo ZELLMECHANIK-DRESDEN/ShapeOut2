@@ -81,7 +81,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.widget_filter.filters_changed.connect(
             self.data_matrix.update_content)
         self.widget_ana_view.widget_plot.plots_changed.connect(
-            self.data_matrix.update_content)
+            self.plot_matrix.update_content)
 
     def add_dataslot(self):
         fnames, _ = QtWidgets.QFileDialog.getOpenFileNames(
@@ -110,25 +110,33 @@ class ShapeOut2(QtWidgets.QMainWindow):
     def add_plot(self):
         plot_id = self.pipeline.add_plot()
         self.plot_matrix.add_plot(identifier=plot_id)
-        self.widget_ana_view.widget_plot.update_content()
+
         # create subwindow
-        sub = QtWidgets.QMdiSubWindow()
-        pw = pipeline_plot.PipelinePlot(pipeline=self.pipeline,
+        sub = QtWidgets.QMdiSubWindow(self)
+        pw = pipeline_plot.PipelinePlot(parent=sub,
+                                        pipeline=self.pipeline,
                                         plot_id=plot_id)
         self.plots_changed.connect(pw.update_content)
-        sub.setWidget(pw)
-        self.mdiArea.addSubWindow(sub)
-        self.subwindows[plot_id] = sub
         sub.setSystemMenu(None)
         sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
                            | QtCore.Qt.WindowTitleHint
                            | QtCore.Qt.Tool)
-        sub.setVisible(True)
+        sub.setWidget(pw)
+        self.mdiArea.addSubWindow(sub)
+        self.subwindows[plot_id] = sub
+        # update UI contents
+        self.widget_ana_view.widget_plot.update_content()
+        pw.update_content()
+        sub.show()
 
     def init_analysis_view(self):
-        sub = QtWidgets.QMdiSubWindow()
+        sub = QtWidgets.QMdiSubWindow(self)
         sub.hide()
         self.widget_ana_view = ana_view.AnalysisView()
+        sub.setSystemMenu(None)
+        sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
+                           | QtCore.Qt.WindowTitleHint
+                           | QtCore.Qt.Tool)
         sub.setWidget(self.widget_ana_view)
         self.mdiArea.addSubWindow(sub)
         self.toolButton_ana_view.clicked.connect(sub.setVisible)
@@ -136,13 +144,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.widget_filter.pushButton_apply.clicked.connect(
             self.on_quickview_refresh)
         self.subwindows["analysis_view"] = sub
-        sub.setSystemMenu(None)
-        sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
-                           | QtCore.Qt.WindowTitleHint
-                           | QtCore.Qt.Tool)
 
     def init_quick_view(self):
-        sub = QtWidgets.QMdiSubWindow()
+        sub = QtWidgets.QMdiSubWindow(self)
         sub.hide()
         self.widget_quick_view = quick_view.QuickView()
         sub.setWidget(self.widget_quick_view)

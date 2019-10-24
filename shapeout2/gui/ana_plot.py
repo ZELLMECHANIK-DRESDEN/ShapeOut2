@@ -53,7 +53,7 @@ class PlotPanel(QtWidgets.QWidget):
                 "downsampling value": self.spinBox_downsample.value(),
                 "enabled": self.groupBox_scatter.isChecked(),
                 "marker hue": self.comboBox_marker_hue.currentData(),
-                "marker size": self.spinBox_marker_size.value(),
+                "marker size": self.doubleSpinBox_marker_size.value(),
                 "hue feature": self.comboBox_marker_feature.currentData(),
                 "colormap": self.comboBox_colormap.currentData(),
             },
@@ -101,7 +101,7 @@ class PlotPanel(QtWidgets.QWidget):
         self.groupBox_scatter.setChecked(sca["enabled"])
         hue_index = self.comboBox_marker_hue.findData(sca["marker hue"])
         self.comboBox_marker_hue.setCurrentIndex(hue_index)
-        self.spinBox_marker_size.setValue(sca["marker size"])
+        self.doubleSpinBox_marker_size.setValue(sca["marker size"])
         feat_index = feats_srt.index(sca["hue feature"])
         self.comboBox_marker_feature.setCurrentIndex(feat_index)
         color_index = COLORMAPS.index(sca["colormap"])

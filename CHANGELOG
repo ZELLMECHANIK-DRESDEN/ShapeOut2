@@ -1,3 +1,6 @@
+2.0.0a21
+ - fix regression with isoelastics in QuickView
+ - fix display of features as hue
 2.0.0a20
  - fix missing source files in previous release
 2.0.0a19

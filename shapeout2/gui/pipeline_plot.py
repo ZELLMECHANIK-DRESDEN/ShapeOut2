@@ -58,13 +58,14 @@ class PipelinePlotWidget(pg.PlotWidget):
         if gen["isoelastics"]:
             cfg = datasets[0].config
             els = add_isoelastics(plot_widget=self,
-                                  plot_state=state,
+                                  axis_x=gen["axis x"],
+                                  axis_y=gen["axis y"],
                                   channel_width=cfg["setup"]["channel width"],
                                   pixel_size=cfg["imaging"]["pixel size"])
             self._plot_elements += els
         # Set Log scale
-        self.plotItem.setLogMode(x=gen["scale x"] == "logarithmic",
-                                 y=gen["scale y"] == "logarithmic")
+        self.plotItem.setLogMode(x=gen["scale x"] == "log",
+                                 y=gen["scale y"] == "log")
         # Scatter data
         if state["scatter"]["enabled"]:
             for rtdc_ds in datasets:
@@ -75,10 +76,8 @@ class PipelinePlotWidget(pg.PlotWidget):
                 self._plot_elements += sct
 
 
-def add_isoelastics(plot_widget, plot_state, channel_width, pixel_size):
+def add_isoelastics(plot_widget, axis_x, axis_y, channel_width, pixel_size):
     elements = []
-    axis_x = plot_state["general"]["axis x"]
-    axis_y = plot_state["general"]["axis y"]
     isodef = dclab.isoelastics.get_default()
     # We do not use isodef.get_with_rtdcbase, because then the
     # isoelastics would be shifted according to flow rate and.
@@ -121,7 +120,7 @@ def add_scatter(plot_widget, plot_state, rtdc_ds):
     else:
         kde_type = "none"
 
-    x, y, kde, _idx = plot_cache.get_scatter_data(
+    x, y, kde, idx = plot_cache.get_scatter_data(
         rtdc_ds=rtdc_ds,
         downsample=sca["downsample"] * sca["downsampling value"],
         xax=gen["axis x"],
@@ -130,7 +129,7 @@ def add_scatter(plot_widget, plot_state, rtdc_ds):
         yscale=gen["scale y"],
         kde_type=kde_type,
     )
-
+    filtered_idx = rtdc_ds.filter.all[idx]
     # define colormap
     # TODO:
     # - improve speed?
@@ -145,7 +144,7 @@ def add_scatter(plot_widget, plot_state, rtdc_ds):
             brush.append(color)
     elif sca["marker hue"] == "feature":
         brush = []
-        feat = rtdc_ds[sca["hue feature"]][rtdc_ds.filter.all]
+        feat = rtdc_ds[sca["hue feature"]][filtered_idx]
         feat -= feat.min()
         feat /= feat.max()
         num_hues = 500
@@ -157,9 +156,9 @@ def add_scatter(plot_widget, plot_state, rtdc_ds):
     else:
         brush = pg.mkBrush("k")
     # convert to log-scale if applicable
-    if gen["scale x"] == "logarithmic":
+    if gen["scale x"] == "log":
         x = np.log10(x)
-    if gen["scale y"] == "logarithmic":
+    if gen["scale y"] == "log":
         y = np.log10(y)
 
     scatter.setData(x=x, y=y, brush=brush)

@@ -133,8 +133,12 @@ class PlotPanel(QtWidgets.QWidget):
         self.comboBox_scale_x.clear()
         self.comboBox_scale_y.clear()
         for sc in scales:
-            self.comboBox_scale_x.addItem(sc, sc)
-            self.comboBox_scale_y.addItem(sc, sc)
+            if sc == "log":
+                vc = "logarithmic"
+            else:
+                vc = sc
+            self.comboBox_scale_x.addItem(vc, sc)
+            self.comboBox_scale_y.addItem(vc, sc)
         # Marker hue
         hues = STATE_OPTIONS["scatter"]["marker hue"]
         self.comboBox_marker_hue.clear()

@@ -8,7 +8,6 @@ def get_scatter_data(rtdc_ds, downsample, xax, yax, xscale, yscale,
               xax, yax, xscale, yscale,
               kde_type, kde_kwargs]
     shash = util.hashobj(tohash)
-
     if shash in cache_data:
         x, y, kde, idx = cache_data[shash]
     else:

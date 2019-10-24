@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>699</width>
-    <height>630</height>
+    <width>627</width>
+    <height>681</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -308,7 +308,10 @@
        <property name="checkable">
         <bool>true</bool>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
+        </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
@@ -357,6 +360,19 @@
         </item>
         <item>
          <layout class="QGridLayout" name="gridLayout_2">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetMinimumSize</enum>
+          </property>
+          <item row="2" column="1">
+           <widget class="QComboBox" name="comboBox_colormap"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_colormap">
+            <property name="text">
+             <string>Colormap</string>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="2">
            <widget class="QComboBox" name="comboBox_marker_feature">
             <item>
@@ -364,20 +380,6 @@
               <string>Area [µm]</string>
              </property>
             </item>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Marker size</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>Marker hue</string>
-            </property>
            </widget>
           </item>
           <item row="1" column="1">
@@ -404,26 +406,10 @@
             </item>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QSpinBox" name="spinBox_marker_size">
-            <property name="suffix">
-             <string> pt</string>
-            </property>
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>10</number>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QComboBox" name="comboBox_colormap"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_colormap">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_8">
             <property name="text">
-             <string>Colormap</string>
+             <string>Marker hue</string>
             </property>
            </widget>
           </item>
@@ -439,6 +425,26 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item row="0" column="1">
+           <widget class="QSpinBox" name="spinBox_marker_size">
+            <property name="suffix">
+             <string> pt</string>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Marker size</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -614,6 +620,19 @@
         </item>
        </layout>
       </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_6">

@@ -10,6 +10,4 @@ class AnalysisView(QtWidgets.QWidget):
             "shapeout2.gui", "ana_view.ui")
         uic.loadUi(path_ui, self)
         self.setWindowTitle("Analysis View")
-
-    def show(self, path):
-        pass
+        self.setMinimumSize(self.sizeHint())

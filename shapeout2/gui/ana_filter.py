@@ -22,7 +22,6 @@ class FilterPanel(QtWidgets.QWidget):
         path_ui = pkg_resources.resource_filename(
             "shapeout2.gui", "ana_filter.ui")
         uic.loadUi(path_ui, self)
-
         self._init_box_filters()
 
         self.pushButton_apply.clicked.connect(self.write_filter)
@@ -38,6 +37,7 @@ class FilterPanel(QtWidgets.QWidget):
         self._box_range_controls = {}
         feats = dclab.dfn.scalar_feature_names
         labs = [dclab.dfn.feature_name2label[f] for f in feats]
+        self.verticalLayout_box.setAlignment(QtCore.Qt.AlignTop)
 
         for lab, feat in sorted(zip(labs, feats)):
             integer = True if feat in idiom.INTEGER_FEATURES else False

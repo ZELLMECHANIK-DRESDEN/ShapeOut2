@@ -129,7 +129,6 @@ def add_scatter(plot_widget, plot_state, rtdc_ds):
         yscale=gen["scale y"],
         kde_type=kde_type,
     )
-    filtered_idx = rtdc_ds.filter.all[idx]
     # define colormap
     # TODO:
     # - improve speed?
@@ -144,7 +143,7 @@ def add_scatter(plot_widget, plot_state, rtdc_ds):
             brush.append(color)
     elif sca["marker hue"] == "feature":
         brush = []
-        feat = rtdc_ds[sca["hue feature"]][filtered_idx]
+        feat = rtdc_ds[sca["hue feature"]][idx]
         feat -= feat.min()
         feat /= feat.max()
         num_hues = 500

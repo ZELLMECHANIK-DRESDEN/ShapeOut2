@@ -105,7 +105,24 @@
      </item>
      <item>
       <layout class="QGridLayout" name="gridLayout">
+       <item row="3" column="1">
+        <widget class="RangeControl" name="widget_range_y" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
+        </widget>
+       </item>
        <item row="2" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Y axis</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
         <widget class="QLabel" name="label_9">
          <property name="toolTip">
           <string>Kernel Density Estimator</string>
@@ -115,28 +132,49 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="2">
-        <widget class="QComboBox" name="comboBox_scale_x">
-         <item>
-          <property name="text">
-           <string>linear</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>logarithmic</string>
-          </property>
-         </item>
+       <item row="1" column="1">
+        <widget class="RangeControl" name="widget_range_x" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QComboBox" name="comboBox_kde">
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
-          <property name="text">
-           <string>Histogram</string>
-          </property>
+          <widget class="QComboBox" name="comboBox_axis_y"/>
          </item>
-        </widget>
+         <item>
+          <widget class="QComboBox" name="comboBox_scale_y">
+           <item>
+            <property name="text">
+             <string>linear</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>logarithmic</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_11">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label_6">
@@ -146,44 +184,67 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QComboBox" name="comboBox_axis_x"/>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Y axis</string>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <property name="rightMargin">
+          <number>0</number>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QComboBox" name="comboBox_axis_y"/>
-       </item>
-       <item row="1" column="2">
-        <widget class="QComboBox" name="comboBox_scale_y">
          <item>
-          <property name="text">
-           <string>linear</string>
-          </property>
+          <widget class="QComboBox" name="comboBox_axis_x"/>
          </item>
          <item>
-          <property name="text">
-           <string>logarithmic</string>
-          </property>
+          <widget class="QComboBox" name="comboBox_scale_x">
+           <item>
+            <property name="text">
+             <string>linear</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>logarithmic</string>
+            </property>
+           </item>
+          </widget>
          </item>
-        </widget>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
-       <item row="0" column="3">
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
+       <item row="4" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <item>
+          <widget class="QComboBox" name="comboBox_kde">
+           <item>
+            <property name="text">
+             <string>Histogram</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_12">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -301,6 +362,13 @@
          </property>
         </spacer>
        </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_range_controls">
+       <property name="topMargin">
+        <number>0</number>
+       </property>
       </layout>
      </item>
      <item>
@@ -445,7 +513,7 @@
              <number>1</number>
             </property>
             <property name="minimum">
-             <double>0.100000000000000</double>
+             <double>-999999999999989.000000000000000</double>
             </property>
             <property name="value">
              <double>3.000000000000000</double>
@@ -691,6 +759,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>RangeControl</class>
+   <extends>QWidget</extends>
+   <header>shapeout2.gui.rangecontrol</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

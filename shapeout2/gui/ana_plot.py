@@ -20,19 +20,25 @@ class PlotPanel(QtWidgets.QWidget):
             "shapeout2.gui", "ana_plot.ui")
         uic.loadUi(path_ui, self)
 
-        self.pushButton_reset.clicked.connect(self.update_content)
-        self.pushButton_apply.clicked.connect(self.write_plot)
-        self.comboBox_plots.currentIndexChanged.connect(self.update_content)
-        self.comboBox_marker_hue.currentIndexChanged.connect(
-            self.on_hue_select)
-
         # current Shape-Out 2 pipeline
         self._pipeline = None
         self._init_controls()
         self.update_content()
 
+        # signals
+        self.pushButton_reset.clicked.connect(self.update_content)
+        self.pushButton_apply.clicked.connect(self.write_plot)
+        self.comboBox_plots.currentIndexChanged.connect(self.update_content)
+        self.comboBox_marker_hue.currentIndexChanged.connect(
+            self.on_hue_select)
+        self.comboBox_axis_x.currentIndexChanged.connect(self.on_axis_select)
+        self.comboBox_axis_y.currentIndexChanged.connect(self.on_axis_select)
+
     def __getstate__(self):
         feats_srt = self.pipeline.get_features(label_sort=True)
+
+        rx = self.widget_range_x.__getstate__()
+        ry = self.widget_range_y.__getstate__()
 
         state = {
             "general": {
@@ -43,6 +49,8 @@ class PlotPanel(QtWidgets.QWidget):
                 "kde": self.comboBox_kde.currentData(),
                 "legend":  self.checkBox_legend.isChecked(),
                 "name": self.lineEdit.text(),
+                "range x": [rx["start"], rx["end"]],
+                "range y": [ry["start"], ry["end"]],
                 "scale x": self.comboBox_scale_x.currentData(),
                 "scale y": self.comboBox_scale_y.currentData(),
                 "size x": self.spinBox_size_x.value(),
@@ -76,6 +84,13 @@ class PlotPanel(QtWidgets.QWidget):
 
     def __setstate__(self, state):
         feats_srt = self.pipeline.get_features(label_sort=True)
+        toblock = [
+            self.comboBox_axis_x,
+            self.comboBox_axis_y,
+        ]
+
+        for b in toblock:
+            b.blockSignals(True)
 
         # General
         gen = state["general"]
@@ -93,6 +108,11 @@ class PlotPanel(QtWidgets.QWidget):
         self.comboBox_scale_y.setCurrentIndex(scy_index)
         self.spinBox_size_x.setValue(gen["size x"])
         self.spinBox_size_y.setValue(gen["size y"])
+        self._set_range_state(axis_x=gen["axis x"],
+                              axis_y=gen["axis y"],
+                              range_x=gen["range x"],
+                              range_y=gen["range y"],
+                              )
 
         # Scatter
         sca = state["scatter"]
@@ -120,6 +140,9 @@ class PlotPanel(QtWidgets.QWidget):
         self.comboBox_ls_2.setCurrentIndex(ls2_index)
         self.doubleSpinBox_spacing_x.setValue(con["spacing x"])
         self.doubleSpinBox_spacing_y.setValue(con["spacing y"])
+
+        for b in toblock:
+            b.blockSignals(False)
 
     def _init_controls(self):
         """All controls that are not subject to change"""
@@ -158,6 +181,28 @@ class PlotPanel(QtWidgets.QWidget):
         for l in lstyles:
             self.comboBox_ls_1.addItem(l, l)
             self.comboBox_ls_2.addItem(l, l)
+        # range controls
+        for rc in [self.widget_range_x, self.widget_range_y]:
+            rc.setLabel("")
+            rc.setCheckable(False)
+
+    def _set_range_state(self, axis_x=None, range_x=None,
+                         axis_y=None, range_y=None):
+
+        for axis, rang, rc in zip([axis_x, axis_y],
+                                  [range_x, range_y],
+                                  [self.widget_range_x, self.widget_range_y],
+                                  ):
+            if axis is not None:
+                lim = self.pipeline.get_min_max(feat=axis)
+                rc.setLimits(vmin=lim[0],
+                             vmax=lim[1])
+                if rang is None:
+                    rang = lim
+                rc.__setstate__({"active": True,
+                                 "start": rang[0],
+                                 "end": rang[1],
+                                 })
 
     @property
     def current_plot(self):
@@ -182,6 +227,13 @@ class PlotPanel(QtWidgets.QWidget):
     def plot_names(self):
         """List of plot names"""
         return [Plot._instances[f].name for f in self.plot_ids]
+
+    def on_axis_select(self):
+        gen = self.__getstate__()["general"]
+        if self.sender() == self.comboBox_axis_x:
+            self._set_range_state(axis_x=gen["axis x"])
+        elif self.sender() == self.comboBox_axis_y:
+            self._set_range_state(axis_y=gen["axis y"])
 
     def on_hue_select(self):
         """Show/hide options for feature-based hue selection"""
@@ -222,6 +274,7 @@ class PlotPanel(QtWidgets.QWidget):
             for cb in [self.comboBox_axis_x,
                        self.comboBox_axis_y,
                        self.comboBox_marker_feature]:
+                cb.blockSignals(True)
                 if cb.count:
                     # remember current selection
                     curfeat = cb.currentData()
@@ -236,6 +289,7 @@ class PlotPanel(QtWidgets.QWidget):
                     # write back current selection
                     curidx = feats_srt.index(curfeat)
                     cb.setCurrentIndex(curidx)
+                cb.blockSignals(False)
             # populate content
             plot = Plot.get_plot(identifier=self.plot_ids[plot_index])
             state = plot.__getstate__()

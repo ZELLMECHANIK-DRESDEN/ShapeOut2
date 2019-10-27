@@ -279,7 +279,7 @@ class Pipeline(object):
             vmax = np.nanmax(ds[feat])
             fmin = np.min([fmin, vmin])
             fmax = np.max([fmax, vmax])
-        return fmin, fmax
+        return [fmin, fmax]
 
     def get_plot_datasets(self, plot_id):
         """Return a list of datasets that belong to a plot"""

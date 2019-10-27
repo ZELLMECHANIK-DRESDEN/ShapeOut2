@@ -193,6 +193,7 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
         v = self._valueToPos(value)
         self._splitter.splitterMoved.disconnect()
         self._splitter.moveSplitter(v, self._SPLIT_START)
+        self._splitter.refresh()
         self._splitter.splitterMoved.connect(self._handleMoveSplitter)
         self._setStart(value)
 
@@ -205,6 +206,7 @@ class QRangeSlider(QtWidgets.QWidget, Ui_Form):
         v = self._valueToPos(value)
         self._splitter.splitterMoved.disconnect()
         self._splitter.moveSplitter(v, self._SPLIT_END)
+        self._splitter.refresh()
         self._splitter.splitterMoved.connect(self._handleMoveSplitter)
         self._setEnd(value)
 

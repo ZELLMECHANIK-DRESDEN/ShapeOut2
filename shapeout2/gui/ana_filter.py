@@ -43,6 +43,7 @@ class FilterPanel(QtWidgets.QWidget):
         for lab, feat in sorted(zip(labs, feats)):
             integer = True if feat in idiom.INTEGER_FEATURES else False
             rc = rangecontrol.RangeControl(
+                self,
                 checkbox=False,  # checkbox is used in on_moreless
                 integer=integer,
                 label=lab,

@@ -13,6 +13,8 @@ DEFAULT_STATE = {
         "kde": "histogram",  # see dclab.kde_methods.methods
         "legend": True,  # display plot legend
         "name": "no default",  # overridden by __init__
+        "range x": [0, 500],
+        "range y": [0, 0.2],
         "scale x": "linear",
         "scale y": "linear",
         "size x": 500,
@@ -49,6 +51,8 @@ STATE_OPTIONS = {
         "kde": _kde_methods,
         "legend": [False, True],
         "name": str,
+        "range x": (float,),
+        "range y": (float,),
         "scale x": ["linear", "log"],
         "scale y": ["linear", "log"],
         "size x": float,

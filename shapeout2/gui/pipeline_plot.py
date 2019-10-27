@@ -38,6 +38,10 @@ class PipelinePlot(QtWidgets.QWidget):
 class PipelinePlotWidget(pg.PlotWidget):
     def __init__(self, *args, **kwargs):
         super(PipelinePlotWidget, self).__init__(*args, **kwargs)
+        # Disable user interaction
+        self.plotItem.setMouseEnabled(x=False, y=False)
+        self.plotItem.setMenuEnabled(False)
+        self.plotItem.hideButtons()
         self._plot_elements = []
 
     def redraw(self, datasets, state):
@@ -63,6 +67,11 @@ class PipelinePlotWidget(pg.PlotWidget):
                                   channel_width=cfg["setup"]["channel width"],
                                   pixel_size=cfg["imaging"]["pixel size"])
             self._plot_elements += els
+        # Set Range
+        self.plotItem.setRange(xRange=gen["range x"],
+                               yRange=gen["range y"],
+                               padding=0,
+                               )
         # Set Log scale
         self.plotItem.setLogMode(x=gen["scale x"] == "log",
                                  y=gen["scale y"] == "log")

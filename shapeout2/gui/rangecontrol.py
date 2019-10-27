@@ -170,7 +170,7 @@ class RangeControl(QtWidgets.QWidget):
             vmaxh = vmax
         else:
             # estimate based on number of digits
-            if vmin > 0:
+            if vmin >= 0:
                 vminh = 0
             else:
                 lmin = np.int(np.ceil(np.log10(np.abs(vmin)))) + 1

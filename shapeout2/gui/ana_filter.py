@@ -122,14 +122,16 @@ class FilterPanel(QtWidgets.QWidget):
 
     def on_moreless(self):
         """User wants to choose box filters"""
+        features = self.pipeline.get_features()
         if not self._box_edit_view:
             # Show all filters to the user
-            for _, rc in self._box_range_controls.items():
-                rc.setVisible(True)
-                rc.checkBox.setVisible(True)
-                rc.doubleSpinBox_min.setEnabled(False)
-                rc.doubleSpinBox_max.setEnabled(False)
-                rc.range_slider.setEnabled(False)
+            for feat, rc in self._box_range_controls.items():
+                if feat in features:
+                    rc.setVisible(True)
+                    rc.checkBox.setVisible(True)
+                    rc.doubleSpinBox_min.setEnabled(False)
+                    rc.doubleSpinBox_max.setEnabled(False)
+                    rc.range_slider.setEnabled(False)
             self.toolButton_moreless.setText("...Finish editing")
             self._box_edit_view = True
         else:

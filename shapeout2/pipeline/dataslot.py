@@ -1,3 +1,6 @@
+import numpy as np
+
+
 class Dataslot(object):
     """Handles datasets in a pipeline"""
     _instance_counter = 0
@@ -22,3 +25,26 @@ class Dataslot(object):
             raise ValueError("Dataslot with identifier "
                              + "'{}' already exists!".format(identifier))
         Dataslot._instances[identifier] = self
+        self.color = random_color()
+
+    def __getstate__(self):
+        state = {"color": self.color,
+                 "name": self.name,
+                 "path": self.path,
+                 }
+        return state
+
+    def __setstate__(self, state):
+        self.color = state["color"]
+        self.name = state["name"]
+        self.path = state["path"]
+
+
+def random_color():
+    color = "#"
+    for _ in range(3):
+        # dark colors (until 200)
+        color += hex(np.random.randint(0, 200))[2:]
+    # alpha
+    color += "FF"
+    return color.upper()

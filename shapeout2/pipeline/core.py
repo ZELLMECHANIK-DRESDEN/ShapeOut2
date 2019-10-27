@@ -215,7 +215,8 @@ class Pipeline(object):
             # - if `self.elements_dict` is not complete, autocomplete it
             #   (as it is done in gui.matrix.dm_dataset)
 
-    def get_dataset(self, slot_index, filt_index, apply_filter=True):
+    def get_dataset(self, slot_index, filt_index, apply_filter=True,
+                    ret_color=False):
         """Return dataset with all filters updated (optionally applied)
 
         Parameters
@@ -228,11 +229,13 @@ class Pipeline(object):
             whether to call `dataset.apply_filter` in the end;
             if set to `False`, only the filtering configuration
             of the dataset and its hierarchy parents are updated
+        ret_color: bool
+            also return the color of the dataset as a string
         """
         self.construct_matrix()
         row = self.matrix[slot_index]
-        slot_id = self.slots[slot_index].identifier
-        fstates = self.element_states[slot_id]
+        slot = self.slots[slot_index]
+        fstates = self.element_states[slot.identifier]
         # set all necessary filters
         for ii in range(filt_index + 1):
             filt = self.filters[ii]
@@ -249,7 +252,10 @@ class Pipeline(object):
         dsend = row[filt_index]
         if apply_filter:
             dsend.apply_filter()
-        return dsend
+        if ret_color:
+            return dsend, slot.color
+        else:
+            return dsend
 
     def get_features(self, scalar=False, label_sort=False):
         """Return a list of features that all slots share"""
@@ -282,18 +288,21 @@ class Pipeline(object):
         return [fmin, fmax]
 
     def get_plot_datasets(self, plot_id):
-        """Return a list of datasets that belong to a plot"""
+        """Return a list of datasets with colors that belong to a plot"""
         datasets = []
+        colors = []
         filt_index = self.num_filters - 1
         # keep the same order as in self.slots
         for slot_index in range(len(self.slots)):
             slot_id = self.slots[slot_index].identifier
             if self.element_states[slot_id][plot_id]:
-                ds = self.get_dataset(slot_index=slot_index,
-                                      filt_index=filt_index,
-                                      apply_filter=True)
+                ds, c = self.get_dataset(slot_index=slot_index,
+                                         filt_index=filt_index,
+                                         apply_filter=True,
+                                         ret_color=True)
                 datasets.append(ds)
-        return datasets
+                colors.append(c)
+        return datasets, colors
 
     def reset(self):
         """Reset the pipeline"""

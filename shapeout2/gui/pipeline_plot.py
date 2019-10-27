@@ -20,7 +20,7 @@ class PipelinePlot(QtWidgets.QWidget):
         self.update_content()
 
     def update_content(self):
-        datasets = self.pipeline.get_plot_datasets(self.identifier)
+        datasets, colors = self.pipeline.get_plot_datasets(self.identifier)
         plot = Plot.get_instances()[self.identifier]
         state = plot.__getstate__()
         # Plot size and title
@@ -32,7 +32,7 @@ class PipelinePlot(QtWidgets.QWidget):
         size_hint = self.parent().sizeHint()
         parent.setMinimumSize(size_hint)
         parent.setMaximumSize(size_hint)
-        self.plot.redraw(datasets, state)
+        self.plot.redraw(datasets, colors, state)
 
 
 class PipelinePlotWidget(pg.PlotWidget):
@@ -44,7 +44,7 @@ class PipelinePlotWidget(pg.PlotWidget):
         self.plotItem.hideButtons()
         self._plot_elements = []
 
-    def redraw(self, datasets, state):
+    def redraw(self, datasets, colors, state):
         # Remove everything
         for el in self._plot_elements:
             self.removeItem(el)
@@ -77,10 +77,11 @@ class PipelinePlotWidget(pg.PlotWidget):
                                  y=gen["scale y"] == "log")
         # Scatter data
         if state["scatter"]["enabled"]:
-            for rtdc_ds in datasets:
+            for rtdc_ds, color in zip(datasets, colors):
                 sct = add_scatter(plot_widget=self,
                                   rtdc_ds=rtdc_ds,
                                   plot_state=state,
+                                  color=color
                                   )
                 self._plot_elements += sct
 
@@ -115,7 +116,7 @@ def add_isoelastics(plot_widget, axis_x, axis_y, channel_width, pixel_size):
     return elements
 
 
-def add_scatter(plot_widget, plot_state, rtdc_ds):
+def add_scatter(plot_widget, plot_state, rtdc_ds, color):
     gen = plot_state["general"]
     sca = plot_state["scatter"]
     scatter = pg.ScatterPlotItem(size=sca["marker size"],
@@ -148,8 +149,7 @@ def add_scatter(plot_widget, plot_state, rtdc_ds):
         kde /= kde.max()
         num_hues = 500
         for k in kde:
-            color = pg.intColor(int(k*num_hues), num_hues)
-            brush.append(color)
+            brush.append(pg.intColor(int(k*num_hues), num_hues))
     elif sca["marker hue"] == "feature":
         brush = []
         feat = rtdc_ds[sca["hue feature"]][idx]
@@ -157,10 +157,10 @@ def add_scatter(plot_widget, plot_state, rtdc_ds):
         feat /= feat.max()
         num_hues = 500
         for f in feat:
-            color = pg.intColor(int(f*num_hues), num_hues)
-            brush.append(color)
+            brush.append(pg.intColor(int(f*num_hues), num_hues))
     elif sca["marker hue"] == "dataset":
-        raise NotImplementedError("TODO")
+
+        brush = pg.mkBrush(color)
     else:
         brush = pg.mkBrush("k")
     # convert to log-scale if applicable

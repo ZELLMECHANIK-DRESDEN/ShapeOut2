@@ -1,8 +1,9 @@
 import pkg_resources
 
 import dclab
+from dclab import kde_contours
 import numpy as np
-from PyQt5 import uic, QtWidgets
+from PyQt5 import uic, QtCore, QtWidgets
 import pyqtgraph as pg
 
 from ..pipeline import Plot
@@ -84,6 +85,58 @@ class PipelinePlotWidget(pg.PlotWidget):
                                   color=color
                                   )
                 self._plot_elements += sct
+        # Contour data
+        if state["contour"]["enabled"]:
+            for rtdc_ds, color in zip(datasets, colors):
+                con = add_contour(plot_widget=self,
+                                  rtdc_ds=rtdc_ds,
+                                  plot_state=state,
+                                  color=color
+                                  )
+                self._plot_elements += con
+
+
+def add_contour(plot_widget, plot_state, rtdc_ds, color):
+    gen = plot_state["general"]
+    con = plot_state["contour"]
+    x, y, density = plot_cache.get_contour_data(
+        rtdc_ds=rtdc_ds,
+        xax=gen["axis x"],
+        yax=gen["axis y"],
+        xacc=con["spacing x"],
+        yacc=con["spacing y"],
+        xscale=gen["scale x"],
+        yscale=gen["scale y"],
+        kde_type=gen["kde"],
+    )
+    plev = kde_contours.get_quantile_levels(
+        density=density,
+        x=x,
+        y=y,
+        xp=rtdc_ds[gen["axis x"]][rtdc_ds.filter.all],
+        yp=rtdc_ds[gen["axis y"]][rtdc_ds.filter.all],
+        q=np.array(con["percentiles"])/100,
+        normalize=True)
+    contours = []
+    for level in plev:
+        cc = kde_contours.find_contours_level(density, x=x, y=y, level=level)
+        contours.append(cc)
+
+    elements = []
+    for ii in range(len(contours)):
+        style = linestyles[con["line styles"][ii]]
+        width = con["line widths"][ii]
+        for cci in contours[ii]:
+            cline = pg.PlotDataItem(x=cci[:, 0],
+                                    y=cci[:, 1],
+                                    pen=pg.mkPen(color=color,
+                                                 width=width,
+                                                 style=style,
+                                                 ),
+                                    )
+            elements.append(cline)
+            plot_widget.addItem(cline)
+    return elements
 
 
 def add_isoelastics(plot_widget, axis_x, axis_y, channel_width, pixel_size):
@@ -171,3 +224,10 @@ def add_scatter(plot_widget, plot_state, rtdc_ds, color):
 
     scatter.setData(x=x, y=y, brush=brush)
     return [scatter]
+
+
+linestyles = {
+    "solid": QtCore.Qt.SolidLine,
+    "dashed": QtCore.Qt.DashLine,
+    "dotted": QtCore.Qt.DotLine,
+    }

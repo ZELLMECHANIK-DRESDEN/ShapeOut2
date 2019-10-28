@@ -31,11 +31,11 @@ DEFAULT_STATE = {
     },
     "contour": {
         "enabled": True,
-        "percentiles": [50.0, 95.0],
+        "percentiles": [95.0, 50.0],
         "line widths": [3.0, 1.5],  # contour line widths [pt]
         "line styles": ["solid", "dashed"],
-        "spacing x": 10,  # spacing for "axis x" and linear "scale x"
-        "spacing y": 0.01,  # spacing for "axis y" and linear "scale y"
+        "spacing x": 2,  # spacing for "axis x" and linear "scale x"
+        "spacing y": 0.005,  # spacing for "axis y" and linear "scale y"
     }
 }
 

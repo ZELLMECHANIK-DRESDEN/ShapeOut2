@@ -2,13 +2,37 @@
 from . import util
 
 
+def get_contour_data(rtdc_ds, xax, yax, xacc, yacc, xscale, yscale,
+                     kde_type="histogram", kde_kwargs={}):
+    tohash = [rtdc_ds.identifier, rtdc_ds.filter.all,
+              xax, yax, xscale, yscale,
+              kde_type, kde_kwargs]
+    shash = util.hashobj(tohash)
+    if shash in cache_data:
+        x, y, den = cache_data[shash]
+    else:
+        # compute scatter plot data
+        x, y, den = rtdc_ds.get_kde_contour(
+            xax=xax,
+            yax=yax,
+            xacc=xacc,
+            yacc=yacc,
+            xscale=xscale,
+            yscale=yscale,
+            kde_type=kde_type,
+            kde_kwargs=kde_kwargs)
+        # save in cache
+        cache_data[shash] = x, y, den
+    return x, y, den
+
+
 def get_scatter_data(rtdc_ds, downsample, xax, yax, xscale, yscale,
                      kde_type="histogram", kde_kwargs={}):
     tohash = [rtdc_ds.identifier, rtdc_ds.filter.all, downsample,
               xax, yax, xscale, yscale,
               kde_type, kde_kwargs]
     shash = util.hashobj(tohash)
-    if False and shash in cache_data:
+    if shash in cache_data:
         x, y, kde, idx = cache_data[shash]
     else:
         # compute scatter plot data

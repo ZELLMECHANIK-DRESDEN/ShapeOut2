@@ -44,7 +44,10 @@ def random_color():
     color = "#"
     for _ in range(3):
         # dark colors (until 200)
-        color += hex(np.random.randint(0, 200))[2:]
+        part = hex(np.random.randint(0, 200))[2:]
+        if len(part) == 1:
+            part += "0"
+        color += part
     # alpha
     color += "FF"
     return color.upper()

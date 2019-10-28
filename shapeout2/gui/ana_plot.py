@@ -1,6 +1,7 @@
 import pkg_resources
 
 import dclab
+import numpy as np
 from PyQt5 import uic, QtCore, QtWidgets
 
 from ..pipeline import Plot
@@ -129,7 +130,7 @@ class PlotPanel(QtWidgets.QWidget):
 
         # Contour
         con = state["contour"]
-        self.groupBox_scatter.setChecked(con["enabled"])
+        self.groupBox_contour.setChecked(con["enabled"])
         self.doubleSpinBox_perc_1.setValue(con["percentiles"][0])
         self.doubleSpinBox_perc_2.setValue(con["percentiles"][1])
         self.doubleSpinBox_lw_1.setValue(con["line widths"][0])
@@ -138,8 +139,18 @@ class PlotPanel(QtWidgets.QWidget):
         self.comboBox_ls_1.setCurrentIndex(ls1_index)
         ls2_index = self.comboBox_ls_2.findData(con["line styles"][1])
         self.comboBox_ls_2.setCurrentIndex(ls2_index)
-        self.doubleSpinBox_spacing_x.setValue(con["spacing x"])
-        self.doubleSpinBox_spacing_y.setValue(con["spacing y"])
+        for control, spacing in zip([self.doubleSpinBox_spacing_x,
+                                     self.doubleSpinBox_spacing_y],
+                                    [con["spacing x"],
+                                     con["spacing y"]]):
+            if spacing >= 1:
+                dec = 2
+            else:
+                dec = -np.int(np.log10(spacing)) + 3
+            control.setDecimals(dec)
+            control.setMinimum(10**-dec)
+            control.setSingleStep(10**-dec)
+            control.setValue(spacing)
 
         for b in toblock:
             b.blockSignals(False)
@@ -301,7 +312,7 @@ class PlotPanel(QtWidgets.QWidget):
         """Update the shapeout2.pipeline.Plot instance"""
         # get current index
         plot_index = self.comboBox_plots.currentIndex()
-        plot = Plot.get_plot(identifier=self.plot_names[plot_index])
+        plot = Plot.get_plot(identifier=self.plot_ids[plot_index])
         state = self.__getstate__()
         plot.__setstate__(state)
         self.plots_changed.emit()

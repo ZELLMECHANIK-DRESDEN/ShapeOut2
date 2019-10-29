@@ -1,7 +1,7 @@
 2.0.0a22
  - add update functions to fix non-updating UI behavior on macOS
    in frozen application
- - dclab: circumvent UnicodeDecodeError on on macOS (frozen) 
+ - dclab: circumvent UnicodeDecodeError on on macOS (frozen)
 2.0.0a21
  - fix regression with isoelastics in QuickView
  - fix display of features as hue

@@ -195,7 +195,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 pg,
                 scipy,
                 ]
-        sw_text = "PyJibe {}\n\n".format(__version__)
+        sw_text = "Shape-Out {}\n\n".format(__version__)
         sw_text += "Python {}\n\n".format(sys.version)
         sw_text += "Modules:\n"
         for lib in libs:

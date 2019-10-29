@@ -71,7 +71,7 @@ STATE_OPTIONS = {
         "enabled":  [False, True],
         "percentiles": (float,),
         "line widths": (float,),
-        "line styles": (["solid", "dashed"],),
+        "line styles": (["solid", "dashed", "dotted"],),
         "spacing x": float,
         "spacing y": float,
     }

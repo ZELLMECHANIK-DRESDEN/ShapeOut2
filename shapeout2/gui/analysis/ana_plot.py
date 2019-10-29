@@ -293,7 +293,8 @@ class PlotPanel(QtWidgets.QWidget):
                     curfeat = None
                 # repopulate
                 cb.clear()
-                feats_srt = self.pipeline.get_features(label_sort=True)
+                feats_srt = self.pipeline.get_features(label_sort=True,
+                                                       scalar=True)
                 for feat in feats_srt:
                     cb.addItem(dclab.dfn.feature_name2label[feat], feat)
                 if curfeat is not None:

@@ -403,6 +403,9 @@
     <addaction name="action_Quit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>Edit</string>
     </property>
@@ -417,8 +420,17 @@
     <addaction name="action_Software"/>
     <addaction name="action_About"/>
    </widget>
+   <widget class="QMenu" name="menuExport">
+    <property name="title">
+     <string>Export</string>
+    </property>
+    <addaction name="actionData_2"/>
+    <addaction name="actionPlots_2"/>
+    <addaction name="actionStatistics"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuExport"/>
    <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -493,6 +505,31 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+Z</string>
+   </property>
+  </action>
+  <action name="actionAll_Plots">
+   <property name="text">
+    <string>All Plots</string>
+   </property>
+  </action>
+  <action name="actionStatistics">
+   <property name="text">
+    <string>Statistics</string>
+   </property>
+  </action>
+  <action name="actionAll_Data">
+   <property name="text">
+    <string>All Data</string>
+   </property>
+  </action>
+  <action name="actionPlots_2">
+   <property name="text">
+    <string>Plots</string>
+   </property>
+  </action>
+  <action name="actionData_2">
+   <property name="text">
+    <string>Data</string>
    </property>
   </action>
  </widget>

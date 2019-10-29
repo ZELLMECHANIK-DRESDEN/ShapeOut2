@@ -14,6 +14,7 @@ class DataMatrix(QtWidgets.QWidget):
     quickviewed = QtCore.pyqtSignal(int, int)
     matrix_changed = QtCore.pyqtSignal()
     filter_modify_clicked = QtCore.pyqtSignal(str)
+    slot_modify_clicked = QtCore.pyqtSignal(str)
 
     def __init__(self, parent=None):
         super(DataMatrix, self).__init__(parent)
@@ -130,7 +131,7 @@ class DataMatrix(QtWidgets.QWidget):
                 height = item.geometry().height()
                 break
         else:
-            height = 73
+            height = 99
         return height
 
     @property
@@ -188,12 +189,13 @@ class DataMatrix(QtWidgets.QWidget):
         md.enabled_toggled.connect(self.toggle_dataset_enable)
         md.enabled_toggled.connect(self.plot_matrix.toggle_dataset_enable)
         md.option_action.connect(self.on_option_dataset)
+        md.modify_clicked.connect(self.slot_modify_clicked.emit)
         self.fill_elements()
         self.adjust_size()
         self.plot_matrix.fill_elements()
         self.plot_matrix.adjust_size()
-        self.publish_matrix()
         self.setUpdatesEnabled(True)
+        self.publish_matrix()
         return md
 
     def add_filter(self, identifier=None, state=None):

@@ -10,6 +10,7 @@ class MatrixDataset(QtWidgets.QWidget):
     active_toggled = QtCore.pyqtSignal()
     enabled_toggled = QtCore.pyqtSignal(bool)
     option_action = QtCore.pyqtSignal(str)
+    modify_clicked = QtCore.pyqtSignal(str)
 
     def __init__(self, identifier=None, state=None):
         """Create a new dataset matrix element
@@ -34,6 +35,9 @@ class MatrixDataset(QtWidgets.QWidget):
 
         # toggle enabled/disabled state
         self.checkBox.clicked.connect(self.enabled_toggled.emit)
+
+        # modify slot button
+        self.toolButton_modify.clicked.connect(self.on_modify)
 
         if state is None:
             slot = pipeline.Dataslot._instances[identifier]
@@ -65,6 +69,9 @@ class MatrixDataset(QtWidgets.QWidget):
 
     def action_remove(self):
         self.option_action.emit("remove")
+
+    def on_modify(self):
+        self.modify_clicked.emit(self.identifier)
 
     def update_content(self):
         """Reset tool tips and title"""

@@ -5,7 +5,7 @@ from . import util
 def get_contour_data(rtdc_ds, xax, yax, xacc, yacc, xscale, yscale,
                      kde_type="histogram", kde_kwargs={}):
     tohash = [rtdc_ds.identifier, rtdc_ds.filter.all,
-              xax, yax, xscale, yscale,
+              xax, yax, xacc, yacc, xscale, yscale,
               kde_type, kde_kwargs]
     shash = util.hashobj(tohash)
     if shash in cache_data:

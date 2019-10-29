@@ -4,10 +4,10 @@ from PyQt5 import uic, QtCore, QtWidgets
 
 import dclab
 
-from ..pipeline import Filter
+from ...pipeline import Filter
 
-from . import rangecontrol
-from . import idiom
+from .. import rangecontrol
+from .. import idiom
 
 # features shown by default
 SHOW_FEATURES = ["deform", "area_um", "bright_avg"]
@@ -20,7 +20,7 @@ class FilterPanel(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self)
         path_ui = pkg_resources.resource_filename(
-            "shapeout2.gui", "ana_filter.ui")
+            "shapeout2.gui.analysis", "ana_filter.ui")
         uic.loadUi(path_ui, self)
         self.setUpdatesEnabled(False)
         self._init_box_filters()
@@ -108,7 +108,7 @@ class FilterPanel(QtWidgets.QWidget):
 
     @property
     def filter_ids(self):
-        """List of filter names"""
+        """List of filter identifiers"""
         return sorted(Filter.get_instances().keys())
 
     @property
@@ -159,7 +159,6 @@ class FilterPanel(QtWidgets.QWidget):
             self.setEnabled(True)
             # update combobox
             self.comboBox_filters.blockSignals(True)
-            # this also updates the combobox
             if filt_index is None:
                 filt_index = self.comboBox_filters.currentIndex()
                 if filt_index > len(self.filter_ids) - 1 or filt_index < 0:

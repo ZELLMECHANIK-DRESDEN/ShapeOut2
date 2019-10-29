@@ -230,4 +230,4 @@ linestyles = {
     "solid": QtCore.Qt.SolidLine,
     "dashed": QtCore.Qt.DashLine,
     "dotted": QtCore.Qt.DotLine,
-    }
+}

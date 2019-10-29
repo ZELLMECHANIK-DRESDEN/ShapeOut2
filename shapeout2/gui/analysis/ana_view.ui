@@ -46,7 +46,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="MetaPanel" name="widget_2" native="true">
+        <widget class="MetaPanel" name="widget_meta" native="true">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -54,6 +54,28 @@
           </size>
          </property>
         </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Dataset</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="SlotPanel" name="widget_slot" native="true"/>
        </item>
       </layout>
      </widget>
@@ -112,19 +134,25 @@
   <customwidget>
    <class>FilterPanel</class>
    <extends>QWidget</extends>
-   <header>shapeout2.gui.ana_filter</header>
+   <header>shapeout2.gui.analysis</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>MetaPanel</class>
    <extends>QWidget</extends>
-   <header>shapeout2.gui.ana_meta</header>
+   <header>shapeout2.gui.analysis</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>PlotPanel</class>
    <extends>QWidget</extends>
-   <header>shapeout2.gui.ana_plot</header>
+   <header>shapeout2.gui.analysis</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SlotPanel</class>
+   <extends>QWidget</extends>
+   <header>shapeout2.gui.analysis</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

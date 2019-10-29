@@ -4,8 +4,8 @@ import dclab
 import numpy as np
 from PyQt5 import uic, QtCore, QtWidgets
 
-from ..pipeline import Plot
-from ..pipeline.plot import STATE_OPTIONS
+from ...pipeline import Plot
+from ...pipeline.plot import STATE_OPTIONS
 
 
 COLORMAPS = ["jet"]
@@ -18,7 +18,7 @@ class PlotPanel(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self)
         path_ui = pkg_resources.resource_filename(
-            "shapeout2.gui", "ana_plot.ui")
+            "shapeout2.gui.analysis", "ana_plot.ui")
         uic.loadUi(path_ui, self)
 
         # current Shape-Out 2 pipeline

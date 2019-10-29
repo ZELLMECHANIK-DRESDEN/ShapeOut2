@@ -2,6 +2,8 @@
  - fix regression with isoelastics in QuickView
  - fix display of features as hue
  - functionalize plotting panel
+ - add modify button and corresponding logic for dataslots
+ - refactor analysis view into separate submodule
 2.0.0a20
  - fix missing source files in previous release
 2.0.0a19

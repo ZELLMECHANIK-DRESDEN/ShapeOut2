@@ -26,11 +26,15 @@ class Dataslot(object):
                              + "'{}' already exists!".format(identifier))
         Dataslot._instances[identifier] = self
         self.color = random_color()
+        self.fl_name_dict = {"fl1": "FL-1",
+                             "fl2": "FL-2",
+                             "fl3": "FL-3"}
 
     def __getstate__(self):
         state = {"color": self.color,
                  "name": self.name,
                  "path": self.path,
+                 "fl names": self.fl_name_dict,
                  }
         return state
 
@@ -38,6 +42,25 @@ class Dataslot(object):
         self.color = state["color"]
         self.name = state["name"]
         self.path = state["path"]
+        self.fl_name_dict = state["fl names"]
+
+    @staticmethod
+    def get_slot(identifier):
+        """Get the slot with the given identifier.
+
+        Notes
+        -----
+        Creates the slot if it does not exist.
+        """
+        if identifier in Dataslot._instances:
+            d = Dataslot._instances[identifier]
+        else:
+            d = Dataslot(identifier=identifier)
+        return d
+
+    @staticmethod
+    def get_instances():
+        return Dataslot._instances
 
 
 def random_color():

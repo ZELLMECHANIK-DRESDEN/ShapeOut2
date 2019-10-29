@@ -28,6 +28,8 @@ class MatrixFilter(QtWidgets.QWidget):
 
         # toggle enabled/disabled state
         self.checkBox.clicked.connect(self.on_enabled_toggled)
+
+        # modify filter button
         self.toolButton_modify.clicked.connect(self.on_modify)
 
         if state is None:

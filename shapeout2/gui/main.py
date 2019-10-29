@@ -214,6 +214,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.splitter.setSizes([200, 1000])
         else:
             self.splitter.setSizes([0, 1])
+        self.splitter.update()
 
     @QtCore.pyqtSlot(str)
     def on_modify_filter(self, filt_id):
@@ -222,6 +223,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # finally, check the button
         self.toolButton_ana_view.setChecked(True)
         self.subwindows["analysis_view"].setVisible(True)
+        self.mdiArea.update()
+        self.subwindows["analysis_view"].update()
 
     @QtCore.pyqtSlot(str)
     def on_modify_plot(self, plot_id):
@@ -230,6 +233,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # finally, check the button
         self.toolButton_ana_view.setChecked(True)
         self.subwindows["analysis_view"].setVisible(True)
+        self.mdiArea.update()
+        self.subwindows["analysis_view"].update()
 
     @QtCore.pyqtSlot(str)
     def on_modify_slot(self, slot_id):
@@ -238,12 +243,16 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # finally, check the button
         self.toolButton_ana_view.setChecked(True)
         self.subwindows["analysis_view"].setVisible(True)
+        self.mdiArea.update()
+        self.subwindows["analysis_view"].update()
 
     @QtCore.pyqtSlot(bool)
     def on_quickview(self, view=True):
         """Show/Hide QuickView (User clicked the QuickView button)"""
         self.subwindows["quick_view"].setVisible(view)
         self.data_matrix.enable_quickview(view)
+        self.mdiArea.update()
+        self.subwindows["quick_view"].update()
 
     @QtCore.pyqtSlot()
     def on_quickview_refresh(self):
@@ -294,6 +303,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.plots_changed.emit()
         # Update analysis view
         self.widget_ana_view.update_content()
+        self.mdiArea.update()
+        self.subwindows["analysis_view"].update()
 
 
 def excepthook(etype, value, trace):

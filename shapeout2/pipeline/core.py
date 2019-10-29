@@ -288,21 +288,20 @@ class Pipeline(object):
         return [fmin, fmax]
 
     def get_plot_datasets(self, plot_id):
-        """Return a list of datasets with colors that belong to a plot"""
+        """Return a list of datasets with slot states that belong to a plot"""
         datasets = []
-        colors = []
+        states = []
         filt_index = self.num_filters - 1
         # keep the same order as in self.slots
         for slot_index in range(len(self.slots)):
-            slot_id = self.slots[slot_index].identifier
-            if self.element_states[slot_id][plot_id]:
-                ds, c = self.get_dataset(slot_index=slot_index,
-                                         filt_index=filt_index,
-                                         apply_filter=True,
-                                         ret_color=True)
+            slot = self.slots[slot_index]
+            if self.element_states[slot.identifier][plot_id]:
+                ds = self.get_dataset(slot_index=slot_index,
+                                      filt_index=filt_index,
+                                      apply_filter=True)
                 datasets.append(ds)
-                colors.append(c)
-        return datasets, colors
+                states.append(slot.__getstate__())
+        return datasets, states
 
     def reset(self):
         """Reset the pipeline"""

@@ -21,11 +21,11 @@ class PipelinePlot(QtWidgets.QWidget):
         self.update_content()
 
     def update_content(self):
-        datasets, colors = self.pipeline.get_plot_datasets(self.identifier)
+        dslist, slot_states = self.pipeline.get_plot_datasets(self.identifier)
         plot = Plot.get_instances()[self.identifier]
-        state = plot.__getstate__()
+        plot_state = plot.__getstate__()
         # Plot size and title
-        gen = state["general"]
+        gen = plot_state["general"]
         parent = self.parent()
         self.setWindowTitle(gen["name"])
         self.setMinimumSize(gen["size x"], gen["size y"])
@@ -33,7 +33,7 @@ class PipelinePlot(QtWidgets.QWidget):
         size_hint = self.parent().sizeHint()
         parent.setMinimumSize(size_hint)
         parent.setMaximumSize(size_hint)
-        self.plot.redraw(datasets, colors, state)
+        self.plot.redraw(dslist, slot_states, plot_state)
 
 
 class PipelinePlotWidget(pg.PlotWidget):
@@ -45,23 +45,21 @@ class PipelinePlotWidget(pg.PlotWidget):
         self.plotItem.hideButtons()
         self._plot_elements = []
 
-    def redraw(self, datasets, colors, state):
+    def redraw(self, dslist, slot_states, plot_state):
         # Remove everything
         for el in self._plot_elements:
             self.removeItem(el)
 
-        if not datasets:
+        if not dslist:
             return
         # General
-        gen = state["general"]
-        self.plotItem.setLabels(
-            left=dclab.dfn.feature_name2label[gen["axis y"]],
-            bottom=dclab.dfn.feature_name2label[gen["axis x"]])
+        gen = plot_state["general"]
+        set_axes_labels(self.plotItem, plot_state, slot_states)
         # TODO:
         # - test whether all datasets have same channel width / pixel size
         # Isoelastics
         if gen["isoelastics"]:
-            cfg = datasets[0].config
+            cfg = dslist[0].config
             els = add_isoelastics(plot_widget=self,
                                   axis_x=gen["axis x"],
                                   axis_y=gen["axis y"],
@@ -77,26 +75,26 @@ class PipelinePlotWidget(pg.PlotWidget):
         self.plotItem.setLogMode(x=gen["scale x"] == "log",
                                  y=gen["scale y"] == "log")
         # Scatter data
-        if state["scatter"]["enabled"]:
-            for rtdc_ds, color in zip(datasets, colors):
+        if plot_state["scatter"]["enabled"]:
+            for rtdc_ds, ss in zip(dslist, slot_states):
                 sct = add_scatter(plot_widget=self,
                                   rtdc_ds=rtdc_ds,
-                                  plot_state=state,
-                                  color=color
+                                  plot_state=plot_state,
+                                  slot_state=ss
                                   )
                 self._plot_elements += sct
         # Contour data
-        if state["contour"]["enabled"]:
-            for rtdc_ds, color in zip(datasets, colors):
+        if plot_state["contour"]["enabled"]:
+            for rtdc_ds, ss in zip(dslist, slot_states):
                 con = add_contour(plot_widget=self,
                                   rtdc_ds=rtdc_ds,
-                                  plot_state=state,
-                                  color=color
+                                  plot_state=plot_state,
+                                  slot_state=ss
                                   )
                 self._plot_elements += con
 
 
-def add_contour(plot_widget, plot_state, rtdc_ds, color):
+def add_contour(plot_widget, plot_state, rtdc_ds, slot_state):
     gen = plot_state["general"]
     con = plot_state["contour"]
     x, y, density = plot_cache.get_contour_data(
@@ -129,7 +127,7 @@ def add_contour(plot_widget, plot_state, rtdc_ds, color):
         for cci in contours[ii]:
             cline = pg.PlotDataItem(x=cci[:, 0],
                                     y=cci[:, 1],
-                                    pen=pg.mkPen(color=color,
+                                    pen=pg.mkPen(color=slot_state["color"],
                                                  width=width,
                                                  style=style,
                                                  ),
@@ -169,7 +167,7 @@ def add_isoelastics(plot_widget, axis_x, axis_y, channel_width, pixel_size):
     return elements
 
 
-def add_scatter(plot_widget, plot_state, rtdc_ds, color):
+def add_scatter(plot_widget, plot_state, rtdc_ds, slot_state):
     gen = plot_state["general"]
     sca = plot_state["scatter"]
     scatter = pg.ScatterPlotItem(size=sca["marker size"],
@@ -213,7 +211,7 @@ def add_scatter(plot_widget, plot_state, rtdc_ds, color):
             brush.append(pg.intColor(int(f*num_hues), num_hues))
     elif sca["marker hue"] == "dataset":
 
-        brush = pg.mkBrush(color)
+        brush = pg.mkBrush(slot_state["color"])
     else:
         brush = pg.mkBrush("k")
     # convert to log-scale if applicable
@@ -224,6 +222,25 @@ def add_scatter(plot_widget, plot_state, rtdc_ds, color):
 
     scatter.setData(x=x, y=y, brush=brush)
     return [scatter]
+
+
+def set_axes_labels(plot_item, plot_state, slot_states):
+    gen = plot_state["general"]
+    labelx = dclab.dfn.feature_name2label[gen["axis x"]]
+    labely = dclab.dfn.feature_name2label[gen["axis y"]]
+    # replace FL-? with user-defined names
+    fl_names = slot_states[0]["fl names"]
+    if labelx.count("FL"):
+        for key in fl_names:
+            if key in labelx:
+                labelx = labelx.replace(key, fl_names[key])
+                break
+    if labely.count("FL"):
+        for key in fl_names:
+            if key in labelx:
+                labelx = labelx.replace(key, fl_names[key])
+                break
+    plot_item.setLabels(left=labely, bottom=labelx)
 
 
 linestyles = {

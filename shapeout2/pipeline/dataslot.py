@@ -26,9 +26,9 @@ class Dataslot(object):
                              + "'{}' already exists!".format(identifier))
         Dataslot._instances[identifier] = self
         self.color = random_color()
-        self.fl_name_dict = {"fl1": "FL-1",
-                             "fl2": "FL-2",
-                             "fl3": "FL-3"}
+        self.fl_name_dict = {"FL-1": "FL-1",
+                             "FL-2": "FL-2",
+                             "FL-3": "FL-3"}
 
     def __getstate__(self):
         state = {"color": self.color,

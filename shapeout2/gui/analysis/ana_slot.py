@@ -28,9 +28,9 @@ class SlotPanel(QtWidgets.QWidget):
             "name": self.lineEdit_name.text(),
             "path": slot.path,
             "color": self.lineEdit_color.text(),
-            "fl names": {"fl1": self.lineEdit_fl1.text(),
-                         "fl2": self.lineEdit_fl2.text(),
-                         "fl3": self.lineEdit_fl3.text(),
+            "fl names": {"FL-1": self.lineEdit_fl1.text(),
+                         "FL-2": self.lineEdit_fl2.text(),
+                         "FL-3": self.lineEdit_fl3.text(),
                          }
         }
         return state
@@ -39,9 +39,9 @@ class SlotPanel(QtWidgets.QWidget):
         self.lineEdit_name.setText(state["name"])
         self.lineEdit_path.setText(str(state["path"]))
         self.lineEdit_color.setText(state["color"])
-        self.lineEdit_fl1.setText(state["fl names"]["fl1"])
-        self.lineEdit_fl2.setText(state["fl names"]["fl2"])
-        self.lineEdit_fl3.setText(state["fl names"]["fl3"])
+        self.lineEdit_fl1.setText(state["fl names"]["FL-1"])
+        self.lineEdit_fl2.setText(state["fl names"]["FL-2"])
+        self.lineEdit_fl3.setText(state["fl names"]["FL-3"])
 
         features = meta_tool.get_rtdc_features(state["path"])
 

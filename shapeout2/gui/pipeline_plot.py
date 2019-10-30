@@ -44,6 +44,14 @@ class PipelinePlotWidget(pg.PlotWidget):
         self.plotItem.setMenuEnabled(False)
         self.plotItem.hideButtons()
         self._plot_elements = []
+        # General plot options
+        # show top and right axes, but not ticklabels
+        for kax in ["top", "right"]:
+            self.plotItem.showAxis(kax)
+            ax = self.plotItem.axes[kax]["item"]
+            ax.setTicks([])
+        # show grid
+        self.plotItem.showGrid(x=True, y=True, alpha=.1)
 
     def redraw(self, dslist, slot_states, plot_state):
         # Remove everything

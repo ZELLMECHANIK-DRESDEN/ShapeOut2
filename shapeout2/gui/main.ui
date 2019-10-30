@@ -180,7 +180,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QScrollArea" name="scrollArea">
+         <widget class="QScrollArea" name="scrollArea_block">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
             <horstretch>0</horstretch>
@@ -422,7 +422,7 @@
    </widget>
    <widget class="QMenu" name="menuExport">
     <property name="title">
-     <string>Export</string>
+     <string>E&amp;xport</string>
     </property>
     <addaction name="actionData_2"/>
     <addaction name="actionPlots_2"/>
@@ -514,7 +514,7 @@
   </action>
   <action name="actionStatistics">
    <property name="text">
-    <string>Statistics</string>
+    <string>&amp;Statistics</string>
    </property>
   </action>
   <action name="actionAll_Data">
@@ -524,12 +524,12 @@
   </action>
   <action name="actionPlots_2">
    <property name="text">
-    <string>Plots</string>
+    <string>&amp;Plots</string>
    </property>
   </action>
   <action name="actionData_2">
    <property name="text">
-    <string>Data</string>
+    <string>&amp;Data</string>
    </property>
   </action>
  </widget>

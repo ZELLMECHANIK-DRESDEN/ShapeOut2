@@ -110,11 +110,13 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.widget_filter.update_box_ranges()
         # Update dataslot in analysis view
         self.widget_ana_view.widget_slot.update_content()
+        self.scrollArea_block.update()
 
     def add_filter(self):
         filt_id = self.pipeline.add_filter()
         self.data_matrix.add_filter(identifier=filt_id)
         self.widget_ana_view.widget_filter.update_content()
+        self.scrollArea_block.update()
 
     def add_plot(self):
         plot_id = self.pipeline.add_plot()
@@ -137,6 +139,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.widget_plot.update_content()
         pw.update_content()
         sub.show()
+        self.scrollArea_block.update()
 
     def init_analysis_view(self):
         sub = QtWidgets.QMdiSubWindow(self)

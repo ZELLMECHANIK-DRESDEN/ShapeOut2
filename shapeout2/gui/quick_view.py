@@ -87,6 +87,15 @@ class QuickView(QtWidgets.QWidget):
             vim.keyReleaseEvent = lambda _: None
         # Defaults for trace plot
         self.graphicsView_trace.setBackground('w')
+        # General plot options
+        # show top and right axes, but not ticklabels
+        for kax in ["top", "right"]:
+            self.graphicsView_trace.plotItem.showAxis(kax)
+            ax = self.graphicsView_trace.plotItem.axes[kax]["item"]
+            ax.setTicks([])
+        # show grid
+        self.graphicsView_trace.plotItem.showGrid(x=True, y=True, alpha=.1)
+
         # Set individual plots
         kw0 = dict(x=np.arange(10), y=np.arange(10))
         self.trace_plots = {
@@ -458,6 +467,16 @@ class RTDCScatterWidget(pg.PlotWidget):
         self.data_x = None
         #: Unfiltered and not-downsampled y component of current scatter plot
         self.data_y = None
+
+        # General plot options
+        # show top and right axes, but not ticklabels
+        for kax in ["top", "right"]:
+            self.plotItem.showAxis(kax)
+            ax = self.plotItem.axes[kax]["item"]
+            ax.setTicks([])
+        # show grid
+        self.plotItem.showGrid(x=True, y=True, alpha=.1)
+
 
     def plot_data(self, rtdc_ds, xax="area_um", yax="deform", downsample=False,
                   xscale="linear", yscale="linear", isoelastics=False):

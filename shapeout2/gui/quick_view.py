@@ -477,7 +477,6 @@ class RTDCScatterWidget(pg.PlotWidget):
         # show grid
         self.plotItem.showGrid(x=True, y=True, alpha=.1)
 
-
     def plot_data(self, rtdc_ds, xax="area_um", yax="deform", downsample=False,
                   xscale="linear", yscale="linear", isoelastics=False):
         self.rtdc_ds = rtdc_ds

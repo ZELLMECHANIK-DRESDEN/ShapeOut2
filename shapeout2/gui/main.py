@@ -110,12 +110,14 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.widget_filter.update_box_ranges()
         # Update dataslot in analysis view
         self.widget_ana_view.widget_slot.update_content()
+        # redraw
         self.scrollArea_block.update()
 
     def add_filter(self):
         filt_id = self.pipeline.add_filter()
         self.data_matrix.add_filter(identifier=filt_id)
         self.widget_ana_view.widget_filter.update_content()
+        # redraw
         self.scrollArea_block.update()
 
     def add_plot(self):
@@ -137,8 +139,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.subwindows[plot_id] = sub
         # update UI contents
         self.widget_ana_view.widget_plot.update_content()
-        pw.update_content()
         sub.show()
+        pw.update_content()
+        # redraw
         self.scrollArea_block.update()
 
     def init_analysis_view(self):
@@ -217,7 +220,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.splitter.setSizes([200, 1000])
         else:
             self.splitter.setSizes([0, 1])
+        # redraw
         self.splitter.update()
+        self.mdiArea.update()
+        self.scrollArea_block.update()
 
     @QtCore.pyqtSlot(str)
     def on_modify_filter(self, filt_id):
@@ -226,6 +232,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # finally, check the button
         self.toolButton_ana_view.setChecked(True)
         self.subwindows["analysis_view"].setVisible(True)
+        # redraw
         self.mdiArea.update()
         self.subwindows["analysis_view"].update()
 
@@ -236,6 +243,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # finally, check the button
         self.toolButton_ana_view.setChecked(True)
         self.subwindows["analysis_view"].setVisible(True)
+        # redraw
         self.mdiArea.update()
         self.subwindows["analysis_view"].update()
 
@@ -246,6 +254,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # finally, check the button
         self.toolButton_ana_view.setChecked(True)
         self.subwindows["analysis_view"].setVisible(True)
+        # redraw
         self.mdiArea.update()
         self.subwindows["analysis_view"].update()
 
@@ -254,6 +263,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         """Show/Hide QuickView (User clicked the QuickView button)"""
         self.subwindows["quick_view"].setVisible(view)
         self.data_matrix.enable_quickview(view)
+        # redraw
         self.mdiArea.update()
         self.subwindows["quick_view"].update()
 
@@ -306,6 +316,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.plots_changed.emit()
         # Update analysis view
         self.widget_ana_view.update_content()
+        # redraw
+        self.scrollArea_block.update()
         self.mdiArea.update()
         self.subwindows["analysis_view"].update()
 

@@ -40,10 +40,12 @@ class QuickView(QtWidgets.QWidget):
         # Hide settings/events by default
         self.widget_event.setVisible(False)
         self.widget_settings.setVisible(False)
+        self.widget_poly.setVisible(False)
 
         # settings button
-        self.toolButton_settings.toggled.connect(self.on_tool)
         self.toolButton_event.toggled.connect(self.on_tool)
+        self.toolButton_poly.toggled.connect(self.on_tool)
+        self.toolButton_settings.toggled.connect(self.on_tool)
 
         # event changed signal
         self.widget_scatter.scatter.sigClicked.connect(
@@ -215,26 +217,39 @@ class QuickView(QtWidgets.QWidget):
         """Show and hide tools when the user selected a tool button"""
         # show extra data
         show_event = False
+        show_poly = False
         show_settings = False
         sender = self.sender()
-        if sender == self.toolButton_settings:
-            if self.toolButton_settings.isChecked():
-                show_settings = True
-                self.toolButton_event.setChecked(False)
-        elif sender == self.toolButton_event:
+        if sender == self.toolButton_event:
             if self.toolButton_event.isChecked():
                 show_event = True
-                self.toolButton_settings.setChecked(False)
-                # update event plot (maybe axes changed)
-                self.on_event_scatter_update()
+        elif sender == self.toolButton_poly:
+            if self.toolButton_poly.isChecked():
+                show_poly = True
+        elif sender == self.toolButton_settings:
+            if self.toolButton_settings.isChecked():
+                show_settings = True
         else:
             # keep everything as-is but update the sizes
             show_event = self.widget_event.isVisible()
             show_settings = self.widget_settings.isVisible()
-        self.widget_event.setVisible(show_event)
-        self.widget_scatter.select.setVisible(show_event)
+            show_poly = self.widget_poly.isVisible()
 
+        # toolbutton checked
+        self.toolButton_event.setChecked(show_event)
+        self.toolButton_poly.setChecked(show_poly)
+        self.toolButton_settings.setChecked(show_settings)
+
+        # widget visibility
+        self.widget_event.setVisible(show_event)
+        self.widget_scatter.select.setVisible(show_event)  # point in scatter
+        self.widget_poly.setVisible(show_poly)
         self.widget_settings.setVisible(show_settings)
+
+        if show_event:
+            # update event plot (maybe axes changed)
+            self.on_event_scatter_update()
+
         # set size
         show = show_event * show_settings
         mdiwin = self.parent()

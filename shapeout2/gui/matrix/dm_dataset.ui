@@ -122,6 +122,9 @@
         <property name="text">
          <string>modify</string>
         </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -137,6 +140,9 @@
         </property>
         <property name="text">
          <string>toggle</string>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -207,13 +213,19 @@
            </size>
           </property>
           <property name="text">
-           <string>opt</string>
+           <string>opt </string>
           </property>
           <property name="popupMode">
            <enum>QToolButton::InstantPopup</enum>
           </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonTextOnly</enum>
+           <enum>Qt::ToolButtonIconOnly</enum>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+          <property name="arrowType">
+           <enum>Qt::NoArrow</enum>
           </property>
          </widget>
         </item>

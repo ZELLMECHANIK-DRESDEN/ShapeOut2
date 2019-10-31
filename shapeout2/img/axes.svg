@@ -13,7 +13,7 @@
    font-size="12"
    version="1.1"
    id="svg9"
-   sodipodi:docname="eye.svg"
+   sodipodi:docname="axes.svg"
    width="203.625"
    height="214.17191"
    style="font-style:normal;font-weight:normal;font-size:12px;font-family:Dialog;color-interpolation:auto;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto"
@@ -26,7 +26,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -52,9 +52,9 @@
      inkscape:bbox-nodes="true"
      inkscape:snap-bbox-edge-midpoints="true"
      inkscape:snap-bbox-midpoints="true"
-     inkscape:zoom="1.668772"
-     inkscape:cx="43.522288"
-     inkscape:cy="84.67615"
+     inkscape:zoom="1.18"
+     inkscape:cx="91.543299"
+     inkscape:cy="114.61259"
      inkscape:window-x="149"
      inkscape:window-y="104"
      inkscape:window-maximized="0"
@@ -63,9 +63,31 @@
   <defs
      id="genericDefs" />
   <path
-     d="m 200.41249,110.40833 c -9.99042,18.04928 -23.91039,31.83602 -41.7599,41.36021 -17.05028,9.12455 -36.23184,13.68683 -57.54469,13.68683 -21.379445,0 -40.561013,-4.56228 -57.544703,-13.68683 C 25.713684,142.24435 11.727126,128.45761 1.6035222,110.40833 11.793765,92.292404 25.747028,78.472345 43.463311,68.948153 60.447001,59.8236 79.661864,55.261324 101.1079,55.261324 c 21.37944,0 40.561,4.562276 57.54469,13.686829 17.84951,9.524192 31.76948,23.344251 41.7599,41.460177 z m -18.88183,0 c -13.05417,-22.911317 -33.63441,-36.698081 -61.7407,-41.360291 31.09161,14.943839 34.92754,63.756431 0.4995,82.620621 27.90653,-4.72881 48.32026,-18.48225 61.2412,-41.26033 z M 82.026215,69.048039 C 53.986507,73.84343 33.472888,87.630194 20.485358,110.40833 33.406297,133.11982 53.786735,146.87327 81.62667,151.66866 50.805438,135.26794 49.94067,86.53319 82.026215,69.048039 Z"
-     id="path3"
+     style="fill:none;stroke:#000000;stroke-width:22.00499916;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+     d="M 11.907137,11.405188 V 203.21514 H 191.49032"
+     id="path4523"
      inkscape:connector-curvature="0"
-     style="stroke:none;stroke-width:0.71042836"
-     sodipodi:nodetypes="ccscccscccccccccc" />
+     sodipodi:nodetypes="ccc" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:28.61922455px;line-height:1.25;font-family:'Abyssinica SIL';-inkscape-font-specification:'Abyssinica SIL';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.07322097"
+     x="34.556911"
+     y="185.8699"
+     id="text4527"
+     transform="scale(1.0732209,0.93177462)"><tspan
+       sodipodi:role="line"
+       id="tspan4525"
+       x="34.556911"
+       y="185.8699"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:143.09611511px;font-family:'Ubuntu Mono';-inkscape-font-specification:'Ubuntu Mono';stroke-width:1.07322097">XY</tspan></text>
+  <path
+     style="fill:none;stroke:#000000;stroke-width:12;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+     d="M 53.694915,40.070211 H 167.25424"
+     id="path4529"
+     inkscape:connector-curvature="0" />
+  <path
+     style="font-style:normal;font-weight:normal;font-size:12px;font-family:Dialog;color-interpolation:auto;fill:none;fill-opacity:1;stroke:#000000;stroke-width:17.25004387;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto"
+     d="M 138.62922,13.802197 V 66.338225"
+     id="path4531-6"
+     inkscape:connector-curvature="0" />
 </svg>

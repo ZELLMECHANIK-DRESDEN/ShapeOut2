@@ -424,13 +424,28 @@
     <property name="title">
      <string>E&amp;xport</string>
     </property>
+    <widget class="QMenu" name="menuPipeline">
+     <property name="title">
+      <string>Pipeline</string>
+     </property>
+     <addaction name="actionPolygon_filters"/>
+     <addaction name="actionBlock_Matrix"/>
+    </widget>
     <addaction name="actionData_2"/>
     <addaction name="actionPlots_2"/>
     <addaction name="actionStatistics"/>
+    <addaction name="menuPipeline"/>
+   </widget>
+   <widget class="QMenu" name="menuImport">
+    <property name="title">
+     <string>Import</string>
+    </property>
+    <addaction name="actionPolygon_Filters"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menuEdit"/>
    <addaction name="menuExport"/>
+   <addaction name="menuImport"/>
    <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -530,6 +545,26 @@
   <action name="actionData_2">
    <property name="text">
     <string>&amp;Data</string>
+   </property>
+  </action>
+  <action name="actionPolygon_filters">
+   <property name="text">
+    <string>Polygon Filters</string>
+   </property>
+  </action>
+  <action name="actionFilters">
+   <property name="text">
+    <string>All Filters</string>
+   </property>
+  </action>
+  <action name="actionBlock_Matrix">
+   <property name="text">
+    <string>Block Matrix</string>
+   </property>
+  </action>
+  <action name="actionPolygon_Filters">
+   <property name="text">
+    <string>Polygon Filters</string>
    </property>
   </action>
  </widget>

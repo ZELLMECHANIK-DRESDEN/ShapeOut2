@@ -175,13 +175,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
                            | QtCore.Qt.WindowTitleHint
                            | QtCore.Qt.Tool)
 
-    def on_action_docs(self):
-        webbrowser.open("https://shapeout2.readthedocs.io")
-
-    def on_action_quit(self):
-        """Determine what happens when the user wants to quit"""
-        QtCore.QCoreApplication.quit()
-
     def on_action_about(self):
         about_text = "Shape-Out 2 is the successor of Shape-Out, " \
             + "a graphical user interface for the analysis and " \
@@ -192,6 +185,13 @@ class ShapeOut2(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.about(self,
                                     "Shape-Out {}".format(__version__),
                                     about_text)
+
+    def on_action_docs(self):
+        webbrowser.open("https://shapeout2.readthedocs.io")
+
+    def on_action_quit(self):
+        """Determine what happens when the user wants to quit"""
+        QtCore.QCoreApplication.quit()
 
     def on_action_software(self):
         libs = [appdirs,

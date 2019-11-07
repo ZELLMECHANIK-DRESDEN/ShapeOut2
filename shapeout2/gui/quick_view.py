@@ -47,6 +47,17 @@ class QuickView(QtWidgets.QWidget):
         self.toolButton_poly.toggled.connect(self.on_tool)
         self.toolButton_settings.toggled.connect(self.on_tool)
 
+        # polygon filter signals
+        self.label_poly_create.hide()
+        self.label_poly_modify.hide()
+        self.pushButton_poly_save.hide()
+        self.pushButton_poly_cancel.hide()
+        self.pushButton_poly_create.clicked.connect(self.on_poly_create)
+        self.pushButton_poly_save.clicked.connect(self.on_poly_done)
+        self.pushButton_poly_cancel.clicked.connect(self.on_poly_done)
+        self.comboBox_poly.currentIndexChanged.connect(self.on_poly_modify)
+        self.update_polygon_panel()
+
         # event changed signal
         self.widget_scatter.scatter.sigClicked.connect(
             self.on_event_scatter_clicked)
@@ -174,12 +185,13 @@ class QuickView(QtWidgets.QWidget):
         for tb in self.signal_widgets:
             tb.blockSignals(False)
         if "event" in state:
+            event = state["event"]
             self.checkBox_image_contrast.setChecked(
-                state["image auto contrast"])
-            self.checkBox_image_contour.setChecked(state["image contour"])
-            self.checkBox_image_zoom.setChecked(state["event"]["image zoom"])
-            self.spinBox_event.setValue(state["event"]["index"])
-            self.checkBox_trace_raw.setChecked(state["event"]["trace raw"])
+                event["image auto contrast"])
+            self.checkBox_image_contour.setChecked(event["image contour"])
+            self.checkBox_image_zoom.setChecked(event["image zoom"])
+            self.spinBox_event.setValue(event["index"])
+            self.checkBox_trace_raw.setChecked(event["trace raw"])
 
     def on_event_scatter_clicked(self, plot, point):
         """User clicked on scatter plot
@@ -213,8 +225,88 @@ class QuickView(QtWidgets.QWidget):
         event = self.spinBox_event.value()
         self.show_event(event - 1)
 
+    def on_poly_create(self):
+        """User wants to create a polygon filter"""
+        self.comboBox_poly.setEnabled(False)
+        self.groupBox_poly.setEnabled(True)
+        self.label_poly_create.setVisible(True)
+        self.pushButton_poly_save.setVisible(True)
+        self.pushButton_poly_cancel.setVisible(True)
+        # defaults
+        self.lineEdit_poly.setText("Polygon Filter {}".format(
+            dclab.PolygonFilter._instance_counter + 1))
+        self.checkBox_poly.setChecked(False)
+        # add ROI
+        plr = pg.PolyLineROI([], closed=True)
+        plr.setPen("k")
+        self.widget_scatter.poly_line_roi = plr
+        self.widget_scatter.addItem(plr)
+        self.widget_scatter.set_mouse_click_mode("poly-create")
+
+    def on_poly_done(self):
+        """User is done creating or modifying a polygon filter"""
+        self.label_poly_create.setVisible(False)
+        self.label_poly_modify.setVisible(False)
+        self.pushButton_poly_save.setVisible(False)
+        self.pushButton_poly_cancel.setVisible(False)
+        if self.sender() == self.pushButton_poly_save:
+            # save the polygon filter
+            plr_state = self.widget_scatter.poly_line_roi.getState()
+            points = [[p.x(), p.y()] for p in plr_state["points"]]
+            name = self.lineEdit_poly.text()
+            inverted = self.checkBox_poly.isChecked()
+            axes = self.widget_scatter.xax, self.widget_scatter.yax
+            # determine whether to create a new polygon filter or whether
+            # to update an existing one.
+            idp = self.comboBox_poly.currentData()
+            if idp is None:
+                dclab.PolygonFilter(axes=axes, points=points, name=name,
+                                    inverted=inverted)
+            else:
+                pf = dclab.PolygonFilter.get_instance_from_id(idp)
+                pf.name = name
+                pf.inverted = inverted
+                pf.points = points
+        # remove the PolyLineRoi
+        self.widget_scatter.removeItem(self.widget_scatter.poly_line_roi)
+        self.widget_scatter.poly_line_roi = None
+        self.widget_scatter.set_mouse_click_mode("scatter")
+        self.update_polygon_panel()
+
+    def on_poly_modify(self):
+        """User wants to modify a polygon filter"""
+        self.comboBox_poly.setEnabled(False)
+        self.groupBox_poly.setEnabled(True)
+        self.label_poly_modify.setVisible(True)
+        self.pushButton_poly_save.setVisible(True)
+        self.pushButton_poly_cancel.setVisible(True)
+        # get the polygon filter id
+        idp = self.comboBox_poly.currentData()
+        pf = dclab.PolygonFilter.get_instance_from_id(idp)
+        # set UI information
+        self.lineEdit_poly.setText(pf.name)
+        self.checkBox_poly.setChecked(pf.inverted)
+        # set axes
+        state = self.__getstate__()
+        state["plot"]["axis x"] = pf.axes[0]
+        state["plot"]["axis y"] = pf.axes[1]
+        self.__setstate__(state)
+        self.plot()
+        # add ROI
+        plr = pg.PolyLineROI(pf.points, closed=True)
+        plr.setPen("k")
+        self.widget_scatter.poly_line_roi = plr
+        self.widget_scatter.addItem(plr)
+        self.widget_scatter.set_mouse_click_mode("poly-modify")
+
     def on_tool(self):
         """Show and hide tools when the user selected a tool button"""
+        toblock = [self.toolButton_event,
+                   self.toolButton_poly,
+                   self.toolButton_settings,
+                   ]
+        for b in toblock:
+            b.blockSignals(True)
         # show extra data
         show_event = False
         show_poly = False
@@ -250,6 +342,9 @@ class QuickView(QtWidgets.QWidget):
             # update event plot (maybe axes changed)
             self.on_event_scatter_update()
 
+        for b in toblock:
+            b.blockSignals(False)
+
         # set size
         show = show_event * show_settings
         mdiwin = self.parent()
@@ -272,6 +367,9 @@ class QuickView(QtWidgets.QWidget):
                                       isoelastics=plot["isoelastics"])
         # make sure the correct plot items are visible (e.g. scatter select)
         self.on_tool()
+        # update polygon filter axis names
+        self.label_poly_x.setText(dclab.dfn.feature_name2label[plot["axis x"]])
+        self.label_poly_y.setText(dclab.dfn.feature_name2label[plot["axis y"]])
 
     def show_event(self, event):
         """Display the event data (image, contour, trace)
@@ -462,10 +560,47 @@ class QuickView(QtWidgets.QWidget):
         # sender)
         self.on_tool()
 
+    def update_polygon_panel(self):
+        """Update polygon filter combobox etc."""
+        pfts = dclab.PolygonFilter.instances
+        if pfts:
+            self.comboBox_poly.blockSignals(True)
+            self.comboBox_poly.clear()
+            self.comboBox_poly.addItem("Choose...", None)
+            for pf in pfts:
+                self.comboBox_poly.addItem(pf.name, pf.unique_id)
+            self.comboBox_poly.blockSignals(False)
+            self.comboBox_poly.setEnabled(True)
+        else:
+            self.comboBox_poly.setEnabled(False)
+        self.groupBox_poly.setEnabled(False)
+
+
+class CustomViewBox(pg.ViewBox):
+    set_scatter_point = QtCore.pyqtSignal(QtCore.QPointF)
+    add_poly_vertex = QtCore.pyqtSignal(QtCore.QPointF)
+
+    def __init__(self, *args, **kwds):
+        pg.ViewBox.__init__(self, *args, **kwds)
+        self.mode = "scatter"
+
+    def mouseClickEvent(self, ev):
+        if ev.button() == QtCore.Qt.LeftButton:
+            pos = self.mapToView(ev.pos())
+            if self.mode == "scatter":
+                self.set_scatter_point.emit(pos)
+            elif self.mode == "poly-create":
+                self.add_poly_vertex.emit(pos)
+            ev.accept()
+        else:
+            ev.ignore()
+
 
 class RTDCScatterWidget(pg.PlotWidget):
     def __init__(self, *args, **kwargs):
-        super(RTDCScatterWidget, self).__init__(*args, **kwargs)
+        self._view_box = CustomViewBox()
+        super(RTDCScatterWidget, self).__init__(viewBox=self._view_box,
+                                                *args, **kwargs)
         self.scatter = RTDCScatterPlot()
         self.select = pg.PlotDataItem(x=[1], y=[2], symbol="o")
         #: List of isoelasticity line plots
@@ -491,6 +626,18 @@ class RTDCScatterWidget(pg.PlotWidget):
             ax.setTicks([])
         # show grid
         self.plotItem.showGrid(x=True, y=True, alpha=.1)
+        self.poly_line_roi = None
+
+        # Signals for mouse click
+        # let view box update the selected event in the scatter plot
+        self._view_box.set_scatter_point.connect(self.scatter.set_point)
+        # let view box update self.poly_line_roi
+        self._view_box.add_poly_vertex.connect(self.add_poly_vertex)
+
+    def add_poly_vertex(self, pos):
+        state = self.poly_line_roi.getState()
+        state["points"].append([pos.x(), pos.y()])
+        self.poly_line_roi.setState(state)
 
     def plot_data(self, rtdc_ds, xax="area_um", yax="deform", downsample=False,
                   xscale="linear", yscale="linear", isoelastics=False):
@@ -558,6 +705,17 @@ class RTDCScatterWidget(pg.PlotWidget):
                 channel_width=cfg["setup"]["channel width"],
                 pixel_size=cfg["imaging"]["pixel size"])
 
+    def set_mouse_click_mode(self, mode):
+        allowed = ["scatter", "poly-create", "poly-modify"]
+        if mode not in allowed:
+            raise ValueError("Invalid mouse mode: {}, ".format(mode)
+                             + "expected one of {}".format(allowed))
+        if mode in ["poly-create", "poly-modify"]:
+            if self.poly_line_roi is None:
+                raise ValueError("Please set self.poly_line_roi before "
+                                 + "setting the click mode!")
+        self._view_box.mode = mode
+
     def setSelection(self, event_index):
         x = self.data_x[event_index]
         y = self.data_y[event_index]
@@ -599,12 +757,20 @@ class RTDCScatterPlot(pg.ScatterPlotItem):
                 d = di
         return p
 
+    def set_point(self, view_pos):
+        pos = self.mapFromView(view_pos)
+        pt = self.pointAt(pos)
+        self.ptClicked = pt
+        self.sigClicked.emit(self, self.ptClicked)
+
     def mouseClickEvent(self, ev):
         """Override that return only a single point using `pointAt`"""
-        if ev.button() == QtCore.Qt.LeftButton:
-            pt = self.pointAt(ev.pos())
-            self.ptClicked = pt
-            self.sigClicked.emit(self, self.ptClicked)
-            ev.accept()
-        else:
-            ev.ignore()
+        ev.ignore()  # clicks are handles by CustomViewBox
+        if False:
+            if ev.button() == QtCore.Qt.LeftButton:
+                pt = self.pointAt(ev.pos())
+                self.ptClicked = pt
+                self.sigClicked.emit(self, self.ptClicked)
+                ev.accept()
+            else:
+                ev.ignore()

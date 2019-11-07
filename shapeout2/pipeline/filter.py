@@ -50,6 +50,7 @@ class Filter(object):
             "name": self.name,
             "remove invalid events": self.general["remove invalid events"],
             "box filters": self.boxdict.copy(),
+            "polygon filters": self.polylist.copy(),
         }
         return state
 
@@ -60,6 +61,7 @@ class Filter(object):
         self.name = state["name"]
         self.general["remove invalid events"] = state["remove invalid events"]
         self.boxdict = state["box filters"].copy()
+        self.polylist = state["polygon filters"].copy()
 
     @staticmethod
     def get_filter(identifier):

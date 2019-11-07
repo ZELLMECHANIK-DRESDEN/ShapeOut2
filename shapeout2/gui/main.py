@@ -61,7 +61,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.init_analysis_view()
         self.mdiArea.cascadeSubWindows()
         self.showMaximized()
-        # data matrix
+        # Data matrix
         self.data_matrix.matrix_changed.connect(self.update_pipeline)
         self.data_matrix.slot_modify_clicked.connect(
             self.on_modify_slot)
@@ -72,17 +72,23 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.toolButton_new_filter.clicked.connect(self.add_filter)
         self.toolButton_new_dataset.clicked.connect(self.add_dataslot)
         self.toolButton_import.clicked.connect(self.add_dataslot)
-        # plot matrix
+        # Plot matrix
         self.plot_matrix.matrix_changed.connect(self.update_pipeline)
         self.plot_matrix.plot_modify_clicked.connect(
             self.on_modify_plot)
         self.toolButton_new_plot.clicked.connect(self.add_plot)
-        # analysis view
+        # Analysis view
         self.widget_ana_view.widget_filter.set_pipeline(self.pipeline)
         self.widget_ana_view.widget_plot.set_pipeline(self.pipeline)
         self.widget_ana_view.widget_slot.set_pipeline(self.pipeline)
+        # filter signals
         self.widget_ana_view.widget_filter.filters_changed.connect(
             self.data_matrix.update_content)
+        self.widget_ana_view.widget_filter.request_new_polygon_filter.connect(
+            self.on_new_polygon_filter)
+        self.widget_quick_view.new_polygon_filter_created.connect(
+            self.widget_ana_view.widget_filter.update_polygon_filters)
+        # plot signals
         self.widget_ana_view.widget_plot.plots_changed.connect(
             self.plot_matrix.update_content)
         self.widget_ana_view.widget_slot.slots_changed.connect(
@@ -224,6 +230,11 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.splitter.update()
         self.mdiArea.update()
         self.scrollArea_block.update()
+
+    def on_new_polygon_filter(self):
+        self.on_quickview(view=True)
+        self.widget_quick_view.on_poly_create()
+        self.widget_quick_view.on_tool()  # adjusts QuickView size correctly
 
     @QtCore.pyqtSlot(str)
     def on_modify_filter(self, filt_id):

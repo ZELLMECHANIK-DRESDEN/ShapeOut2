@@ -16,6 +16,8 @@ SHOW_FEATURES = ["deform", "area_um", "bright_avg"]
 class FilterPanel(QtWidgets.QWidget):
     #: Emitted when a shapeout2.pipeline.Filter is modified
     filters_changed = QtCore.pyqtSignal()
+    #: Emitted when the user wants to create a new polygon filter
+    request_new_polygon_filter = QtCore.pyqtSignal()
 
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self)
@@ -24,6 +26,8 @@ class FilterPanel(QtWidgets.QWidget):
         uic.loadUi(path_ui, self)
         self.setUpdatesEnabled(False)
         self._init_box_filters()
+        self._polygon_checkboxes = {}
+        self.update_polygon_filters()
         self.pushButton_apply.clicked.connect(self.write_filter)
         self.pushButton_reset.clicked.connect(self.update_content)
         self.comboBox_filters.currentIndexChanged.connect(self.update_content)
@@ -68,6 +72,12 @@ class FilterPanel(QtWidgets.QWidget):
             rc = self._box_range_controls[feat]
             box[feat] = rc.__getstate__()
         state["box filters"] = box
+        # polygon filters
+        pflist = []
+        for key in self._polygon_checkboxes:
+            if self._polygon_checkboxes[key].isChecked():
+                pflist.append(key)
+        state["polygon filters"] = pflist
         return state
 
     def __setstate__(self, state):
@@ -86,6 +96,13 @@ class FilterPanel(QtWidgets.QWidget):
             elif not rc.isHidden():
                 # update range to limits
                 rc.reset_range()
+        # polygon filters
+        pflist = state["polygon filters"]
+        for key in self._polygon_checkboxes:
+            if key in pflist:
+                self._polygon_checkboxes[key].setChecked(True)
+            else:
+                self._polygon_checkboxes[key].setChecked(False)
 
     @property
     def active_box_features(self):
@@ -157,6 +174,7 @@ class FilterPanel(QtWidgets.QWidget):
     def update_content(self, event=None, filt_index=None):
         if self.filter_ids:
             self.setEnabled(True)
+            self.update_polygon_filters()
             # update combobox
             self.comboBox_filters.blockSignals(True)
             if filt_index is None:
@@ -204,6 +222,37 @@ class FilterPanel(QtWidgets.QWidget):
                     if feat not in state["box filters"]:
                         # reset range to limits
                         rc.reset_range()
+
+    def update_polygon_filters(self):
+        """Update the layout containing the polygon filters"""
+        state = self.__getstate__()
+        self.verticalLayout_poly.setAlignment(QtCore.Qt.AlignTop)
+        # clear layout
+        for ii in reversed(range(self.verticalLayout_poly.count())):
+            item = self.verticalLayout_poly.itemAt(ii).widget()
+            if item is not None:
+                item.deleteLater()
+        self._polygon_checkboxes = {}  # must come after getting the state
+        if dclab.PolygonFilter.instances:
+            for pf in dclab.PolygonFilter.instances:
+                widget = QtWidgets.QWidget()
+                hbox = QtWidgets.QHBoxLayout()
+                hbox.setAlignment(QtCore.Qt.AlignLeft)
+                hbox.setContentsMargins(0, 0, 0, 0)
+                chb = QtWidgets.QCheckBox()
+                hbox.addWidget(chb)
+                hbox.addWidget(QtWidgets.QLabel(pf.name))
+                widget.setLayout(hbox)
+                self.verticalLayout_poly.addWidget(widget)
+                self._polygon_checkboxes[pf.unique_id] = chb
+        else:
+            label = QtWidgets.QLabel("No polygon filters have been created "
+                                     + "yet.")
+            button = QtWidgets.QPushButton("Create polygon filter")
+            button.clicked.connect(self.request_new_polygon_filter)
+            self.verticalLayout_poly.addWidget(label)
+            self.verticalLayout_poly.addWidget(button)
+        self.__setstate__(state)
 
     def write_filter(self):
         """Update the shapeout2.pipeline.Filter instance"""

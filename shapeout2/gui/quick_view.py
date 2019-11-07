@@ -14,6 +14,8 @@ from . import pipeline_plot
 
 
 class QuickView(QtWidgets.QWidget):
+    new_polygon_filter_created = QtCore.pyqtSignal()
+
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self)
         path_ui = pkg_resources.resource_filename(
@@ -227,6 +229,11 @@ class QuickView(QtWidgets.QWidget):
 
     def on_poly_create(self):
         """User wants to create a polygon filter"""
+        self.pushButton_poly_create.setEnabled(False)
+        if not self.toolButton_poly.isChecked():
+            # emulate mouse toggle
+            self.toolButton_poly.setChecked(True)
+            self.toolButton_poly.toggled.emit(True)
         self.comboBox_poly.setEnabled(False)
         self.groupBox_poly.setEnabled(True)
         self.label_poly_create.setVisible(True)
@@ -236,15 +243,17 @@ class QuickView(QtWidgets.QWidget):
         self.lineEdit_poly.setText("Polygon Filter {}".format(
             dclab.PolygonFilter._instance_counter + 1))
         self.checkBox_poly.setChecked(False)
-        # add ROI
-        plr = pg.PolyLineROI([], closed=True)
-        plr.setPen("k")
-        self.widget_scatter.poly_line_roi = plr
-        self.widget_scatter.addItem(plr)
-        self.widget_scatter.set_mouse_click_mode("poly-create")
+        if self.widget_scatter.poly_line_roi is None:
+            # add ROI only if there is nothing going on already
+            plr = pg.PolyLineROI([], closed=True)
+            plr.setPen("k")
+            self.widget_scatter.poly_line_roi = plr
+            self.widget_scatter.addItem(plr)
+            self.widget_scatter.set_mouse_click_mode("poly-create")
 
     def on_poly_done(self):
         """User is done creating or modifying a polygon filter"""
+        self.pushButton_poly_create.setEnabled(True)
         self.label_poly_create.setVisible(False)
         self.label_poly_modify.setVisible(False)
         self.pushButton_poly_save.setVisible(False)
@@ -272,9 +281,11 @@ class QuickView(QtWidgets.QWidget):
         self.widget_scatter.poly_line_roi = None
         self.widget_scatter.set_mouse_click_mode("scatter")
         self.update_polygon_panel()
+        self.new_polygon_filter_created.emit()
 
     def on_poly_modify(self):
         """User wants to modify a polygon filter"""
+        self.pushButton_poly_create.setEnabled(False)
         self.comboBox_poly.setEnabled(False)
         self.groupBox_poly.setEnabled(True)
         self.label_poly_modify.setVisible(True)
@@ -346,10 +357,10 @@ class QuickView(QtWidgets.QWidget):
             b.blockSignals(False)
 
         # set size
-        show = show_event * show_settings
+        hide = show_event * show_settings * show_poly
         mdiwin = self.parent()
         geom = mdiwin.geometry()
-        geom.setWidth(geom.width() - (-1)**show * 300)
+        geom.setWidth(geom.width() - (-1)**hide * 300)
         mdiwin.setGeometry(geom)
         mdiwin.adjustSize()
 

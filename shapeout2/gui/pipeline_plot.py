@@ -9,6 +9,8 @@ import pyqtgraph as pg
 from ..pipeline import Plot
 from .. import plot_cache
 
+from .simple_plot_widget import SimplePlotWidget
+
 
 class PipelinePlot(QtWidgets.QWidget):
     def __init__(self, parent, pipeline, plot_id, *args, **kwargs):
@@ -36,22 +38,13 @@ class PipelinePlot(QtWidgets.QWidget):
         self.plot.redraw(dslist, slot_states, plot_state)
 
 
-class PipelinePlotWidget(pg.PlotWidget):
+class PipelinePlotWidget(SimplePlotWidget):
     def __init__(self, *args, **kwargs):
         super(PipelinePlotWidget, self).__init__(*args, **kwargs)
         # Disable user interaction
         self.plotItem.setMouseEnabled(x=False, y=False)
-        self.plotItem.setMenuEnabled(False)
-        self.plotItem.hideButtons()
+        # Keep track of all elements (for redraw)
         self._plot_elements = []
-        # General plot options
-        # show top and right axes, but not ticklabels
-        for kax in ["top", "right"]:
-            self.plotItem.showAxis(kax)
-            ax = self.plotItem.axes[kax]["item"]
-            ax.setTicks([])
-        # show grid
-        self.plotItem.showGrid(x=True, y=True, alpha=.1)
 
     def redraw(self, dslist, slot_states, plot_state):
         # Remove everything

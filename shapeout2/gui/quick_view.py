@@ -100,16 +100,6 @@ class QuickView(QtWidgets.QWidget):
             # disable keyboard shortcuts
             vim.keyPressEvent = lambda _: None
             vim.keyReleaseEvent = lambda _: None
-        # Defaults for trace plot
-        self.graphicsView_trace.setBackground('w')
-        # General plot options
-        # show top and right axes, but not ticklabels
-        for kax in ["top", "right"]:
-            self.graphicsView_trace.plotItem.showAxis(kax)
-            ax = self.graphicsView_trace.plotItem.axes[kax]["item"]
-            ax.setTicks([])
-        # show grid
-        self.graphicsView_trace.plotItem.showGrid(x=True, y=True, alpha=.1)
 
         # Set individual plots
         kw0 = dict(x=np.arange(10), y=np.arange(10))
@@ -587,12 +577,17 @@ class QuickView(QtWidgets.QWidget):
         self.groupBox_poly.setEnabled(False)
 
 
-class CustomViewBox(pg.ViewBox):
+class QuickViewViewBox(pg.ViewBox):
     set_scatter_point = QtCore.pyqtSignal(QtCore.QPointF)
     add_poly_vertex = QtCore.pyqtSignal(QtCore.QPointF)
 
+    #: allowed right-click menu
+    right_click_actions = ["Export...",
+                           "View All",
+                           "Mouse Mode"]
+
     def __init__(self, *args, **kwds):
-        pg.ViewBox.__init__(self, *args, **kwds)
+        super(QuickViewViewBox, self).__init__(*args, **kwds)
         self.mode = "scatter"
 
     def mouseClickEvent(self, ev):
@@ -605,12 +600,26 @@ class CustomViewBox(pg.ViewBox):
             ev.accept()
         else:
             # right mouse button shows menu
-            super(CustomViewBox, self).mouseClickEvent(ev)
+            super(QuickViewViewBox, self).mouseClickEvent(ev)
+
+    def raiseContextMenu(self, ev):
+        # Let the scene add on to the end of our context menu
+        # (this is optional)
+        menu = self.scene().addParentContextMenus(self, self.menu, ev)
+
+        # Only keep list of action defined in `self.right_click_actions`
+        for action in self.menu.actions():
+            if action.text() not in self.right_click_actions:
+                self.menu.removeAction(action)
+
+        pos = ev.screenPos()
+        menu.popup(QtCore.QPoint(pos.x(), pos.y()))
+        return True
 
 
 class RTDCScatterWidget(pg.PlotWidget):
     def __init__(self, *args, **kwargs):
-        self._view_box = CustomViewBox()
+        self._view_box = QuickViewViewBox()
         super(RTDCScatterWidget, self).__init__(viewBox=self._view_box,
                                                 *args, **kwargs)
         self.scatter = RTDCScatterPlot()
@@ -638,6 +647,8 @@ class RTDCScatterWidget(pg.PlotWidget):
             ax.setTicks([])
         # show grid
         self.plotItem.showGrid(x=True, y=True, alpha=.1)
+
+        # polygon editing ROI
         self.poly_line_roi = None
 
         # Signals for mouse click

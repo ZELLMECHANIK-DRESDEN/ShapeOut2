@@ -608,7 +608,7 @@
                  </layout>
                 </item>
                 <item>
-                 <widget class="PlotWidget" name="graphicsView_trace">
+                 <widget class="SimplePlotWidget" name="graphicsView_trace">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -873,9 +873,9 @@
    <header>pyqtgraph</header>
   </customwidget>
   <customwidget>
-   <class>PlotWidget</class>
+   <class>SimplePlotWidget</class>
    <extends>QGraphicsView</extends>
-   <header>pyqtgraph</header>
+   <header>shapeout2.gui.simple_plot_widget</header>
   </customwidget>
  </customwidgets>
  <resources/>

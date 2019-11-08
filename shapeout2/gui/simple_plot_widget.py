@@ -10,6 +10,7 @@ class SimplePlotWidget(pg.PlotWidget):
     - white background
     - top and right axes
     """
+
     def __init__(self, *args, **kwargs):
         super(SimplePlotWidget, self).__init__(viewBox=SimpleViewBox(),
                                                *args, **kwargs)

@@ -10,9 +10,10 @@ class SimpleImageView(pg.ImageView):
     - white background
     - top and right axes
     """
+
     def __init__(self, *args, **kwargs):
         super(SimpleImageView, self).__init__(view=SimpleViewBox(),
-                                               *args, **kwargs)
+                                              *args, **kwargs)
         # disable pyqtgraph controls we don't need
         self.ui.histogram.hide()
         self.ui.roiBtn.hide()
@@ -20,7 +21,6 @@ class SimpleImageView(pg.ImageView):
         # disable keyboard shortcuts
         self.keyPressEvent = lambda _: None
         self.keyReleaseEvent = lambda _: None
-
 
 
 class SimpleViewBox(pg.ViewBox):

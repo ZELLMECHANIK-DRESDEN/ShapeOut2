@@ -604,7 +604,8 @@ class CustomViewBox(pg.ViewBox):
                 self.add_poly_vertex.emit(pos)
             ev.accept()
         else:
-            ev.ignore()
+            # right mouse button shows menu
+            super(CustomViewBox, self).mouseClickEvent(ev)
 
 
 class RTDCScatterWidget(pg.PlotWidget):
@@ -775,13 +776,5 @@ class RTDCScatterPlot(pg.ScatterPlotItem):
         self.sigClicked.emit(self, self.ptClicked)
 
     def mouseClickEvent(self, ev):
-        """Override that return only a single point using `pointAt`"""
+        """Override that does not handle events"""
         ev.ignore()  # clicks are handles by CustomViewBox
-        if False:
-            if ev.button() == QtCore.Qt.LeftButton:
-                pt = self.pointAt(ev.pos())
-                self.ptClicked = pt
-                self.sigClicked.emit(self, self.ptClicked)
-                ev.accept()
-            else:
-                ev.ignore()

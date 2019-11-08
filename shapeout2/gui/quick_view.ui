@@ -514,7 +514,7 @@
                  </layout>
                 </item>
                 <item>
-                 <widget class="ImageView" name="imageView_image">
+                 <widget class="SimpleImageView" name="imageView_image">
                   <property name="minimumSize">
                    <size>
                     <width>300</width>
@@ -868,14 +868,14 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ImageView</class>
-   <extends>QGraphicsView</extends>
-   <header>pyqtgraph</header>
-  </customwidget>
-  <customwidget>
    <class>SimplePlotWidget</class>
    <extends>QGraphicsView</extends>
    <header>shapeout2.gui.simple_plot_widget</header>
+  </customwidget>
+  <customwidget>
+   <class>SimpleImageView</class>
+   <extends>QGraphicsView</extends>
+   <header>shapeout2.gui.simple_image_view</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -92,15 +92,6 @@ class QuickView(QtWidgets.QWidget):
             elif hasattr(w, "valueChanged"):
                 w.valueChanged.connect(self.plot)
 
-        # disable pyqtgraph controls we don't need
-        for vim in [self.imageView_image]:
-            vim.ui.histogram.hide()
-            vim.ui.roiBtn.hide()
-            vim.ui.menuBtn.hide()
-            # disable keyboard shortcuts
-            vim.keyPressEvent = lambda _: None
-            vim.keyReleaseEvent = lambda _: None
-
         # Set individual plots
         kw0 = dict(x=np.arange(10), y=np.arange(10))
         self.trace_plots = {

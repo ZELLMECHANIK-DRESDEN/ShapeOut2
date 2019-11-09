@@ -1,3 +1,4 @@
+import dclab
 import numpy as np
 
 
@@ -29,12 +30,32 @@ class Dataslot(object):
         self.fl_name_dict = {"FL-1": "FL-1",
                              "FL-2": "FL-2",
                              "FL-3": "FL-3"}
+        self.config = {
+            "crosstalk": {
+                # crosstalk
+                "crosstalk fl12": 0,
+                "crosstalk fl13": 0,
+                "crosstalk fl21": 0,
+                "crosstalk fl23": 0,
+                "crosstalk fl31": 0,
+                "crosstalk fl32": 0,
+            },
+            "emodulus": {
+                # emodulus
+                "emodulus model": "elastic sphere",
+                "emodulus medium": "undefined",
+                "emodulus temperature": np.nan,
+                "emodulus viscosity": np.nan,
+            }
+        }
 
     def __getstate__(self):
         state = {"color": self.color,
                  "name": self.name,
                  "path": self.path,
                  "fl names": self.fl_name_dict,
+                 "crosstalk": self.config["crosstalk"],
+                 "emodulus": self.config["emodulus"],
                  }
         return state
 
@@ -43,6 +64,8 @@ class Dataslot(object):
         self.name = state["name"]
         self.path = state["path"]
         self.fl_name_dict = state["fl names"]
+        self.config["crosstalk"] = state["crosstalk"]
+        self.config["emodulus"] = state["emodulus"]
 
     @staticmethod
     def get_slot(identifier):
@@ -61,6 +84,34 @@ class Dataslot(object):
     @staticmethod
     def get_instances():
         return Dataslot._instances
+
+    def update_dataset(self, dataset):
+        """Update the configuration of a dataset
+
+        This is used to update the configuration for computing
+        the Young's modulus and fluorescence crosstalk.
+        """
+        # emodulus
+        medium = self.config["emodulus"]["emodulus medium"]
+        temp = self.config["emodulus"]["emodulus temperature"]
+        visc = self.config["emodulus"]["emodulus viscosity"]
+        if ((medium == "other" and not np.isnan(visc))
+            or (medium in dclab.features.emodulus_viscosity.KNOWN_MEDIA
+                and not np.isnan(temp))):
+            dataset.config["calculation"].update(self.config["emodulus"])
+        else:
+            # remove any information
+            for key in self.config["emodulus"]:
+                if key in dataset.config["calculation"]:
+                    dataset.config["calculation"].pop(key)
+        # crosstalk
+        if np.sum(list(self.config["crosstalk"].values())):
+            dataset.config["calculation"].update(self.config["crosstalk"])
+        else:
+            # remove any information
+            for key in self.config["crosstalk"]:
+                if key in dataset.config["calculation"]:
+                    dataset.config["calculation"].pop(key)
 
 
 def random_color():

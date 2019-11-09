@@ -114,6 +114,8 @@ class QuickView(QtWidgets.QWidget):
                          levels=(0, 254),
                          )
 
+        self.rtdc_ds = None
+
     def __getstate__(self):
         plot = {
             "downsampling": self.checkBox_downsample.isChecked(),
@@ -145,15 +147,8 @@ class QuickView(QtWidgets.QWidget):
         # downsampling
         self.checkBox_downsample.setChecked(plot["downsampling"])
         self.spinBox_downsample.setValue(plot["downsampling value"])
-        # axes combobox choices
-        ds_features = self.rtdc_ds.features
-        for cb in [self.comboBox_x, self.comboBox_y]:
-            # set features
-            cb.clear()
-            for feat in dclab.dfn.scalar_feature_names:
-                if feat in ds_features:
-                    cb.addItem(dclab.dfn.feature_name2label[feat], feat)
         # axes labels
+        self.update_feature_choices()
         idx = self.comboBox_x.findData(plot["axis x"])
         self.comboBox_x.setCurrentIndex(idx)
         idy = self.comboBox_y.findData(plot["axis y"])
@@ -551,6 +546,30 @@ class QuickView(QtWidgets.QWidget):
         # this only updates the size of the tools (because there is no
         # sender)
         self.on_tool()
+
+    def update_feature_choices(self):
+        """Updates the axes comboboxes choices
+
+        This is used e.g. when emodulus becomes available
+        """
+        if self.rtdc_ds is not None:
+            # axes combobox choices
+            ds_features = self.rtdc_ds.features
+            ds_labels = [dclab.dfn.feature_name2label[f] for f in ds_features]
+            ds_fl = sorted(zip(ds_labels, ds_features))
+            for cb in [self.comboBox_x, self.comboBox_y]:
+                fcur = cb.currentData()
+                blocked = cb.signalsBlocked()  # remember block state
+                cb.blockSignals(True)
+                # set features
+                cb.clear()
+                for label, feat in ds_fl:
+                    if feat in ds_features:
+                        cb.addItem(label, feat)
+                idcur = cb.findData(fcur)
+                if idcur >= 0:
+                    cb.setCurrentIndex(idcur)
+                cb.blockSignals(blocked)
 
     def update_polygon_panel(self):
         """Update polygon filter combobox etc."""

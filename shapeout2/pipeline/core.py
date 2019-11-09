@@ -178,6 +178,7 @@ class Pipeline(object):
                         # new dataset
                         ds = dclab.new_dataset(sl.path,
                                                identifier=sl.identifier)
+                        sl.update_dataset(ds)
                         row = [ds]
                         for _ in self.filters:
                             # generate hierarchy children
@@ -250,6 +251,8 @@ class Pipeline(object):
             else:
                 row[ii].config["filtering"]["enable filters"] = False
         dsend = row[filt_index]
+        # update configuration from slot
+        slot.update_dataset(dsend)
         if apply_filter:
             dsend.apply_filter()
         if ret_color:

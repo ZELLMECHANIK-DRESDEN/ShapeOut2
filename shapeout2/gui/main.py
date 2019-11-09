@@ -91,10 +91,13 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # plot signals
         self.widget_ana_view.widget_plot.plots_changed.connect(
             self.plot_matrix.update_content)
-        self.widget_ana_view.widget_slot.slots_changed.connect(
-            self.data_matrix.update_content)
         self.widget_ana_view.widget_plot.plots_changed.connect(
             self.plots_changed)
+        # slot signals
+        self.widget_ana_view.widget_slot.slots_changed.connect(
+            self.data_matrix.update_content)
+        self.widget_ana_view.widget_slot.slots_changed.connect(
+            self.widget_quick_view.update_feature_choices)
 
     def add_dataslot(self):
         fnames, _ = QtWidgets.QFileDialog.getOpenFileNames(

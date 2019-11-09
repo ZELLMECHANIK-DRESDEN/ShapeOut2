@@ -4,9 +4,12 @@ from . import util
 
 def get_contour_data(rtdc_ds, xax, yax, xacc, yacc, xscale, yscale,
                      kde_type="histogram", kde_kwargs={}):
-    tohash = [rtdc_ds.identifier, rtdc_ds.filter.all,
-              xax, yax, xacc, yacc, xscale, yscale,
-              kde_type, kde_kwargs]
+    cfg = rtdc_ds.config
+    tohash = [
+        rtdc_ds.identifier, rtdc_ds.filter.all,
+        cfg["calculation"] if "calculation" in cfg else "",
+        xax, yax, xacc, yacc, xscale, yscale,
+        kde_type, kde_kwargs]
     shash = util.hashobj(tohash)
     if shash in cache_data:
         x, y, den = cache_data[shash]
@@ -28,9 +31,11 @@ def get_contour_data(rtdc_ds, xax, yax, xacc, yacc, xscale, yscale,
 
 def get_scatter_data(rtdc_ds, downsample, xax, yax, xscale, yscale,
                      kde_type="histogram", kde_kwargs={}):
-    tohash = [rtdc_ds.identifier, rtdc_ds.filter.all, downsample,
-              xax, yax, xscale, yscale,
-              kde_type, kde_kwargs]
+    cfg = rtdc_ds.config
+    tohash = [
+        rtdc_ds.identifier, rtdc_ds.filter.all,
+        cfg["calculation"] if "calculation" in cfg else "",
+        xax, yax, xscale, yscale, kde_type, kde_kwargs]
     shash = util.hashobj(tohash)
     if shash in cache_data:
         x, y, kde, idx = cache_data[shash]

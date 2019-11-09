@@ -1,6 +1,7 @@
 2.0.0a24
  - implemented polygon filters
  - condense context menus, add export context menu to all plots
+ - add computation of Young's modulus and crosstalk correction
 2.0.0a23
  - add more update functions to fix frozen macOS app
  - improve plot visualizations

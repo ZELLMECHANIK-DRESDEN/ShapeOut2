@@ -585,6 +585,16 @@
                   <property name="topMargin">
                    <number>0</number>
                   </property>
+                  <item row="0" column="1">
+                   <widget class="QCheckBox" name="checkBox_trace_zoom">
+                    <property name="text">
+                     <string>Zoom (experimental)</string>
+                    </property>
+                    <property name="checked">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="0" column="0">
                    <widget class="QCheckBox" name="checkBox_trace_raw">
                     <property name="text">
@@ -595,13 +605,10 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="0" column="1">
-                   <widget class="QCheckBox" name="checkBox_trace_zoom">
+                  <item row="1" column="0">
+                   <widget class="QCheckBox" name="checkBox_trace_legend">
                     <property name="text">
-                     <string>Zoom (experimental)</string>
-                    </property>
-                    <property name="checked">
-                     <bool>false</bool>
+                     <string>Legend</string>
                     </property>
                    </widget>
                   </item>

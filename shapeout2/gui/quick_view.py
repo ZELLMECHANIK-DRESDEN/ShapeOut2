@@ -8,6 +8,7 @@ import pyqtgraph as pg
 from scipy.ndimage import binary_erosion
 
 from .. import plot_cache
+from ..pipeline import Dataslot
 
 from . import idiom
 from . import pipeline_plot
@@ -72,6 +73,8 @@ class QuickView(QtWidgets.QWidget):
             self.on_event_scatter_update)
         self.checkBox_trace_raw.stateChanged.connect(
             self.on_event_scatter_update)
+        self.checkBox_trace_legend.stateChanged.connect(
+            self.on_event_scatter_update)
         self.checkBox_trace_zoom.stateChanged.connect(
             self.on_event_scatter_update)
 
@@ -108,6 +111,8 @@ class QuickView(QtWidgets.QWidget):
 
         self.graphicsView_trace.plotItem.setLabels(
             left="Fluorescence [a.u.]", bottom="Event time [µs]")
+        self.legend_trace = self.graphicsView_trace.addLegend(
+            offset=(-.01, +.01))
 
         #: default parameters for the event image
         self.imkw = dict(autoLevels=False,
@@ -131,6 +136,7 @@ class QuickView(QtWidgets.QWidget):
             "image auto contrast": self.checkBox_image_contrast.isChecked(),
             "image contour": self.checkBox_image_contour.isChecked(),
             "image zoom": self.checkBox_image_zoom.isChecked(),
+            "trace legend": self.checkBox_trace_legend.isChecked(),
             "trace raw": self.checkBox_trace_raw.isChecked(),
             "trace zoom": self.checkBox_trace_zoom.isChecked(),
         }
@@ -170,6 +176,7 @@ class QuickView(QtWidgets.QWidget):
             self.checkBox_image_zoom.setChecked(event["image zoom"])
             self.spinBox_event.setValue(event["index"])
             self.checkBox_trace_raw.setChecked(event["trace raw"])
+            self.checkBox_trace_legend.setChecked(event["trace legend"])
 
     def on_event_scatter_clicked(self, plot, point):
         """User clicked on scatter plot
@@ -417,6 +424,12 @@ class QuickView(QtWidgets.QWidget):
             self.groupBox_image.hide()
 
         if "trace" in ds:
+            # remove legend items
+            for item in reversed(self.legend_trace.items):
+                self.legend_trace.removeItem(item[1].text)
+            self.legend_trace.setVisible(state["event"]["trace legend"])
+            # get slot from identifier
+            slot = Dataslot.get_slot(ds.identifier)
             # time axis
             flsamples = ds.config["fluorescence"]["samples per event"]
             flrate = ds.config["fluorescence"]["sample rate"]
@@ -448,6 +461,11 @@ class QuickView(QtWidgets.QWidget):
                             range_t[0] = flpos - 1.5 * flwidth
                             range_t[1] = flpos + 1.5 * flwidth
                             range_t[2] = flmax
+                    # set legend name
+                    ln = "{} {}".format(
+                        slot.fl_name_dict["FL-{}".format(key[2])], key[4:])
+                    self.legend_trace.addItem(self.trace_plots[key], ln)
+                    self.legend_trace.update()
                 else:
                     self.trace_plots[key].hide()
             self.graphicsView_trace.setXRange(*range_t[:2], padding=0)
@@ -685,7 +703,9 @@ class RTDCScatterWidget(pg.PlotWidget):
             xscale=self.xscale,
             yscale=self.yscale)
         self.events_plotted = idx
+        #: unfiltered x data
         self.data_x = self.rtdc_ds[self.xax]
+        #: unfiltered y data
         self.data_y = self.rtdc_ds[self.yax]
         # define colormap
         # TODO: improve speed?
@@ -714,10 +734,19 @@ class RTDCScatterWidget(pg.PlotWidget):
         self.plotItem.setRange(xRange=(x.min(), x.max()),
                                yRange=(y.min(), y.max()),
                                padding=.05)
-
-        self.plotItem.setLabels(
-            left=dclab.dfn.feature_name2label[self.yax],
-            bottom=dclab.dfn.feature_name2label[self.xax])
+        # set axes labels (replace with user-defined flourescence names)
+        slot = Dataslot.get_slot(rtdc_ds.identifier)
+        left = dclab.dfn.feature_name2label[self.yax]
+        bottom = dclab.dfn.feature_name2label[self.xax]
+        for key in slot.fl_name_dict:
+            if key in left:
+                left = left.replace(key, slot.fl_name_dict[key])
+                break
+        for key in slot.fl_name_dict:
+            if key in bottom:
+                bottom = bottom.replace(key, slot.fl_name_dict[key])
+                break
+        self.plotItem.setLabels(left=left, bottom=bottom)
 
         # Force updating the plot item size, otherwise axes labels
         # may have an offset.

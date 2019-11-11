@@ -36,7 +36,7 @@ class PlotPanel(QtWidgets.QWidget):
         self.comboBox_axis_y.currentIndexChanged.connect(self.on_axis_select)
 
     def __getstate__(self):
-        feats_srt = self.pipeline.get_features(label_sort=True)
+        feats_srt = self.pipeline.get_features(scalar=True, label_sort=True)
 
         rx = self.widget_range_x.__getstate__()
         ry = self.widget_range_y.__getstate__()
@@ -84,7 +84,7 @@ class PlotPanel(QtWidgets.QWidget):
         return state
 
     def __setstate__(self, state):
-        feats_srt = self.pipeline.get_features(label_sort=True)
+        feats_srt = self.pipeline.get_features(scalar=True, label_sort=True)
         toblock = [
             self.comboBox_axis_x,
             self.comboBox_axis_y,

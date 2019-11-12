@@ -13,56 +13,82 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="2">
-    <widget class="QGroupBox" name="groupBox_3">
-     <property name="title">
-      <string>Imaging</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3"/>
-    </widget>
+  <layout class="QVBoxLayout" name="verticalLayout_7">
+   <item>
+    <widget class="QComboBox" name="comboBox_slots"/>
    </item>
-   <item row="0" column="0">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Experiment</string>
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="widgetResizable">
+      <bool>true</bool>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout"/>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="title">
-      <string>Setup</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2"/>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="groupBox_4">
-     <property name="title">
-      <string>Fluorescence</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4"/>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QGroupBox" name="groupBox_5">
-     <property name="title">
-      <string>Online Filter</string>
-     </property>
-     <property name="checkable">
-      <bool>false</bool>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_5"/>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="QGroupBox" name="groupBox_6">
-     <property name="title">
-      <string>Online Contour</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_6"/>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>680</width>
+        <height>481</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="groupBox_setup">
+           <property name="title">
+            <string>Setup</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_2"/>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="groupBox_experiment">
+           <property name="title">
+            <string>Experiment</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout"/>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QGroupBox" name="groupBox_imaging">
+           <property name="title">
+            <string>Imaging</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3"/>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QGroupBox" name="groupBox_online_contour">
+           <property name="title">
+            <string>Online Contour</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_6"/>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QGroupBox" name="groupBox_fluorescence">
+           <property name="title">
+            <string>Fluorescence</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4"/>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QGroupBox" name="groupBox_online_filter">
+           <property name="title">
+            <string>Online Filter</string>
+           </property>
+           <property name="checkable">
+            <bool>false</bool>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_5"/>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>

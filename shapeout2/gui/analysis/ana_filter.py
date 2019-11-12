@@ -38,26 +38,6 @@ class FilterPanel(QtWidgets.QWidget):
         self._pipeline = None
         self.setUpdatesEnabled(True)
 
-    def _init_box_filters(self, show_features=SHOW_FEATURES):
-        self._box_range_controls = {}
-        feats = dclab.dfn.scalar_feature_names
-        labs = [dclab.dfn.feature_name2label[f] for f in feats]
-        self.verticalLayout_box.setAlignment(QtCore.Qt.AlignTop)
-
-        for lab, feat in sorted(zip(labs, feats)):
-            integer = True if feat in idiom.INTEGER_FEATURES else False
-            rc = rangecontrol.RangeControl(
-                self,
-                checkbox=False,  # checkbox is used in on_moreless
-                integer=integer,
-                label=lab,
-                data=feat)
-            self.verticalLayout_box.addWidget(rc)
-            if feat not in show_features:
-                rc.checkBox.setChecked(False)
-                rc.setVisible(False)
-            self._box_range_controls[feat] = rc
-
     def __getstate__(self):
         state = {
             "enable filters": self.checkBox_enable.isChecked(),
@@ -103,6 +83,26 @@ class FilterPanel(QtWidgets.QWidget):
                 self._polygon_checkboxes[key].setChecked(True)
             else:
                 self._polygon_checkboxes[key].setChecked(False)
+
+    def _init_box_filters(self, show_features=SHOW_FEATURES):
+        self._box_range_controls = {}
+        feats = dclab.dfn.scalar_feature_names
+        labs = [dclab.dfn.feature_name2label[f] for f in feats]
+        self.verticalLayout_box.setAlignment(QtCore.Qt.AlignTop)
+
+        for lab, feat in sorted(zip(labs, feats)):
+            integer = True if feat in idiom.INTEGER_FEATURES else False
+            rc = rangecontrol.RangeControl(
+                self,
+                checkbox=False,  # checkbox is used in on_moreless
+                integer=integer,
+                label=lab,
+                data=feat)
+            self.verticalLayout_box.addWidget(rc)
+            if feat not in show_features:
+                rc.checkBox.setChecked(False)
+                rc.setVisible(False)
+            self._box_range_controls[feat] = rc
 
     @property
     def active_box_features(self):

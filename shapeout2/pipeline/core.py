@@ -306,6 +306,18 @@ class Pipeline(object):
                 states.append(slot.__getstate__())
         return datasets, states
 
+    def get_slot(self, identifier):
+        """Return the Dataslot matching the RTDCBase identifier"""
+        self.construct_matrix()
+        for slot, row in zip(self.slots, self.matrix):
+            ids = [ds.identifier for ds in row]
+            if identifier in ids:
+                break
+        else:
+            raise ValueError("Unknown dataset identifier: "
+                             + "`{}`".format(identifier))
+        return slot
+
     def reset(self):
         """Reset the pipeline"""
         #: Filters are instances of :class:`shapeout2.pipeline.Filter`

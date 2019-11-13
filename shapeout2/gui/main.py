@@ -294,8 +294,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         ds = self.pipeline.get_dataset(slot_index=slot_index,
                                        filt_index=filt_index,
                                        apply_filter=True)
+        slot = self.pipeline.slots[slot_index]
         # update quick view subwindow
-        self.widget_quick_view.show_rtdc(ds)
+        self.widget_quick_view.show_rtdc(ds, slot)
         # show quick view subwindow
         if not self.subwindows["quick_view"].isVisible():
             self.toolButton_quick_view.toggle()

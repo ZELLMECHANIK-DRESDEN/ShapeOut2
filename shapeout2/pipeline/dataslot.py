@@ -70,23 +70,15 @@ class Dataslot(object):
     @staticmethod
     def get_slot(identifier):
         """Get the slot with the given identifier.
-
-        Notes
-        -----
-        Creates the slot if it does not exist.
         """
-        if identifier in Dataslot._instances:
-            d = Dataslot._instances[identifier]
-        else:
-            d = Dataslot(identifier=identifier)
-        return d
+        return Dataslot._instances[identifier]
 
     @staticmethod
     def get_instances():
         return Dataslot._instances
 
     def update_dataset(self, dataset):
-        """Update the configuration of a dataset
+        """Update the configuration of an instance of RTDCBase
 
         This is used to update the configuration for computing
         the Young's modulus and fluorescence crosstalk.

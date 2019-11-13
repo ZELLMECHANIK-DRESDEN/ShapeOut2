@@ -126,6 +126,8 @@ def format_config_key_value(section, key, value):
         elif key == "module composition":
             descr = "Modules used"
             string = ", ".join(string.split(","))
+        elif key == "software version":
+            descr = "Software"
 
     # Units
     if descr.endswith("]"):

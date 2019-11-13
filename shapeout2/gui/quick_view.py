@@ -8,7 +8,6 @@ import pyqtgraph as pg
 from scipy.ndimage import binary_erosion
 
 from .. import plot_cache
-from ..pipeline import Dataslot
 
 from . import idiom
 from . import pipeline_plot
@@ -354,6 +353,7 @@ class QuickView(QtWidgets.QWidget):
         downsample = plot["downsampling"] * plot["downsampling value"]
 
         self.widget_scatter.plot_data(rtdc_ds=self.rtdc_ds,
+                                      slot=self.slot,
                                       downsample=downsample,
                                       xax=plot["axis x"],
                                       yax=plot["axis y"],
@@ -430,7 +430,6 @@ class QuickView(QtWidgets.QWidget):
                 self.legend_trace.removeItem(item[1].text)
             self.legend_trace.setVisible(state["event"]["trace legend"])
             # get slot from identifier
-            slot = Dataslot.get_slot(ds.identifier)
             # time axis
             flsamples = ds.config["fluorescence"]["samples per event"]
             flrate = ds.config["fluorescence"]["sample rate"]
@@ -463,8 +462,8 @@ class QuickView(QtWidgets.QWidget):
                             range_t[1] = flpos + 1.5 * flwidth
                             range_t[2] = flmax
                     # set legend name
-                    ln = "{} {}".format(
-                        slot.fl_name_dict["FL-{}".format(key[2])], key[4:])
+                    ln = "{} {}".format(self.slot.fl_name_dict[
+                        "FL-{}".format(key[2])], key[4:])
                     self.legend_trace.addItem(self.trace_plots[key], ln)
                     self.legend_trace.update()
                 else:
@@ -515,7 +514,7 @@ class QuickView(QtWidgets.QWidget):
         self.tableWidget_feats.setUpdatesEnabled(True)
 
     @QtCore.pyqtSlot(dclab.rtdc_dataset.RTDCBase)
-    def show_rtdc(self, rtdc_ds):
+    def show_rtdc(self, rtdc_ds, slot):
         """Display an RT-DC measurement given by `path` and `filters`"""
         # make things visible
         self.label_howto.hide()
@@ -527,6 +526,7 @@ class QuickView(QtWidgets.QWidget):
         # remove event state (ill-defined for different datasets)
         state.pop("event")
         self.rtdc_ds = rtdc_ds
+        self.slot = slot
         # default features (plot axes)
         if plot["axis x"] is None:
             plot["axis x"] = "area_um"
@@ -669,9 +669,10 @@ class RTDCScatterWidget(SimplePlotWidget):
         state["points"].append([pos.x(), pos.y()])
         self.poly_line_roi.setState(state)
 
-    def plot_data(self, rtdc_ds, xax="area_um", yax="deform", downsample=False,
+    def plot_data(self, rtdc_ds, slot, xax="area_um", yax="deform", downsample=False,
                   xscale="linear", yscale="linear", isoelastics=False):
         self.rtdc_ds = rtdc_ds
+        self.slot = slot
         self.xax = xax
         self.yax = yax
         x, y, kde, idx = plot_cache.get_scatter_data(
@@ -714,16 +715,15 @@ class RTDCScatterWidget(SimplePlotWidget):
                                yRange=(y.min(), y.max()),
                                padding=.05)
         # set axes labels (replace with user-defined flourescence names)
-        slot = Dataslot.get_slot(rtdc_ds.identifier)
         left = dclab.dfn.feature_name2label[self.yax]
         bottom = dclab.dfn.feature_name2label[self.xax]
-        for key in slot.fl_name_dict:
+        for key in self.slot.fl_name_dict:
             if key in left:
-                left = left.replace(key, slot.fl_name_dict[key])
+                left = left.replace(key, self.slot.fl_name_dict[key])
                 break
-        for key in slot.fl_name_dict:
+        for key in self.slot.fl_name_dict:
             if key in bottom:
-                bottom = bottom.replace(key, slot.fl_name_dict[key])
+                bottom = bottom.replace(key, self.slot.fl_name_dict[key])
                 break
         self.plotItem.setLabels(left=left, bottom=bottom)
 

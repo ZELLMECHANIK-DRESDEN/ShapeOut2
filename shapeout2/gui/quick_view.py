@@ -12,7 +12,7 @@ from ..pipeline import Dataslot
 
 from . import idiom
 from . import pipeline_plot
-from .simple_plot_widget import SimplePlotWidget
+from .simple_plot_widget import SimplePlotWidget, SimpleViewBox
 
 
 class QuickView(QtWidgets.QWidget):
@@ -606,14 +606,15 @@ class QuickView(QtWidgets.QWidget):
         self.groupBox_poly.setEnabled(False)
 
 
-class QuickViewViewBox(pg.ViewBox):
+class QuickViewViewBox(SimpleViewBox):
     set_scatter_point = QtCore.pyqtSignal(QtCore.QPointF)
     add_poly_vertex = QtCore.pyqtSignal(QtCore.QPointF)
 
-    #: allowed right-click menu
-    right_click_actions = ["Export...",
-                           "View All",
-                           "Mouse Mode"]
+    #: allowed right-click menu options with new name
+    right_click_actions = {"Export...": "Advanced Export",
+                           "View All": "View All Content",
+                           "Mouse Mode": "Change Mouse mode",
+                           }
 
     def __init__(self, *args, **kwds):
         super(QuickViewViewBox, self).__init__(*args, **kwds)
@@ -630,20 +631,6 @@ class QuickViewViewBox(pg.ViewBox):
         else:
             # right mouse button shows menu
             super(QuickViewViewBox, self).mouseClickEvent(ev)
-
-    def raiseContextMenu(self, ev):
-        # Let the scene add on to the end of our context menu
-        # (this is optional)
-        menu = self.scene().addParentContextMenus(self, self.menu, ev)
-
-        # Only keep list of action defined in `self.right_click_actions`
-        for action in self.menu.actions():
-            if action.text() not in self.right_click_actions:
-                self.menu.removeAction(action)
-
-        pos = ev.screenPos()
-        menu.popup(QtCore.QPoint(pos.x(), pos.y()))
-        return True
 
 
 class RTDCScatterWidget(SimplePlotWidget):

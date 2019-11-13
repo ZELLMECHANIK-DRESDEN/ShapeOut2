@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtWidgets
 import pyqtgraph as pg
 from pyqtgraph import exporters
 
+
 class SimplePlotItem(pg.PlotItem):
     """Custom class for data visualization in Shape-Out
 
@@ -9,6 +10,7 @@ class SimplePlotItem(pg.PlotItem):
     - right click menu only with "Export..."
     - top and right axes
     """
+
     def __init__(self, parent=None, *args, **kwargs):
         if "viewBox" not in kwargs:
             kwargs["viewBox"] = SimpleViewBox()

@@ -11,6 +11,8 @@ class SimplePlotItem(pg.PlotItem):
     """
 
     def __init__(self, *args, **kwargs):
+        if "viewBox" not in kwargs:
+            kwargs["viewBox"] = SimpleViewBox()
         super(SimplePlotItem, self).__init__(*args, **kwargs)
         # show top and right axes, but not ticklabels
         for kax in ["top", "right"]:

@@ -30,7 +30,7 @@ class PlotPanel(QtWidgets.QWidget):
         self.comboBox_division.clear()
         self.comboBox_division.addItem("Merge all plots", "merge")
         self.comboBox_division.addItem("One plot per dataset", "each")
-        self.comboBox_division.addItem("Scatter plots plus joint contour plot",
+        self.comboBox_division.addItem("Scatter plots and joint contour plot",
                                        "multiscatter+contour")
         self.comboBox_division.setCurrentIndex(2)
 

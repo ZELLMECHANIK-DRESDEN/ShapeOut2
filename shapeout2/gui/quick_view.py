@@ -12,6 +12,7 @@ from ..pipeline import Dataslot
 
 from . import idiom
 from . import pipeline_plot
+from .simple_plot_widget import SimplePlotWidget
 
 
 class QuickView(QtWidgets.QWidget):
@@ -645,7 +646,7 @@ class QuickViewViewBox(pg.ViewBox):
         return True
 
 
-class RTDCScatterWidget(pg.PlotWidget):
+class RTDCScatterWidget(SimplePlotWidget):
     def __init__(self, *args, **kwargs):
         self._view_box = QuickViewViewBox()
         super(RTDCScatterWidget, self).__init__(viewBox=self._view_box,
@@ -666,15 +667,6 @@ class RTDCScatterWidget(pg.PlotWidget):
         self.data_x = None
         #: Unfiltered and not-downsampled y component of current scatter plot
         self.data_y = None
-
-        # General plot options
-        # show top and right axes, but not ticklabels
-        for kax in ["top", "right"]:
-            self.plotItem.showAxis(kax)
-            ax = self.plotItem.axes[kax]["item"]
-            ax.setTicks([])
-        # show grid
-        self.plotItem.showGrid(x=True, y=True, alpha=.1)
 
         # polygon editing ROI
         self.poly_line_roi = None

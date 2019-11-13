@@ -26,6 +26,14 @@ class PlotPanel(QtWidgets.QWidget):
         self._init_controls()
         self.update_content()
 
+        # options for division
+        self.comboBox_division.clear()
+        self.comboBox_division.addItem("Merge all plots", "merge")
+        self.comboBox_division.addItem("One plot per dataset", "each")
+        self.comboBox_division.addItem("Scatter plots plus joint contour plot",
+                                       "multiscatter+contour")
+        self.comboBox_division.setCurrentIndex(2)
+
         # signals
         self.pushButton_reset.clicked.connect(self.update_content)
         self.pushButton_apply.clicked.connect(self.write_plot)
@@ -42,20 +50,24 @@ class PlotPanel(QtWidgets.QWidget):
         ry = self.widget_range_y.__getstate__()
 
         state = {
+            "layout": {
+                "division": self.comboBox_division.currentData(),
+                "legend":  self.checkBox_legend.isChecked(),
+                "name": self.lineEdit.text(),
+                "column count": self.spinBox_column_count.value(),
+                "show event count": self.checkBox_event_count.isChecked(),
+                "size x": self.spinBox_size_x.value(),
+                "size y": self.spinBox_size_y.value(),
+            },
             "general": {
                 "axis x": feats_srt[self.comboBox_axis_x.currentIndex()],
                 "axis y": feats_srt[self.comboBox_axis_y.currentIndex()],
-                "event count": self.checkBox_event_count.isChecked(),
                 "isoelastics": self.checkBox_isoelastics.isChecked(),
                 "kde": self.comboBox_kde.currentData(),
-                "legend":  self.checkBox_legend.isChecked(),
-                "name": self.lineEdit.text(),
                 "range x": [rx["start"], rx["end"]],
                 "range y": [ry["start"], ry["end"]],
                 "scale x": self.comboBox_scale_x.currentData(),
                 "scale y": self.comboBox_scale_y.currentData(),
-                "size x": self.spinBox_size_x.value(),
-                "size y": self.spinBox_size_y.value(),
             },
             "scatter": {
                 "downsample": self.checkBox_downsample.isChecked(),
@@ -94,21 +106,25 @@ class PlotPanel(QtWidgets.QWidget):
             b.blockSignals(True)
 
         # General
+        lay = state["layout"]
+        self.spinBox_column_count.setValue(lay["column count"])
+        idx = self.comboBox_division.findData(lay["division"])
+        self.comboBox_division.setCurrentIndex(idx)
+        self.checkBox_legend.setChecked(lay["legend"])
+        self.lineEdit.setText(lay["name"])
+        self.checkBox_event_count.setChecked(lay["show event count"])
+        self.spinBox_size_x.setValue(lay["size x"])
+        self.spinBox_size_y.setValue(lay["size y"])
         gen = state["general"]
         self.comboBox_axis_x.setCurrentIndex(feats_srt.index(gen["axis x"]))
         self.comboBox_axis_y.setCurrentIndex(feats_srt.index(gen["axis y"]))
-        self.checkBox_event_count.setChecked(gen["event count"])
         self.checkBox_isoelastics.setChecked(gen["isoelastics"])
         kde_index = self.comboBox_kde.findData(gen["kde"])
         self.comboBox_kde.setCurrentIndex(kde_index)
-        self.checkBox_legend.setChecked(gen["legend"])
-        self.lineEdit.setText(gen["name"])
         scx_index = self.comboBox_scale_x.findData(gen["scale x"])
         self.comboBox_scale_x.setCurrentIndex(scx_index)
         scy_index = self.comboBox_scale_y.findData(gen["scale y"])
         self.comboBox_scale_y.setCurrentIndex(scy_index)
-        self.spinBox_size_x.setValue(gen["size x"])
-        self.spinBox_size_y.setValue(gen["size y"])
         self._set_range_state(axis_x=gen["axis x"],
                               axis_y=gen["axis y"],
                               range_x=gen["range x"],

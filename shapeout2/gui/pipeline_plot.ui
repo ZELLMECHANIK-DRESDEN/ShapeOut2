@@ -36,7 +36,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="PipelinePlotWidget" name="plot" native="true">
+    <widget class="GraphicsLayoutWidget" name="plot_layout" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -52,9 +52,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PipelinePlotWidget</class>
+   <class>GraphicsLayoutWidget</class>
    <extends>QWidget</extends>
-   <header>shapeout2.gui.pipeline_plot</header>
+   <header>pyqtgraph</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

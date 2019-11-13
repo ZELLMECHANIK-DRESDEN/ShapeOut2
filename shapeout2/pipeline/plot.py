@@ -5,20 +5,24 @@ import dclab
 
 
 DEFAULT_STATE = {
+    "layout": {
+        "column count": 3,
+        "division": "each",
+        "legend": True,  # display plot legend
+        "name": "no default",  # overridden by __init__
+        "show event count": True,  # display event count
+        "size x": 500,
+        "size y": 400,
+    },
     "general": {
         "axis x": "area_um",
         "axis y": "deform",
-        "event count": True,  # display event count
         "isoelastics": True,  # display isoelasticity lines
         "kde": "histogram",  # see dclab.kde_methods.methods
-        "legend": True,  # display plot legend
-        "name": "no default",  # overridden by __init__
         "range x": [0, 500],
         "range y": [0, 0.2],
         "scale x": "linear",
         "scale y": "linear",
-        "size x": 500,
-        "size y": 400,
     },
     "scatter": {
         "downsample": True,
@@ -43,32 +47,35 @@ _kde_methods = sorted(dclab.kde_methods.methods.keys())
 _kde_methods.remove("none")  # does not make sense here
 
 STATE_OPTIONS = {
+    "layout": {
+        "column count": int,
+        "division": ["each", "merge", "multiscatter+contour"],
+        "legend": bool,
+        "name": str,
+        "show event count": bool,
+        "size x": float,
+        "size y": float, },
     "general": {
         "axis x": dclab.dfn.scalar_feature_names,
         "axis y": dclab.dfn.scalar_feature_names,
-        "event count": [False, True],
-        "isoelastics": [False, True],
+        "isoelastics": bool,
         "kde": _kde_methods,
-        "legend": [False, True],
-        "name": str,
         "range x": (float,),
         "range y": (float,),
         "scale x": ["linear", "log"],
         "scale y": ["linear", "log"],
-        "size x": float,
-        "size y": float,
     },
     "scatter": {
-        "downsampling": [False, True],
+        "downsampling": bool,
         "downsampling value": int,
-        "enabled":  [False, True],
+        "enabled":  bool,
         "marker hue": ["dataset", "kde", "feature", "none"],
         "marker size": float,
         "hue feature": dclab.dfn.scalar_feature_names,
         "colormap": ["jet"],
     },
     "contour": {
-        "enabled":  [False, True],
+        "enabled":  bool,
         "percentiles": (float,),
         "line widths": (float,),
         "line styles": (["solid", "dashed", "dotted"],),
@@ -107,11 +114,11 @@ class Plot(object):
 
     @property
     def name(self):
-        return self._state["general"]["name"]
+        return self._state["layout"]["name"]
 
     @name.setter
     def name(self, value):
-        self._state["general"]["name"] = value
+        self._state["layout"]["name"] = value
 
     def __getstate__(self):
         return self._state

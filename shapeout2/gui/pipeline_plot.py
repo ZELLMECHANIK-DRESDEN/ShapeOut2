@@ -1,3 +1,4 @@
+import copy
 import pkg_resources
 
 import dclab
@@ -8,8 +9,7 @@ import pyqtgraph as pg
 
 from ..pipeline import Plot
 from .. import plot_cache
-
-from .simple_plot_widget import SimplePlotWidget
+from .simple_plot_widget import SimplePlotItem
 
 
 class PipelinePlot(QtWidgets.QWidget):
@@ -27,22 +27,87 @@ class PipelinePlot(QtWidgets.QWidget):
         plot = Plot.get_instances()[self.identifier]
         plot_state = plot.__getstate__()
         # Plot size and title
-        gen = plot_state["general"]
+        lay = plot_state["layout"]
         parent = self.parent()
-        self.setWindowTitle(gen["name"])
-        self.setMinimumSize(gen["size x"], gen["size y"])
-        self.setMaximumSize(gen["size x"], gen["size y"])
+        self.setWindowTitle(lay["name"])
+        self.setMinimumSize(lay["size x"], lay["size y"])
+        self.setMaximumSize(lay["size x"], lay["size y"])
         size_hint = self.parent().sizeHint()
         parent.setMinimumSize(size_hint)
         parent.setMaximumSize(size_hint)
-        self.plot.redraw(dslist, slot_states, plot_state)
+        # clear widget
+        self.plot_layout.clear()
+        # https://github.com/pyqtgraph/pyqtgraph/pull/1076
+        self.plot_layout.ci.currentRow = 0
+        self.plot_layout.ci.currentCol = 0
+
+        if not slot_states:
+            return
+
+        labelx, labely = get_axes_labels(plot_state, slot_states)
+
+        self.plot_layout.addLabel(lay["name"], colspan=2)
+        self.plot_layout.nextRow()
+
+        self.plot_layout.addLabel(labely, angle=-90)
+        linner = self.plot_layout.addLayout()
+        self.plot_layout.nextRow()
+        self.plot_layout.addLabel(labelx, col=1)
+
+        if lay["division"] == "merge":
+            pp = PipelinePlotItem()
+            linner.addItem(item=pp,
+                           row=None,
+                           col=None,
+                           rowspan=1,
+                           colspan=1)
+            pp.redraw(dslist, slot_states, plot_state)
+        elif lay["division"] == "each":
+            colcount = 0
+            for ds, sl in zip(dslist, slot_states):
+                pp = PipelinePlotItem()
+                linner.addItem(item=pp,
+                               row=None,
+                               col=None,
+                               rowspan=1,
+                               colspan=1)
+                pp.redraw([ds], [sl], plot_state)
+                colcount += 1
+                if colcount % lay["column count"] == 0:
+                    linner.nextRow()
+        elif lay["division"] == "multiscatter+contour":
+            colcount = 0
+            # scatter plots
+            plot_state_scatter = copy.deepcopy(plot_state)
+            plot_state_scatter["contour"]["enabled"] = False
+            for ds, sl in zip(dslist, slot_states):
+                pp = PipelinePlotItem()
+                linner.addItem(item=pp,
+                               row=None,
+                               col=None,
+                               rowspan=1,
+                               colspan=1)
+                pp.redraw([ds], [sl], plot_state_scatter)
+                colcount += 1
+                if colcount % lay["column count"] == 0:
+                    linner.nextRow()
+            # contour plot
+            plot_state_contour = copy.deepcopy(plot_state)
+            plot_state_contour["scatter"]["enabled"] = False
+            pp = PipelinePlotItem()
+            linner.addItem(item=pp,
+                           row=None,
+                           col=None,
+                           rowspan=1,
+                           colspan=1)
+            pp.redraw(dslist, slot_states, plot_state_contour)
 
 
-class PipelinePlotWidget(SimplePlotWidget):
+class PipelinePlotItem(SimplePlotItem):
     def __init__(self, *args, **kwargs):
-        super(PipelinePlotWidget, self).__init__(*args, **kwargs)
+        super(PipelinePlotItem, self).__init__(*args, **kwargs)
         # Disable user interaction
-        self.plotItem.setMouseEnabled(x=False, y=False)
+        self.setMouseEnabled(x=False, y=False)
         # Keep track of all elements (for redraw)
         self._plot_elements = []
 
@@ -55,30 +120,29 @@ class PipelinePlotWidget(SimplePlotWidget):
             return
         # General
         gen = plot_state["general"]
-        set_axes_labels(self.plotItem, plot_state, slot_states)
         # TODO:
         # - test whether all datasets have same channel width / pixel size
         # Isoelastics
         if gen["isoelastics"]:
             cfg = dslist[0].config
-            els = add_isoelastics(plot_widget=self,
+            els = add_isoelastics(plot_item=self,
                                   axis_x=gen["axis x"],
                                   axis_y=gen["axis y"],
                                   channel_width=cfg["setup"]["channel width"],
                                   pixel_size=cfg["imaging"]["pixel size"])
             self._plot_elements += els
         # Set Range
-        self.plotItem.setRange(xRange=gen["range x"],
-                               yRange=gen["range y"],
-                               padding=0,
-                               )
+        self.setRange(xRange=gen["range x"],
+                      yRange=gen["range y"],
+                      padding=0,
+                      )
         # Set Log scale
-        self.plotItem.setLogMode(x=gen["scale x"] == "log",
-                                 y=gen["scale y"] == "log")
+        self.setLogMode(x=gen["scale x"] == "log",
+                        y=gen["scale y"] == "log")
         # Scatter data
         if plot_state["scatter"]["enabled"]:
             for rtdc_ds, ss in zip(dslist, slot_states):
-                sct = add_scatter(plot_widget=self,
+                sct = add_scatter(plot_item=self,
                                   rtdc_ds=rtdc_ds,
                                   plot_state=plot_state,
                                   slot_state=ss
@@ -87,7 +151,7 @@ class PipelinePlotWidget(SimplePlotWidget):
         # Contour data
         if plot_state["contour"]["enabled"]:
             for rtdc_ds, ss in zip(dslist, slot_states):
-                con = add_contour(plot_widget=self,
+                con = add_contour(plot_item=self,
                                   rtdc_ds=rtdc_ds,
                                   plot_state=plot_state,
                                   slot_state=ss
@@ -95,7 +159,7 @@ class PipelinePlotWidget(SimplePlotWidget):
                 self._plot_elements += con
 
 
-def add_contour(plot_widget, plot_state, rtdc_ds, slot_state):
+def add_contour(plot_item, plot_state, rtdc_ds, slot_state):
     gen = plot_state["general"]
     con = plot_state["contour"]
     x, y, density = plot_cache.get_contour_data(
@@ -134,11 +198,11 @@ def add_contour(plot_widget, plot_state, rtdc_ds, slot_state):
                                                  ),
                                     )
             elements.append(cline)
-            plot_widget.addItem(cline)
+            plot_item.addItem(cline)
     return elements
 
 
-def add_isoelastics(plot_widget, axis_x, axis_y, channel_width, pixel_size):
+def add_isoelastics(plot_item, axis_x, axis_y, channel_width, pixel_size):
     elements = []
     isodef = dclab.isoelastics.get_default()
     # We do not use isodef.get_with_rtdcbase, because then the
@@ -161,21 +225,21 @@ def add_isoelastics(plot_widget, axis_x, axis_y, channel_width, pixel_size):
     else:
         for ss in iso:
             iline = pg.PlotDataItem(x=ss[:, 0], y=ss[:, 1])
-            plot_widget.addItem(iline)
+            plot_item.addItem(iline)
             elements.append(iline)
             # send them to the back
             iline.setZValue(-1)
     return elements
 
 
-def add_scatter(plot_widget, plot_state, rtdc_ds, slot_state):
+def add_scatter(plot_item, plot_state, rtdc_ds, slot_state):
     gen = plot_state["general"]
     sca = plot_state["scatter"]
     scatter = pg.ScatterPlotItem(size=sca["marker size"],
                                  pen=pg.mkPen(color=(0, 0, 0, 0)),
                                  brush=pg.mkBrush("k"),
                                  symbol="s")
-    plot_widget.addItem(scatter)
+    plot_item.addItem(scatter)
 
     if sca["marker hue"] == "kde":
         kde_type = gen["kde"]
@@ -225,7 +289,7 @@ def add_scatter(plot_widget, plot_state, rtdc_ds, slot_state):
     return [scatter]
 
 
-def set_axes_labels(plot_item, plot_state, slot_states):
+def get_axes_labels(plot_state, slot_states):
     gen = plot_state["general"]
     labelx = dclab.dfn.feature_name2label[gen["axis x"]]
     labely = dclab.dfn.feature_name2label[gen["axis y"]]
@@ -241,7 +305,7 @@ def set_axes_labels(plot_item, plot_state, slot_states):
             if key in labelx:
                 labelx = labelx.replace(key, fl_names[key])
                 break
-    plot_item.setLabels(left=labely, bottom=labelx)
+    return labelx, labely
 
 
 linestyles = {

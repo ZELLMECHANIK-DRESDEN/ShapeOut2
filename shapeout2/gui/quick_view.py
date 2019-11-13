@@ -761,7 +761,7 @@ class RTDCScatterWidget(pg.PlotWidget):
         if isoelastics:
             cfg = self.rtdc_ds.config
             self.isoelastics = pipeline_plot.add_isoelastics(
-                plot_widget=self,
+                plot_item=self.plotItem,
                 axis_x=self.xax,
                 axis_y=self.yax,
                 channel_width=cfg["setup"]["channel width"],

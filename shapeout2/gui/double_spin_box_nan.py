@@ -4,6 +4,7 @@ from PyQt5 import QtWidgets, QtGui
 
 class DoubleSpinBoxNan(QtWidgets.QDoubleSpinBox):
     """A doubleSpinBox that uses minimum() and maximum() as np.nan"""
+
     def __init__(self, *args, **kwargs):
         super(DoubleSpinBoxNan, self).__init__(*args, **kwargs)
         self._suffix = self.suffix()  # remember initial suffix

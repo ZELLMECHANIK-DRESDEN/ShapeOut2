@@ -2,29 +2,57 @@ from PyQt5 import QtCore
 import pyqtgraph as pg
 
 
-class SimplePlotWidget(pg.PlotWidget):
+class SimplePlotItem(pg.PlotItem):
     """Custom class for data visualization in Shape-Out
 
     Modifications include:
     - right click menu only with "Export..."
-    - white background
     - top and right axes
     """
 
     def __init__(self, *args, **kwargs):
-        super(SimplePlotWidget, self).__init__(viewBox=SimpleViewBox(),
-                                               *args, **kwargs)
-        # white background
-        self.setBackground('w')
+        super(SimplePlotItem, self).__init__(*args, **kwargs)
         # show top and right axes, but not ticklabels
         for kax in ["top", "right"]:
-            self.plotItem.showAxis(kax)
-            ax = self.plotItem.axes[kax]["item"]
+            self.showAxis(kax)
+            ax = self.axes[kax]["item"]
             ax.setTicks([])
+            ax.setLabel(None)
+            ax.setStyle(tickTextOffset=0,
+                        tickTextWidth=0,
+                        tickTextHeight=0,
+                        autoExpandTextSpace=False,
+                        showValues=False,
+                        )
         # show grid
-        self.plotItem.showGrid(x=True, y=True, alpha=.1)
+        self.showGrid(x=True, y=True, alpha=.1)
         # visualization
-        self.plotItem.hideButtons()
+        self.hideButtons()
+
+
+class SimplePlotWidget(pg.PlotWidget):
+    """Custom class for data visualization in Shape-Out
+
+    Modifications include:
+    - white background
+    - those of SimplePlotItem
+    """
+
+    def __init__(self, parent=None, background='w', **kargs):
+        # The following code is copied from pg.PlotWidget and instead
+        # of PlotItem we use SimplePlotItem.
+        pg.GraphicsView.__init__(self, parent, background=background)
+        self.enableMouse(False)
+        self.plotItem = SimplePlotItem(**kargs)
+        self.setCentralItem(self.plotItem)
+        # Explicitly wrap methods from plotItem
+        for m in [
+            'addItem', 'removeItem', 'autoRange', 'clear', 'setXRange',
+            'setYRange', 'setRange', 'setAspectLocked', 'setMouseEnabled',
+            'setXLink', 'setYLink', 'enableAutoRange', 'disableAutoRange',
+                'setLimits', 'register', 'unregister', 'viewRect']:
+            setattr(self, m, getattr(self.plotItem, m))
+        self.plotItem.sigRangeChanged.connect(self.viewRangeChanged)
 
 
 class SimpleViewBox(pg.ViewBox):

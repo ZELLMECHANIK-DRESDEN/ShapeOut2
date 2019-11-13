@@ -1,5 +1,7 @@
 import pkg_resources
 
+import dclab
+import numpy as np
 from PyQt5 import uic, QtCore, QtWidgets
 
 from ... import meta_tool
@@ -45,13 +47,16 @@ class MetaPanel(QtWidgets.QWidget):
             if item is not None:
                 item.deleteLater()
         # populate
-        for key, value in config[section].items():
+        items = sort_config_section_items(section, config[section].items())
+        for key, value in items:
+            k, v, t = format_config_key_value(section, key, value)
             widget = QtWidgets.QWidget()
+            widget.setToolTip(t)
             hbox = QtWidgets.QHBoxLayout()
             hbox.setAlignment(QtCore.Qt.AlignLeft)
             hbox.setContentsMargins(0, 0, 0, 0)
-            hbox.addWidget(QtWidgets.QLabel(key))
-            hbox.addWidget(QtWidgets.QLabel("{}".format(value)))
+            hbox.addWidget(QtWidgets.QLabel(k + ": "))
+            hbox.addWidget(QtWidgets.QLabel(v))
             widget.setLayout(hbox)
             group_box.layout().addWidget(widget)
 
@@ -86,3 +91,70 @@ class MetaPanel(QtWidgets.QWidget):
                                  "setup")
         else:
             self.setEnabled(False)
+
+
+def format_config_key_value(section, key, value):
+    mdsec = dclab.dfn.CFG_METADATA[section]
+    for dckey, dctype, descr in mdsec:
+        if dckey == key:
+            break
+    else:
+        raise ValueError("Unknwon key: [{}]: {}".format(section, key))
+    tip = ""
+    # Value formatting
+    if dctype == float:  # pretty-print floats
+        # determine number of decimals
+        dec = int(np.ceil(np.log10(1/np.abs(value))))
+        if dec < 0:
+            dec = 0
+        string = ("{:." + "{}".format(dec + 2) + "f}").format(value)
+    else:
+        string = str(value)
+
+    # Special cases
+    if section == "experiment":
+        if key in ["date", "time"]:
+            descr, form = descr.split("(")
+            tip = form.strip("()'")
+        elif key == "sample":
+            descr = "Sample name"
+    elif section == "setup":
+        if key == "chip region":
+            descr = descr.split(" (")[0]
+        elif key == "medium" and string == "CellCarrierB":
+            string = "CellCarrier B"
+        elif key == "module composition":
+            descr = "Modules used"
+            string = ", ".join(string.split(","))
+
+    # Units
+    if descr.endswith("]"):
+        descr, units = descr.rsplit(" [", 1)
+        units = units.strip("] ")
+        string += " " + units
+
+    return descr, string, tip
+
+
+def sort_config_section_items(section, items):
+    if section == "experiment":
+        order = ["sample", "run index", "event count", "date", "time"]
+    elif section == "setup":
+        order = ["medium", "channel width"]
+    else:
+        order = None
+
+    if order is None:
+        sitems = items
+    else:
+        sitems = []
+        for key in order:
+            for item in items:
+                if key == item[0]:
+                    sitems.append(item)
+                    break
+        # append those not in `order`
+        for item in items:
+            if item not in sitems:
+                sitems.append(item)
+    return sitems

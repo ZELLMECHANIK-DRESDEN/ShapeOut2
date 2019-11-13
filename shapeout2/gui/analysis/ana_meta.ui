@@ -33,59 +33,55 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <widget class="QGroupBox" name="groupBox_setup">
-           <property name="title">
-            <string>Setup</string>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_2"/>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QGroupBox" name="groupBox_experiment">
-           <property name="title">
-            <string>Experiment</string>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout"/>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QGroupBox" name="groupBox_imaging">
-           <property name="title">
-            <string>Imaging</string>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_3"/>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QGroupBox" name="groupBox_online_contour">
-           <property name="title">
-            <string>Online Contour</string>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_6"/>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QGroupBox" name="groupBox_fluorescence">
-           <property name="title">
-            <string>Fluorescence</string>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_4"/>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QGroupBox" name="groupBox_online_filter">
-           <property name="title">
-            <string>Online Filter</string>
-           </property>
-           <property name="checkable">
-            <bool>false</bool>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_5"/>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QGroupBox" name="groupBox_experiment">
+         <property name="title">
+          <string>Experiment</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout"/>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QGroupBox" name="groupBox_fluorescence">
+         <property name="title">
+          <string>Fluorescence</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4"/>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QGroupBox" name="groupBox_imaging">
+         <property name="title">
+          <string>Imaging</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3"/>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QGroupBox" name="groupBox_online_filter">
+         <property name="title">
+          <string>Online Filter</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_5"/>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="groupBox_setup">
+         <property name="title">
+          <string>Setup</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2"/>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QGroupBox" name="groupBox_online_contour">
+         <property name="title">
+          <string>Online Contour</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_6"/>
+        </widget>
        </item>
       </layout>
      </widget>

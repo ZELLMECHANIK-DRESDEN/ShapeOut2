@@ -7,10 +7,9 @@ import dclab
 DEFAULT_STATE = {
     "layout": {
         "column count": 3,
-        "division": "each",
-        "legend": True,  # display plot legend
+        "division": "multiscatter+contour",
+        "label plots": True,
         "name": "no default",  # overridden by __init__
-        "show event count": True,  # display event count
         "size x": 500,
         "size y": 400,
     },
@@ -25,19 +24,21 @@ DEFAULT_STATE = {
         "scale y": "linear",
     },
     "scatter": {
+        "colormap": "jet",  # only applies when hue is "kde" or "feature"
         "downsample": True,
         "downsampling value": 5000,
         "enabled": True,
+        "hue feature": "bright_avg",  # which feature to use, if set
         "marker hue": "kde",  # hue defined by: kde, dataset, feature, none
         "marker size": 3.0,  # marker size [pt]
-        "hue feature": "bright_avg",  # which feature to use, if set
-        "colormap": "jet",  # only applies when hue is "kde" or "feature"
+        "show event count": True,  # display event count
     },
     "contour": {
         "enabled": True,
-        "percentiles": [95.0, 50.0],
+        "legend": False,  # display plot legend
         "line widths": [3.0, 1.5],  # contour line widths [pt]
         "line styles": ["solid", "dashed"],
+        "percentiles": [95.0, 50.0],
         "spacing x": 2,  # spacing for "axis x" and linear "scale x"
         "spacing y": 0.005,  # spacing for "axis y" and linear "scale y"
     }
@@ -50,11 +51,11 @@ STATE_OPTIONS = {
     "layout": {
         "column count": int,
         "division": ["each", "merge", "multiscatter+contour"],
-        "legend": bool,
+        "label plots": bool,
         "name": str,
-        "show event count": bool,
         "size x": float,
-        "size y": float, },
+        "size y": float,
+    },
     "general": {
         "axis x": dclab.dfn.scalar_feature_names,
         "axis y": dclab.dfn.scalar_feature_names,
@@ -66,19 +67,21 @@ STATE_OPTIONS = {
         "scale y": ["linear", "log"],
     },
     "scatter": {
+        "colormap": ["jet"],
         "downsampling": bool,
         "downsampling value": int,
         "enabled":  bool,
+        "hue feature": dclab.dfn.scalar_feature_names,
         "marker hue": ["dataset", "kde", "feature", "none"],
         "marker size": float,
-        "hue feature": dclab.dfn.scalar_feature_names,
-        "colormap": ["jet"],
+        "show event count": bool,
     },
     "contour": {
         "enabled":  bool,
-        "percentiles": (float,),
+        "legend": bool,
         "line widths": (float,),
         "line styles": (["solid", "dashed", "dotted"],),
+        "percentiles": (float,),
         "spacing x": float,
         "spacing y": float,
     }

@@ -29,6 +29,9 @@ class SimplePlotItem(pg.PlotItem):
                         autoExpandTextSpace=False,
                         showValues=False,
                         )
+        # bring axes to front
+        for kax in self.axes:
+            self.axes[kax]["item"].setZValue(100)
         # show grid
         self.showGrid(x=True, y=True, alpha=.1)
         # visualization

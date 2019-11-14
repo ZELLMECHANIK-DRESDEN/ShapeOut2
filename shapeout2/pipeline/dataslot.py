@@ -114,6 +114,4 @@ def random_color():
         if len(part) == 1:
             part += "0"
         color += part
-    # alpha
-    color += "FF"
     return color.upper()

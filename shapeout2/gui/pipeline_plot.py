@@ -55,7 +55,7 @@ class PipelinePlot(QtWidgets.QWidget):
         self.plot_layout.addLabel(labelx, col=1)
 
         if lay["division"] == "merge":
-            pp = PipelinePlotItem()
+            pp = PipelinePlotItem(parent=linner)
             linner.addItem(item=pp,
                            row=None,
                            col=None,
@@ -65,7 +65,7 @@ class PipelinePlot(QtWidgets.QWidget):
         elif lay["division"] == "each":
             colcount = 0
             for ds, sl in zip(dslist, slot_states):
-                pp = PipelinePlotItem()
+                pp = PipelinePlotItem(parent=linner)
                 linner.addItem(item=pp,
                                row=None,
                                col=None,
@@ -81,7 +81,7 @@ class PipelinePlot(QtWidgets.QWidget):
             plot_state_scatter = copy.deepcopy(plot_state)
             plot_state_scatter["contour"]["enabled"] = False
             for ds, sl in zip(dslist, slot_states):
-                pp = PipelinePlotItem()
+                pp = PipelinePlotItem(parent=linner)
                 linner.addItem(item=pp,
                                row=None,
                                col=None,
@@ -94,7 +94,7 @@ class PipelinePlot(QtWidgets.QWidget):
             # contour plot
             plot_state_contour = copy.deepcopy(plot_state)
             plot_state_contour["scatter"]["enabled"] = False
-            pp = PipelinePlotItem()
+            pp = PipelinePlotItem(parent=linner)
             linner.addItem(item=pp,
                            row=None,
                            col=None,
@@ -118,6 +118,7 @@ class PipelinePlotItem(SimplePlotItem):
 
         if not dslist:
             return
+
         # General
         gen = plot_state["general"]
         # TODO:
@@ -150,16 +151,49 @@ class PipelinePlotItem(SimplePlotItem):
                 self._plot_elements += sct
         # Contour data
         if plot_state["contour"]["enabled"]:
+            # show legend
+            if plot_state["contour"]["legend"]:
+                legend = self.addLegend(offset=(-.01, +.01))
+            else:
+                legend = None
             for rtdc_ds, ss in zip(dslist, slot_states):
                 con = add_contour(plot_item=self,
                                   rtdc_ds=rtdc_ds,
                                   plot_state=plot_state,
-                                  slot_state=ss
+                                  slot_state=ss,
+                                  legend=legend,
                                   )
                 self._plot_elements += con
 
+        # Set subplot title and number of events
+        if plot_state["layout"]["label plots"]:
+            if len(dslist) == 1 and plot_state["scatter"]["enabled"]:
+                # only one scatter plot
+                # set title
+                ss = slot_states[0]
+                thtmls = "<span style='color:{}'>{}</span>"
+                title = thtmls.format(ss["color"], ss["name"])
+                self.setTitle(title)
+                if plot_state["scatter"]["show event count"]:
+                    # set event count
+                    chtml = "<span style='font-size:10pt'>{} events</span>"
+                    label = QtWidgets.QGraphicsTextItem(
+                        "",
+                        # This is kind of hackish: set the parent to the right
+                        # axis so that it is always drawn there.
+                        parent=self.axes["right"]["item"])
+                    label.setHtml(chtml.format(len(sct[0].data)))
+                    # move the label to the left by its width
+                    label.setPos(-label.boundingRect().width()+2, -5)
 
-def add_contour(plot_item, plot_state, rtdc_ds, slot_state):
+            elif (plot_state["contour"]["enabled"]
+                    and not plot_state["scatter"]["enabled"]):
+                # only a contour plot
+                # set title
+                self.setTitle("Contours")
+
+
+def add_contour(plot_item, plot_state, rtdc_ds, slot_state, legend=None):
     gen = plot_state["general"]
     con = plot_state["contour"]
     x, y, density = plot_cache.get_contour_data(
@@ -199,6 +233,8 @@ def add_contour(plot_item, plot_state, rtdc_ds, slot_state):
                                     )
             elements.append(cline)
             plot_item.addItem(cline)
+            if ii == 0 and legend is not None:
+                legend.addItem(cline, slot_state["name"])
     return elements
 
 
@@ -228,7 +264,7 @@ def add_isoelastics(plot_item, axis_x, axis_y, channel_width, pixel_size):
             plot_item.addItem(iline)
             elements.append(iline)
             # send them to the back
-            iline.setZValue(-1)
+            iline.setZValue(-10)
     return elements
 
 
@@ -286,6 +322,7 @@ def add_scatter(plot_item, plot_state, rtdc_ds, slot_state):
         y = np.log10(y)
 
     scatter.setData(x=x, y=y, brush=brush)
+    scatter.setZValue(-1)
     return [scatter]
 
 

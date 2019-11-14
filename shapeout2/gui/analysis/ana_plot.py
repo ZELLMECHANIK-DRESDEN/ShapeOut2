@@ -51,11 +51,10 @@ class PlotPanel(QtWidgets.QWidget):
 
         state = {
             "layout": {
-                "division": self.comboBox_division.currentData(),
-                "legend":  self.checkBox_legend.isChecked(),
-                "name": self.lineEdit.text(),
                 "column count": self.spinBox_column_count.value(),
-                "show event count": self.checkBox_event_count.isChecked(),
+                "division": self.comboBox_division.currentData(),
+                "label plots": self.checkBox_label_plots.isChecked(),
+                "name": self.lineEdit.text(),
                 "size x": self.spinBox_size_x.value(),
                 "size y": self.spinBox_size_y.value(),
             },
@@ -70,24 +69,26 @@ class PlotPanel(QtWidgets.QWidget):
                 "scale y": self.comboBox_scale_y.currentData(),
             },
             "scatter": {
+                "colormap": self.comboBox_colormap.currentData(),
                 "downsample": self.checkBox_downsample.isChecked(),
                 "downsampling value": self.spinBox_downsample.value(),
                 "enabled": self.groupBox_scatter.isChecked(),
+                "hue feature": self.comboBox_marker_feature.currentData(),
                 "marker hue": self.comboBox_marker_hue.currentData(),
                 "marker size": self.doubleSpinBox_marker_size.value(),
-                "hue feature": self.comboBox_marker_feature.currentData(),
-                "colormap": self.comboBox_colormap.currentData(),
+                "show event count": self.checkBox_event_count.isChecked(),
             },
             "contour": {
                 "enabled": self.groupBox_contour.isChecked(),
-                "percentiles": [self.doubleSpinBox_perc_1.value(),
-                                self.doubleSpinBox_perc_2.value(),
-                                ],
+                "legend":  self.checkBox_legend.isChecked(),
                 "line widths": [self.doubleSpinBox_lw_1.value(),
                                 self.doubleSpinBox_lw_2.value(),
                                 ],
                 "line styles": [self.comboBox_ls_1.currentData(),
                                 self.comboBox_ls_2.currentData(),
+                                ],
+                "percentiles": [self.doubleSpinBox_perc_1.value(),
+                                self.doubleSpinBox_perc_2.value(),
                                 ],
                 "spacing x": self.doubleSpinBox_spacing_x.value(),
                 "spacing y": self.doubleSpinBox_spacing_y.value(),
@@ -110,9 +111,8 @@ class PlotPanel(QtWidgets.QWidget):
         self.spinBox_column_count.setValue(lay["column count"])
         idx = self.comboBox_division.findData(lay["division"])
         self.comboBox_division.setCurrentIndex(idx)
-        self.checkBox_legend.setChecked(lay["legend"])
+        self.checkBox_label_plots.setChecked(lay["label plots"])
         self.lineEdit.setText(lay["name"])
-        self.checkBox_event_count.setChecked(lay["show event count"])
         self.spinBox_size_x.setValue(lay["size x"])
         self.spinBox_size_y.setValue(lay["size y"])
         gen = state["general"]
@@ -143,10 +143,12 @@ class PlotPanel(QtWidgets.QWidget):
         self.comboBox_marker_feature.setCurrentIndex(feat_index)
         color_index = COLORMAPS.index(sca["colormap"])
         self.comboBox_colormap.setCurrentIndex(color_index)
+        self.checkBox_event_count.setChecked(sca["show event count"])
 
         # Contour
         con = state["contour"]
         self.groupBox_contour.setChecked(con["enabled"])
+        self.checkBox_legend.setChecked(con["legend"])
         self.doubleSpinBox_perc_1.setValue(con["percentiles"][0])
         self.doubleSpinBox_perc_2.setValue(con["percentiles"][1])
         self.doubleSpinBox_lw_1.setValue(con["line widths"][0])

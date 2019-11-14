@@ -33,7 +33,7 @@ def get_scatter_data(rtdc_ds, downsample, xax, yax, xscale, yscale,
                      kde_type="histogram", kde_kwargs={}):
     cfg = rtdc_ds.config
     tohash = [
-        rtdc_ds.identifier, rtdc_ds.filter.all,
+        rtdc_ds.identifier, rtdc_ds.filter.all, downsample,
         cfg["calculation"] if "calculation" in cfg else "",
         xax, yax, xscale, yscale, kde_type, kde_kwargs]
     shash = util.hashobj(tohash)

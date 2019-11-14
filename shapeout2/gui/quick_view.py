@@ -669,8 +669,9 @@ class RTDCScatterWidget(SimplePlotWidget):
         state["points"].append([pos.x(), pos.y()])
         self.poly_line_roi.setState(state)
 
-    def plot_data(self, rtdc_ds, slot, xax="area_um", yax="deform", downsample=False,
-                  xscale="linear", yscale="linear", isoelastics=False):
+    def plot_data(self, rtdc_ds, slot, xax="area_um", yax="deform",
+                  xscale="linear", yscale="linear",  downsample=False,
+                  isoelastics=False):
         self.rtdc_ds = rtdc_ds
         self.slot = slot
         self.xax = xax

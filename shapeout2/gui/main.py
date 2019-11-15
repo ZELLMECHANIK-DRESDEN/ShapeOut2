@@ -132,26 +132,32 @@ class ShapeOut2(QtWidgets.QMainWindow):
     def add_plot(self):
         plot_id = self.pipeline.add_plot()
         self.plot_matrix.add_plot(identifier=plot_id)
-
-        # create subwindow
-        sub = QtWidgets.QMdiSubWindow(self)
-        pw = pipeline_plot.PipelinePlot(parent=sub,
-                                        pipeline=self.pipeline,
-                                        plot_id=plot_id)
-        self.plots_changed.connect(pw.update_content)
-        sub.setSystemMenu(None)
-        sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
-                           | QtCore.Qt.WindowTitleHint
-                           | QtCore.Qt.Tool)
-        sub.setWidget(pw)
-        self.mdiArea.addSubWindow(sub)
-        self.subwindows[plot_id] = sub
+        self.add_plot_window(plot_id)
         # update UI contents
         self.widget_ana_view.widget_plot.update_content()
-        sub.show()
-        pw.update_content()
         # redraw
         self.scrollArea_block.update()
+
+    def add_plot_window(self, plot_id):
+        """Create a plot window if necessary and show it"""
+        if plot_id in self.subwindows:
+            sub = self.subwindows[plot_id]
+        else:
+            # create subwindow
+            sub = QtWidgets.QMdiSubWindow(self)
+            pw = pipeline_plot.PipelinePlot(parent=sub,
+                                            pipeline=self.pipeline,
+                                            plot_id=plot_id)
+            self.plots_changed.connect(pw.update_content)
+            pw.update_content()
+            sub.setSystemMenu(None)
+            sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
+                               | QtCore.Qt.WindowTitleHint
+                               | QtCore.Qt.Tool)
+            sub.setWidget(pw)
+            self.mdiArea.addSubWindow(sub)
+            self.subwindows[plot_id] = sub
+        sub.show()
 
     def init_analysis_view(self):
         sub = QtWidgets.QMdiSubWindow(self)
@@ -235,9 +241,21 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.scrollArea_block.update()
 
     def on_new_polygon_filter(self):
-        self.on_quickview(view=True)
-        self.widget_quick_view.on_poly_create()
-        self.widget_quick_view.on_tool()  # adjusts QuickView size correctly
+        if not self.pipeline.slots:
+            msg = QtWidgets.QMessageBox()
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
+            msg.setText("A dataset is required for creating a polygon filter!")
+            msg.setWindowTitle("No dataset loaded")
+            msg.exec_()
+        else:
+            slot_index, _ = self.data_matrix.get_quickview_indices()
+            if slot_index is None:
+                # show the first dataset
+                self.on_quickview_show_dataset(0, 0)
+            self.on_quickview(view=True)
+            self.widget_quick_view.on_poly_create()
+            # adjusts QuickView size correctly
+            self.widget_quick_view.on_tool()
 
     @QtCore.pyqtSlot(str)
     def on_modify_filter(self, filt_id):
@@ -317,16 +335,20 @@ class ShapeOut2(QtWidgets.QMainWindow):
         state = self.data_matrix.__getstate__()
         statep = self.plot_matrix.__getstate__()
         state["plots"] = statep["plots"]
-        for slot in statep["elements"]:
-            for plot in statep["elements"][slot]:
-                state["elements"][slot][plot] = statep["elements"][slot][plot]
+        for ss in statep["elements"]:
+            for plot in statep["elements"][ss]:
+                state["elements"][ss][plot] = statep["elements"][ss][plot]
         # Reduce a state from DataMatrix to something Pipeline can work with
         for slot_id in state["elements"]:
             for fp_id in state["elements"][slot_id]:
                 active = state["elements"][slot_id][fp_id]["active"]
                 enabled = state["elements"][slot_id][fp_id]["enabled"]
                 state["elements"][slot_id][fp_id] = active and enabled
+        # Set the new state of the pipeline
         self.pipeline.__setstate__(state)
+        # Make sure all plot windows are created and shown
+        for plot_state in state["plots"]:
+            self.add_plot_window(plot_state["identifier"])
         # Update all plots
         self.plots_changed.emit()
         # Update analysis view

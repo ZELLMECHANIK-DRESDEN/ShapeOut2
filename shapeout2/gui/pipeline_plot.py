@@ -264,7 +264,7 @@ def add_isoelastics(plot_item, axis_x, axis_y, channel_width, pixel_size):
             plot_item.addItem(iline)
             elements.append(iline)
             # send them to the back
-            iline.setZValue(-10)
+            iline.setZValue(-100)
     return elements
 
 
@@ -322,7 +322,7 @@ def add_scatter(plot_item, plot_state, rtdc_ds, slot_state):
         y = np.log10(y)
 
     scatter.setData(x=x, y=y, brush=brush)
-    scatter.setZValue(-1)
+    scatter.setZValue(-50)
     return [scatter]
 
 

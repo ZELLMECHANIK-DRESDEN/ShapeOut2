@@ -14,8 +14,7 @@ class SimplePlotItem(pg.PlotItem):
     def __init__(self, parent=None, *args, **kwargs):
         if "viewBox" not in kwargs:
             kwargs["viewBox"] = SimpleViewBox()
-        super(SimplePlotItem, self).__init__(*args, **kwargs)
-        self.parent = parent
+        super(SimplePlotItem, self).__init__(parent, *args, **kwargs)
         self.vb.export.connect(self.on_export)
         # show top and right axes, but not ticklabels
         for kax in ["top", "right"]:
@@ -30,8 +29,10 @@ class SimplePlotItem(pg.PlotItem):
                         showValues=False,
                         )
         # bring axes to front
-        for kax in self.axes:
-            self.axes[kax]["item"].setZValue(100)
+        # (This screws up event selection in QuickView)
+        # for kax in self.axes:
+        #    self.axes[kax]["item"].setZValue(-1)
+
         # show grid
         self.showGrid(x=True, y=True, alpha=.1)
         # visualization
@@ -72,7 +73,7 @@ class SimplePlotWidget(pg.PlotWidget):
         # of PlotItem we use SimplePlotItem.
         pg.GraphicsView.__init__(self, parent, background=background)
         self.enableMouse(False)
-        self.plotItem = SimplePlotItem(self, **kargs)
+        self.plotItem = SimplePlotItem(**kargs)
         self.setCentralItem(self.plotItem)
         # Explicitly wrap methods from plotItem
         for m in [
@@ -102,8 +103,10 @@ class SimpleViewBox(pg.ViewBox):
             else:
                 action.setText(self.right_click_actions[action.text()])
 
-        menu.addAction("Export PNG", lambda: self.export.emit("png"))
-        menu.addAction("Export SVG", lambda: self.export.emit("svg"))
+        menu.addAction("Export subplot as PNG",
+                       lambda: self.export.emit("png"))
+        menu.addAction("Export subplot as SVG",
+                       lambda: self.export.emit("svg"))
 
         pos = ev.screenPos()
         menu.popup(QtCore.QPoint(pos.x(), pos.y()))

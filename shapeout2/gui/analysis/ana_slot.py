@@ -29,7 +29,7 @@ class SlotPanel(QtWidgets.QWidget):
         state = {
             "name": self.lineEdit_name.text(),
             "path": slot.path,
-            "color": self.lineEdit_color.text(),
+            "color": self.pushButton_color.color().name(),
             "fl names": {"FL-1": self.lineEdit_fl1.text(),
                          "FL-2": self.lineEdit_fl2.text(),
                          "FL-3": self.lineEdit_fl3.text(),
@@ -54,7 +54,7 @@ class SlotPanel(QtWidgets.QWidget):
     def __setstate__(self, state):
         self.lineEdit_name.setText(state["name"])
         self.lineEdit_path.setText(str(state["path"]))
-        self.lineEdit_color.setText(state["color"])
+        self.pushButton_color.setColor(state["color"])
         self.lineEdit_fl1.setText(state["fl names"]["FL-1"])
         self.lineEdit_fl2.setText(state["fl names"]["FL-2"])
         self.lineEdit_fl3.setText(state["fl names"]["FL-3"])

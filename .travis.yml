@@ -17,7 +17,7 @@ install:
 - travis_retry pip install --upgrade pip
 - travis_retry pip install setuptools wheel
 - travis_retry pip install git+git://github.com/ZELLMECHANIK-DRESDEN/dclab.git
-- travis_retry pip install git+https://github.com/pyqtgraph/pyqtgraph.git@1ec175385e31c4e1e8dbe829b4387e4ac560082c
+- travis_retry pip install git+git://github.com/ZELLMECHANIK-DRESDEN/pyqtgraph.git
 - travis_retry pip install -e .
 # for tests:
 - travis_retry pip install codecov coverage flake8

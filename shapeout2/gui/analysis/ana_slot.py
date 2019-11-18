@@ -211,5 +211,5 @@ class SlotPanel(QtWidgets.QWidget):
         """Update the shapeout2.pipeline.Dataslot instance"""
         # get current index
         slot_state = self.__getstate__()
+        self.update_content()  # update slot combobox and visible fl names
         self.slot_changed.emit(slot_state)
-        # self.update_content()  # update slot combobox and visible fl names

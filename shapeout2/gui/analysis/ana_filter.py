@@ -15,7 +15,7 @@ SHOW_FEATURES = ["deform", "area_um", "bright_avg"]
 
 class FilterPanel(QtWidgets.QWidget):
     #: Emitted when a shapeout2.pipeline.Filter is modified
-    filters_changed = QtCore.pyqtSignal()
+    filter_changed = QtCore.pyqtSignal(dict)
     #: Emitted when the user wants to create a new polygon filter
     request_new_polygon_filter = QtCore.pyqtSignal()
 
@@ -24,6 +24,8 @@ class FilterPanel(QtWidgets.QWidget):
         path_ui = pkg_resources.resource_filename(
             "shapeout2.gui.analysis", "ana_filter.ui")
         uic.loadUi(path_ui, self)
+        # current Shape-Out 2 pipeline
+        self._pipeline = None
         self.setUpdatesEnabled(False)
         self._init_box_filters()
         self._polygon_checkboxes = {}
@@ -34,8 +36,6 @@ class FilterPanel(QtWidgets.QWidget):
         self.toolButton_moreless.clicked.connect(self.on_moreless)
         self._box_edit_view = False
         self.update_content()
-        # current Shape-Out 2 pipeline
-        self._pipeline = None
         self.setUpdatesEnabled(True)
 
     def __getstate__(self):
@@ -129,12 +129,20 @@ class FilterPanel(QtWidgets.QWidget):
     @property
     def filter_ids(self):
         """List of filter identifiers"""
-        return sorted(Filter.get_instances().keys())
+        if self.pipeline is not None:
+            ids = [filt.identifier for filt in self.pipeline.filters]
+        else:
+            ids = []
+        return ids
 
     @property
     def filter_names(self):
         """List of filter names"""
-        return [Filter._instances[f].name for f in self.filter_ids]
+        if self.pipeline is not None:
+            nms = [filt.name for filt in self.pipeline.filters]
+        else:
+            nms = []
+        return nms
 
     @property
     def pipeline(self):
@@ -260,7 +268,7 @@ class FilterPanel(QtWidgets.QWidget):
         # get current index
         filt_index = self.comboBox_filters.currentIndex()
         filt = Filter.get_filter(identifier=self.filter_names[filt_index])
-        state = self.__getstate__()
-        filt.__setstate__(state)
-        self.filters_changed.emit()
+        filter_state = self.__getstate__()
+        filt.__setstate__(filter_state)
         self.update_content()  # update filter selection combobox
+        self.filter_changed.emit(filter_state)

@@ -62,10 +62,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.init_analysis_view()
         self.mdiArea.cascadeSubWindows()
         self.showMaximized()
+        # BLOCK MATRIX
         # BlockMatrix wraps DataMatrix and PlotMatrix
         self.block_matrix = BlockMatrix(self.data_matrix, self.plot_matrix)
-        # Signals
-        # BlockMatrix pipeline
+        # signals
         self.block_matrix.pipeline_changed.connect(self.adopt_pipeline)
         # BlockMatrix buttons
         self.toolButton_dm.clicked.connect(self.on_data_matrix)
@@ -79,22 +79,19 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.data_matrix.filter_modify_clicked.connect(self.on_modify_filter)
         # Plot matrix
         self.plot_matrix.plot_modify_clicked.connect(self.on_modify_plot)
-        # Analysis view
+        # ANALYSIS VIEW
         self.widget_ana_view.adopt_pipeline(self.pipeline.__getstate__())
         self.widget_ana_view.widget_filter.set_pipeline(self.pipeline)
         self.widget_ana_view.widget_plot.set_pipeline(self.pipeline)
         # filter signals
-        self.widget_ana_view.widget_filter.filters_changed.connect(
-            self.data_matrix.update_content)
+        self.widget_ana_view.filter_changed.connect(self.adopt_filter)
+        # polygon filter creation
         self.widget_ana_view.widget_filter.request_new_polygon_filter.connect(
             self.on_new_polygon_filter)
         self.widget_quick_view.new_polygon_filter_created.connect(
             self.widget_ana_view.widget_filter.update_polygon_filters)
         # plot signals
-        self.widget_ana_view.widget_plot.plots_changed.connect(
-            self.plot_matrix.update_content)
-        self.widget_ana_view.widget_plot.plots_changed.connect(
-            self.plots_changed)
+        self.widget_ana_view.plot_changed.connect(self.adopt_plot)
         # slot signals
         self.widget_ana_view.widget_slot.slot_changed.connect(self.adopt_slot)
 
@@ -112,11 +109,24 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(dict)
     def adopt_pipeline(self, pipeline_state):
+        # Set the new state of the pipeline
         self.pipeline.__setstate__(pipeline_state)
         if self.sender() != self.block_matrix:
+            # Update BlockMatrix
             self.block_matrix.adopt_pipeline(pipeline_state)
-        self.widget_ana_view.adopt_pipeline(pipeline_state)
-        self.update_pipeline()
+        if self.sender() != self.widget_ana_view:
+            self.widget_ana_view.adopt_pipeline(pipeline_state)
+
+        self.widget_quick_view.update_feature_choices()
+        # Make sure all plot windows are created and shown
+        for plot_state in pipeline_state["plots"]:
+            self.add_plot_window(plot_state["identifier"])
+        self.plots_changed.emit()
+
+        # redraw
+        self.scrollArea_block.update()
+        self.mdiArea.update()
+        self.subwindows["analysis_view"].update()
 
     @QtCore.pyqtSlot(dict)
     def adopt_plot(self, plot_state):
@@ -141,7 +151,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
         else:
             raise ValueError("Slot not in pipeline: {}".format(slot_id))
         self.adopt_pipeline(state)
-        self.widget_quick_view.update_feature_choices()
 
     def add_dataslot(self):
         """Adds a dataslot to the pipeline"""
@@ -375,24 +384,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.toolButton_dm.setChecked(False)
         else:
             self.toolButton_dm.setChecked(True)
-
-    @QtCore.pyqtSlot()
-    def update_pipeline(self):
-        """Read state from block matrix and apply to self.pipeline"""
-        state = self.block_matrix.__getstate__()
-        # Set the new state of the pipeline
-        self.pipeline.__setstate__(state)
-        # Make sure all plot windows are created and shown
-        for plot_state in state["plots"]:
-            self.add_plot_window(plot_state["identifier"])
-        # Update all plots
-        self.plots_changed.emit()
-        # Update analysis view
-        self.widget_ana_view.update_content()
-        # redraw
-        self.scrollArea_block.update()
-        self.mdiArea.update()
-        self.subwindows["analysis_view"].update()
 
 
 def excepthook(etype, value, trace):

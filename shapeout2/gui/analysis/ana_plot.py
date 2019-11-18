@@ -13,7 +13,7 @@ COLORMAPS = ["jet"]
 
 class PlotPanel(QtWidgets.QWidget):
     #: Emitted when a shapeout2.pipeline.Plot is modified
-    plots_changed = QtCore.pyqtSignal()
+    plot_changed = QtCore.pyqtSignal(dict)
 
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self)
@@ -50,6 +50,7 @@ class PlotPanel(QtWidgets.QWidget):
         ry = self.widget_range_y.__getstate__()
 
         state = {
+            "identifier": self.current_plot.identifier,
             "layout": {
                 "column count": self.spinBox_column_count.value(),
                 "division": self.comboBox_division.currentData(),
@@ -97,6 +98,8 @@ class PlotPanel(QtWidgets.QWidget):
         return state
 
     def __setstate__(self, state):
+        if self.current_plot.identifier != state["identifier"]:
+            raise ValueError("Plot identifier mismatch!")
         feats_srt = self.pipeline.get_features(scalar=True, label_sort=True)
         toblock = [
             self.comboBox_axis_x,
@@ -237,7 +240,7 @@ class PlotPanel(QtWidgets.QWidget):
     def current_plot(self):
         if self.plot_ids:
             plot_index = self.comboBox_plots.currentIndex()
-            plot_id = self.ploter_ids[plot_index]
+            plot_id = self.plot_ids[plot_index]
             plot = Plot.get_instances()[plot_id]
         else:
             plot = None
@@ -249,13 +252,21 @@ class PlotPanel(QtWidgets.QWidget):
 
     @property
     def plot_ids(self):
-        """List of plot names"""
-        return sorted(Plot.get_instances().keys())
+        """List of plot identifiers"""
+        if self.pipeline is not None:
+            ids = [plot.identifier for plot in self.pipeline.plots]
+        else:
+            ids = []
+        return ids
 
     @property
     def plot_names(self):
         """List of plot names"""
-        return [Plot._instances[f].name for f in self.plot_ids]
+        if self.pipeline is not None:
+            ids = [plot.name for plot in self.pipeline.plots]
+        else:
+            ids = []
+        return ids
 
     def on_axis_select(self):
         gen = self.__getstate__()["general"]
@@ -332,8 +343,7 @@ class PlotPanel(QtWidgets.QWidget):
         # get current index
         plot_index = self.comboBox_plots.currentIndex()
         plot = Plot.get_plot(identifier=self.plot_ids[plot_index])
-        state = self.__getstate__()
-        state["identifier"] = plot.identifier
-        plot.__setstate__(state)
-        self.plots_changed.emit()
+        plot_state = self.__getstate__()
+        plot.__setstate__(plot_state)
         self.update_content()  # update plot selection combobox
+        self.plot_changed.emit(plot_state)

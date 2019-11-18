@@ -100,12 +100,14 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.widget_quick_view.update_feature_choices)
 
     def add_dataslot(self):
+        """Adds a dataslot to the pipeline"""
         fnames, _ = QtWidgets.QFileDialog.getOpenFileNames(
             parent=self,
             caption="Select an RT-DC measurement",
             directory=self.settings.get_path(name="rtdc import dataset"),
             filter="RT-DC Files (*.rtdc)")
 
+        # Create Dataslot instance and update block matrix
         for fn in fnames:
             path = pathlib.Path(fn)
             self.settings.set_path(wd=path.parent, name="rtdc import dataset")
@@ -113,7 +115,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             if self.pipeline.num_filters == 0:
                 self.add_filter()
             slot_id = self.pipeline.add_slot(path=path)
-            self.data_matrix.add_dataset(identifier=slot_id)
+            self.data_matrix.add_dataset(slot_id=slot_id)
 
         # Update box filter limits
         self.widget_ana_view.widget_filter.update_box_ranges()
@@ -121,6 +123,15 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.widget_slot.update_content()
         # redraw
         self.scrollArea_block.update()
+
+    def rem_dataslot(self, slot_id):
+        """Remove a dadaslot from the pipeline"""
+        # First, remove it from the block matrix
+        # (if it is already removed, do nothing)
+        self.data_matrix.rem_dataset(slot_id, not_exist_ok=True)
+        # All other widgets are updated using the block matrix state
+        # by calling self.update_pipeline.
+        self.update_pipeline()
 
     def add_filter(self):
         filt_id = self.pipeline.add_filter()
@@ -332,6 +343,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot()
     def update_pipeline(self):
+        """Read state from block matrix and apply to self.pipeline"""
         state = self.data_matrix.__getstate__()
         statep = self.plot_matrix.__getstate__()
         state["plots"] = statep["plots"]

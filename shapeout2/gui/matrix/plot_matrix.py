@@ -30,7 +30,7 @@ class PlotMatrix(QtWidgets.QWidget):
         # elements
         mestates = {}
         dm = self.data_matrix
-        for ds in dm.datasets:
+        for ds in dm.dataset_widgets:
             idict = {}
             for ps in self.plots:
                 me = self.get_matrix_element(ds.identifier, ps.identifier)

@@ -4,7 +4,6 @@ import dclab
 from PyQt5 import uic, QtCore, QtWidgets
 
 from ... import meta_tool
-from ...pipeline import Dataslot
 
 
 class SlotPanel(QtWidgets.QWidget):
@@ -16,12 +15,14 @@ class SlotPanel(QtWidgets.QWidget):
         path_ui = pkg_resources.resource_filename(
             "shapeout2.gui.analysis", "ana_slot.ui")
         uic.loadUi(path_ui, self)
+        # current Shape-Out 2 pipeline
+        self._pipeline = None
+        # signals
         self.pushButton_apply.clicked.connect(self.write_slot)
         self.pushButton_reset.clicked.connect(self.update_content)
         self.comboBox_slots.currentIndexChanged.connect(self.update_content)
+        # init
         self.update_content()
-        # current Shape-Out 2 pipeline
-        self._pipeline = None
         self._init_emodulus()
 
     def __getstate__(self):
@@ -121,7 +122,7 @@ class SlotPanel(QtWidgets.QWidget):
         if self.slot_ids:
             slot_index = self.comboBox_slots.currentIndex()
             slot_id = self.slot_ids[slot_index]
-            slot = Dataslot.get_instances()[slot_id]
+            slot = self.pipeline.get_slot(slot_id)
         else:
             slot = None
         return slot
@@ -129,12 +130,18 @@ class SlotPanel(QtWidgets.QWidget):
     @property
     def slot_ids(self):
         """List of slot identifiers"""
-        return sorted(Dataslot.get_instances().keys())
+        if self.pipeline is None:
+            return []
+        else:
+            return [slot.identifier for slot in self.pipeline.slots]
 
     @property
     def slot_names(self):
         """List of slot names"""
-        return [Dataslot._instances[f].name for f in self.slot_ids]
+        if self.pipeline is None:
+            return []
+        else:
+            return [slot.name for slot in self.pipeline.slots]
 
     @property
     def pipeline(self):
@@ -188,7 +195,7 @@ class SlotPanel(QtWidgets.QWidget):
             self.comboBox_slots.setCurrentIndex(slot_index)
             self.comboBox_slots.blockSignals(False)
             # populate content
-            slot = Dataslot.get_slot(identifier=self.slot_ids[slot_index])
+            slot = self.pipeline.slots[slot_index]
             state = slot.__getstate__()
             self.__setstate__(state)
             # determine whether we already have a medium defined
@@ -209,7 +216,7 @@ class SlotPanel(QtWidgets.QWidget):
         """Update the shapeout2.pipeline.Dataslot instance"""
         # get current index
         slot_index = self.comboBox_slots.currentIndex()
-        slot = Dataslot.get_slot(identifier=self.slot_names[slot_index])
+        slot = self.pipeline.slots[slot_index]
         state = self.__getstate__()
         slot.__setstate__(state)
         self.slots_changed.emit()

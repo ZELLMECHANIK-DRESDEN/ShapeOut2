@@ -40,6 +40,7 @@ class FilterPanel(QtWidgets.QWidget):
 
     def __getstate__(self):
         state = {
+            "identifier": self.current_filter.identifier,
             "enable filters": self.checkBox_enable.isChecked(),
             "name": self.lineEdit_name.text(),
             "limit events bool": self.checkBox_limit.isChecked(),
@@ -61,6 +62,8 @@ class FilterPanel(QtWidgets.QWidget):
         return state
 
     def __setstate__(self, state):
+        if self.current_filter.identifier != state["identifier"]:
+            raise ValueError("Filter identifier mismatch!")
         self.checkBox_enable.setChecked(state["enable filters"])
         self.lineEdit_name.setText(state["name"])
         self.checkBox_limit.setChecked(state["limit events bool"])
@@ -225,7 +228,6 @@ class FilterPanel(QtWidgets.QWidget):
 
     def update_polygon_filters(self):
         """Update the layout containing the polygon filters"""
-        state = self.__getstate__()
         self.verticalLayout_poly.setAlignment(QtCore.Qt.AlignTop)
         # clear layout
         for ii in reversed(range(self.verticalLayout_poly.count())):
@@ -252,7 +254,6 @@ class FilterPanel(QtWidgets.QWidget):
             button.clicked.connect(self.request_new_polygon_filter)
             self.verticalLayout_poly.addWidget(label)
             self.verticalLayout_poly.addWidget(button)
-        self.__setstate__(state)
 
     def write_filter(self):
         """Update the shapeout2.pipeline.Filter instance"""

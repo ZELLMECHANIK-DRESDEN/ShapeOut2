@@ -12,6 +12,11 @@ class AnalysisView(QtWidgets.QWidget):
         self.setWindowTitle("Analysis View")
         self.setMinimumSize(self.sizeHint())
 
+    def adopt_pipeline(self, pipeline_state):
+        self.widget_slot.pipeline_state = pipeline_state
+        self.widget_meta.pipeline_state = pipeline_state
+        self.update_content()
+
     def update_content(self):
         self.widget_filter.update_content()
         self.widget_meta.update_content()

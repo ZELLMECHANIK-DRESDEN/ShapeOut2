@@ -245,6 +245,7 @@ class DataMatrix(QtWidgets.QWidget):
             state["slots"].insert(index+1, new_state)
         state["slots used"].append(new_id)
         self.__setstate__(state)
+        self.publish_matrix()
 
     def rem_dataset(self, slot_id, not_exist_ok=False):
         """Remove a dataset from the DataMatrix"""
@@ -263,6 +264,7 @@ class DataMatrix(QtWidgets.QWidget):
         pstate["elements"].pop(slot_state["identifier"])
         self.__setstate__(state)
         self.plot_matrix.__setstate__(pstate)
+        self.publish_matrix()
 
     def add_filter(self, identifier=None, state=None):
         self.setUpdatesEnabled(False)
@@ -307,6 +309,7 @@ class DataMatrix(QtWidgets.QWidget):
             self._old_quickview_instance = MatrixElement._quick_view_instance
             MatrixElement._quick_view_instance = None
         self.update_content()
+        self.publish_matrix()
 
     def clear(self):
         """Reset layout"""

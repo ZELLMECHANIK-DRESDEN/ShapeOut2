@@ -15,6 +15,7 @@ from PyQt5 import uic, QtCore, QtWidgets
 import pyqtgraph as pg
 
 from . import analysis
+from .matrix import BlockMatrix
 from . import pipeline_plot
 from . import quick_view
 
@@ -61,26 +62,27 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.init_analysis_view()
         self.mdiArea.cascadeSubWindows()
         self.showMaximized()
-        # Data matrix
-        self.data_matrix.matrix_changed.connect(self.update_pipeline)
-        self.data_matrix.slot_modify_clicked.connect(
-            self.on_modify_slot)
-        self.data_matrix.filter_modify_clicked.connect(
-            self.on_modify_filter)
+        # BlockMatrix wraps DataMatrix and PlotMatrix
+        self.block_matrix = BlockMatrix(self.data_matrix, self.plot_matrix)
+        # Signals
+        # BlockMatrix pipeline
+        self.block_matrix.pipeline_changed.connect(self.adopt_pipeline)
+        # BlockMatrix buttons
         self.toolButton_dm.clicked.connect(self.on_data_matrix)
         self.splitter.splitterMoved.connect(self.on_splitter)
         self.toolButton_new_filter.clicked.connect(self.add_filter)
         self.toolButton_new_dataset.clicked.connect(self.add_dataslot)
         self.toolButton_import.clicked.connect(self.add_dataslot)
-        # Plot matrix
-        self.plot_matrix.matrix_changed.connect(self.update_pipeline)
-        self.plot_matrix.plot_modify_clicked.connect(
-            self.on_modify_plot)
         self.toolButton_new_plot.clicked.connect(self.add_plot)
+        # DataMatrix
+        self.data_matrix.slot_modify_clicked.connect(self.on_modify_slot)
+        self.data_matrix.filter_modify_clicked.connect(self.on_modify_filter)
+        # Plot matrix
+        self.plot_matrix.plot_modify_clicked.connect(self.on_modify_plot)
         # Analysis view
+        self.widget_ana_view.adopt_pipeline(self.pipeline.__getstate__())
         self.widget_ana_view.widget_filter.set_pipeline(self.pipeline)
         self.widget_ana_view.widget_plot.set_pipeline(self.pipeline)
-        self.widget_ana_view.widget_slot.set_pipeline(self.pipeline)
         # filter signals
         self.widget_ana_view.widget_filter.filters_changed.connect(
             self.data_matrix.update_content)
@@ -94,10 +96,52 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.widget_plot.plots_changed.connect(
             self.plots_changed)
         # slot signals
-        self.widget_ana_view.widget_slot.slots_changed.connect(
-            self.data_matrix.update_content)
-        self.widget_ana_view.widget_slot.slots_changed.connect(
-            self.widget_quick_view.update_feature_choices)
+        self.widget_ana_view.widget_slot.slot_changed.connect(self.adopt_slot)
+
+    @QtCore.pyqtSlot(dict)
+    def adopt_filter(self, filt_state):
+        filt_id = filt_state["identifier"]
+        state = self.pipeline.__getstate__()
+        for ii in range(len(state["filters"])):
+            if state["filters"][ii]["identifier"] == filt_id:
+                state["filters"][ii] = filt_state
+                break
+        else:
+            raise ValueError("Filter not in pipeline: {}".format(filt_id))
+        self.adopt_pipeline(state)
+
+    @QtCore.pyqtSlot(dict)
+    def adopt_pipeline(self, pipeline_state):
+        self.pipeline.__setstate__(pipeline_state)
+        if self.sender() != self.block_matrix:
+            self.block_matrix.adopt_pipeline(pipeline_state)
+        self.widget_ana_view.adopt_pipeline(pipeline_state)
+        self.update_pipeline()
+
+    @QtCore.pyqtSlot(dict)
+    def adopt_plot(self, plot_state):
+        plot_id = plot_state["identifier"]
+        state = self.pipeline.__getstate__()
+        for ii in range(len(state["plots"])):
+            if state["plots"][ii]["identifier"] == plot_id:
+                state["plots"][ii] = plot_state
+                break
+        else:
+            raise ValueError("Plot not in pipeline: {}".format(plot_id))
+        self.adopt_pipeline(state)
+
+    @QtCore.pyqtSlot(dict)
+    def adopt_slot(self, slot_state):
+        slot_id = slot_state["identifier"]
+        state = self.pipeline.__getstate__()
+        for ii in range(len(state["slots"])):
+            if state["slots"][ii]["identifier"] == slot_id:
+                state["slots"][ii] = slot_state
+                break
+        else:
+            raise ValueError("Slot not in pipeline: {}".format(slot_id))
+        self.adopt_pipeline(state)
+        self.widget_quick_view.update_feature_choices()
 
     def add_dataslot(self):
         """Adds a dataslot to the pipeline"""
@@ -123,15 +167,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.widget_slot.update_content()
         # redraw
         self.scrollArea_block.update()
-
-    def rem_dataslot(self, slot_id):
-        """Remove a dadaslot from the pipeline"""
-        # First, remove it from the block matrix
-        # (if it is already removed, do nothing)
-        self.data_matrix.rem_dataset(slot_id, not_exist_ok=True)
-        # All other widgets are updated using the block matrix state
-        # by calling self.update_pipeline.
-        self.update_pipeline()
 
     def add_filter(self):
         filt_id = self.pipeline.add_filter()
@@ -344,12 +379,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def update_pipeline(self):
         """Read state from block matrix and apply to self.pipeline"""
-        state = self.data_matrix.__getstate__()
-        statep = self.plot_matrix.__getstate__()
-        state["plots"] = statep["plots"]
-        for ss in statep["elements"]:
-            for plot in statep["elements"][ss]:
-                state["elements"][ss][plot] = statep["elements"][ss][plot]
+        state = self.block_matrix.__getstate__()
         # Set the new state of the pipeline
         self.pipeline.__setstate__(state)
         # Make sure all plot windows are created and shown

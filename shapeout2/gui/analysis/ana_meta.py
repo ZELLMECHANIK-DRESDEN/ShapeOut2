@@ -5,7 +5,6 @@ import numpy as np
 from PyQt5 import uic, QtCore, QtWidgets
 
 from ... import meta_tool
-from ...pipeline import Dataslot
 
 
 class MetaPanel(QtWidgets.QWidget):
@@ -16,27 +15,35 @@ class MetaPanel(QtWidgets.QWidget):
         uic.loadUi(path_ui, self)
 
         self.comboBox_slots.currentIndexChanged.connect(self.update_content)
+        self.pipeline_state = None
         self.update_content()
 
     @property
-    def current_slot(self):
-        if self.slot_ids:
+    def current_slot_state(self):
+        if self.pipeline_state is not None:
             slot_index = self.comboBox_slots.currentIndex()
-            slot_id = self.slot_ids[slot_index]
-            slot = Dataslot.get_instances()[slot_id]
+            slot_state = self.pipeline_state["slots"][slot_index]
         else:
-            slot = None
-        return slot
+            slot_state = None
+        return slot_state
 
     @property
     def slot_ids(self):
         """List of slot identifiers"""
-        return sorted(Dataslot.get_instances().keys())
+        if self.pipeline_state is not None:
+            ids = [ss["identifier"] for ss in self.pipeline_state["slots"]]
+        else:
+            ids = []
+        return ids
 
     @property
     def slot_names(self):
         """List of slot names"""
-        return [Dataslot._instances[f].name for f in self.slot_ids]
+        if self.pipeline_state is not None:
+            nms = [ss["name"] for ss in self.pipeline_state["slots"]]
+        else:
+            nms = []
+        return nms
 
     def update_info_box(self, group_box, config, section):
         """Populate an individual group box with keyword-value pairs"""
@@ -74,9 +81,8 @@ class MetaPanel(QtWidgets.QWidget):
             self.comboBox_slots.setCurrentIndex(slot_index)
             self.comboBox_slots.blockSignals(False)
             # populate content
-            slot = Dataslot.get_slot(identifier=self.slot_ids[slot_index])
-            state = slot.__getstate__()
-            cfg = meta_tool.get_rtdc_config(state["path"])
+            slot_state = self.pipeline_state["slots"][slot_index]
+            cfg = meta_tool.get_rtdc_config(slot_state["path"])
             self.update_info_box(self.groupBox_experiment, cfg,
                                  "experiment")
             self.update_info_box(self.groupBox_fluorescence, cfg,

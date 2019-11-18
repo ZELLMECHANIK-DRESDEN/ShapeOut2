@@ -8,7 +8,7 @@ from ... import meta_tool
 
 class SlotPanel(QtWidgets.QWidget):
     #: Emitted when a shapeout2.pipeline.Dataslot is modified
-    slots_changed = QtCore.pyqtSignal()
+    slot_changed = QtCore.pyqtSignal(dict)
 
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self)
@@ -16,7 +16,7 @@ class SlotPanel(QtWidgets.QWidget):
             "shapeout2.gui.analysis", "ana_slot.ui")
         uic.loadUi(path_ui, self)
         # current Shape-Out 2 pipeline
-        self._pipeline = None
+        self.pipeline_state = None
         # signals
         self.pushButton_apply.clicked.connect(self.write_slot)
         self.pushButton_reset.clicked.connect(self.update_content)
@@ -26,10 +26,11 @@ class SlotPanel(QtWidgets.QWidget):
         self._init_emodulus()
 
     def __getstate__(self):
-        slot = self.current_slot
+        slot_state = self.current_slot_state
         state = {
+            "identifier": slot_state["identifier"],
             "name": self.lineEdit_name.text(),
-            "path": slot.path,
+            "path": slot_state["path"],
             "color": self.pushButton_color.color().name(),
             "fl names": {"FL-1": self.lineEdit_fl1.text(),
                          "FL-2": self.lineEdit_fl2.text(),
@@ -53,6 +54,9 @@ class SlotPanel(QtWidgets.QWidget):
         return state
 
     def __setstate__(self, state):
+        cur_state = self.current_slot_state
+        if cur_state["identifier"] != state["identifier"]:
+            raise ValueError("Slot dentifier mismatch!")
         self.lineEdit_name.setText(state["name"])
         self.lineEdit_path.setText(str(state["path"]))
         self.pushButton_color.setColor(state["color"])
@@ -118,34 +122,29 @@ class SlotPanel(QtWidgets.QWidget):
         self.doubleSpinBox_temp.valueChanged.connect(self.on_temperature)
 
     @property
-    def current_slot(self):
+    def current_slot_state(self):
         if self.slot_ids:
             slot_index = self.comboBox_slots.currentIndex()
-            slot_id = self.slot_ids[slot_index]
-            slot = self.pipeline.get_slot(slot_id)
+            slot_state = self.pipeline_state["slots"][slot_index]
         else:
-            slot = None
-        return slot
+            slot_state = None
+        return slot_state
 
     @property
     def slot_ids(self):
         """List of slot identifiers"""
-        if self.pipeline is None:
+        if self.pipeline_state is None:
             return []
         else:
-            return [slot.identifier for slot in self.pipeline.slots]
+            return [ss["identifier"] for ss in self.pipeline_state["slots"]]
 
     @property
     def slot_names(self):
         """List of slot names"""
-        if self.pipeline is None:
+        if self.pipeline_state is None:
             return []
         else:
-            return [slot.name for slot in self.pipeline.slots]
-
-    @property
-    def pipeline(self):
-        return self._pipeline
+            return [ss["name"] for ss in self.pipeline_state["slots"]]
 
     def on_medium(self):
         """Called if the user chose a different medium"""
@@ -175,9 +174,6 @@ class SlotPanel(QtWidgets.QWidget):
             self.doubleSpinBox_visc.setValue(visc)
             self.doubleSpinBox_visc.setReadOnly(True)
 
-    def set_pipeline(self, pipeline):
-        self._pipeline = pipeline
-
     def show_slot(self, slot_id):
         self.update_content(slot_index=self.slot_ids.index(slot_id))
 
@@ -195,11 +191,10 @@ class SlotPanel(QtWidgets.QWidget):
             self.comboBox_slots.setCurrentIndex(slot_index)
             self.comboBox_slots.blockSignals(False)
             # populate content
-            slot = self.pipeline.slots[slot_index]
-            state = slot.__getstate__()
-            self.__setstate__(state)
+            slot_state = self.pipeline_state["slots"][slot_index]
+            self.__setstate__(slot_state)
             # determine whether we already have a medium defined
-            cfg = meta_tool.get_rtdc_config(state["path"])
+            cfg = meta_tool.get_rtdc_config(slot_state["path"])
             if "medium" in cfg["setup"]:
                 medium = cfg["setup"]["medium"]
                 idx = self.comboBox_medium.findData(medium)
@@ -215,9 +210,6 @@ class SlotPanel(QtWidgets.QWidget):
     def write_slot(self):
         """Update the shapeout2.pipeline.Dataslot instance"""
         # get current index
-        slot_index = self.comboBox_slots.currentIndex()
-        slot = self.pipeline.slots[slot_index]
-        state = self.__getstate__()
-        slot.__setstate__(state)
-        self.slots_changed.emit()
-        self.update_content()  # update slot combobox and visible fl names
+        slot_state = self.__getstate__()
+        self.slot_changed.emit(slot_state)
+        # self.update_content()  # update slot combobox and visible fl names

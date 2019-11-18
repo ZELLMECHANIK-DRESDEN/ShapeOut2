@@ -58,6 +58,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.pushButton_preset_save.hide()
         # Subwindows
         self.subwindows = {}
+        # Subwindows for plots
+        self.subwindows_plots = {}
+        # Initialize a few thigns
         self.init_quick_view()
         self.init_analysis_view()
         self.mdiArea.cascadeSubWindows()
@@ -111,16 +114,28 @@ class ShapeOut2(QtWidgets.QMainWindow):
     def adopt_pipeline(self, pipeline_state):
         # Set the new state of the pipeline
         self.pipeline.__setstate__(pipeline_state)
+        # Update BlockMatrix
         if self.sender() != self.block_matrix:
             # Update BlockMatrix
             self.block_matrix.adopt_pipeline(pipeline_state)
+        # Update AnalysisView
         if self.sender() != self.widget_ana_view:
             self.widget_ana_view.adopt_pipeline(pipeline_state)
-
+        # Update QuickView choices
         self.widget_quick_view.update_feature_choices()
-        # Make sure all plot windows are created and shown
+        # Show Plot Windows
+        # create and show
         for plot_state in pipeline_state["plots"]:
             self.add_plot_window(plot_state["identifier"])
+        # remove old plot subwindows
+        plot_ids = [pp["identifier"] for pp in pipeline_state["plots"]]
+        for plot_id in list(self.subwindows_plots.keys()):
+            if plot_id not in plot_ids:
+                sub = self.subwindows_plots.pop(plot_id)
+                # disconnect signals
+                pw = sub.children()[-1]
+                self.plots_changed.disconnect(pw.update_content)
+                sub.deleteLater()
         self.plots_changed.emit()
 
         # redraw
@@ -195,8 +210,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     def add_plot_window(self, plot_id):
         """Create a plot window if necessary and show it"""
-        if plot_id in self.subwindows:
-            sub = self.subwindows[plot_id]
+        if plot_id in self.subwindows_plots:
+            sub = self.subwindows_plots[plot_id]
         else:
             # create subwindow
             sub = QtWidgets.QMdiSubWindow(self)
@@ -211,7 +226,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                                | QtCore.Qt.Tool)
             sub.setWidget(pw)
             self.mdiArea.addSubWindow(sub)
-            self.subwindows[plot_id] = sub
+            self.subwindows_plots[plot_id] = sub
         sub.show()
 
     def init_analysis_view(self):

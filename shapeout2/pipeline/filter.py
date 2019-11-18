@@ -45,6 +45,7 @@ class Filter(object):
     def __getstate__(self):
         state = {
             "enable filters": self.general["enable filters"],
+            "identifier": self.identifier,
             "limit events bool": self.limit_events[0],
             "limit events num": self.limit_events[1],
             "name": self.name,
@@ -55,6 +56,9 @@ class Filter(object):
         return state
 
     def __setstate__(self, state):
+        if self.identifier != state["identifier"]:
+            raise ValueError("Identifier mismatch: '{}' vs. '{}'".format(
+                self.identifier, state["identifier"]))
         self.general["enable filters"] = state["enable filters"]
         self.limit_events = [state["limit events bool"],
                              state["limit events num"]]

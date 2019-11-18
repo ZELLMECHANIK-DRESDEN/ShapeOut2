@@ -5,6 +5,7 @@ import dclab
 
 
 DEFAULT_STATE = {
+    "identifier": "no default",
     "layout": {
         "column count": 3,
         "division": "multiscatter+contour",
@@ -124,9 +125,16 @@ class Plot(object):
         self._state["layout"]["name"] = value
 
     def __getstate__(self):
-        return self._state
+        state = copy.deepcopy(self._state)
+        state["identifier"] = self.identifier
+        return state
 
     def __setstate__(self, state):
+        state = copy.deepcopy(state)
+        if self.identifier != state["identifier"]:
+            raise ValueError("Identifier mismatch: '{}' vs. '{}'".format(
+                self.identifier, state["identifier"]))
+        state.pop("identifier")
         self._state = state
 
     @staticmethod

@@ -350,12 +350,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
         for ss in statep["elements"]:
             for plot in statep["elements"][ss]:
                 state["elements"][ss][plot] = statep["elements"][ss][plot]
-        # Reduce a state from DataMatrix to something Pipeline can work with
-        for slot_id in state["elements"]:
-            for fp_id in state["elements"][slot_id]:
-                active = state["elements"][slot_id][fp_id]["active"]
-                enabled = state["elements"][slot_id][fp_id]["enabled"]
-                state["elements"][slot_id][fp_id] = active and enabled
         # Set the new state of the pipeline
         self.pipeline.__setstate__(state)
         # Make sure all plot windows are created and shown

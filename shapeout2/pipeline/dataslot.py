@@ -51,6 +51,7 @@ class Dataslot(object):
 
     def __getstate__(self):
         state = {"color": self.color,
+                 "identifier": self.identifier,
                  "name": self.name,
                  "path": self.path,
                  "fl names": self.fl_name_dict,
@@ -60,6 +61,9 @@ class Dataslot(object):
         return state
 
     def __setstate__(self, state):
+        if self.identifier != state["identifier"]:
+            raise ValueError("Identifier mismatch: '{}' vs. '{}'".format(
+                self.identifier, state["identifier"]))
         self.color = state["color"]
         self.name = state["name"]
         self.path = state["path"]

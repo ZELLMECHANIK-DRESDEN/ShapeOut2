@@ -333,6 +333,7 @@ class PlotPanel(QtWidgets.QWidget):
         plot_index = self.comboBox_plots.currentIndex()
         plot = Plot.get_plot(identifier=self.plot_ids[plot_index])
         state = self.__getstate__()
+        state["identifier"] = plot.identifier
         plot.__setstate__(state)
         self.plots_changed.emit()
         self.update_content()  # update plot selection combobox

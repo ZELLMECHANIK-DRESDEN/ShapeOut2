@@ -32,26 +32,41 @@ class DataMatrix(QtWidgets.QWidget):
         self._old_quickview_instance = None
 
     def __getstate__(self):
-        """Logical states of the current data matrix"""
+        """State of the current data matrix"""
         # slots
-        datasets = []
-        for ds in self.dataset_widgets:
-            datasets.append(ds.__getstate__())
+        slot_states = []
+        slots_used = []
+        for dw in self.dataset_widgets:
+            dw_state = dw.__getstate__()
+            slot = pipeline.Dataslot.get_slot(dw_state["identifier"])
+            slot_states.append(slot.__getstate__())
+            if dw_state["enabled"]:
+                slots_used.append(dw_state["identifier"])
         # filters
-        filters = []
-        for fs in self.filters:
-            filters.append(fs.__getstate__())
+        filter_states = []
+        filters_used = []
+        for fw in self.filter_widgets:
+            fw_state = fw.__getstate__()
+            filt = pipeline.Filter.get_filter(fw_state["identifier"])
+            filter_states.append(filt.__getstate__())
+            if fw_state["enabled"]:
+                filters_used.append(fw_state["identifier"])
         # elements
         mestates = {}
-        for ds in self.dataset_widgets:
+        for dw in self.dataset_widgets:
             idict = {}
-            for fs in self.filters:
-                me = self.get_matrix_element(ds.identifier, fs.identifier)
-                idict[fs.identifier] = me.__getstate__()
-            mestates[ds.identifier] = idict
+            for fw in self.filter_widgets:
+                me = self.get_matrix_element(dw.identifier, fw.identifier)
+                # We only store the information about whether the user
+                # clicked this element. The state about "enabled" is stored
+                # in `slots_used` and `filters_used`.
+                idict[fw.identifier] = me.__getstate__()["active"]
+            mestates[dw.identifier] = idict
         state = {"elements": mestates,
-                 "filters": filters,
-                 "slots": datasets,
+                 "filters": filter_states,
+                 "filters used": filters_used,
+                 "slots": slot_states,
+                 "slots used": slots_used,
                  }
         return state
 
@@ -61,19 +76,31 @@ class DataMatrix(QtWidgets.QWidget):
         self.clear()
         # dataset states
         for ii in range(len(state["slots"])):
-            self.add_dataset(state=state["slots"][ii])
+            slot_id = state["slots"][ii]["identifier"]
+            dw_state = {"path": state["slots"][ii]["path"],
+                        "identifier": slot_id,
+                        "enabled": slot_id in state["slots used"],
+                        }
+            self.add_dataset(state=dw_state)
         # filter states
         for jj in range(len(state["filters"])):
-            self.add_filter(state=state["filters"][jj])
+            filt_id = state["filters"][jj]["identifier"]
+            fw_state = {"identifier": filt_id,
+                        "enabled": filt_id in state["filters used"],
+                        "name": state["filters"][jj]["name"]
+                        }
+            self.add_filter(state=fw_state)
         # make sure elements exist
+        # (this also sets enabled/disabled state)
         self.fill_elements()
         # element states
         MatrixElement._quick_view_instance = None
         for slot_id in state["elements"]:
             ds_state = state["elements"][slot_id]
             for filt_id in ds_state:
-                me_state = ds_state[filt_id]
                 me = self.get_matrix_element(slot_id, filt_id)
+                me_state = me.__getstate__()
+                me_state["active"] = ds_state[filt_id]
                 me.__setstate__(me_state)
         self.adjust_size()
         self.blockSignals(False)
@@ -135,7 +162,7 @@ class DataMatrix(QtWidgets.QWidget):
         return height
 
     @property
-    def filters(self):
+    def filter_widgets(self):
         filters = []
         for jj in range(self.glo.columnCount()):
             item = self.glo.itemAtPosition(0, jj+1)
@@ -202,7 +229,6 @@ class DataMatrix(QtWidgets.QWidget):
     def copy_dataset(self, slot_id, duplicate=True):
         """Insert a copy of a dataset in the DataMatrix"""
         state = self.__getstate__()
-
         # this state will be used for the new slot
         new_state, index = self.get_slot_state(slot_id, ret_index=True)
         # create a new slot
@@ -217,6 +243,7 @@ class DataMatrix(QtWidgets.QWidget):
             # enable by default
             new_state["enabled"] = True
             state["slots"].insert(index+1, new_state)
+        state["slots used"].append(new_id)
         self.__setstate__(state)
 
     def rem_dataset(self, slot_id, not_exist_ok=False):
@@ -307,10 +334,12 @@ class DataMatrix(QtWidgets.QWidget):
         # make sure enabled/disabled is honored
         state = self.__getstate__()
         for slot_sate in state["slots"]:
+            slot_id = slot_sate["identifier"]
             for filt_state in state["filters"]:
-                if not slot_sate["enabled"] or not filt_state["enabled"]:
-                    me = self.get_matrix_element(slot_sate["identifier"],
-                                                 filt_state["identifier"])
+                filt_id = filt_state["identifier"]
+                if not (slot_id in state["slots used"]
+                        and filt_id in state["filters used"]):
+                    me = self.get_matrix_element(slot_id, filt_id)
                     mstate = me.__getstate__()
                     mstate["enabled"] = False
                     me.__setstate__(mstate)
@@ -327,7 +356,7 @@ class DataMatrix(QtWidgets.QWidget):
             return ds.__getstate__()
 
     def get_filter_state(self, filter_id):
-        for fs in self.filters:
+        for fs in self.filter_widgets:
             if fs.identifier == filter_id:
                 break
         else:

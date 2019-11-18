@@ -25,17 +25,19 @@ class PlotMatrix(QtWidgets.QWidget):
         """Logical states of the current plot matrix"""
         # plots
         plots = []
-        for ps in self.plots:
-            plots.append(ps.__getstate__())
+        for pw in self.plot_widgets:
+            pw_state = pw.__getstate__()
+            plot = pipeline.Plot._instances[pw_state["identifier"]]
+            plots.append(plot.__getstate__())
         # elements
         mestates = {}
         dm = self.data_matrix
-        for ds in dm.dataset_widgets:
+        for dw in dm.dataset_widgets:
             idict = {}
-            for ps in self.plots:
-                me = self.get_matrix_element(ds.identifier, ps.identifier)
-                idict[ps.identifier] = me.__getstate__()
-            mestates[ds.identifier] = idict
+            for pw in self.plot_widgets:
+                me = self.get_matrix_element(dw.identifier, pw.identifier)
+                idict[pw.identifier] = me.__getstate__()["active"]
+            mestates[dw.identifier] = idict
         state = {"elements": mestates,
                  "plots": plots}
         return state
@@ -46,15 +48,20 @@ class PlotMatrix(QtWidgets.QWidget):
         self.clear()
         # plot states
         for jj in range(len(state["plots"])):
-            self.add_plot(state=state["plots"][jj])
+            plot_id = state["plots"][jj]["identifier"]
+            pw_state = {"identifier": plot_id,
+                        "name": state["plots"][jj]["layout"]["name"],
+                        }
+            self.add_plot(state=pw_state)
         # make sure elements exist
         self.fill_elements()
         # element states
-        for ds_key in state["elements"]:
-            ds_state = state["elements"][ds_key]
-            for p_key in ds_state:
-                el_state = ds_state[p_key]
-                el = self.get_matrix_element(ds_key, p_key)
+        for slot_id in state["elements"]:
+            ds_d = state["elements"][slot_id]
+            for plot_id in ds_d:
+                el = self.get_matrix_element(slot_id, plot_id)
+                el_state = el.__getstate__()
+                el_state["active"] = ds_d[plot_id]
                 el.__setstate__(el_state)
         self.adjust_size()
         self.blockSignals(False)
@@ -123,7 +130,7 @@ class PlotMatrix(QtWidgets.QWidget):
         return count
 
     @property
-    def plots(self):
+    def plot_widgets(self):
         plots = []
         for jj in range(self.glo.columnCount()):
             item = self.glo.itemAtPosition(0, jj)
@@ -178,11 +185,12 @@ class PlotMatrix(QtWidgets.QWidget):
         # make sure enabled/disabled is honored
         dstate = self.data_matrix.__getstate__()
         pstate = self.__getstate__()
-        for ds in dstate["slots"]:
-            for ps in pstate["plots"]:
-                if not ds["enabled"]:
-                    me = self.get_matrix_element(ds["identifier"],
-                                                 ps["identifier"])
+        for slot_state in dstate["slots"]:
+            slot_id = slot_state["identifier"]
+            if slot_id not in dstate["slots used"]:
+                for plot_state in pstate["plots"]:
+                    plot_id = plot_state["identifier"]
+                    me = self.get_matrix_element(slot_id, plot_id)
                     mstate = me.__getstate__()
                     mstate["enabled"] = False
                     me.__setstate__(mstate)

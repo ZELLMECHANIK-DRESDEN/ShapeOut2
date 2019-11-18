@@ -34,34 +34,25 @@ class Pipeline(object):
             return
         self._old_state = state
         self.reset()
-        for ff in state["filters"]:
-            if ff["identifier"] in Filter._instances:
-                filt = Filter._instances[ff["identifier"]]
-            else:
-                filt = Filter(identifier=ff["identifier"])
-            # Also update filter parameters (for convenience)
-            filt.general["enable filters"] = ff["enabled"]
-            filt.name = ff["name"]
-            self.add_filter(filt)
-        for dd in state["slots"]:
-            if dd["identifier"] in Dataslot._instances:
-                # use existing slot
-                slot = Dataslot._instances[dd["identifier"]]
-            else:
-                # create new slot
-                slot = Dataslot(path=dd["path"],
-                                identifier=dd["identifier"])
-            self.add_slot(slot=slot)
-        for pp in state["plots"]:
-            if pp["identifier"] in Plot._instances:
-                # use existing slot
-                plot = Plot._instances[pp["identifier"]]
-            else:
-                # create new slot
-                plot = Plot(path=pp["path"],
-                            identifier=pp["identifier"])
-            self.add_plot(plot=plot)
         self.element_states = state["elements"]
+        for filt_state in state["filters"]:
+            self.add_filter(filt_state)
+        self.filters_used = state["filters used"]
+        for plot_state in state["plots"]:
+            self.add_plot(plot_state)
+        for slot_state in state["slots"]:
+            self.add_slot(slot=slot_state)
+        self.slots_used = state["slots used"]
+
+    def __getstate__(self):
+        state = {}
+        state["elements"] = self.element_states
+        state["filters"] = [filt.__getstate__() for filt in self.filters]
+        state["filters used"] = self.filters_used
+        state["plots"] = [plot.__getstate__() for plot in self.plots]
+        state["slots"] = [slot.__getstate__() for slot in self.slots]
+        state["slots used"] = self.slots_used
+        return state
 
     @property
     def num_filters(self):
@@ -84,8 +75,8 @@ class Pipeline(object):
 
         Parameters
         ----------
-        filt: shapeout2.pipeline.Filter
-            filter to apply
+        filt: shapeout2.pipeline.Filter or dict
+            Filter instance or its state from Filter.__getstate__()
 
         Returns
         -------
@@ -95,6 +86,15 @@ class Pipeline(object):
         """
         if filt is None:
             filt = Filter()
+        elif isinstance(filt, Filter):
+            pass
+        elif isinstance(filt, dict):
+            state = filt
+            if state["identifier"] in Filter._instances:
+                filt = Filter._instances[filt["identifier"]]
+            else:
+                filt = Filter()
+            filt.__setstate__(state)
         self.filters.append(filt)
         return filt.identifier
 
@@ -103,8 +103,8 @@ class Pipeline(object):
 
         Parameters
         ----------
-        plot: shapeout2.pipeline.Plot
-            plot to generate
+        plot: shapeout2.pipeline.Plot or dict
+            Plot instance or its state from Plot.__getstate__()
 
         Returns
         -------
@@ -114,6 +114,16 @@ class Pipeline(object):
         """
         if plot is None:
             plot = Plot()
+        elif isinstance(plot, Plot):
+            pass
+        elif isinstance(plot, dict):
+            state = plot
+            if state["identifier"] in Plot._instances:
+                plot = Plot._instances[plot["identifier"]]
+            else:
+                plot = Plot()
+            plot.__setstate__(state)
+
         self.plots.append(plot)
         return plot.identifier
 
@@ -122,8 +132,11 @@ class Pipeline(object):
 
         Parameters
         ----------
-        slot: Dataslot
-            Dataslot representing an experimental dataset
+        slot: shapeout2.pipeline.Dataslot or dict
+            Dataslot representing an experimental dataset or its
+            state from Dataslot.__getstate__()
+        path: str or pathlib.Path
+            Path to a measurement
 
         Returns
         -------
@@ -133,12 +146,21 @@ class Pipeline(object):
         identifier: str
             identifier of the slot
         """
-        if slot is None and path is not None:
+        if ((slot is None and path is None)
+                or (slot is not None and path is not None)):
+            raise ValueError("Please specify either `slot` or `path`.")
+        elif path is not None:
             slot = Dataslot(path=path)
-        elif isinstance(slot, Dataslot) and path is None:
+        elif isinstance(slot, Dataslot):
             pass
-        else:
-            raise ValueError("Please check arguments")
+        elif isinstance(slot, dict):
+            state = slot
+            if state["identifier"] in Dataslot._instances:
+                slot = Dataslot._instances[slot["identifier"]]
+            else:
+                slot = Dataslot()
+            slot.__setstate__(state)
+
         self.slots.append(slot)
         # check that the features are all the same
         f0 = meta_tool.get_rtdc_features(self.slots[0].path)
@@ -246,7 +268,7 @@ class Pipeline(object):
             #   states to avoid recomputation when `apply_filter`
             #   is called.
             # these are the element states in gui.matrix.dm_element
-            if fstates[filt_id]:
+            if fstates[filt_id] and filt_id in self.filters_used:
                 filt.update_dataset(row[ii])
             else:
                 row[ii].config["filtering"]["enable filters"] = False
@@ -298,7 +320,9 @@ class Pipeline(object):
         # keep the same order as in self.slots
         for slot_index in range(len(self.slots)):
             slot = self.slots[slot_index]
-            if self.element_states[slot.identifier][plot_id]:
+            slot_id = slot.identifier
+            if (self.element_states[slot_id][plot_id]
+                    and slot_id in self.slots_used):
                 ds = self.get_dataset(slot_index=slot_index,
                                       filt_index=filt_index,
                                       apply_filter=True)
@@ -306,26 +330,30 @@ class Pipeline(object):
                 states.append(slot.__getstate__())
         return datasets, states
 
-    def get_slot(self, identifier):
+    def get_slot(self, slot_id):
         """Return the Dataslot matching the RTDCBase identifier"""
         self.construct_matrix()
         for slot, row in zip(self.slots, self.matrix):
             ids = [ds.identifier for ds in row]
-            if identifier in ids:
+            if slot_id in ids:
                 break
         else:
             raise ValueError("Unknown dataset identifier: "
-                             + "`{}`".format(identifier))
+                             + "`{}`".format(slot_id))
         return slot
 
     def reset(self):
         """Reset the pipeline"""
         #: Filters are instances of :class:`shapeout2.pipeline.Filter`
         self.filters = []
+        #: List of identifiers for filters that are used
+        self.filters_used = []
         #: Plots are instances of :class:`shapeout2.pipeline.Plot`
         self.plots = []
         #: Slots are instances of :class:`shapeout2.pipeline.Dataslot`
         self.slots = []
+        #: List of identifiers for slots that are used
+        self.slots_used = []
         #: individual element states
         self.element_states = {}
 

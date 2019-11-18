@@ -71,8 +71,8 @@ class DataMatrix(QtWidgets.QWidget):
         return state
 
     def __setstate__(self, state):
-        self.blockSignals(True)
         self.setUpdatesEnabled(False)
+        self.blockSignals(True)
         self.clear()
         # dataset states
         for ii in range(len(state["slots"])):
@@ -226,46 +226,6 @@ class DataMatrix(QtWidgets.QWidget):
         self.publish_matrix()
         return md
 
-    def copy_dataset(self, slot_id, duplicate=True):
-        """Insert a copy of a dataset in the DataMatrix"""
-        state = self.__getstate__()
-        # this state will be used for the new slot
-        new_state, index = self.get_slot_state(slot_id, ret_index=True)
-        # create a new slot
-        slot = pipeline.Dataslot(path=new_state["path"])
-        new_id = slot.identifier
-        new_state["identifier"] = new_id
-        if duplicate:
-            # also set element states
-            state["elements"][new_id] = state["elements"][slot_id]
-            state["slots"].insert(index+1, new_state)
-        else:
-            # enable by default
-            new_state["enabled"] = True
-            state["slots"].insert(index+1, new_state)
-        state["slots used"].append(new_id)
-        self.__setstate__(state)
-        self.publish_matrix()
-
-    def rem_dataset(self, slot_id, not_exist_ok=False):
-        """Remove a dataset from the DataMatrix"""
-        state = self.__getstate__()
-        pstate = self.plot_matrix.__getstate__()
-        for slot_index, slot_state in enumerate(state["slots"]):
-            if slot_state["identifier"] == slot_id:
-                break
-        else:
-            if not_exist_ok:
-                return
-            else:
-                raise ValueError("Slot '{}' does not exist!".format(slot_id))
-        state["slots"].pop(slot_index)
-        state["elements"].pop(slot_state["identifier"])
-        pstate["elements"].pop(slot_state["identifier"])
-        self.__setstate__(state)
-        self.plot_matrix.__setstate__(pstate)
-        self.publish_matrix()
-
     def add_filter(self, identifier=None, state=None):
         self.setUpdatesEnabled(False)
         mf = MatrixFilter(identifier=identifier, state=state)
@@ -309,7 +269,6 @@ class DataMatrix(QtWidgets.QWidget):
             self._old_quickview_instance = MatrixElement._quick_view_instance
             MatrixElement._quick_view_instance = None
         self.update_content()
-        self.publish_matrix()
 
     def clear(self):
         """Reset layout"""
@@ -417,12 +376,35 @@ class DataMatrix(QtWidgets.QWidget):
         slot_id = ds_state["identifier"]
         # remember current quickview element ids
         qvslot_id, qv_filt_id = self.get_quickview_ids()
-        if option == "insert_anew":
-            self.copy_dataset(slot_id=slot_id, duplicate=False)
-        elif option == "duplicate":
-            self.copy_dataset(slot_id=slot_id, duplicate=True)
-        else:  # remove
-            self.rem_dataset(slot_id=slot_id)
+        state = self.__getstate__()
+        if option == "remove":
+            pstate = self.plot_matrix.__getstate__()
+            for slot_index, slot_state in enumerate(state["slots"]):
+                if slot_state["identifier"] == slot_id:
+                    break
+            else:
+                raise ValueError("Slot '{}' does not exist!".format(slot_id))
+            state["slots"].pop(slot_index)
+            if slot_id in state["slots used"]:
+                state["slots used"].pop(slot_id)
+            state["elements"].pop(slot_state["identifier"])
+            pstate["elements"].pop(slot_state["identifier"])
+            self.plot_matrix.__setstate__(pstate)
+        else:
+            new_state, index = self.get_slot_state(slot_id, ret_index=True)
+            # create a new slot
+            slot = pipeline.Dataslot(path=new_state["path"])
+            new_id = slot.identifier
+            new_state["identifier"] = new_id
+            if option == "duplicate":
+                # also set element states
+                state["elements"][new_id] = state["elements"][slot_id]
+                state["slots"].insert(index+1, new_state)
+            else:  # insert_anew
+                new_state["enabled"] = True
+                state["slots"].insert(index+1, new_state)
+            state["slots used"].append(new_id)
+        self.__setstate__(state)
         # re-apply current quickview ids
         try:
             meqv = self.get_matrix_element(qvslot_id, qv_filt_id)

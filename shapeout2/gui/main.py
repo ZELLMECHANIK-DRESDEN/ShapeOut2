@@ -367,7 +367,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.data_matrix.enable_quickview(view)
         # redraw
         self.mdiArea.update()
-        self.subwindows["quick_view"].update()
+        if view:
+            self.subwindows["quick_view"].update()
 
     @QtCore.pyqtSlot()
     def on_quickview_refresh(self):

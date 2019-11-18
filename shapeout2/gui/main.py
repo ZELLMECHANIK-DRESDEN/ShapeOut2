@@ -88,6 +88,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.widget_plot.set_pipeline(self.pipeline)
         # filter signals
         self.widget_ana_view.filter_changed.connect(self.adopt_filter)
+        self.widget_ana_view.pipeline_changed.connect(self.adopt_pipeline)
         # polygon filter creation
         self.widget_ana_view.widget_filter.request_new_polygon_filter.connect(
             self.on_new_polygon_filter)
@@ -119,8 +120,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             # Update BlockMatrix
             self.block_matrix.adopt_pipeline(pipeline_state)
         # Update AnalysisView
-        if self.sender() != self.widget_ana_view:
-            self.widget_ana_view.adopt_pipeline(pipeline_state)
+        self.widget_ana_view.adopt_pipeline(pipeline_state)
         # Update QuickView choices
         self.widget_quick_view.update_feature_choices()
         # Show Plot Windows

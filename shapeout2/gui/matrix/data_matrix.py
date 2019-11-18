@@ -71,6 +71,8 @@ class DataMatrix(QtWidgets.QWidget):
         return state
 
     def __setstate__(self, state):
+        # remember current QuickView identifiers
+        qv_slot_id, qv_filt_id = self.get_quickview_ids()
         self.setUpdatesEnabled(False)
         self.blockSignals(True)
         self.clear()
@@ -102,6 +104,14 @@ class DataMatrix(QtWidgets.QWidget):
                 me_state = me.__getstate__()
                 me_state["active"] = ds_state[filt_id]
                 me.__setstate__(me_state)
+        # re-apply current quickview ids
+        try:
+            meqv = self.get_matrix_element(qv_slot_id, qv_filt_id)
+        except KeyError:
+            pass
+        else:
+            MatrixElement._quick_view_instance = meqv
+            self.update_content()
         self.adjust_size()
         self.blockSignals(False)
         self.setUpdatesEnabled(True)
@@ -423,8 +433,6 @@ class DataMatrix(QtWidgets.QWidget):
         _, column, _, _ = self.glo.getItemPosition(idx)
         state = self.__getstate__()
         f_state = sender.__getstate__()
-        # remember current quickview element ids
-        qvslot_id, qv_filt_id = self.get_quickview_ids()
         if option == "duplicate":
             filt = pipeline.Filter()
             f_state["identifier"] = filt.identifier
@@ -435,14 +443,6 @@ class DataMatrix(QtWidgets.QWidget):
             for ds_key in state["elements"]:
                 state["elements"][ds_key].pop(f_state["identifier"])
         self.__setstate__(state)
-        # re-apply current quickview ids
-        try:
-            meqv = self.get_matrix_element(qvslot_id, qv_filt_id)
-        except KeyError:
-            pass
-        else:
-            MatrixElement._quick_view_instance = meqv
-            self.update_content()
         self.publish_matrix()
 
     def publish_matrix(self):

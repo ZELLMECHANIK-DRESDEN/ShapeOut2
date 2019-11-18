@@ -7,6 +7,7 @@ class AnalysisView(QtWidgets.QWidget):
     filter_changed = QtCore.pyqtSignal(dict)
     plot_changed = QtCore.pyqtSignal(dict)
     slot_changed = QtCore.pyqtSignal(dict)
+    pipeline_changed = QtCore.pyqtSignal(dict)
 
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self)
@@ -17,6 +18,7 @@ class AnalysisView(QtWidgets.QWidget):
         self.setMinimumSize(self.sizeHint())
         # Signals
         self.widget_filter.filter_changed.connect(self.filter_changed)
+        self.widget_filter.pipeline_changed.connect(self.pipeline_changed)
         self.widget_plot.plot_changed.connect(self.plot_changed)
         self.widget_slot.slot_changed.connect(self.slot_changed)
 

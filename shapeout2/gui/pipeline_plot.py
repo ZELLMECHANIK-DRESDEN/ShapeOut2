@@ -102,6 +102,7 @@ class PipelinePlot(QtWidgets.QWidget):
                            colspan=1)
             pp.redraw(dslist, slot_states, plot_state_contour)
 
+
 class PipelinePlotItem(SimplePlotItem):
     def __init__(self, *args, **kwargs):
         super(PipelinePlotItem, self).__init__(*args, **kwargs)

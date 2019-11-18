@@ -34,7 +34,6 @@ class Pipeline(object):
             return
         self._old_state = state
         self.reset()
-        self.element_states = state["elements"]
         for filt_state in state["filters"]:
             self.add_filter(filt_state)
         self.filters_used = state["filters used"]
@@ -43,6 +42,8 @@ class Pipeline(object):
         for slot_state in state["slots"]:
             self.add_slot(slot=slot_state)
         self.slots_used = state["slots used"]
+        # set element states at the end
+        self.element_states = state["elements"]
 
     def __getstate__(self):
         state = {}
@@ -53,6 +54,18 @@ class Pipeline(object):
         state["slots"] = [slot.__getstate__() for slot in self.slots]
         state["slots used"] = self.slots_used
         return state
+
+    @property
+    def filter_ids(self):
+        return [filt.identifier for filt in self.filters]
+
+    @property
+    def plot_ids(self):
+        return [plot.identifier for plot in self.plots]
+
+    @property
+    def slot_ids(self):
+        return [slot.identifier for slot in self.slots]
 
     @property
     def num_filters(self):
@@ -70,13 +83,15 @@ class Pipeline(object):
     def paths(self):
         return [ds.path for ds in self.slots]
 
-    def add_filter(self, filt=None):
+    def add_filter(self, filt=None, index=None):
         """Add a filter to the pipeline
 
         Parameters
         ----------
         filt: shapeout2.pipeline.Filter or dict
             Filter instance or its state from Filter.__getstate__()
+        index: int
+            Position in the filter list, defaults to `len(self.filters)`
 
         Returns
         -------
@@ -84,6 +99,8 @@ class Pipeline(object):
             index of the filter in the pipeline;
             indexing starts at "0".
         """
+        if index is None:
+            index = len(self.filters)
         if filt is None:
             filt = Filter()
         elif isinstance(filt, Filter):
@@ -95,16 +112,22 @@ class Pipeline(object):
             else:
                 filt = Filter()
             filt.__setstate__(state)
-        self.filters.append(filt)
-        return filt.identifier
+        self.filters.insert(index, filt)
+        filt_id = filt.identifier
+        for slot_id in self.slot_ids:
+            self.element_states[slot_id][filt_id] = False
+        self.filters_used.append(filt_id)
+        return filt_id
 
-    def add_plot(self, plot=None):
+    def add_plot(self, plot=None, index=None):
         """Add a filter to the pipeline
 
         Parameters
         ----------
         plot: shapeout2.pipeline.Plot or dict
             Plot instance or its state from Plot.__getstate__()
+        index: int
+            Position in the plot list, defaults to `len(self.plots)`
 
         Returns
         -------
@@ -112,6 +135,8 @@ class Pipeline(object):
             index of the plot in the pipeline;
             indexing starts at "0".
         """
+        if index is None:
+            index = len(self.plots)
         if plot is None:
             plot = Plot()
         elif isinstance(plot, Plot):
@@ -124,10 +149,14 @@ class Pipeline(object):
                 plot = Plot()
             plot.__setstate__(state)
 
-        self.plots.append(plot)
+        self.plots.insert(index, plot)
+        plot_id = plot.identifier
+        for slot_id in self.slot_ids:
+            self.element_states[slot_id][plot_id] = False
+
         return plot.identifier
 
-    def add_slot(self, slot=None, path=None):
+    def add_slot(self, slot=None, path=None, index=None):
         """Add a slot (experiment) to the pipeline
 
         Parameters
@@ -137,6 +166,8 @@ class Pipeline(object):
             state from Dataslot.__getstate__()
         path: str or pathlib.Path
             Path to a measurement
+        index: int
+            Position in the slot list, defaults to `len(self.slots)`
 
         Returns
         -------
@@ -146,6 +177,8 @@ class Pipeline(object):
         identifier: str
             identifier of the slot
         """
+        if index is None:
+            index = len(self.slots)
         if ((slot is None and path is None)
                 or (slot is not None and path is not None)):
             raise ValueError("Please specify either `slot` or `path`.")
@@ -161,7 +194,13 @@ class Pipeline(object):
                 slot = Dataslot()
             slot.__setstate__(state)
 
-        self.slots.append(slot)
+        self.slots.insert(index, slot)
+        slot_id = slot.identifier
+        self.element_states[slot_id] = {}
+        for filt_id in self.filter_ids:
+            self.element_states[slot_id][filt_id] = False
+        self.slots_used.append(slot_id)
+
         # check that the features are all the same
         f0 = meta_tool.get_rtdc_features(self.slots[0].path)
         fi = meta_tool.get_rtdc_features(slot.path)
@@ -342,6 +381,33 @@ class Pipeline(object):
                              + "`{}`".format(slot_id))
         return slot
 
+    def remove_filter(self, filt_id):
+        """Remove a filter by filter identifier"""
+        index = self.filter_ids.index(filt_id)
+        self.filters.pop(index)
+        if filt_id in self.filters_used:
+            self.filters_used.remove(filt_id)
+        for slot_id in self.element_states:
+            if filt_id in self.element_states[slot_id]:
+                self.element_states[slot_id].pop(filt_id)
+
+    def remove_plot(self, plot_id):
+        """Remove a filter by plot identifier"""
+        index = self.filter_ids.index(plot_id)
+        self.plot_id.pop(index)
+        for slot_id in self.element_states:
+            if plot_id in self.element_states[slot_id]:
+                self.element_states[slot_id].pop(plot_id)
+
+    def remove_slot(self, slot_id):
+        """Remove a slot by slot identifier"""
+        index = self.filter_ids.index(slot_id)
+        self.filters.pop(index)
+        if slot_id in self.plots_used:
+            self.plots_used.remove(slot_id)
+        if slot_id in self.element_states:
+            self.element_states.pop(slot_id)
+
     def reset(self):
         """Reset the pipeline"""
         #: Filters are instances of :class:`shapeout2.pipeline.Filter`
@@ -356,17 +422,3 @@ class Pipeline(object):
         self.slots_used = []
         #: individual element states
         self.element_states = {}
-
-    def rm_filter(self, index):
-        """Remove a filter by index
-
-        indexing starts at "0"
-        """
-        self.filters.pop(index)
-
-    def rm_slot(self, index):
-        """Remove a slot by index
-
-        indexing starts at "0"
-        """
-        self.slots.pop(index)

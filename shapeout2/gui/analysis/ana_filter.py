@@ -1,3 +1,4 @@
+import copy
 import pkg_resources
 
 from PyQt5 import uic, QtCore, QtWidgets
@@ -14,8 +15,10 @@ SHOW_FEATURES = ["deform", "area_um", "bright_avg"]
 
 
 class FilterPanel(QtWidgets.QWidget):
-    #: Emitted when a shapeout2.pipeline.Filter is modified
+    #: Emitted when a shapeout2.pipeline.Filter is to be changed
     filter_changed = QtCore.pyqtSignal(dict)
+    #: Emitted when the pipeline is to be changed
+    pipeline_changed = QtCore.pyqtSignal(dict)
     #: Emitted when the user wants to create a new polygon filter
     request_new_polygon_filter = QtCore.pyqtSignal()
 
@@ -30,6 +33,8 @@ class FilterPanel(QtWidgets.QWidget):
         self._init_box_filters()
         self._polygon_checkboxes = {}
         self.update_polygon_filters()
+        self.pushButton_duplicate.clicked.connect(self.on_duplicate_filter)
+        self.pushButton_remove.clicked.connect(self.on_remove_filter)
         self.pushButton_apply.clicked.connect(self.write_filter)
         self.pushButton_reset.clicked.connect(self.update_content)
         self.comboBox_filters.currentIndexChanged.connect(self.update_content)
@@ -147,6 +152,26 @@ class FilterPanel(QtWidgets.QWidget):
     @property
     def pipeline(self):
         return self._pipeline
+
+    def on_duplicate_filter(self):
+        # determine the new filter state
+        filt_state = self.__getstate__()
+        new_state = copy.deepcopy(filt_state)
+        new_filt = Filter()
+        new_state["identifier"] = new_filt.identifier
+        new_state["name"] = new_filt.name
+        new_filt.__setstate__(new_state)
+        # determine the filter position
+        pos = self.pipeline.filter_ids.index(filt_state["identifier"])
+        self.pipeline.add_filter(new_filt, index=pos+1)
+        state = self.pipeline.__getstate__()
+        self.pipeline_changed.emit(state)
+
+    def on_remove_filter(self):
+        filt_state = self.__getstate__()
+        self.pipeline.remove_filter(filt_state["identifier"])
+        state = self.pipeline.__getstate__()
+        self.pipeline_changed.emit(state)
 
     def on_moreless(self):
         """User wants to choose box filters"""
@@ -266,9 +291,6 @@ class FilterPanel(QtWidgets.QWidget):
     def write_filter(self):
         """Update the shapeout2.pipeline.Filter instance"""
         # get current index
-        filt_index = self.comboBox_filters.currentIndex()
-        filt = Filter.get_filter(identifier=self.filter_names[filt_index])
         filter_state = self.__getstate__()
-        filt.__setstate__(filter_state)
-        self.update_content()  # update filter selection combobox
         self.filter_changed.emit(filter_state)
+        self.update_content()  # update filter selection combobox

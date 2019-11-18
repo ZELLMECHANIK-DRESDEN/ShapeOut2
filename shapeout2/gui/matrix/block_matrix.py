@@ -26,10 +26,6 @@ class BlockMatrix(QtCore.QObject):
         return state
 
     def __setstate__(self, state):
-        if self._old_state == state:
-            return
-        else:
-            self._old_state = state
         # DataMatrix
         stated = copy.deepcopy(state)
         stated.pop("plots")

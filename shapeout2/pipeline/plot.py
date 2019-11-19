@@ -30,6 +30,7 @@ DEFAULT_STATE = {
         "downsampling value": 5000,
         "enabled": True,
         "hue feature": "bright_avg",  # which feature to use, if set
+        "marker alpha": 0.3,  # alpha value for feature-hue plots
         "marker hue": "kde",  # hue defined by: kde, dataset, feature, none
         "marker size": 3.0,  # marker size [pt]
         "show event count": True,  # display event count
@@ -74,6 +75,7 @@ STATE_OPTIONS = {
         "downsampling value": int,
         "enabled":  bool,
         "hue feature": dclab.dfn.scalar_feature_names,
+        "marker alpha": float,
         "marker hue": ["dataset", "kde", "feature", "none"],
         "marker size": float,
         "show event count": bool,

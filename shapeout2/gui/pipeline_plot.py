@@ -311,10 +311,16 @@ def add_scatter(plot_item, plot_state, rtdc_ds, slot_state):
         for f in feat:
             brush.append(pg.intColor(int(f*num_hues), num_hues))
     elif sca["marker hue"] == "dataset":
-
-        brush = pg.mkBrush(slot_state["color"])
+        alpha = int(sca["marker alpha"] * 255)
+        color = pg.mkColor(slot_state["color"])
+        color.setAlpha(alpha)
+        brush = pg.mkBrush(color)
     else:
-        brush = pg.mkBrush("k")
+        alpha = int(sca["marker alpha"] * 255)
+        color = pg.mkColor("k")
+        color.setAlpha(alpha)
+        brush = pg.mkBrush(color)
+
     # convert to log-scale if applicable
     if gen["scale x"] == "log":
         x = np.log10(x)

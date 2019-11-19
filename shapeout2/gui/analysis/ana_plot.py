@@ -80,6 +80,7 @@ class PlotPanel(QtWidgets.QWidget):
                 "downsampling value": self.spinBox_downsample.value(),
                 "enabled": self.groupBox_scatter.isChecked(),
                 "hue feature": self.comboBox_marker_feature.currentData(),
+                "marker alpha": self.spinBox_alpha.value() / 100,
                 "marker hue": self.comboBox_marker_hue.currentData(),
                 "marker size": self.doubleSpinBox_marker_size.value(),
                 "show event count": self.checkBox_event_count.isChecked(),
@@ -152,6 +153,7 @@ class PlotPanel(QtWidgets.QWidget):
         color_index = COLORMAPS.index(sca["colormap"])
         self.comboBox_colormap.setCurrentIndex(color_index)
         self.checkBox_event_count.setChecked(sca["show event count"])
+        self.spinBox_alpha.setValue(sca["marker alpha"]*100)
 
         # Contour
         con = state["contour"]
@@ -302,18 +304,24 @@ class PlotPanel(QtWidgets.QWidget):
 
     def on_hue_select(self):
         """Show/hide options for feature-based hue selection"""
+        selection = self.comboBox_marker_hue.currentData()
+        # hide everything
+        self.comboBox_marker_feature.hide()
+        self.widget_dataset_alpha.hide()
+        self.comboBox_colormap.hide()
+        self.label_colormap.hide()
         # Only show feature selection if needed
-        if self.comboBox_marker_hue.currentData() == "feature":
+        if selection == "feature":
             self.comboBox_marker_feature.show()
-        else:
-            self.comboBox_marker_feature.hide()
-        # Only show colormap selection if needed
-        if self.comboBox_marker_hue.currentData() in ["dataset", "none"]:
-            self.comboBox_colormap.hide()
-            self.label_colormap.hide()
-        else:
             self.comboBox_colormap.show()
             self.label_colormap.show()
+        elif selection == "kde":
+            self.comboBox_colormap.show()
+            self.label_colormap.show()
+        elif selection in ["dataset", "none"]:
+            self.widget_dataset_alpha.show()
+        else:
+            raise ValueError("Unknown selection: '{}'".format(selection))
 
     def show_plot(self, plot_id):
         self.update_content(plot_index=self.plot_ids.index(plot_id))

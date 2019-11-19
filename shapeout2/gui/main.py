@@ -104,6 +104,13 @@ class ShapeOut2(QtWidgets.QMainWindow):
         for ii in range(len(state["filters"])):
             if state["filters"][ii]["identifier"] == filt_id:
                 state["filters"][ii] = filt_state
+                # make sure filters are enabled/disabled
+                if (filt_state["filter used"]
+                        and filt_id not in state["filters used"]):
+                    state["filters used"].append(filt_id)
+                elif (not filt_state["filter used"]
+                      and filt_id in state["filters used"]):
+                    state["filters used"].remove(filt_id)
                 break
         else:
             raise ValueError("Filter not in pipeline: {}".format(filt_id))
@@ -160,6 +167,13 @@ class ShapeOut2(QtWidgets.QMainWindow):
         for ii in range(len(state["slots"])):
             if state["slots"][ii]["identifier"] == slot_id:
                 state["slots"][ii] = slot_state
+                # make sure filters are enabled/disabled
+                if (slot_state["slot used"]
+                        and slot_id not in state["slots used"]):
+                    state["slots used"].append(slot_id)
+                elif (not slot_state["slot used"]
+                      and slot_id in state["slots used"]):
+                    state["slots used"].remove(slot_id)
                 break
         else:
             raise ValueError("Slot not in pipeline: {}".format(slot_id))

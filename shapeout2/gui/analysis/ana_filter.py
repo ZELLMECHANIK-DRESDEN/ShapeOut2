@@ -45,11 +45,11 @@ class FilterPanel(QtWidgets.QWidget):
 
     def __getstate__(self):
         state = {
+            "filter used": self.checkBox_enable.isChecked(),
             "identifier": self.current_filter.identifier,
-            "enable filters": self.checkBox_enable.isChecked(),
-            "name": self.lineEdit_name.text(),
             "limit events bool": self.checkBox_limit.isChecked(),
             "limit events num": self.spinBox_limit.value(),
+            "name": self.lineEdit_name.text(),
             "remove invalid events": self.checkBox_invalid.isChecked(),
         }
         # box filters
@@ -69,7 +69,7 @@ class FilterPanel(QtWidgets.QWidget):
     def __setstate__(self, state):
         if self.current_filter.identifier != state["identifier"]:
             raise ValueError("Filter identifier mismatch!")
-        self.checkBox_enable.setChecked(state["enable filters"])
+        self.checkBox_enable.setChecked(state["filter used"])
         self.lineEdit_name.setText(state["name"])
         self.checkBox_limit.setChecked(state["limit events bool"])
         self.spinBox_limit.setValue(state["limit events num"])

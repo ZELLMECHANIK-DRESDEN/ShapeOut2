@@ -153,6 +153,13 @@
       </layout>
      </item>
      <item>
+      <widget class="QCheckBox" name="checkBox_use">
+       <property name="text">
+        <string>Use this slot</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QGroupBox" name="groupBox_2">
        <property name="toolTip">
         <string>These values are used to compute the Young's modulus.</string>

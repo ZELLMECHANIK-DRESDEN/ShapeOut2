@@ -39,9 +39,11 @@ class DataMatrix(QtWidgets.QWidget):
         for dw in self.dataset_widgets:
             dw_state = dw.__getstate__()
             slot = pipeline.Dataslot.get_slot(dw_state["identifier"])
+            slot.slot_used = dw_state["enabled"]
             slot_states.append(slot.__getstate__())
             if dw_state["enabled"]:
                 slots_used.append(dw_state["identifier"])
+
         # filters
         filter_states = []
         filters_used = []

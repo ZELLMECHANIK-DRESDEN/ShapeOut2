@@ -39,6 +39,7 @@ class SlotPanel(QtWidgets.QWidget):
             "name": self.lineEdit_name.text(),
             "path": slot_state["path"],
             "color": self.pushButton_color.color().name(),
+            "slot used": self.checkBox_use.isChecked(),
             "fl names": {"FL-1": self.lineEdit_fl1.text(),
                          "FL-2": self.lineEdit_fl2.text(),
                          "FL-3": self.lineEdit_fl3.text(),
@@ -70,6 +71,7 @@ class SlotPanel(QtWidgets.QWidget):
         self.lineEdit_fl1.setText(state["fl names"]["FL-1"])
         self.lineEdit_fl2.setText(state["fl names"]["FL-2"])
         self.lineEdit_fl3.setText(state["fl names"]["FL-3"])
+        self.checkBox_use.setChecked(state["slot used"])
         # crosstalk
         crosstalk = state["crosstalk"]
         self.doubleSpinBox_ct12.setValue(crosstalk["crosstalk fl12"])

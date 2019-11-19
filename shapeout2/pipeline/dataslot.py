@@ -22,6 +22,8 @@ class Dataslot(object):
         self.identifier = identifier
         #: user-defined name of the filter
         self.name = name
+        #: whether or not to use this slot
+        self.slot_used = True
         if identifier in Dataslot._instances:
             raise ValueError("Dataslot with identifier "
                              + "'{}' already exists!".format(identifier))
@@ -51,12 +53,13 @@ class Dataslot(object):
 
     def __getstate__(self):
         state = {"color": self.color,
+                 "crosstalk": self.config["crosstalk"],
+                 "emodulus": self.config["emodulus"],
+                 "fl names": self.fl_name_dict,
                  "identifier": self.identifier,
                  "name": self.name,
                  "path": self.path,
-                 "fl names": self.fl_name_dict,
-                 "crosstalk": self.config["crosstalk"],
-                 "emodulus": self.config["emodulus"],
+                 "slot used": self.slot_used,
                  }
         return state
 
@@ -65,11 +68,12 @@ class Dataslot(object):
             raise ValueError("Identifier mismatch: '{}' vs. '{}'".format(
                 self.identifier, state["identifier"]))
         self.color = state["color"]
-        self.name = state["name"]
-        self.path = state["path"]
-        self.fl_name_dict = state["fl names"]
         self.config["crosstalk"] = state["crosstalk"]
         self.config["emodulus"] = state["emodulus"]
+        self.fl_name_dict = state["fl names"]
+        self.name = state["name"]
+        self.path = state["path"]
+        self.slot_used = state["slot used"]
 
     @staticmethod
     def get_slot(identifier):

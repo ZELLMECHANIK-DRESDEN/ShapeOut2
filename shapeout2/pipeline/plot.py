@@ -49,6 +49,7 @@ _kde_methods = sorted(dclab.kde_methods.methods.keys())
 _kde_methods.remove("none")  # does not make sense here
 
 STATE_OPTIONS = {
+    "identifier": str,
     "layout": {
         "column count": int,
         "division": ["each", "merge", "multiscatter+contour"],

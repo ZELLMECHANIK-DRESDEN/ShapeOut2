@@ -316,24 +316,34 @@ class DataMatrix(QtWidgets.QWidget):
                     mstate["enabled"] = False
                     me.__setstate__(mstate)
 
-    def get_slot_state(self, slot_id, ret_index=False):
+    def get_filter_index(self, filter_id):
+        for ii, fs in enumerate(self.filter_widgets):
+            if fs.identifier == filter_id:
+                break
+        else:
+            raise KeyError("Filter '{}' not found!".format(filter_id))
+        return ii
+
+    def get_filter_widget_state(self, filter_id):
+        ii = self.get_filter_index(filter_id)
+        fw = self.filter_widgets[ii]
+        return fw.__getstate__()
+
+    def get_slot_index(self, slot_id):
         for ii, ds in enumerate(self.dataset_widgets):
             if ds.identifier == slot_id:
                 break
         else:
             raise KeyError("Dataset '{}' not found!".format(slot_id))
-        if ret_index:
-            return ds.__getstate__(), ii
-        else:
-            return ds.__getstate__()
+        return ii
 
-    def get_filter_state(self, filter_id):
-        for fs in self.filter_widgets:
-            if fs.identifier == filter_id:
-                break
+    def get_slot_widget_state(self, slot_id, ret_index=False):
+        ii = self.get_slot_index(slot_id)
+        dw = self.dataset_widgets[ii]
+        if ret_index:
+            return dw.__getstate__(), ii
         else:
-            raise KeyError("Filter '{}' not found!".format(filter_id))
-        return fs.__getstate__()
+            return dw.__getstate__()
 
     def get_matrix_element(self, slot_id, filt_id):
         """Return matrix element matching dataset and filter identifiers"""
@@ -381,67 +391,65 @@ class DataMatrix(QtWidgets.QWidget):
     @QtCore.pyqtSlot(str)
     def on_option_dataset(self, option):
         """Dataset option logic (remove, insert_anew, duplicate)"""
-        sender = self.sender()
-        ds_state = sender.__getstate__()
-        slot_id = ds_state["identifier"]
-        # remember current quickview element ids
-        qvslot_id, qv_filt_id = self.get_quickview_ids()
+        self.setUpdatesEnabled(False)
+        dw_state = self.sender().__getstate__()
+        slot_id = dw_state["identifier"]
+        slot_index = self.get_slot_index(slot_id)
         state = self.__getstate__()
+        pstate = self.plot_matrix.__getstate__()
         if option == "remove":
-            pstate = self.plot_matrix.__getstate__()
-            for slot_index, slot_state in enumerate(state["slots"]):
-                if slot_state["identifier"] == slot_id:
-                    break
-            else:
-                raise ValueError("Slot '{}' does not exist!".format(slot_id))
             state["slots"].pop(slot_index)
             if slot_id in state["slots used"]:
-                state["slots used"].pop(slot_id)
-            state["elements"].pop(slot_state["identifier"])
-            pstate["elements"].pop(slot_state["identifier"])
-            self.plot_matrix.__setstate__(pstate)
+                state["slots used"].remove(slot_id)
+            state["elements"].pop(slot_id)
+            pstate["elements"].pop(slot_id)
         else:
-            new_state, index = self.get_slot_state(slot_id, ret_index=True)
             # create a new slot
-            slot = pipeline.Dataslot(path=new_state["path"])
+            slot = pipeline.Dataslot(path=dw_state["path"])
             new_id = slot.identifier
-            new_state["identifier"] = new_id
             if option == "duplicate":
+                orig_state = copy.deepcopy(state["slots"][slot_index])
+                # use original state
+                new_state = orig_state
+                new_state["identifier"] = new_id
+                new_state["name"] = slot.name
+                new_state["color"] = slot.color
                 # also set element states
-                state["elements"][new_id] = state["elements"][slot_id]
-                state["slots"].insert(index+1, new_state)
+                # state["elements"][new_id] = state["elements"][slot_id]
             else:  # insert_anew
-                new_state["enabled"] = True
-                state["slots"].insert(index+1, new_state)
+                new_state = slot.__getstate__()
+            slot.__setstate__(new_state)
+            state["slots"].insert(slot_index+1, new_state)
             state["slots used"].append(new_id)
+        # this also takes care of filling up matrix elements
         self.__setstate__(state)
-        # re-apply current quickview ids
-        try:
-            meqv = self.get_matrix_element(qvslot_id, qv_filt_id)
-        except KeyError:
-            pass
-        else:
-            MatrixElement._quick_view_instance = meqv
-            self.update_content()
+        # this correctly assigns elements in plot matrix
+        # (also when option is not remove)
+        self.plot_matrix.__setstate__(pstate)
+        self.plot_matrix.fill_elements()
         self.publish_matrix()
+        self.setUpdatesEnabled(True)
 
     @QtCore.pyqtSlot(str)
     def on_option_filter(self, option):
         """Filter option logic (remove, duplicate)"""
-        sender = self.sender()
-        idx = self.glo.indexOf(sender)
-        _, column, _, _ = self.glo.getItemPosition(idx)
+        fw_state = self.sender().__getstate__()
+        filt_id = fw_state["identifier"]
+        filt_index = self.get_filter_index(filt_id)
         state = self.__getstate__()
-        f_state = sender.__getstate__()
-        if option == "duplicate":
-            filt = pipeline.Filter()
-            f_state["identifier"] = filt.identifier
-            f_state["name"] = filt.name
-            state["filters"].insert(column, f_state)
-        else:  # remove
-            state["filters"].pop(column-1)
+        if option == "remove":
+            state["filters"].pop(filt_index)
+            # remove matrix elements
             for ds_key in state["elements"]:
-                state["elements"][ds_key].pop(f_state["identifier"])
+                state["elements"][ds_key].pop(filt_id)
+        else:  # duplicate
+            filt = pipeline.Filter()
+            new_state = copy.deepcopy(state["filters"][filt_index])
+            new_state["identifier"] = filt.identifier
+            new_state["name"] = filt.name
+            state["filters"].insert(filt_index+1, new_state)
+            state["filters used"].append(filt.identifier)
+            filt.__setstate__(new_state)
         self.__setstate__(state)
         self.publish_matrix()
 
@@ -462,7 +470,7 @@ class DataMatrix(QtWidgets.QWidget):
         self.semi_states_filter = {}
         sender = self.sender()
         slot_id = sender.identifier
-        state = self.get_slot_state(slot_id)
+        state = self.get_slot_widget_state(slot_id)
         num_actives = sum([s["active"] for s in state.values()])
 
         # update state according to the scheme in the docstring
@@ -500,7 +508,7 @@ class DataMatrix(QtWidgets.QWidget):
         state = self.__getstate__()
         for filt_id in state["elements"][slot_id]:
             # make sure that disabled filters are honored
-            fstate = self.get_filter_state(filt_id)
+            fstate = self.get_filter_widget_state(filt_id)
             fenabled = fstate["enabled"]
             # update element widget
             me = self.get_matrix_element(slot_id, filt_id)
@@ -563,7 +571,7 @@ class DataMatrix(QtWidgets.QWidget):
         state = self.__getstate__()
         for slot_id in state["elements"]:
             # make sure that disabled filters are honored
-            dstate = self.get_slot_state(slot_id)
+            dstate = self.get_slot_widget_state(slot_id)
             denabled = dstate["enabled"]
             # update element widget
             me = self.get_matrix_element(slot_id, sid)

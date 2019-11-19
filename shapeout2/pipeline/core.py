@@ -393,8 +393,8 @@ class Pipeline(object):
 
     def remove_plot(self, plot_id):
         """Remove a filter by plot identifier"""
-        index = self.filter_ids.index(plot_id)
-        self.plot_id.pop(index)
+        index = self.plot_ids.index(plot_id)
+        self.plots.pop(index)
         for slot_id in self.element_states:
             if plot_id in self.element_states[slot_id]:
                 self.element_states[slot_id].pop(plot_id)

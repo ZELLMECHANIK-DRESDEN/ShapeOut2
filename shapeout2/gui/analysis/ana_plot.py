@@ -1,3 +1,4 @@
+import copy
 import pkg_resources
 
 import dclab
@@ -12,8 +13,10 @@ COLORMAPS = ["jet"]
 
 
 class PlotPanel(QtWidgets.QWidget):
-    #: Emitted when a shapeout2.pipeline.Plot is modified
+    #: Emitted when a shapeout2.pipeline.Plot is to be changed
     plot_changed = QtCore.pyqtSignal(dict)
+    #: Emitted when the pipeline is to be changed
+    pipeline_changed = QtCore.pyqtSignal(dict)
 
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self)
@@ -35,6 +38,8 @@ class PlotPanel(QtWidgets.QWidget):
         self.comboBox_division.setCurrentIndex(2)
 
         # signals
+        self.pushButton_duplicate.clicked.connect(self.on_duplicate_plot)
+        self.pushButton_remove.clicked.connect(self.on_remove_plot)
         self.pushButton_reset.clicked.connect(self.update_content)
         self.pushButton_apply.clicked.connect(self.write_plot)
         self.comboBox_plots.currentIndexChanged.connect(self.update_content)
@@ -274,6 +279,26 @@ class PlotPanel(QtWidgets.QWidget):
             self._set_range_state(axis_x=gen["axis x"])
         elif self.sender() == self.comboBox_axis_y:
             self._set_range_state(axis_y=gen["axis y"])
+
+    def on_duplicate_plot(self):
+        # determine the new filter state
+        plot_state = self.__getstate__()
+        new_state = copy.deepcopy(plot_state)
+        new_plot = Plot()
+        new_state["identifier"] = new_plot.identifier
+        new_state["layout"]["name"] = new_plot.name
+        new_plot.__setstate__(new_state)
+        # determine the filter position
+        pos = self.pipeline.plot_ids.index(plot_state["identifier"])
+        self.pipeline.add_plot(new_plot, index=pos+1)
+        state = self.pipeline.__getstate__()
+        self.pipeline_changed.emit(state)
+
+    def on_remove_plot(self):
+        plot_state = self.__getstate__()
+        self.pipeline.remove_plot(plot_state["identifier"])
+        state = self.pipeline.__getstate__()
+        self.pipeline_changed.emit(state)
 
     def on_hue_select(self):
         """Show/hide options for feature-based hue selection"""

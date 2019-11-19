@@ -83,9 +83,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # Plot matrix
         self.plot_matrix.plot_modify_clicked.connect(self.on_modify_plot)
         # ANALYSIS VIEW
-        self.widget_ana_view.adopt_pipeline(self.pipeline.__getstate__())
-        self.widget_ana_view.widget_filter.set_pipeline(self.pipeline)
-        self.widget_ana_view.widget_plot.set_pipeline(self.pipeline)
+        self.widget_ana_view.set_pipeline(self.pipeline)
         # filter signals
         self.widget_ana_view.filter_changed.connect(self.adopt_filter)
         self.widget_ana_view.pipeline_changed.connect(self.adopt_pipeline)
@@ -97,7 +95,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # plot signals
         self.widget_ana_view.plot_changed.connect(self.adopt_plot)
         # slot signals
-        self.widget_ana_view.widget_slot.slot_changed.connect(self.adopt_slot)
+        self.widget_ana_view.slot_changed.connect(self.adopt_slot)
 
     @QtCore.pyqtSlot(dict)
     def adopt_filter(self, filt_state):

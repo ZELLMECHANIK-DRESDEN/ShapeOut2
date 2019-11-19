@@ -134,7 +134,6 @@ class Plot(object):
         if self.identifier != state["identifier"]:
             raise ValueError("Identifier mismatch: '{}' vs. '{}'".format(
                 self.identifier, state["identifier"]))
-        state.pop("identifier")
         self._state = state
 
     @staticmethod

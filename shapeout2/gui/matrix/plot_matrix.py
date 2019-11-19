@@ -22,7 +22,7 @@ class PlotMatrix(QtWidgets.QWidget):
         self.semi_states_plot = {}
 
     def __getstate__(self):
-        """Logical states of the current plot matrix"""
+        """State of the current plot matrix"""
         # plots
         plots = []
         for pw in self.plot_widgets:
@@ -43,8 +43,8 @@ class PlotMatrix(QtWidgets.QWidget):
         return state
 
     def __setstate__(self, state):
-        self.blockSignals(True)
         self.setUpdatesEnabled(False)
+        self.blockSignals(True)
         self.clear()
         # plot states
         for jj in range(len(state["plots"])):
@@ -213,23 +213,40 @@ class PlotMatrix(QtWidgets.QWidget):
             raise KeyError("Dataset '{}' not found!".format(dataset_id))
         return self.glo.itemAtPosition(ii, jj).widget()
 
+    def get_plot_index(self, plot_id):
+        for ii, pw in enumerate(self.plot_widgets):
+            if pw.identifier == plot_id:
+                break
+        else:
+            raise KeyError("Dataset '{}' not found!".format(plot_id))
+        return ii
+
+    def get_plot_widget_state(self, plot_id, ret_index=False):
+        ii = self.get_plot_index(plot_id)
+        pw = self.plot_widgets[ii]
+        if ret_index:
+            return pw.__getstate__(), ii
+        else:
+            return pw.__getstate__()
+
     @QtCore.pyqtSlot(str)
     def on_option_plot(self, option):
         """Plot option logic (remove, duplicate)"""
-        sender = self.sender()
-        idx = self.glo.indexOf(sender)
-        _, column, _, _ = self.glo.getItemPosition(idx)
+        pw_state = self.sender().__getstate__()
+        plot_id = pw_state["identifier"]
+        plot_index = self.get_plot_index(plot_id)
         state = self.__getstate__()
-        p_state = sender.__getstate__()
-        if option == "duplicate":
-            plot = pipeline.Plot()
-            p_state["identifier"] = plot.identifier
-            p_state["name"] = plot.name
-            state["plots"].insert(column+1, p_state)
-        else:  # remove
-            state["plots"].pop(column)
+        if option == "remove":
+            state["plots"].pop(plot_index)
             for ds_key in state["elements"]:
-                state["elements"][ds_key].pop(p_state["identifier"])
+                state["elements"][ds_key].pop(plot_id)
+        else:  # duplicate
+            plot = pipeline.Plot()
+            new_state = copy.deepcopy(state["plots"][plot_index])
+            new_state["identifier"] = plot.identifier
+            new_state["layout"]["name"] = plot.name
+            state["plots"].insert(plot_index+1, new_state)
+            plot.__setstate__(new_state)
         self.__setstate__(state)
         self.publish_matrix()
 

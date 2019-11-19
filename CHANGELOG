@@ -8,6 +8,7 @@
  - implement multiple subplots per plot, plot title, plot labels,
    legend, and event count
  - refactor data model
+ - functionalize buttons in analysis view
 2.0.0a23
  - add more update functions to fix frozen macOS app
  - improve plot visualizations

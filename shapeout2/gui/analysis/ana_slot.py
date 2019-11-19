@@ -1,14 +1,18 @@
+import copy
 import pkg_resources
 
 import dclab
 from PyQt5 import uic, QtCore, QtWidgets
 
 from ... import meta_tool
+from ...pipeline import Dataslot
 
 
 class SlotPanel(QtWidgets.QWidget):
-    #: Emitted when a shapeout2.pipeline.Dataslot is modified
+    #: Emitted when a shapeout2.pipeline.Dataslot is to be changed
     slot_changed = QtCore.pyqtSignal(dict)
+    #: Emitted when the pipeline is to be changed
+    pipeline_changed = QtCore.pyqtSignal(dict)
 
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self)
@@ -16,8 +20,11 @@ class SlotPanel(QtWidgets.QWidget):
             "shapeout2.gui.analysis", "ana_slot.ui")
         uic.loadUi(path_ui, self)
         # current Shape-Out 2 pipeline
-        self.pipeline_state = None
+        self._pipeline = None
         # signals
+        self.pushButton_anew.clicked.connect(self.on_anew_slot)
+        self.pushButton_duplicate.clicked.connect(self.on_duplicate_slot)
+        self.pushButton_remove.clicked.connect(self.on_remove_slot)
         self.pushButton_apply.clicked.connect(self.write_slot)
         self.pushButton_reset.clicked.connect(self.update_content)
         self.comboBox_slots.currentIndexChanged.connect(self.update_content)
@@ -125,26 +132,58 @@ class SlotPanel(QtWidgets.QWidget):
     def current_slot_state(self):
         if self.slot_ids:
             slot_index = self.comboBox_slots.currentIndex()
-            slot_state = self.pipeline_state["slots"][slot_index]
+            slot_state = self.pipeline.slots[slot_index].__getstate__()
         else:
             slot_state = None
         return slot_state
 
     @property
+    def pipeline(self):
+        return self._pipeline
+
+    @property
     def slot_ids(self):
         """List of slot identifiers"""
-        if self.pipeline_state is None:
+        if self.pipeline is None:
             return []
         else:
-            return [ss["identifier"] for ss in self.pipeline_state["slots"]]
+            return [slot.identifier for slot in self.pipeline.slots]
 
     @property
     def slot_names(self):
         """List of slot names"""
-        if self.pipeline_state is None:
+        if self.pipeline is None:
             return []
         else:
-            return [ss["name"] for ss in self.pipeline_state["slots"]]
+            return [slot.name for slot in self.pipeline.slots]
+
+    def on_anew_slot(self):
+        slot_state = self.__getstate__()
+        new_slot = Dataslot(slot_state["path"])
+        pos = self.pipeline.slot_ids.index(slot_state["identifier"])
+        self.pipeline.add_slot(new_slot, index=pos+1)
+        state = self.pipeline.__getstate__()
+        self.pipeline_changed.emit(state)
+
+    def on_duplicate_slot(self):
+        # determine the new filter state
+        slot_state = self.__getstate__()
+        new_state = copy.deepcopy(slot_state)
+        new_slot = Dataslot(slot_state["path"])
+        new_state["identifier"] = new_slot.identifier
+        new_state["name"] = new_slot.name
+        new_slot.__setstate__(new_state)
+        # determine the filter position
+        pos = self.pipeline.slot_ids.index(slot_state["identifier"])
+        self.pipeline.add_slot(new_slot, index=pos+1)
+        state = self.pipeline.__getstate__()
+        self.pipeline_changed.emit(state)
+
+    def on_remove_slot(self):
+        slot_state = self.__getstate__()
+        self.pipeline.remove_slot(slot_state["identifier"])
+        state = self.pipeline.__getstate__()
+        self.pipeline_changed.emit(state)
 
     def on_medium(self):
         """Called if the user chose a different medium"""
@@ -174,6 +213,9 @@ class SlotPanel(QtWidgets.QWidget):
             self.doubleSpinBox_visc.setValue(visc)
             self.doubleSpinBox_visc.setReadOnly(True)
 
+    def set_pipeline(self, pipeline):
+        self._pipeline = pipeline
+
     def show_slot(self, slot_id):
         self.update_content(slot_index=self.slot_ids.index(slot_id))
 
@@ -191,7 +233,7 @@ class SlotPanel(QtWidgets.QWidget):
             self.comboBox_slots.setCurrentIndex(slot_index)
             self.comboBox_slots.blockSignals(False)
             # populate content
-            slot_state = self.pipeline_state["slots"][slot_index]
+            slot_state = self.pipeline.slots[slot_index].__getstate__()
             self.__setstate__(slot_state)
             # determine whether we already have a medium defined
             cfg = meta_tool.get_rtdc_config(slot_state["path"])

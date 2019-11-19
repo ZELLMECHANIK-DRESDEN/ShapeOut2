@@ -175,7 +175,9 @@ class FilterPanel(QtWidgets.QWidget):
 
     def on_moreless(self):
         """User wants to choose box filters"""
-        features = self.pipeline.get_features()
+        features = self.pipeline.get_features(scalar=True,
+                                              label_sort=True,
+                                              union=True)
         if not self._box_edit_view:
             # Show all filters to the user
             for feat, rc in self._box_range_controls.items():

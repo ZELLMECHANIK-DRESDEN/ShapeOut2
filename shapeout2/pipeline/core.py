@@ -1,8 +1,9 @@
+import warnings
+
 import dclab
 from dclab.rtdc_dataset.fmt_hierarchy import RTDC_Hierarchy
 import numpy as np
 
-from .. import meta_tool
 from .. import util
 
 from .dataslot import Dataslot
@@ -200,17 +201,6 @@ class Pipeline(object):
         for filt_id in self.filter_ids:
             self.element_states[slot_id][filt_id] = False
         self.slots_used.append(slot_id)
-
-        # check that the features are all the same
-        f0 = meta_tool.get_rtdc_features(self.slots[0].path)
-        fi = meta_tool.get_rtdc_features(slot.path)
-        if f0 != fi:
-            # This is important for updating the filter min/max values
-            # TODO:
-            # - ignore features that are not shared among all datasets
-            raise ValueError("Currently, only RT-DC measurements with the "
-                             + "same scalar features are allowed - Sorry. "
-                             + "Please create an issue if you need this.")
         return slot.identifier
 
     def construct_matrix(self):
@@ -321,21 +311,44 @@ class Pipeline(object):
         else:
             return dsend
 
-    def get_features(self, scalar=False, label_sort=False):
-        """Return a list of features that all slots share"""
+    def get_features(self, scalar=False, label_sort=False, union=False):
+        """Return a list of features in the pipeline
+
+        Parameters
+        ----------
+        scalar: bool
+            If True, only return scalar features
+        label_sort: bool
+            If True, return the features sorted by label
+            instead of by feature name
+        union: bool
+            If True, return the union of features available in all
+            slots of the pipeline. If False (default), return only
+            those features that are shared by all slots.
+        """
         if scalar:
-            features = dclab.dfn.scalar_feature_names
+            base_features = dclab.dfn.scalar_feature_names
         else:
-            features = dclab.dfn.feature_names
+            base_features = dclab.dfn.feature_names
+        if union:
+            features = set()
+        else:
+            features = set(base_features)
         for slot_index in range(self.num_slots):
             ds = self.get_dataset(slot_index=slot_index,
                                   filt_index=0,
                                   apply_filter=False)
-            features = sorted(set(ds.features) & set(features))
+            ds_features = set(ds.features) & set(base_features)
+            if union:
+                features |= ds_features
+            else:
+                features &= ds_features
         if label_sort:
             labs = [dclab.dfn.feature_name2label[f] for f in features]
             lf = sorted(zip(labs, features))
             features = [it[1] for it in lf]
+        else:
+            features = sorted(features)
         return features
 
     def get_min_max(self, feat):
@@ -345,10 +358,14 @@ class Pipeline(object):
             ds = self.get_dataset(slot_index=slot_index,
                                   filt_index=0,
                                   apply_filter=False)
-            vmin = np.nanmin(ds[feat])
-            vmax = np.nanmax(ds[feat])
-            fmin = np.min([fmin, vmin])
-            fmax = np.max([fmax, vmax])
+            if feat in ds:
+                vmin = np.nanmin(ds[feat])
+                vmax = np.nanmax(ds[feat])
+                fmin = np.min([fmin, vmin])
+                fmax = np.max([fmax, vmax])
+            else:
+                warnings.warn("Dataset at index {} does ".format(slot_index)
+                              + "not contain the feature '{}'!".format(feat))
         return [fmin, fmax]
 
     def get_plot_datasets(self, plot_id):

@@ -28,15 +28,18 @@ class SimplePlotItem(pg.PlotItem):
                         autoExpandTextSpace=False,
                         showValues=False,
                         )
-        # bring axes to front
-        # (This screws up event selection in QuickView)
-        # for kax in self.axes:
-        #    self.axes[kax]["item"].setZValue(-1)
 
         # show grid
         self.showGrid(x=True, y=True, alpha=.1)
         # visualization
         self.hideButtons()
+
+    def axes_to_front(self):
+        """Give the axes a high zValue"""
+        # bring axes to front
+        # (This screws up event selection in QuickView)
+        for kax in self.axes:
+            self.axes[kax]["item"].setZValue(200)
 
     def on_export(self, suffix):
         file, _ = QtWidgets.QFileDialog.getSaveFileName(

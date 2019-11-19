@@ -108,6 +108,8 @@ class PipelinePlotItem(SimplePlotItem):
         super(PipelinePlotItem, self).__init__(*args, **kwargs)
         # Disable user interaction
         self.setMouseEnabled(x=False, y=False)
+        # bring axes to front
+        self.axes_to_front()
         # Keep track of all elements (for redraw)
         self._plot_elements = []
 

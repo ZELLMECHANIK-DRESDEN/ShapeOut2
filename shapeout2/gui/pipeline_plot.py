@@ -235,6 +235,9 @@ def add_contour(plot_item, plot_state, rtdc_ds, slot_state, legend=None):
             plot_item.addItem(cline)
             if ii == 0 and legend is not None:
                 legend.addItem(cline, slot_state["name"])
+            # Always plot higher percentiles above lower percentiles
+            # (useful if there are multiple contour plots overlapping)
+            cline.setZValue(con["percentiles"][ii])
     return elements
 
 

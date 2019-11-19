@@ -227,7 +227,7 @@ class PlotPanel(QtWidgets.QWidget):
 
     def _set_range_state(self, axis_x=None, range_x=None,
                          axis_y=None, range_y=None):
-
+        """Set a proper state for the range controls"""
         for axis, rang, rc in zip([axis_x, axis_y],
                                   [range_x, range_y],
                                   [self.widget_range_x, self.widget_range_y],
@@ -242,6 +242,24 @@ class PlotPanel(QtWidgets.QWidget):
                                  "start": rang[0],
                                  "end": rang[1],
                                  })
+
+    def _set_contour_spacing(self, axis_x=None, axis_y=None):
+        for axis, doubleSpinBox in zip([axis_x, axis_y],
+                                       [self.doubleSpinBox_spacing_x,
+                                        self.doubleSpinBox_spacing_y]):
+            if axis is None:
+                # nothing to do
+                continue
+            else:
+                # determine good approximation
+                dslist, _ = self.pipeline.get_plot_datasets(
+                    self.current_plot.identifier)
+                spacings = []
+                for ds in dslist:
+                    spa = dclab.kde_methods.bin_width_percentile(ds[axis])
+                    spacings.append(spa)
+                if spacings:
+                    doubleSpinBox.setValue(np.min(spacings))
 
     @property
     def current_plot(self):
@@ -279,8 +297,10 @@ class PlotPanel(QtWidgets.QWidget):
         gen = self.__getstate__()["general"]
         if self.sender() == self.comboBox_axis_x:
             self._set_range_state(axis_x=gen["axis x"])
+            self._set_contour_spacing(axis_x=gen["axis x"])
         elif self.sender() == self.comboBox_axis_y:
             self._set_range_state(axis_y=gen["axis y"])
+            self._set_contour_spacing(axis_y=gen["axis y"])
 
     def on_duplicate_plot(self):
         # determine the new filter state
@@ -368,6 +388,11 @@ class PlotPanel(QtWidgets.QWidget):
             plot = Plot.get_plot(identifier=self.plot_ids[plot_index])
             state = plot.__getstate__()
             self.__setstate__(state)
+            # set default contour spacings
+            gen = state["general"]
+            self._set_contour_spacing(axis_x=gen["axis x"],
+                                      axis_y=gen["axis y"])
+
         else:
             self.setEnabled(False)
 

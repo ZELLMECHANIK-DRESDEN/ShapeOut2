@@ -50,6 +50,18 @@ class BlockMatrix(QtCore.QObject):
     def adopt_pipeline(self, pipeline_state):
         self.__setstate__(pipeline_state)
 
+    def invalidate_elements(self, invalid_dm, invalid_pm):
+        for slot_id, filt_id in invalid_dm:
+            em = self.data_matrix.get_matrix_element(slot_id, filt_id)
+            em.active = False
+            em.invalid = True
+            em.update_content()
+        for slot_id, plot_id in invalid_pm:
+            em = self.plot_matrix.get_matrix_element(slot_id, plot_id)
+            em.active = False
+            em.invalid = True
+            em.update_content()
+
     def on_matrix_changed(self):
         state = self.__getstate__()
         self.pipeline_changed.emit(state)

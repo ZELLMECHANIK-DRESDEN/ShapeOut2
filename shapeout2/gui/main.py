@@ -124,6 +124,35 @@ class ShapeOut2(QtWidgets.QMainWindow):
         if self.sender() != self.block_matrix:
             # Update BlockMatrix
             self.block_matrix.adopt_pipeline(pipeline_state)
+        # Invalidate block matrix elements that do not make sense due to
+        # filtering or plotting features.
+        invalid_dm = []
+        invalid_pm = []
+        for slot_index, slot in enumerate(self.pipeline.slots):
+            ds = self.pipeline.get_dataset(slot_index=slot_index,
+                                           filt_index=0,
+                                           apply_filter=False)
+            for filt in self.pipeline.filters:
+                # box filters
+                for feat in filt.boxdict:
+                    if feat not in ds.features:
+                        invalid_dm.append((slot.identifier, filt.identifier))
+                        break
+                else:
+                    # polygon filters
+                    for pid in filt.polylist:
+                        pf = dclab.PolygonFilter.get_instance_from_id(pid)
+                        if (pf.axes[0] not in ds.features
+                                or pf.axes[1] not in ds.features):
+                            invalid_dm.append((slot.identifier,
+                                              filt.identifier))
+                            break
+            for plot in self.pipeline.plots:
+                plot_state = plot.__getstate__()
+                if (plot_state["general"]["axis x"] not in ds
+                        or plot_state["general"]["axis x"] not in ds):
+                    invalid_pm.append((slot.identifier, plot.identifier))
+        self.block_matrix.invalidate_elements(invalid_dm, invalid_pm)
         # Update AnalysisView
         self.widget_ana_view.adopt_pipeline(pipeline_state)
         # Update QuickView choices
@@ -142,7 +171,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 self.plots_changed.disconnect(pw.update_content)
                 sub.deleteLater()
         self.plots_changed.emit()
-
         # redraw
         self.scrollArea_block.update()
         self.mdiArea.update()

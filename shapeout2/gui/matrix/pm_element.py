@@ -3,7 +3,11 @@ from . import dm_element
 
 class MatrixElement(dm_element.MatrixElement):
     def update_content(self, quickview=False):
-        if self.active and self.enabled:
+        if self.invalid:
+            color = "#DCDCDC"  # gray
+            label = "invalid"
+            tooltip = "Incompatible plot settings"
+        elif self.active and self.enabled:
             color = "#86E7C1"  # turquois
             label = "used"
             tooltip = "Click to deactivate"

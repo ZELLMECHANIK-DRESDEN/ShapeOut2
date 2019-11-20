@@ -49,7 +49,8 @@ class PlotPanel(QtWidgets.QWidget):
         self.comboBox_axis_y.currentIndexChanged.connect(self.on_axis_select)
 
     def __getstate__(self):
-        feats_srt = self.pipeline.get_features(scalar=True, label_sort=True)
+        feats_srt = self.pipeline.get_features(
+            scalar=True, label_sort=True, plot_id=self.current_plot.identifier)
 
         rx = self.widget_range_x.__getstate__()
         ry = self.widget_range_y.__getstate__()
@@ -106,7 +107,8 @@ class PlotPanel(QtWidgets.QWidget):
     def __setstate__(self, state):
         if self.current_plot.identifier != state["identifier"]:
             raise ValueError("Plot identifier mismatch!")
-        feats_srt = self.pipeline.get_features(scalar=True, label_sort=True)
+        feats_srt = self.pipeline.get_features(
+            scalar=True, label_sort=True, plot_id=self.current_plot.identifier)
         toblock = [
             self.comboBox_axis_x,
             self.comboBox_axis_y,
@@ -375,8 +377,10 @@ class PlotPanel(QtWidgets.QWidget):
                     curfeat = None
                 # repopulate
                 cb.clear()
-                feats_srt = self.pipeline.get_features(label_sort=True,
-                                                       scalar=True)
+                feats_srt = self.pipeline.get_features(
+                    scalar=True,
+                    label_sort=True,
+                    plot_id=self.current_plot.identifier)
                 for feat in feats_srt:
                     cb.addItem(dclab.dfn.feature_name2label[feat], feat)
                 if curfeat is not None:

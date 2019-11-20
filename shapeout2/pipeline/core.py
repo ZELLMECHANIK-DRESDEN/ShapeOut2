@@ -273,7 +273,8 @@ class Pipeline(object):
         slot_index: int
             index of measurement
         filt_index: int or None
-            index of filter; if None, then a plain dataset is returned
+            index of filter; if None or negative, then the plain
+            dataset is returned
         apply_filter: bool
             whether to call `dataset.apply_filter` in the end;
             if set to `False`, only the filtering configuration
@@ -282,27 +283,26 @@ class Pipeline(object):
             also return the color of the dataset as a string
         """
         slot = self.slots[slot_index]
-        if filt_index is None:
+        if filt_index is None or filt_index < 0:
             dsend = slot.get_dataset()
         else:
             self.construct_matrix()
             row = self.matrix[slot_index]
             fstates = self.element_states[slot.identifier]
-
             # set all necessary filters
-            for ii in range(filt_index + 1):
+            for ii in range(filt_index + 1):  # +1 b/c range(0) is empty
+                row_index = ii + 1  # +1 b/c row[0] is plain dataset
                 filt = self.filters[ii]
                 filt_id = filt.identifier
                 # TODO:
                 # - cache previously filter states and compare to new filter
                 #   states to avoid recomputation when `apply_filter`
                 #   is called.
-                # these are the element states in gui.matrix.dm_element
                 if fstates[filt_id] and filt_id in self.filters_used:
-                    filt.update_dataset(row[ii])
+                    filt.update_dataset(row[row_index])
                 else:
-                    row[ii].config["filtering"]["enable filters"] = False
-            dsend = row[filt_index]
+                    row[row_index].config["filtering"]["enable filters"] = False
+            dsend = row[filt_index+1]  # +1 b/c row[0] is plain dataset
             if apply_filter:
                 dsend.apply_filter()
         return dsend

@@ -48,11 +48,11 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # Disable native menubar (e.g. on Mac)
         self.menubar.setNativeMenuBar(False)
         # File menu
-        self.action_Quit.triggered.connect(self.on_action_quit)
+        self.actionQuit.triggered.connect(self.on_action_quit)
         # Help menu
-        self.action_Documentation.triggered.connect(self.on_action_docs)
-        self.action_Software.triggered.connect(self.on_action_software)
-        self.action_About.triggered.connect(self.on_action_about)
+        self.actionDocumentation.triggered.connect(self.on_action_docs)
+        self.actionSoftware.triggered.connect(self.on_action_software)
+        self.actionAbout.triggered.connect(self.on_action_about)
         # Initially hide buttons
         self.pushButton_preset_load.hide()
         self.pushButton_preset_save.hide()
@@ -65,6 +65,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.init_analysis_view()
         self.mdiArea.cascadeSubWindows()
         self.showMaximized()
+        # ACTIONS
+        self.actionLoadDataset.triggered.connect(self.add_dataslot)
+        self.actionNewFilter.triggered.connect(self.add_filter)
+        self.actionNewPlot.triggered.connect(self.add_plot)
         # BLOCK MATRIX
         # BlockMatrix wraps DataMatrix and PlotMatrix
         self.block_matrix = BlockMatrix(self.data_matrix, self.plot_matrix)
@@ -73,10 +77,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # BlockMatrix buttons
         self.toolButton_dm.clicked.connect(self.on_data_matrix)
         self.splitter.splitterMoved.connect(self.on_splitter)
-        self.toolButton_new_filter.clicked.connect(self.add_filter)
-        self.toolButton_new_dataset.clicked.connect(self.add_dataslot)
-        self.toolButton_import.clicked.connect(self.add_dataslot)
-        self.toolButton_new_plot.clicked.connect(self.add_plot)
         # DataMatrix
         self.data_matrix.slot_modify_clicked.connect(self.on_modify_slot)
         self.data_matrix.filter_modify_clicked.connect(self.on_modify_filter)
@@ -129,9 +129,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         invalid_dm = []
         invalid_pm = []
         for slot_index, slot in enumerate(self.pipeline.slots):
-            ds = self.pipeline.get_dataset(slot_index=slot_index,
-                                           filt_index=0,
-                                           apply_filter=False)
+            ds = self.pipeline.get_dataset(slot_index=slot_index)
             for filt in self.pipeline.filters:
                 # box filters
                 for feat in filt.boxdict:
@@ -145,7 +143,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                         if (pf.axes[0] not in ds.features
                                 or pf.axes[1] not in ds.features):
                             invalid_dm.append((slot.identifier,
-                                              filt.identifier))
+                                               filt.identifier))
                             break
             for plot in self.pipeline.plots:
                 plot_state = plot.__getstate__()

@@ -85,6 +85,18 @@ class Dataslot(object):
     def get_instances():
         return Dataslot._instances
 
+    def get_dataset(self):
+        """Return the corresponding dataset
+
+        Returns
+        -------
+        ds: dclab.RTDCBase
+            Loaded dataset
+        """
+        ds = dclab.new_dataset(self.path, identifier=self.identifier)
+        self.update_dataset(ds)
+        return ds
+
     def update_dataset(self, dataset):
         """Update the configuration of an instance of RTDCBase
 

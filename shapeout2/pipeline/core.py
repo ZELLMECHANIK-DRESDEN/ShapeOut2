@@ -219,17 +219,15 @@ class Pipeline(object):
             matrix = []
             if self._matrix_filters == matrix_filters:
                 # only a slot was added/removed
-                for sl in self.slots:
+                for slot in self.slots:
                     # find it in the old matrix
                     for row in self.matrix:
-                        if row[0].identifier == sl.identifier:
+                        if row[0].identifier == slot.identifier:
                             # use this row
                             break
                     else:
                         # new dataset
-                        ds = dclab.new_dataset(sl.path,
-                                               identifier=sl.identifier)
-                        sl.update_dataset(ds)
+                        ds = slot.get_dataset()
                         row = [ds]
                         for _ in self.filters:
                             # generate hierarchy children
@@ -241,7 +239,7 @@ class Pipeline(object):
                   and self._matrix_filters == matrix_filters[:n_filt_then]):
                 # only a filter was added
                 matrix = self.matrix
-                for ii, sl in enumerate(self.slots):
+                for ii in range(len(self.slots)):
                     row = matrix[ii]
                     for _ in self.filters[n_filt_then:]:
                         ds = RTDC_Hierarchy(hparent=row[-1],
@@ -249,8 +247,8 @@ class Pipeline(object):
                         row.append(ds)
             else:
                 # everything changed
-                for sl in self.slots:
-                    ds = dclab.new_dataset(sl.path, identifier=sl.identifier)
+                for slot in self.slots:
+                    ds = slot.get_dataset()
                     row = [ds]
                     for _ in self.filters:
                         # generate hierarchy children
@@ -267,16 +265,15 @@ class Pipeline(object):
             # - if `self.elements_dict` is not complete, autocomplete it
             #   (as it is done in gui.matrix.dm_dataset)
 
-    def get_dataset(self, slot_index, filt_index, apply_filter=True,
-                    ret_color=False):
+    def get_dataset(self, slot_index, filt_index=None, apply_filter=True):
         """Return dataset with all filters updated (optionally applied)
 
         Parameters
         ----------
         slot_index: int
             index of measurement
-        filt_index: int
-            index of filter
+        filt_index: int or None
+            index of filter; if None, then a plain dataset is returned
         apply_filter: bool
             whether to call `dataset.apply_filter` in the end;
             if set to `False`, only the filtering configuration
@@ -284,32 +281,31 @@ class Pipeline(object):
         ret_color: bool
             also return the color of the dataset as a string
         """
-        self.construct_matrix()
-        row = self.matrix[slot_index]
         slot = self.slots[slot_index]
-        fstates = self.element_states[slot.identifier]
-        # set all necessary filters
-        for ii in range(filt_index + 1):
-            filt = self.filters[ii]
-            filt_id = filt.identifier
-            # TODO:
-            # - cache previously filter states and compare to new filter
-            #   states to avoid recomputation when `apply_filter`
-            #   is called.
-            # these are the element states in gui.matrix.dm_element
-            if fstates[filt_id] and filt_id in self.filters_used:
-                filt.update_dataset(row[ii])
-            else:
-                row[ii].config["filtering"]["enable filters"] = False
-        dsend = row[filt_index]
-        # update configuration from slot
-        slot.update_dataset(dsend)
-        if apply_filter:
-            dsend.apply_filter()
-        if ret_color:
-            return dsend, slot.color
+        if filt_index is None:
+            dsend = slot.get_dataset()
         else:
-            return dsend
+            self.construct_matrix()
+            row = self.matrix[slot_index]
+            fstates = self.element_states[slot.identifier]
+
+            # set all necessary filters
+            for ii in range(filt_index + 1):
+                filt = self.filters[ii]
+                filt_id = filt.identifier
+                # TODO:
+                # - cache previously filter states and compare to new filter
+                #   states to avoid recomputation when `apply_filter`
+                #   is called.
+                # these are the element states in gui.matrix.dm_element
+                if fstates[filt_id] and filt_id in self.filters_used:
+                    filt.update_dataset(row[ii])
+                else:
+                    row[ii].config["filtering"]["enable filters"] = False
+            dsend = row[filt_index]
+            if apply_filter:
+                dsend.apply_filter()
+        return dsend
 
     def get_features(self, scalar=False, label_sort=False, union=False,
                      plot_id=None):
@@ -344,9 +340,7 @@ class Pipeline(object):
             if (plot_id is None
                 or (self.element_states[slot_id][plot_id]
                     and slot_id in self.slots_used)):
-                ds = self.get_dataset(slot_index=slot_index,
-                                      filt_index=0,
-                                      apply_filter=False)
+                ds = self.get_dataset(slot_index=slot_index)
                 ds_features = set(ds.features) & set(base_features)
                 if union:
                     features |= ds_features
@@ -364,9 +358,7 @@ class Pipeline(object):
         fmin = np.inf
         fmax = -np.inf
         for slot_index in range(self.num_slots):
-            ds = self.get_dataset(slot_index=slot_index,
-                                  filt_index=0,
-                                  apply_filter=False)
+            ds = self.get_dataset(slot_index=slot_index)
             if feat in ds:
                 vmin = np.nanmin(ds[feat])
                 vmax = np.nanmax(ds[feat])

@@ -69,6 +69,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.actionLoadDataset.triggered.connect(self.add_dataslot)
         self.actionNewFilter.triggered.connect(self.add_filter)
         self.actionNewPlot.triggered.connect(self.add_plot)
+        self.toolButton_new_plot.setEnabled(False)
+        self.toolButton_new_plot2.setEnabled(False)
         # BLOCK MATRIX
         # BlockMatrix wraps DataMatrix and PlotMatrix
         self.block_matrix = BlockMatrix(self.data_matrix, self.plot_matrix)
@@ -212,6 +214,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
             caption="Select an RT-DC measurement",
             directory=self.settings.get_path(name="rtdc import dataset"),
             filter="RT-DC Files (*.rtdc)")
+
+        if fnames:
+            self.toolButton_new_plot.setEnabled(True)
+            self.toolButton_new_plot2.setEnabled(True)
 
         # Create Dataslot instance and update block matrix
         for fn in fnames:

@@ -10,6 +10,7 @@ class Dataslot(object):
     def __init__(self, path, identifier=None, name=None):
         Dataslot._instance_counter += 1
         self.path = path
+        self._dataset = None
         if identifier is None:
             identifier = "Dataslot_{}".format(Dataslot._instance_counter)
             while identifier in Dataslot._instances:
@@ -93,7 +94,11 @@ class Dataslot(object):
         ds: dclab.RTDCBase
             Loaded dataset
         """
-        ds = dclab.new_dataset(self.path, identifier=self.identifier)
+        if self._dataset is None:
+            ds = dclab.new_dataset(self.path, identifier=self.identifier)
+            self._dataset = ds
+        else:
+            ds = self._dataset
         self.update_dataset(ds)
         return ds
 

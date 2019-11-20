@@ -291,7 +291,7 @@ class Pipeline(object):
             fstates = self.element_states[slot.identifier]
             # set all necessary filters
             for ii in range(filt_index + 1):  # +1 b/c range(0) is empty
-                row_index = ii + 1  # +1 b/c row[0] is plain dataset
+                row_idx = ii + 1  # +1 b/c row[0] is plain dataset
                 filt = self.filters[ii]
                 filt_id = filt.identifier
                 # TODO:
@@ -299,9 +299,9 @@ class Pipeline(object):
                 #   states to avoid recomputation when `apply_filter`
                 #   is called.
                 if fstates[filt_id] and filt_id in self.filters_used:
-                    filt.update_dataset(row[row_index])
+                    filt.update_dataset(row[row_idx])
                 else:
-                    row[row_index].config["filtering"]["enable filters"] = False
+                    row[row_idx].config["filtering"]["enable filters"] = False
             dsend = row[filt_index+1]  # +1 b/c row[0] is plain dataset
             if apply_filter:
                 dsend.apply_filter()

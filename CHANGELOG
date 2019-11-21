@@ -1,4 +1,5 @@
 2.0.0b1
+ - feat: implement data export
  - fix: pipeline modified plain dataset filter
  - fix: allow to remove all datasets or filters
  - docs: minor update

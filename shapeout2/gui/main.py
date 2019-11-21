@@ -16,6 +16,7 @@ import pyqtgraph as pg
 
 from . import analysis
 from .matrix import BlockMatrix
+from . import export
 from . import pipeline_plot
 from . import quick_view
 
@@ -53,6 +54,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.actionDocumentation.triggered.connect(self.on_action_docs)
         self.actionSoftware.triggered.connect(self.on_action_software)
         self.actionAbout.triggered.connect(self.on_action_about)
+        # Export menu
+        self.actionExportData.triggered.connect(self.on_action_export_data)
         # Initially hide buttons
         self.pushButton_preset_load.hide()
         self.pushButton_preset_save.hide()
@@ -131,7 +134,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         invalid_dm = []
         invalid_pm = []
         for slot_index, slot in enumerate(self.pipeline.slots):
-            ds = self.pipeline.get_dataset(slot_index=slot_index)
+            ds = self.pipeline.get_dataset(slot_index=slot_index,
+                                           filt_index=None)
             for filt in self.pipeline.filters:
                 # box filters
                 for feat in filt.boxdict:
@@ -317,6 +321,11 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     def on_action_docs(self):
         webbrowser.open("https://shapeout2.readthedocs.io")
+
+    def on_action_export_data(self):
+        dlg = export.ExportData(self, pipeline=self.pipeline)
+        if dlg.path is not None:  # user pressed cancel
+            dlg.exec()
 
     def on_action_quit(self):
         """Determine what happens when the user wants to quit"""

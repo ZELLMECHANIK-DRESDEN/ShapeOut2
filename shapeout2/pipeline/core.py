@@ -267,7 +267,7 @@ class Pipeline(object):
             # - if `self.elements_dict` is not complete, autocomplete it
             #   (as it is done in gui.matrix.dm_dataset)
 
-    def get_dataset(self, slot_index, filt_index=None, apply_filter=True):
+    def get_dataset(self, slot_index, filt_index=-1, apply_filter=True):
         """Return dataset with all filters updated (optionally applied)
 
         Parameters
@@ -275,8 +275,9 @@ class Pipeline(object):
         slot_index: int
             index of measurement
         filt_index: int or None
-            index of filter; if None or negative, then the plain
-            dataset is returned
+            index of filter; if None, then the plain dataset is returned.
+            If negative (default), then the last dataset in the pipeline
+            is returned (all filters set).
         apply_filter: bool
             whether to call `dataset.apply_filter` in the end;
             if set to `False`, only the filtering configuration
@@ -285,9 +286,11 @@ class Pipeline(object):
             also return the color of the dataset as a string
         """
         slot = self.slots[slot_index]
-        if filt_index is None or filt_index < 0:
+        if filt_index is None or (filt_index == -1 and len(self.slots) == 0):
             dsend = slot.get_dataset()
         else:
+            if filt_index < 0:
+                filt_index = len(self.filters) - 1
             self.construct_matrix()
             row = self.matrix[slot_index]
             fstates = self.element_states[slot.identifier]
@@ -342,7 +345,7 @@ class Pipeline(object):
             if (plot_id is None
                 or (self.element_states[slot_id][plot_id]
                     and slot_id in self.slots_used)):
-                ds = self.get_dataset(slot_index=slot_index)
+                ds = self.get_dataset(slot_index=slot_index, filt_index=None)
                 ds_features = set(ds.features) & set(base_features)
                 if union:
                     features |= ds_features
@@ -360,7 +363,7 @@ class Pipeline(object):
         fmin = np.inf
         fmax = -np.inf
         for slot_index in range(self.num_slots):
-            ds = self.get_dataset(slot_index=slot_index)
+            ds = self.get_dataset(slot_index=slot_index, filt_index=None)
             if feat in ds:
                 vmin = np.nanmin(ds[feat])
                 vmax = np.nanmax(ds[feat])

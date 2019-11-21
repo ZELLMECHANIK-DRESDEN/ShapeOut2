@@ -20,7 +20,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="RTDCScatterWidget" name="widget_scatter" native="true">
+      <widget class="QuickViewScatterWidget" name="widget_scatter" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -84,7 +84,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../img/axes.svg</normaloff>../img/axes.svg</iconset>
+          <normaloff>../../img/axes.svg</normaloff>../img/axes.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -110,7 +110,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../img/eye.svg</normaloff>../img/eye.svg</iconset>
+          <normaloff>../../img/eye.svg</normaloff>../img/eye.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -130,7 +130,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../img/poly.svg</normaloff>../img/poly.svg</iconset>
+          <normaloff>../../img/poly.svg</normaloff>../img/poly.svg</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -843,12 +843,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>RTDCScatterWidget</class>
-   <extends>QWidget</extends>
-   <header>shapeout2.gui.quick_view</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>SimplePlotWidget</class>
    <extends>QGraphicsView</extends>
    <header>shapeout2.gui.simple_plot_widget</header>
@@ -857,6 +851,12 @@
    <class>SimpleImageView</class>
    <extends>QGraphicsView</extends>
    <header>shapeout2.gui.simple_image_view</header>
+  </customwidget>
+  <customwidget>
+   <class>QuickViewScatterWidget</class>
+   <extends>QWidget</extends>
+   <header>shapeout2.gui.quick_view.qv_scatter</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

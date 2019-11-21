@@ -146,7 +146,7 @@
       <item row="0" column="1">
        <widget class="QToolButton" name="toolButton_new_filter">
         <property name="text">
-         <string>New &amp;Filter</string>
+         <string>New Filte&amp;r</string>
         </property>
        </widget>
       </item>
@@ -439,9 +439,8 @@
      <string>E&amp;xport</string>
     </property>
     <addaction name="actionExportData"/>
-    <addaction name="actionExportStatistics"/>
-    <addaction name="actionExportPlot"/>
     <addaction name="actionExportFilter"/>
+    <addaction name="actionExportPlot"/>
    </widget>
    <widget class="QMenu" name="menuImport">
     <property name="title">
@@ -449,8 +448,15 @@
     </property>
     <addaction name="actionImportFilter"/>
    </widget>
+   <widget class="QMenu" name="menuCompute">
+    <property name="title">
+     <string>Compute</string>
+    </property>
+    <addaction name="actionComputeStatistics"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuCompute"/>
    <addaction name="menuExport"/>
    <addaction name="menuImport"/>
    <addaction name="menu_Help"/>
@@ -458,7 +464,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionLoadDataset">
    <property name="text">
-    <string>&amp;Load Dataset</string>
+    <string>Load &amp;Dataset</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
@@ -562,6 +568,11 @@
   <action name="actionNewFilter">
    <property name="text">
     <string>New Filter</string>
+   </property>
+  </action>
+  <action name="actionComputeStatistics">
+   <property name="text">
+    <string>Statistics</string>
    </property>
   </action>
  </widget>

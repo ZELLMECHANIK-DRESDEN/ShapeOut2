@@ -1,5 +1,7 @@
 2.0.0b1
- - pipeline modified plain dataset filter
+ - fix: pipeline modified plain dataset filter
+ - fix: allow to remove all datasets or filters
+ - docs: minor update
 2.0.0a24
  - implemented polygon filters
  - condense context menus, add export context menu to all plots

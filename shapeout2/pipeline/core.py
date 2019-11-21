@@ -200,6 +200,8 @@ class Pipeline(object):
         self.element_states[slot_id] = {}
         for filt_id in self.filter_ids:
             self.element_states[slot_id][filt_id] = False
+        for plot_id in self.plot_ids:
+            self.element_states[slot_id][plot_id] = False
         self.slots_used.append(slot_id)
         return slot.identifier
 

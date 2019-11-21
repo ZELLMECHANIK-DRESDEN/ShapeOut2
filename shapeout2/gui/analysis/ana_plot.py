@@ -230,6 +230,12 @@ class PlotPanel(QtWidgets.QWidget):
     def _set_range_state(self, axis_x=None, range_x=None,
                          axis_y=None, range_y=None):
         """Set a proper state for the range controls"""
+        if len(self.pipeline.slots) == 0:
+            self.setEnabled(False)
+            # do nothing
+            return
+        else:
+            self.setEnabled(True)
         for axis, rang, rc in zip([axis_x, axis_y],
                                   [range_x, range_y],
                                   [self.widget_range_x, self.widget_range_y],
@@ -246,6 +252,12 @@ class PlotPanel(QtWidgets.QWidget):
                                  })
 
     def _set_contour_spacing(self, axis_x=None, axis_y=None):
+        if len(self.pipeline.slots) == 0:
+            self.setEnabled(False)
+            # do nothing
+            return
+        else:
+            self.setEnabled(True)
         for axis, doubleSpinBox in zip([axis_x, axis_y],
                                        [self.doubleSpinBox_spacing_x,
                                         self.doubleSpinBox_spacing_y]):

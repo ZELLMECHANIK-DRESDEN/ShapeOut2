@@ -132,12 +132,15 @@ class PlotMatrix(QtWidgets.QWidget):
         return mp
 
     def adjust_size(self):
-        QtWidgets.QApplication.processEvents()
         ncols = self.num_plots
         nrows = self.data_matrix.num_datasets
         if ncols and nrows:
             hwidth = self.element_width + 2
             height = self.data_matrix.sizeHint().height()
+            QtWidgets.QApplication.processEvents()
+            self.setMinimumSize(ncols*hwidth, height)
+            self.setFixedSize(ncols*hwidth, height)
+            QtWidgets.QApplication.processEvents()
             self.setMinimumSize(ncols*hwidth, height)
             self.setFixedSize(ncols*hwidth, height)
 

@@ -79,6 +79,6 @@ class MatrixDataset(QtWidgets.QWidget):
             title = meta_tool.get_repr(self.path, append_path=True)
             self.setToolTip(title)
             self.label.setToolTip(title)
-            if len(title) > 8:
-                title = title[:5] + "..."
+            if len(title) > 12:
+                title = title[:9] + "..."
             self.label.setText(title)

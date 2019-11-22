@@ -1,7 +1,11 @@
-2.0.0b1
+2.0.0a25
  - feat: implement data export
+ - feat: implement simple computation of basic statistics
  - fix: pipeline modified plain dataset filter
  - fix: allow to remove all datasets or filters
+ - fix: failed to load some datasets b/c of zero-valued meta data
+ - fix: toggle buttons in Block Matrix not functional
+ - enh: update font sizes
  - docs: minor update
 2.0.0a24
  - implemented polygon filters

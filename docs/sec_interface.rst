@@ -42,14 +42,14 @@ your data analysis from Shape-Out 1 to Shape-Out 2:
   could be possible to convert sessions (including the corresponding
   .tdms files), but the effort in doing so would probably exceed the
   effort required to just rebuild a clean analysis session in Shape-Out 2.
-- Shape-Out 2 currently does not provide a linear mixed effects models
-  (LMM) analysis. The reason behind that is quite pragmatic: LMM analysis
-  in Shape-Out 1 is done using
+- Shape-Out 2 does not provide a linear mixed effects models
+  (LMM) analysis. LMM analysis in Shape-Out 1 is done using
   `R/lme4 <https://cran.r-project.org/web/packages/lme4/>`_ and thus
-  requires a full R distribution shipped with Shape-Out 1. While this
-  blows up the download and installation size, it is also not clear
-  whether it would work just like that on macOS. However, if many users
-  need this feature, then we can think of a workaround.
+  requires a full R distribution shipped with Shape-Out 1. This
+  blows up the installation size and makes it more difficult to deploy.
+  Furthermore (and we are not saying that LMM Analysis is "bad") we are
+  also looking into other methods for determining statistical significance
+  which might be more intuitive to understand.
 
 
 Basic usage

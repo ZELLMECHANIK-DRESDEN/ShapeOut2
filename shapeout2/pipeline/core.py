@@ -312,6 +312,10 @@ class Pipeline(object):
                 dsend.apply_filter()
         return dsend
 
+    def get_datasets(self):
+        """Return all datasets with filters applied"""
+        return [self.get_dataset(ii) for ii in range(len(self.slots))]
+
     def get_features(self, scalar=False, label_sort=False, union=False,
                      plot_id=None):
         """Return a list of features in the pipeline

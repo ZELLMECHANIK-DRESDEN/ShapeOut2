@@ -94,8 +94,8 @@ class MatrixFilter(QtWidgets.QWidget):
     def update_content(self):
         """Reset tool tips and title"""
         self.label.setToolTip(self.name)
-        if len(self.name) > 8:
-            title = self.name[:5]+"..."
+        if len(self.name) > 12:
+            title = self.name[:9]+"..."
         else:
             title = self.name
         self.checkBox.blockSignals(True)

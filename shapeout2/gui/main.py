@@ -15,8 +15,9 @@ from PyQt5 import uic, QtCore, QtWidgets
 import pyqtgraph as pg
 
 from . import analysis
-from .matrix import BlockMatrix
+from . import compute
 from . import export
+from .matrix import BlockMatrix
 from . import pipeline_plot
 from . import quick_view
 
@@ -56,6 +57,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.actionAbout.triggered.connect(self.on_action_about)
         # Export menu
         self.actionExportData.triggered.connect(self.on_action_export_data)
+        # Comput menu
+        self.actionComputeStatistics.triggered.connect(
+            self.on_action_compute_statistics)
         # Initially hide buttons
         self.pushButton_preset_load.hide()
         self.pushButton_preset_save.hide()
@@ -318,6 +322,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.about(self,
                                     "Shape-Out {}".format(__version__),
                                     about_text)
+
+    def on_action_compute_statistics(self):
+        dlg = compute.ComputeStatistics(self, pipeline=self.pipeline)
+        dlg.exec()
 
     def on_action_docs(self):
         webbrowser.open("https://shapeout2.readthedocs.io")

@@ -4,7 +4,7 @@ import pkg_resources
 import dclab
 from dclab import kde_contours
 import numpy as np
-from PyQt5 import uic, QtCore, QtWidgets
+from PyQt5 import uic, QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
 
 from ..pipeline import Plot
@@ -13,6 +13,7 @@ from .simple_plot_widget import SimplePlotItem
 
 
 class PipelinePlot(QtWidgets.QWidget):
+    """Implements the plotting pipeline using pyqtgraph"""
     def __init__(self, parent, pipeline, plot_id, *args, **kwargs):
         QtWidgets.QWidget.__init__(self, parent=parent, *args, **kwargs)
         path_ui = pkg_resources.resource_filename(
@@ -46,7 +47,9 @@ class PipelinePlot(QtWidgets.QWidget):
 
         labelx, labely = get_axes_labels(plot_state, slot_states)
 
-        self.plot_layout.addLabel(lay["name"], colspan=2)
+        self.plot_layout.addLabel(lay["name"], colspan=2,
+            # default size + 2
+            size="{}pt".format(QtGui.QFont().pointSize() + 2))
         self.plot_layout.nextRow()
 
         self.plot_layout.addLabel(labely, angle=-90)
@@ -178,7 +181,9 @@ class PipelinePlotItem(SimplePlotItem):
                 self.setTitle(title)
                 if plot_state["scatter"]["show event count"]:
                     # set event count
-                    chtml = "<span style='font-size:10pt'>{} events</span>"
+                    chtml = "<span style='font-size:{}pt'>".format(
+                        # default font size - 1
+                        QtGui.QFont().pointSize() - 1) + "{} events</span>"
                     label = QtWidgets.QGraphicsTextItem(
                         "",
                         # This is kind of hackish: set the parent to the right

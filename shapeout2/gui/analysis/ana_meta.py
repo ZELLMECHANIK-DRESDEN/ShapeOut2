@@ -109,11 +109,14 @@ def format_config_key_value(section, key, value):
     tip = ""
     # Value formatting
     if dctype == float:  # pretty-print floats
-        # determine number of decimals
-        dec = int(np.ceil(np.log10(1/np.abs(value))))
-        if dec < 0:
-            dec = 0
-        string = ("{:." + "{}".format(dec + 2) + "f}").format(value)
+        if value == 0:
+            string = "0.0"
+        else:
+            # determine number of decimals
+            dec = int(np.ceil(np.log10(1/np.abs(value))))
+            if dec < 0:
+                dec = 0
+            string = ("{:." + "{}".format(dec + 2) + "f}").format(value)
     else:
         string = str(value)
 

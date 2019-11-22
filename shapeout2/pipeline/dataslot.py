@@ -1,6 +1,8 @@
 import dclab
 import numpy as np
 
+from .. import meta_tool
+
 
 class Dataslot(object):
     """Handles datasets in a pipeline"""
@@ -18,7 +20,7 @@ class Dataslot(object):
                 identifier = "Dataslot_{}".format(Dataslot._instance_counter)
 
         if name is None:
-            name = identifier
+            name = meta_tool.get_rtdc_config(path)["experiment"]["sample"]
         #: unique identifier of the filter
         self.identifier = identifier
         #: user-defined name of the filter

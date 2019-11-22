@@ -285,8 +285,6 @@ class DataMatrix(QtWidgets.QWidget):
     def clear(self):
         """Reset layout"""
         self._reset_layout()
-        self.semi_states_dataset = {}
-        self.semi_states_filter = {}
 
     def dragEnterEvent(self, event):
         print("drag enter event on data matrix")
@@ -469,38 +467,38 @@ class DataMatrix(QtWidgets.QWidget):
         which is defined by the signal sender :class:`MatrixDataset`.
         Cyclic toggling order: semi -> all -> none
         """
-        self.semi_states_filter = {}
+        self.semi_states_filter = {}  # sic
         sender = self.sender()
         slot_id = sender.identifier
-        state = self.get_slot_widget_state(slot_id)
-        num_actives = sum([s["active"] for s in state.values()])
+        state = self.__getstate__()["elements"][slot_id]
+        num_actives = sum([s for s in state.values()])
 
         # update state according to the scheme in the docstring
         if num_actives == 0:
             if slot_id in self.semi_states_dataset:
                 # use semi state
                 oldstate = self.semi_states_dataset[slot_id]
-                for key in oldstate:
-                    if key in state:
-                        state[key] = oldstate[key]
+                for filt_id in oldstate:
+                    if filt_id in state:
+                        state[filt_id] = oldstate[filt_id]
             else:
                 # toggle all to active
-                for key in state:
-                    state[key]["active"] = True
+                for filt_id in state:
+                    state[filt_id] = True
         elif num_actives == len(state):
             # toggle all to inactive
-            for key in state:
-                state[key]["active"] = False
+            for filt_id in state:
+                state[filt_id] = False
         else:
             # save semi state
             self.semi_states_dataset[slot_id] = copy.deepcopy(state)
             # toggle all to active
-            for key in state:
-                state[key]["active"] = True
+            for filt_id in state:
+                state[filt_id] = True
 
         for filt_id in state:
             me = self.get_matrix_element(slot_id, filt_id)
-            me.__setstate__(state[filt_id])
+            me.set_active(state[filt_id])
         self.publish_matrix()
 
     @QtCore.pyqtSlot(bool)
@@ -527,43 +525,43 @@ class DataMatrix(QtWidgets.QWidget):
         which is defined by the signal sender :class:`MatrixFilter`.
         Cyclic toggling order: semi -> all -> none
         """
-        self.semi_states_dataset = {}
+        self.semi_states_dataset = {}  # sic
         sender = self.sender()
         filt_id = sender.identifier
 
         states = self.__getstate__()["elements"]
         state = {}
-        for key in states:
-            state[key] = states[key][filt_id]
+        for slot_id in states:
+            state[slot_id] = states[slot_id][filt_id]
 
-        num_actives = sum([s["active"] for s in state.values()])
+        num_actives = sum(list(state.values()))
 
         # update state according to the scheme in the docstring
         if num_actives == 0:
             if filt_id in self.semi_states_filter:
                 # use semi state
                 oldstate = self.semi_states_filter[filt_id]
-                for key in oldstate:
-                    if key in state:
-                        state[key] = oldstate[key]
+                for slot_id in oldstate:
+                    if slot_id in state:
+                        state[slot_id] = oldstate[slot_id]
             else:
                 # toggle all to active
-                for key in state:
-                    state[key]["active"] = True
+                for slot_id in state:
+                    state[slot_id] = True
         elif num_actives == len(state):
             # toggle all to inactive
-            for key in state:
-                state[key]["active"] = False
+            for slot_id in state:
+                state[slot_id] = False
         else:
             # save semi state
             self.semi_states_filter[filt_id] = copy.deepcopy(state)
             # toggle all to active
-            for key in state:
-                state[key]["active"] = True
+            for slot_id in state:
+                state[slot_id] = True
 
         for slot_id in state:
             me = self.get_matrix_element(slot_id, filt_id)
-            me.__setstate__(state[slot_id])
+            me.set_active(state[slot_id])
         self.publish_matrix()
 
     @QtCore.pyqtSlot(bool)

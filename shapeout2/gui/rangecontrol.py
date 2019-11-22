@@ -195,10 +195,13 @@ class RangeControl(QtWidgets.QWidget):
 
         # decimals
         if not self.is_integer:
-            # two significant digits
-            dec = -int(np.ceil(np.log10(vmax-vmin))) + 4
-            if dec <= 0:
+            if vmax == vmin:
                 dec = 1
+            else:
+                # two significant digits
+                dec = int(np.ceil(np.log10(1/np.abs(vmax-vmin)))) + 5
+                if dec <= 0:
+                    dec = 1
             self.doubleSpinBox_min.setDecimals(dec)
             self.doubleSpinBox_max.setDecimals(dec)
             self.doubleSpinBox_min.setSingleStep(10**-dec)

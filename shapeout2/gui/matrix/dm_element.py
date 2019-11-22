@@ -52,6 +52,11 @@ class MatrixElement(QtWidgets.QWidget):
             self.update_content(quickview)
             event.accept()
 
+    def set_active(self, b=True):
+        state = self.__getstate__()
+        state["active"] = b
+        self.__setstate__(state)
+
     def update_content(self, quickview=False):
         if self.invalid:
             color = "#DCDCDC"  # gray

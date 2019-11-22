@@ -276,43 +276,42 @@ class PlotMatrix(QtWidgets.QWidget):
         which is defined by the signal sender :class:`MatrixPlot`.
         Cyclic toggling order: semi -> all -> none
         """
-        self.semi_states_dataset = {}
         sender = self.sender()
-        sid = sender.identifier
+        plot_id = sender.identifier
 
         states = self.__getstate__()["elements"]
         state = {}
-        for key in states:
-            state[key] = states[key][sid]
+        for slot_id in states:
+            state[slot_id] = states[slot_id][plot_id]
 
-        num_actives = sum([s["active"] for s in state.values()])
+        num_actives = sum(list(state.values()))
 
         # update state according to the scheme in the docstring
         if num_actives == 0:
-            if sid in self.semi_states_plot:
+            if plot_id in self.semi_states_plot:
                 # use semi state
-                oldstate = self.semi_states_plot[sid]
-                for key in oldstate:
-                    if key in state:
-                        state[key] = oldstate[key]
+                oldstate = self.semi_states_plot[plot_id]
+                for slot_id in oldstate:
+                    if slot_id in state:
+                        state[slot_id] = oldstate[slot_id]
             else:
                 # toggle all to active
-                for key in state:
-                    state[key]["active"] = True
+                for slot_id in state:
+                    state[slot_id] = True
         elif num_actives == len(state):
             # toggle all to inactive
-            for key in state:
-                state[key]["active"] = False
+            for slot_id in state:
+                state[slot_id] = False
         else:
             # save semi state
-            self.semi_states_plot[sid] = copy.deepcopy(state)
+            self.semi_states_plot[plot_id] = copy.deepcopy(state)
             # toggle all to active
-            for key in state:
-                state[key]["active"] = True
+            for slot_id in state:
+                state[slot_id] = True
 
-        for dsid in state:
-            me = self.get_matrix_element(dsid, sid)
-            me.__setstate__(state[dsid])
+        for slot_id in state:
+            me = self.get_matrix_element(slot_id, plot_id)
+            me.set_active(state[slot_id])
         self.publish_matrix()
 
     def update_content(self):

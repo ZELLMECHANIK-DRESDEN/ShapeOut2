@@ -14,6 +14,7 @@ from .simple_plot_widget import SimplePlotItem
 
 class PipelinePlot(QtWidgets.QWidget):
     """Implements the plotting pipeline using pyqtgraph"""
+
     def __init__(self, parent, pipeline, plot_id, *args, **kwargs):
         QtWidgets.QWidget.__init__(self, parent=parent, *args, **kwargs)
         path_ui = pkg_resources.resource_filename(
@@ -47,9 +48,9 @@ class PipelinePlot(QtWidgets.QWidget):
 
         labelx, labely = get_axes_labels(plot_state, slot_states)
 
-        self.plot_layout.addLabel(lay["name"], colspan=2,
-            # default size + 2
-            size="{}pt".format(QtGui.QFont().pointSize() + 2))
+        # font size for plot title (default size + 2)
+        size = "{}pt".format(QtGui.QFont().pointSize() + 2)
+        self.plot_layout.addLabel(lay["name"], colspan=2, size=size)
         self.plot_layout.nextRow()
 
         self.plot_layout.addLabel(labely, angle=-90)

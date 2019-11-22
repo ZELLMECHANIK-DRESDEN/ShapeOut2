@@ -1,6 +1,7 @@
-2.0.0b1
+2.0.0a26
  - feat: implement filter export
  - ref: refactor block matrix and reset font sizes
+ - build: make sure latest libraries of dclab and pyqtgraph are used
 2.0.0a25
  - feat: implement data export
  - feat: implement simple computation of basic statistics

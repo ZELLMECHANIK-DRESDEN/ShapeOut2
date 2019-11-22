@@ -29,9 +29,9 @@ install:
   # PyInstaller does not know where scipy DLLs are on Windows
   # https://github.com/pyinstaller/pyinstaller/issues/4533
   - "appveyor-retry python -m pip install scipy==1.3.1"
+  - "appveyor-retry pip install -e ."
   - "appveyor-retry pip install git+git://github.com/ZELLMECHANIK-DRESDEN/dclab.git"
   - "appveyor-retry pip install git+git://github.com/ZELLMECHANIK-DRESDEN/pyqtgraph.git"
-  - "appveyor-retry pip install -e ."
   # Install pyinstaller (includes dependency for pywin32)
   - "appveyor-retry pip install pyinstaller==3.4"
   # Show the installed packages

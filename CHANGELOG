@@ -1,4 +1,5 @@
 2.0.0b1
+ - feat: implement filter export
  - ref: refactor block matrix and reset font sizes
 2.0.0a25
  - feat: implement data export

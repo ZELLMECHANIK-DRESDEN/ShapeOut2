@@ -57,6 +57,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.actionAbout.triggered.connect(self.on_action_about)
         # Export menu
         self.actionExportData.triggered.connect(self.on_action_export_data)
+        self.actionExportFilter.triggered.connect(self.on_action_export_filter)
         # Comput menu
         self.actionComputeStatistics.triggered.connect(
             self.on_action_compute_statistics)
@@ -334,6 +335,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
         dlg = export.ExportData(self, pipeline=self.pipeline)
         if dlg.path is not None:  # user pressed cancel
             dlg.exec()
+
+    def on_action_export_filter(self):
+        dlg = export.ExportFilter(self, pipeline=self.pipeline)
+        dlg.exec()
 
     def on_action_quit(self):
         """Determine what happens when the user wants to quit"""

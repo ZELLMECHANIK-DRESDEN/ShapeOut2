@@ -336,10 +336,10 @@ class QuickView(QtWidgets.QWidget):
             b.blockSignals(False)
 
         # set size
-        hide = show_event * show_settings * show_poly
+        show = show_event or show_settings or show_poly
         mdiwin = self.parent()
         geom = mdiwin.geometry()
-        geom.setWidth(geom.width() - (-1)**hide * 300)
+        geom.setWidth(geom.width() - (-1)**show * 300)
         mdiwin.setGeometry(geom)
         mdiwin.adjustSize()
 

@@ -124,10 +124,10 @@ class ComputeStatistics(QtWidgets.QDialog):
                     line.append("{}".format(vi))
             data.append("\t".join(line))
         # Write BOM
-        with codecs.open(path, "wb") as fd:
+        with path.open("wb") as fd:
             fd.write(codecs.BOM_UTF8)
         # Write rest
-        with codecs.open(path, "a", encoding="utf-8") as fd:
+        with path.open("a", encoding="utf-8") as fd:
             for line in header:
                 fd.write("# " + line + "\r\n")
             for line in data:

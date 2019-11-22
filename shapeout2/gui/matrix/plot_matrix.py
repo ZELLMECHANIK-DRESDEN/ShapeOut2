@@ -63,7 +63,6 @@ class PlotMatrix(QtWidgets.QWidget):
                 el_state = el.__getstate__()
                 el_state["active"] = ds_d[plot_id]
                 el.__setstate__(el_state)
-        self.adjust_size()
         self.blockSignals(False)
         self.setUpdatesEnabled(True)
 
@@ -81,9 +80,6 @@ class PlotMatrix(QtWidgets.QWidget):
         self.glo.setSpacing(2)
         self.glo.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.glo)
-        if not init:
-            # This does not work when data_matrix is not ready yet
-            self.adjust_size()
 
     @property
     def data_matrix(self):
@@ -98,23 +94,6 @@ class PlotMatrix(QtWidgets.QWidget):
     def element_width(self):
         """Data matrix element width (without 2px spacing)"""
         return self.data_matrix.element_width
-
-    @property
-    def element_height(self):
-        """Data matrix element height (without 2px spacing)"""
-        return self.data_matrix.element_height
-
-    @property
-    def header_height(self):
-        """Data matrix horizontal header height"""
-        for jj in range(self.glo.columnCount()):
-            item = self.glo.itemAtPosition(0, jj)
-            if item is not None:
-                height = item.geometry().height()
-                break
-        else:
-            height = 99
-        return height
 
     @property
     def num_datasets(self):
@@ -158,12 +137,9 @@ class PlotMatrix(QtWidgets.QWidget):
         nrows = self.data_matrix.num_datasets
         if ncols and nrows:
             hwidth = self.element_width + 2
-            hheight = self.header_height + 2
-            dheight = self.element_height + 2
-            self.setMinimumSize(ncols*hwidth,
-                                nrows*dheight+hheight)
-            self.setFixedSize(ncols*hwidth,
-                              nrows*dheight+hheight)
+            height = self.data_matrix.sizeHint().height()
+            self.setMinimumSize(ncols*hwidth, height)
+            self.setFixedSize(ncols*hwidth, height)
 
     @QtCore.pyqtSlot()
     def changed_element(self):

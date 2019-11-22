@@ -114,7 +114,6 @@ class DataMatrix(QtWidgets.QWidget):
         else:
             MatrixElement._quick_view_instance = meqv
             self.update_content()
-        self.adjust_size()
         self.blockSignals(False)
         self.setUpdatesEnabled(True)
 
@@ -134,10 +133,8 @@ class DataMatrix(QtWidgets.QWidget):
         # add dummy corner element
         cl = QtWidgets.QLabel("Block\nMatrix")
         cl.setAlignment(QtCore.Qt.AlignCenter)
-        cl.setMinimumSize(67, self.header_height)
         self.glo.addWidget(cl, 0, 0)
         self.setLayout(self.glo)
-        self.adjust_size()
 
     @property
     def dataset_widgets(self):
@@ -162,18 +159,6 @@ class DataMatrix(QtWidgets.QWidget):
         return width
 
     @property
-    def element_height(self):
-        """Data matrix element height (without 2px spacing)"""
-        for ii in range(1, self.glo.rowCount()-1):
-            item = self.glo.itemAtPosition(ii, 0)
-            if item is not None:
-                height = item.geometry().height()
-                break
-        else:
-            height = 99
-        return height
-
-    @property
     def filter_widgets(self):
         filters = []
         for jj in range(self.glo.columnCount()):
@@ -182,18 +167,6 @@ class DataMatrix(QtWidgets.QWidget):
                 fs = item.widget()
                 filters.append(fs)
         return filters
-
-    @property
-    def header_height(self):
-        """Data matrix horizontal header height"""
-        for jj in range(1, self.glo.columnCount()):
-            item = self.glo.itemAtPosition(0, jj)
-            if item is not None:
-                height = item.geometry().height()
-                break
-        else:
-            height = 99
-        return height
 
     @property
     def num_datasets(self):
@@ -231,9 +204,8 @@ class DataMatrix(QtWidgets.QWidget):
         md.option_action.connect(self.on_option_dataset)
         md.modify_clicked.connect(self.slot_modify_clicked.emit)
         self.fill_elements()
-        self.adjust_size()
         self.plot_matrix.fill_elements()
-        self.plot_matrix.adjust_size()
+        self.adjust_size()
         self.setUpdatesEnabled(True)
         self.publish_matrix()
         return md
@@ -254,17 +226,11 @@ class DataMatrix(QtWidgets.QWidget):
 
     def adjust_size(self):
         QtWidgets.QApplication.processEvents()
-        ncols = self.num_filters
-        nrows = self.num_datasets
-        if ncols and nrows:
-            hwidth = self.element_width + 2
-            hheight = self.glo.itemAtPosition(0, 1).geometry().height()
-            dwidth = self.glo.itemAtPosition(1, 0).geometry().width()
-            dheight = self.element_height + 2
-            self.setMinimumSize(ncols*hwidth+dwidth,
-                                nrows*dheight+hheight)
-            self.setFixedSize(ncols*hwidth+dwidth,
-                              nrows*dheight+hheight)
+        self.setMinimumSize(self.sizeHint())
+        self.setFixedSize(self.sizeHint())
+        QtWidgets.QApplication.processEvents()
+        self.setMinimumSize(self.sizeHint())
+        self.setFixedSize(self.sizeHint())
 
     def changed_element(self):
         self.publish_matrix()

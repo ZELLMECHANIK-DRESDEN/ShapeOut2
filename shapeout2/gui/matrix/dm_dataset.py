@@ -80,16 +80,16 @@ class MatrixDataset(QtWidgets.QWidget):
 
     def set_label_string(self, string):
         if self.label.fontMetrics().boundingRect(string).width() < 60:
-            new_string = string
+            nstring = string
         else:
-            new_string = string + "..."
+            nstring = string + "..."
             while True:
-                width = self.label.fontMetrics().boundingRect(new_string).width()
+                width = self.label.fontMetrics().boundingRect(nstring).width()
                 if width > 60:
-                    new_string = new_string[:-4] + "..."
+                    nstring = nstring[:-4] + "..."
                 else:
                     break
-        self.label.setText(new_string)
+        self.label.setText(nstring)
 
     def update_content(self):
         """Reset tool tips and title"""

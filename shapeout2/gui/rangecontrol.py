@@ -32,6 +32,11 @@ class RangeControl(QtWidgets.QWidget):
             self.doubleSpinBox_max.setDecimals(0)
         self.is_integer = integer
 
+        # reduce font size of name
+        font = self.label.font()
+        font.setPointSize(font.pointSize()-1)
+        self.label.setFont(font)
+
         # signals
         self.range_slider.rangeChanged.connect(self.on_range)
         self.doubleSpinBox_min.valueChanged.connect(self.on_spinbox)

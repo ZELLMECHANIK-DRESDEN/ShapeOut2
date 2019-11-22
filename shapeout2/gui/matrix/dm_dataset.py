@@ -39,6 +39,11 @@ class MatrixDataset(QtWidgets.QWidget):
         # modify slot button
         self.toolButton_modify.clicked.connect(self.on_modify)
 
+        # reduce font size of name
+        font = self.label.font()
+        font.setPointSize(font.pointSize()-2)
+        self.label.setFont(font)
+
         if state is None:
             slot = pipeline.Dataslot._instances[identifier]
             self.identifier = identifier
@@ -73,12 +78,25 @@ class MatrixDataset(QtWidgets.QWidget):
     def on_modify(self):
         self.modify_clicked.emit(self.identifier)
 
+    def set_label_string(self, string):
+        if self.label.fontMetrics().boundingRect(string).width() < 60:
+            new_string = string
+        else:
+            new_string = string + "..."
+            while True:
+                width = self.label.fontMetrics().boundingRect(new_string).width()
+                if width > 60:
+                    new_string = new_string[:-4] + "..."
+                else:
+                    break
+        self.label.setText(new_string)
+
     def update_content(self):
         """Reset tool tips and title"""
         if self.path is not None:
-            title = meta_tool.get_repr(self.path, append_path=True)
-            self.setToolTip(title)
-            self.label.setToolTip(title)
-            if len(title) > 12:
-                title = title[:9] + "..."
-            self.label.setText(title)
+            tip = meta_tool.get_repr(self.path, append_path=True)
+            self.setToolTip(tip)
+            self.label.setToolTip(tip)
+            slot = pipeline.Dataslot._instances[self.identifier]
+            name = slot.name
+            self.set_label_string(name)

@@ -26,6 +26,11 @@ class MatrixPlot(QtWidgets.QWidget):
         self.toolButton_toggle.clicked.connect(self.active_toggled.emit)
         self.toolButton_modify.clicked.connect(self.on_modify)
 
+        # reduce font size of name
+        font = self.label.font()
+        font.setPointSize(font.pointSize()-2)
+        self.label.setFont(font)
+
         if state is None:
             plot = pipeline.Plot._instances[identifier]
             self.identifier = identifier
@@ -65,12 +70,21 @@ class MatrixPlot(QtWidgets.QWidget):
     def on_modify(self):
         self.modify_clicked.emit(self.identifier)
 
+    def set_label_string(self, string):
+        if self.label.fontMetrics().boundingRect(string).width() < 60:
+            new_string = string
+        else:
+            new_string = string + "..."
+            while True:
+                width = self.label.fontMetrics().boundingRect(new_string).width()
+                if width > 60:
+                    new_string = new_string[:-4] + "..."
+                else:
+                    break
+        self.label.setText(new_string)
+
     @QtCore.pyqtSlot()
     def update_content(self):
         """Reset tool tips and title"""
         self.label.setToolTip(self.name)
-        if len(self.name) > 12:
-            title = self.name[:9]+"..."
-        else:
-            title = self.name
-        self.label.setText(title)
+        self.set_label_string(self.name)

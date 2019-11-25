@@ -30,6 +30,8 @@ class ExportPlot(QtWidgets.QDialog):
         self.comboBox_fmt.clear()
         for key in EXPORTERS:
             self.comboBox_fmt.addItem(EXPORTERS[key][0], key)
+        # Signals
+        self.comboBox_fmt.currentIndexChanged.connect(self.on_format)
 
     def done(self, r):
         if r:
@@ -64,3 +66,9 @@ class ExportPlot(QtWidgets.QDialog):
                 exp.params["width"] = int(exp.params["width"] / 72 * dpi)
                 exp.params["antialias"] = self.checkBox_aa.isChecked()
             exp.export(str(fnames[plot_id]))
+
+    def on_format(self):
+        if self.comboBox_fmt.currentData() == "png":
+            self.widget_png.show()
+        else:
+            self.widget_png.hide()

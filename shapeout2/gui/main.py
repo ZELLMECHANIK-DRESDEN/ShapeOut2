@@ -58,6 +58,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # Export menu
         self.actionExportData.triggered.connect(self.on_action_export_data)
         self.actionExportFilter.triggered.connect(self.on_action_export_filter)
+        self.actionExportPlot.triggered.connect(self.on_action_export_plot)
         # Comput menu
         self.actionComputeStatistics.triggered.connect(
             self.on_action_compute_statistics)
@@ -338,6 +339,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     def on_action_export_filter(self):
         dlg = export.ExportFilter(self, pipeline=self.pipeline)
+        dlg.exec()
+
+    def on_action_export_plot(self):
+        dlg = export.ExportPlot(self, pipeline=self.pipeline)
         dlg.exec()
 
     def on_action_quit(self):

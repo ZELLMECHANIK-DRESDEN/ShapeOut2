@@ -14,6 +14,7 @@ from .simple_plot_widget import SimplePlotItem
 
 class PipelinePlot(QtWidgets.QWidget):
     """Implements the plotting pipeline using pyqtgraph"""
+    instances = {}
 
     def __init__(self, parent, pipeline, plot_id, *args, **kwargs):
         QtWidgets.QWidget.__init__(self, parent=parent, *args, **kwargs)
@@ -23,6 +24,7 @@ class PipelinePlot(QtWidgets.QWidget):
         self.pipeline = pipeline
         self.identifier = plot_id
         self.update_content()
+        PipelinePlot.instances[plot_id] = self
 
     def update_content(self):
         dslist, slot_states = self.pipeline.get_plot_datasets(self.identifier)
@@ -39,9 +41,6 @@ class PipelinePlot(QtWidgets.QWidget):
         parent.setMaximumSize(size_hint)
         # clear widget
         self.plot_layout.clear()
-        # https://github.com/pyqtgraph/pyqtgraph/pull/1076
-        self.plot_layout.ci.currentRow = 0
-        self.plot_layout.ci.currentCol = 0
 
         if not slot_states:
             return

@@ -1,5 +1,7 @@
 2.0.0a26
+ - feat: implement plot export
  - feat: implement filter export
+ - fix: fix plot export in right-click menu (forked pyqtgraph)
  - ref: refactor block matrix and reset font sizes
  - build: make sure latest libraries of dclab and pyqtgraph are used
 2.0.0a25

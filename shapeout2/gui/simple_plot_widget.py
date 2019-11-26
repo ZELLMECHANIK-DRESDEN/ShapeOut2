@@ -52,11 +52,6 @@ class SimplePlotItem(pg.PlotItem):
         if suffix == "png":
             exp = exporters.ImageExporter(self)
             # translate from screen resolution (80dpi) to 300dpi
-            # Disable this for now:
-            # https://github.com/pyqtgraph/pyqtgraph/issues/16
-            # https://github.com/pyqtgraph/pyqtgraph/issues/105
-            # https://github.com/pyqtgraph/pyqtgraph/issues/484
-            # https://github.com/pyqtgraph/pyqtgraph/pull/88
             exp.params["width"] = int(exp.params["width"] / 72 * 300)
         if suffix == "svg":
             exp = exporters.SVGExporter(self)

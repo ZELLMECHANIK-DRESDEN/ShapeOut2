@@ -7,7 +7,9 @@ import appdirs
 NAME = "shapeout2.cfg"
 
 #: default configuration parameters
-DEFAULTS = {}
+DEFAULTS = {
+    "developer mode": False,
+}
 
 
 class SettingsFile(object):

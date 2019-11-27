@@ -2,6 +2,8 @@ from PyQt5 import QtCore, QtWidgets
 import pyqtgraph as pg
 from pyqtgraph import exporters
 
+from ..settings import SettingsFile
+
 
 class SimplePlotItem(pg.PlotItem):
     """Custom class for data visualization in Shape-Out
@@ -85,8 +87,15 @@ class SimplePlotWidget(pg.PlotWidget):
 
 class SimpleViewBox(pg.ViewBox):
     export = QtCore.pyqtSignal(str)
-    #: allowed right-click menu options with new name
-    right_click_actions = {"Export...": "Advanced Export"}
+
+    def __init__(self, *args, **kwargs):
+        super(SimpleViewBox, self).__init__(*args, **kwargs)
+        #: allowed right-click menu options with new name
+        self.right_click_actions = {}
+        settings = SettingsFile()
+        if settings.get_bool("developer mode"):
+            # Enable advanced export in developer mode
+            self.right_click_actions["Export..."] = "Advanced Export"
 
     def raiseContextMenu(self, ev):
         # Let the scene add on to the end of our context menu

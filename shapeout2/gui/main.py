@@ -54,6 +54,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # Help menu
         self.actionDocumentation.triggered.connect(self.on_action_docs)
         self.actionSoftware.triggered.connect(self.on_action_software)
+        self.actionDeveloperMode.setChecked(
+            self.settings.get_bool("developer mode"))
+        self.actionDeveloperMode.triggered.connect(self.on_action_develop)
         self.actionAbout.triggered.connect(self.on_action_about)
         # Export menu
         self.actionExportData.triggered.connect(self.on_action_export_data)
@@ -328,6 +331,15 @@ class ShapeOut2(QtWidgets.QMainWindow):
     def on_action_compute_statistics(self):
         dlg = compute.ComputeStatistics(self, pipeline=self.pipeline)
         dlg.exec()
+
+    @QtCore.pyqtSlot(bool)
+    def on_action_develop(self, b):
+        self.settings.set_bool("developer mode", b)
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Information)
+        msg.setText("Please restart Shape-Out for the changes to take effect.")
+        msg.setWindowTitle("Restart Shape-Out")
+        msg.exec_()
 
     def on_action_docs(self):
         webbrowser.open("https://shapeout2.readthedocs.io")

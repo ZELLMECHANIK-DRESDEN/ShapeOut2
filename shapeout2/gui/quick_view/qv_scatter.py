@@ -151,15 +151,13 @@ class QuickViewViewBox(SimpleViewBox):
     set_scatter_point = QtCore.pyqtSignal(QtCore.QPointF)
     add_poly_vertex = QtCore.pyqtSignal(QtCore.QPointF)
 
-    #: allowed right-click menu options with new name
-    right_click_actions = {"Export...": "Advanced Export",
-                           "View All": "View All Content",
-                           "Mouse Mode": "Change Mouse mode",
-                           }
-
     def __init__(self, *args, **kwds):
         super(QuickViewViewBox, self).__init__(*args, **kwds)
         self.mode = "scatter"
+
+        #: allowed right-click menu options with new name
+        self.right_click_actions["View All"] = "View All Content"
+        self.right_click_actions["Mouse Mode"] = "Change Mouse mode"
 
     def mouseClickEvent(self, ev):
         if ev.button() == QtCore.Qt.LeftButton:

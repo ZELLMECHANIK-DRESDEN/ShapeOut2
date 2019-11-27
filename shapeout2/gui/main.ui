@@ -197,8 +197,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>329</width>
-          <height>358</height>
+          <width>298</width>
+          <height>512</height>
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
@@ -382,6 +382,7 @@
     </property>
     <addaction name="actionDocumentation"/>
     <addaction name="actionSoftware"/>
+    <addaction name="actionDeveloperMode"/>
     <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuExport">
@@ -523,6 +524,14 @@
   <action name="actionComputeStatistics">
    <property name="text">
     <string>Statistics</string>
+   </property>
+  </action>
+  <action name="actionDeveloperMode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Developer Mode</string>
    </property>
   </action>
  </widget>

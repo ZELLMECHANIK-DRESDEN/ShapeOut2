@@ -1,6 +1,7 @@
 2.0.0a27
  - feat: add developer mode
  - fix: hide confusing "Advances Export" plot menu in developer mode
+ - fix: only show scalar features in QuickView feature selection
 2.0.0a26
  - feat: implement plot export
  - feat: implement filter export

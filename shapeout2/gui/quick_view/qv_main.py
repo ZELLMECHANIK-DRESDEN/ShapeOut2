@@ -567,11 +567,12 @@ class QuickView(QtWidgets.QWidget):
 
         This is used e.g. when emodulus becomes available
         """
+        feats_scalar = dclab.dfn.scalar_feature_names
         if self.rtdc_ds is not None:
             # axes combobox choices
-            ds_features = self.rtdc_ds.features
-            ds_labels = [dclab.dfn.feature_name2label[f] for f in ds_features]
-            ds_fl = sorted(zip(ds_labels, ds_features))
+            ds_feats = [f for f in self.rtdc_ds.features if f in feats_scalar]
+            ds_labels = [dclab.dfn.feature_name2label[f] for f in ds_feats]
+            ds_fl = sorted(zip(ds_labels, ds_feats))
             for cb in [self.comboBox_x, self.comboBox_y]:
                 fcur = cb.currentData()
                 blocked = cb.signalsBlocked()  # remember block state
@@ -579,7 +580,7 @@ class QuickView(QtWidgets.QWidget):
                 # set features
                 cb.clear()
                 for label, feat in ds_fl:
-                    if feat in ds_features:
+                    if feat in ds_feats:
                         cb.addItem(label, feat)
                 idcur = cb.findData(fcur)
                 if idcur >= 0:

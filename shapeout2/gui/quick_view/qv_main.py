@@ -237,6 +237,11 @@ class QuickView(QtWidgets.QWidget):
             self.widget_scatter.poly_line_roi = plr
             self.widget_scatter.addItem(plr)
             self.widget_scatter.set_mouse_click_mode("poly-create")
+        # trigger resize and redraw
+        mdiwin = self.parent()
+        mdiwin.adjustSize()
+        mdiwin.update()
+        self.update()
 
     def on_poly_done(self):
         """User is done creating or modifying a polygon filter"""
@@ -347,7 +352,7 @@ class QuickView(QtWidgets.QWidget):
         show = show_event or show_settings or show_poly
         mdiwin = self.parent()
         geom = mdiwin.geometry()
-        geom.setWidth(geom.width() - (-1)**show * 300)
+        geom.setWidth(geom.width() - (-1)**show * 350)
         mdiwin.setGeometry(geom)
         mdiwin.adjustSize()
 

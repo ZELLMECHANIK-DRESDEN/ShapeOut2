@@ -6,6 +6,7 @@
    on top of each other
  - fix: minor redrawing issues
  - fix: AttributeError when removing a plot on macOS
+ - fix: increase maximum size of plots by factor of 100
  - enh: Increased speed in QuickView when scrolling through events
 2.0.0a26
  - feat: implement plot export

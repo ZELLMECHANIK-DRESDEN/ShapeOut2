@@ -212,7 +212,7 @@ class FilterPanel(QtWidgets.QWidget):
     def update_content(self, event=None, filt_index=None):
         if self.filter_ids:
             self.setEnabled(True)
-            self.update_polygon_filters()
+            self.update_polygon_filters(update_state=False)
             # update combobox
             self.comboBox_filters.blockSignals(True)
             if filt_index is None:
@@ -261,7 +261,7 @@ class FilterPanel(QtWidgets.QWidget):
                         # reset range to limits
                         rc.reset_range()
 
-    def update_polygon_filters(self):
+    def update_polygon_filters(self, update_state=True):
         """Update the layout containing the polygon filters"""
         self.verticalLayout_poly.setAlignment(QtCore.Qt.AlignTop)
         # clear layout
@@ -289,6 +289,9 @@ class FilterPanel(QtWidgets.QWidget):
             button.clicked.connect(self.request_new_polygon_filter)
             self.verticalLayout_poly.addWidget(label)
             self.verticalLayout_poly.addWidget(button)
+        # update current filters
+        if update_state and self.current_filter is not None:
+            self.__setstate__(self.current_filter.__getstate__())
 
     def write_filter(self):
         """Update the shapeout2.pipeline.Filter instance"""

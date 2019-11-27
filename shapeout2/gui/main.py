@@ -138,6 +138,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         if self.sender() != self.block_matrix:
             # Update BlockMatrix
             self.block_matrix.adopt_pipeline(pipeline_state)
+        # trigger redraw
+        self.scrollArea_block.update()
         # Invalidate block matrix elements that do not make sense due to
         # filtering or plotting features.
         invalid_dm = []

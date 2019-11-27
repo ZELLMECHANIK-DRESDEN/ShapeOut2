@@ -5,6 +5,7 @@
  - fix: QuickView -> Event -> Features labels in table were drawn
    on top of each other
  - fix: minor redrawing issues
+ - fix: AttributeError when removing a plot on macOS
  - enh: Increased speed in QuickView when scrolling through events
 2.0.0a26
  - feat: implement plot export

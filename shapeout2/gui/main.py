@@ -181,9 +181,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
         for plot_id in list(self.subwindows_plots.keys()):
             if plot_id not in plot_ids:
                 sub = self.subwindows_plots.pop(plot_id)
-                # disconnect signals
                 pw = sub.children()[-1]
-                self.plots_changed.disconnect(pw.update_content)
+                # disconnect signals (check for attr, b/c not there on macOS)
+                if hasattr(pw, "update_content"):
+                    self.plots_changed.disconnect(pw.update_content)
                 sub.deleteLater()
         self.plots_changed.emit()
         # redraw

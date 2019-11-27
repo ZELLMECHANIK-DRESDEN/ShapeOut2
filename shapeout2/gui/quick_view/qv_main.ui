@@ -84,7 +84,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../../img/axes.svg</normaloff>../img/axes.svg</iconset>
+          <normaloff>../../img/axes.svg</normaloff>../../img/axes.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -110,7 +110,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../../img/eye.svg</normaloff>../img/eye.svg</iconset>
+          <normaloff>../../img/eye.svg</normaloff>../../img/eye.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -130,7 +130,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>../../img/poly.svg</normaloff>../img/poly.svg</iconset>
+          <normaloff>../../img/poly.svg</normaloff>../../img/poly.svg</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -393,7 +393,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QTabWidget" name="tabWidget">
+       <widget class="QTabWidget" name="tabWidget_event">
         <property name="currentIndex">
          <number>0</number>
         </property>

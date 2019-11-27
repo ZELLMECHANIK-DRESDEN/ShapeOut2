@@ -73,6 +73,8 @@ class QuickView(QtWidgets.QWidget):
             self.on_event_scatter_update)
         self.checkBox_trace_zoom.stateChanged.connect(
             self.on_event_scatter_update)
+        self.tabWidget_event.currentChanged.connect(
+            self.on_event_scatter_update)
 
         # value changed signals for plot
         self.signal_widgets = [self.checkBox_downsample,
@@ -116,6 +118,12 @@ class QuickView(QtWidgets.QWidget):
                          )
 
         self.rtdc_ds = None
+
+        # init events/features table
+        self.tableWidget_feats.setColumnCount(2)
+        header = self.tableWidget_feats.horizontalHeader()
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
 
     def __getstate__(self):
         plot = {
@@ -380,134 +388,142 @@ class QuickView(QtWidgets.QWidget):
         # Update selection point in scatter plot
         self.widget_scatter.setSelection(event)
         imkw = self.imkw.copy()
-        # update image
-        state = self.__getstate__()
+        # dataset
         ds = self.rtdc_ds
-        if "image" in ds:
-            cellimg = ds["image"][event]
-            if state["event"]["image auto contrast"]:
-                imkw["levels"] = cellimg.min(), cellimg.max()
-            # convert to RGB
-            cellimg = cellimg.reshape(
-                cellimg.shape[0], cellimg.shape[1], 1)
-            cellimg = np.repeat(cellimg, 3, axis=2)
-            # Only load contour data if there is an image column.
-            # We don't know how big the images should be so we
-            # might run into trouble displaying random contours.
-            if "mask" in ds and len(ds["mask"]) > event:
-                mask = ds["mask"][event]
-                if state["event"]["image contour"]:
-                    # compute contour image from mask
-                    cont = mask ^ binary_erosion(mask)
-                    # set red contour pixel values in original image
-                    cellimg[cont, 0] = int(imkw["levels"][1]*.7)
-                    cellimg[cont, 1] = 0
-                    cellimg[cont, 2] = 0
-                if state["event"]["image zoom"]:
-                    xv, yv = np.where(mask)
-                    idminx = xv.min() - 5
-                    idminy = yv.min() - 5
-                    idmaxx = xv.max() + 5
-                    idmaxy = yv.max() + 5
-                    idminx = idminx if idminx >= 0 else 0
-                    idminy = idminy if idminy >= 0 else 0
-                    shx, shy = mask.shape
-                    idmaxx = idmaxx if idmaxx < shx else shx
-                    idmaxy = idmaxy if idmaxy < shy else shy
-                    cellimg = cellimg[idminx:idmaxx, idminy:idmaxy]
-            self.imageView_image.setImage(cellimg, **imkw)
-            self.groupBox_image.show()
-        else:
-            self.groupBox_image.hide()
-
-        if "trace" in ds:
-            # remove legend items
-            for item in reversed(self.legend_trace.items):
-                self.legend_trace.removeItem(item[1].text)
-            self.legend_trace.setVisible(state["event"]["trace legend"])
-            # get slot from identifier
-            # time axis
-            flsamples = ds.config["fluorescence"]["samples per event"]
-            flrate = ds.config["fluorescence"]["sample rate"]
-            fltime = np.arange(flsamples) / flrate * 1e6
-            # temporal range (min, max, fl-peak-maximum)
-            range_t = [fltime[0], fltime[-1], 0]
-            # fluorescence intensity
-            range_fl = [0, 0]
-            for key in dclab.dfn.FLUOR_TRACES:
-                if key.count("raw") and not state["event"]["trace raw"]:
-                    # hide raw trace data if user decided so
-                    show = False
-                else:
-                    show = True
-                flid = key.split("_")[0]
-                if (key in ds["trace"] and show):
-                    # show the trace information
-                    tracey = ds["trace"][key][event]  # trace data
-                    range_fl[0] = min(range_fl[0], tracey.min())
-                    range_fl[1] = max(range_fl[1], tracey.max())
-                    self.trace_plots[key].setData(fltime, tracey)
-                    self.trace_plots[key].show()
-                    if state["event"]["trace zoom"]:
-                        flpos = ds["{}_pos".format(flid)][event]
-                        flwidth = ds["{}_width".format(flid)][event]
-                        flmax = ds["{}_max".format(flid)][event]
-                        # use the peak maximum to decide which range to use
-                        if flmax > range_t[2]:
-                            range_t[0] = flpos - 1.5 * flwidth
-                            range_t[1] = flpos + 1.5 * flwidth
-                            range_t[2] = flmax
-                    # set legend name
-                    ln = "{} {}".format(self.slot.fl_name_dict[
-                        "FL-{}".format(key[2])], key[4:])
-                    self.legend_trace.addItem(self.trace_plots[key], ln)
-                    self.legend_trace.update()
-                else:
-                    self.trace_plots[key].hide()
-            self.graphicsView_trace.setXRange(*range_t[:2], padding=0)
-            if range_fl[0] != range_fl[1]:
-                self.graphicsView_trace.setYRange(*range_fl, padding=.01)
-            self.graphicsView_trace.setLimits(xMin=0, xMax=fltime[-1])
-            self.groupBox_trace.show()
-        else:
-            self.groupBox_trace.hide()
-
-        # update features tab
-        # Disable updates which look ugly when the user switches quickly
-        self.tableWidget_feats.setUpdatesEnabled(False)
-        # only use computed features (speed)
-        fcands = ds.features_loaded
-        # restrict to scalar features
-        feats = [f for f in fcands if f in dclab.dfn.scalar_feature_names]
-        lf = sorted([(dclab.dfn.feature_name2label[f], f) for f in feats])
-        self.tableWidget_feats.setRowCount(len(feats))
-        self.tableWidget_feats.setColumnCount(2)
-        self.tableWidget_feats.setVerticalHeaderLabels(feats)
-        for ii, (lii, fii) in enumerate(lf):
-            name_vis = lii if len(lii) < 20 else lii[:17] + "..."
-            label_name = QtWidgets.QLabel(name_vis)
-            label_name.setToolTip(lii)
-            value = ds[fii][event]
-            if np.isnan(value) or np.isinf(value):
-                fmt = "{}"
-            elif fii in idiom.INTEGER_FEATURES:
-                fmt = "{:.0f}"
-            elif value == 0:
-                fmt = "{:.1f}"
+        if self.tabWidget_event.currentIndex() == 0:
+            # update image
+            state = self.__getstate__()
+            if "image" in ds:
+                cellimg = ds["image"][event]
+                if state["event"]["image auto contrast"]:
+                    imkw["levels"] = cellimg.min(), cellimg.max()
+                # convert to RGB
+                cellimg = cellimg.reshape(
+                    cellimg.shape[0], cellimg.shape[1], 1)
+                cellimg = np.repeat(cellimg, 3, axis=2)
+                # Only load contour data if there is an image column.
+                # We don't know how big the images should be so we
+                # might run into trouble displaying random contours.
+                if "mask" in ds and len(ds["mask"]) > event:
+                    mask = ds["mask"][event]
+                    if state["event"]["image contour"]:
+                        # compute contour image from mask
+                        cont = mask ^ binary_erosion(mask)
+                        # set red contour pixel values in original image
+                        cellimg[cont, 0] = int(imkw["levels"][1]*.7)
+                        cellimg[cont, 1] = 0
+                        cellimg[cont, 2] = 0
+                    if state["event"]["image zoom"]:
+                        xv, yv = np.where(mask)
+                        idminx = xv.min() - 5
+                        idminy = yv.min() - 5
+                        idmaxx = xv.max() + 5
+                        idmaxy = yv.max() + 5
+                        idminx = idminx if idminx >= 0 else 0
+                        idminy = idminy if idminy >= 0 else 0
+                        shx, shy = mask.shape
+                        idmaxx = idmaxx if idmaxx < shx else shx
+                        idmaxy = idmaxy if idmaxy < shy else shy
+                        cellimg = cellimg[idminx:idmaxx, idminy:idmaxy]
+                self.imageView_image.setImage(cellimg, **imkw)
+                self.groupBox_image.show()
             else:
-                dec = -int(np.ceil(np.log(np.abs(value)))) + 3
-                if dec <= 0:
-                    dec = 1
-                fmt = "{:." + "{}".format(dec) + "f}"
-            label_value = QtWidgets.QLabel(fmt.format(value))
-            label_value.setToolTip(lii)
-            self.tableWidget_feats.setCellWidget(ii, 0, label_name)
-            self.tableWidget_feats.setCellWidget(ii, 1, label_value)
-        header = self.tableWidget_feats.horizontalHeader()
-        header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
-        # enable updates again
-        self.tableWidget_feats.setUpdatesEnabled(True)
+                self.groupBox_image.hide()
+            if "trace" in ds:
+                # remove legend items
+                for item in reversed(self.legend_trace.items):
+                    self.legend_trace.removeItem(item[1].text)
+                self.legend_trace.setVisible(state["event"]["trace legend"])
+                # get slot from identifier
+                # time axis
+                flsamples = ds.config["fluorescence"]["samples per event"]
+                flrate = ds.config["fluorescence"]["sample rate"]
+                fltime = np.arange(flsamples) / flrate * 1e6
+                # temporal range (min, max, fl-peak-maximum)
+                range_t = [fltime[0], fltime[-1], 0]
+                # fluorescence intensity
+                range_fl = [0, 0]
+                for key in dclab.dfn.FLUOR_TRACES:
+                    if key.count("raw") and not state["event"]["trace raw"]:
+                        # hide raw trace data if user decided so
+                        show = False
+                    else:
+                        show = True
+                    flid = key.split("_")[0]
+                    if (key in ds["trace"] and show):
+                        # show the trace information
+                        tracey = ds["trace"][key][event]  # trace data
+                        range_fl[0] = min(range_fl[0], tracey.min())
+                        range_fl[1] = max(range_fl[1], tracey.max())
+                        self.trace_plots[key].setData(fltime, tracey)
+                        self.trace_plots[key].show()
+                        if state["event"]["trace zoom"]:
+                            flpos = ds["{}_pos".format(flid)][event]
+                            flwidth = ds["{}_width".format(flid)][event]
+                            flmax = ds["{}_max".format(flid)][event]
+                            # use the peak maximum to decide which range to use
+                            if flmax > range_t[2]:
+                                range_t[0] = flpos - 1.5 * flwidth
+                                range_t[1] = flpos + 1.5 * flwidth
+                                range_t[2] = flmax
+                        # set legend name
+                        ln = "{} {}".format(self.slot.fl_name_dict[
+                            "FL-{}".format(key[2])], key[4:])
+                        self.legend_trace.addItem(self.trace_plots[key], ln)
+                        self.legend_trace.update()
+                    else:
+                        self.trace_plots[key].hide()
+                self.graphicsView_trace.setXRange(*range_t[:2], padding=0)
+                if range_fl[0] != range_fl[1]:
+                    self.graphicsView_trace.setYRange(*range_fl, padding=.01)
+                self.graphicsView_trace.setLimits(xMin=0, xMax=fltime[-1])
+                self.groupBox_trace.show()
+            else:
+                self.groupBox_trace.hide()
+        else:
+            # update features tab
+            # Disable updates which look ugly when the user switches quickly
+            self.tableWidget_feats.setUpdatesEnabled(False)
+            # only use computed features (speed)
+            fcands = ds.features_loaded
+            # restrict to scalar features
+            feats = [f for f in fcands if f in dclab.dfn.scalar_feature_names]
+            lf = sorted([(dclab.dfn.feature_name2label[f], f) for f in feats])
+            self.tableWidget_feats.setRowCount(len(feats))
+            for ii, (lii, fii) in enumerate(lf):
+                # name
+                name_vis = lii if len(lii) < 20 else lii[:17] + "..."
+                label_name = self.tableWidget_feats.cellWidget(ii, 0)
+                if label_name is None:
+                    label_name = QtWidgets.QLabel(name_vis)
+                    self.tableWidget_feats.setCellWidget(ii, 0, label_name)
+                else:
+                    if label_name.text() != name_vis:
+                        label_name.setText(name_vis)
+                        label_name.setToolTip(lii)
+                # value
+                value = ds[fii][event]
+                if np.isnan(value) or np.isinf(value):
+                    fmt = "{}"
+                elif fii in idiom.INTEGER_FEATURES:
+                    fmt = "{:.0f}"
+                elif value == 0:
+                    fmt = "{:.1f}"
+                else:
+                    dec = -int(np.ceil(np.log(np.abs(value)))) + 3
+                    if dec <= 0:
+                        dec = 1
+                    fmt = "{:." + "{}".format(dec) + "f}"
+                value_vis = fmt.format(value)
+                label_value = self.tableWidget_feats.cellWidget(ii, 1)
+                if label_value is None:
+                    label_value = QtWidgets.QLabel(value_vis)
+                    self.tableWidget_feats.setCellWidget(ii, 1, label_value)
+                else:
+                    label_value.setText(value_vis)
+                label_value.setToolTip(lii)
+            # enable updates again
+            self.tableWidget_feats.setUpdatesEnabled(True)
 
     @QtCore.pyqtSlot(dclab.rtdc_dataset.RTDCBase)
     def show_rtdc(self, rtdc_ds, slot):

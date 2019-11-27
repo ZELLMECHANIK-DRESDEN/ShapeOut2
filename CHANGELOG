@@ -2,6 +2,9 @@
  - feat: add developer mode
  - fix: hide confusing "Advances Export" plot menu in developer mode
  - fix: only show scalar features in QuickView feature selection
+ - fix: QuickView -> Event -> Features labels in table were drawn
+   on top of each other
+ - enh: Increased speed in QuickView when scrolling through events
 2.0.0a26
  - feat: implement plot export
  - feat: implement filter export

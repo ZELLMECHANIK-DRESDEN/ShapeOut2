@@ -60,6 +60,8 @@ class QuickView(QtWidgets.QWidget):
         # event changed signal
         self.widget_scatter.scatter.sigClicked.connect(
             self.on_event_scatter_clicked)
+        self.widget_scatter.update_hover_pos.connect(
+            self.on_event_scatter_hover)
         self.spinBox_event.valueChanged.connect(self.on_event_scatter_spin)
         self.checkBox_image_contour.stateChanged.connect(
             self.on_event_scatter_update)
@@ -117,6 +119,7 @@ class QuickView(QtWidgets.QWidget):
                          levels=(0, 254),
                          )
 
+        # set initial empty dataset
         self.rtdc_ds = None
 
         # init events/features table
@@ -182,6 +185,42 @@ class QuickView(QtWidgets.QWidget):
             self.checkBox_trace_raw.setChecked(event["trace raw"])
             self.checkBox_trace_legend.setChecked(event["trace legend"])
 
+    def get_event_image(self, ds, event):
+        state = self.__getstate__()
+        imkw = self.imkw.copy()
+        cellimg = ds["image"][event]
+        if state["event"]["image auto contrast"]:
+            imkw["levels"] = cellimg.min(), cellimg.max()
+        # convert to RGB
+        cellimg = cellimg.reshape(
+            cellimg.shape[0], cellimg.shape[1], 1)
+        cellimg = np.repeat(cellimg, 3, axis=2)
+        # Only load contour data if there is an image column.
+        # We don't know how big the images should be so we
+        # might run into trouble displaying random contours.
+        if "mask" in ds and len(ds["mask"]) > event:
+            mask = ds["mask"][event]
+            if state["event"]["image contour"]:
+                # compute contour image from mask
+                cont = mask ^ binary_erosion(mask)
+                # set red contour pixel values in original image
+                cellimg[cont, 0] = int(imkw["levels"][1]*.7)
+                cellimg[cont, 1] = 0
+                cellimg[cont, 2] = 0
+            if state["event"]["image zoom"]:
+                xv, yv = np.where(mask)
+                idminx = xv.min() - 5
+                idminy = yv.min() - 5
+                idmaxx = xv.max() + 5
+                idmaxy = yv.max() + 5
+                idminx = idminx if idminx >= 0 else 0
+                idminy = idminy if idminy >= 0 else 0
+                shx, shy = mask.shape
+                idmaxx = idmaxx if idmaxx < shx else shx
+                idmaxy = idmaxy if idmaxy < shy else shy
+                cellimg = cellimg[idminx:idmaxx, idminy:idmaxy]
+        return cellimg, imkw
+
     def on_event_scatter_clicked(self, plot, point):
         """User clicked on scatter plot
 
@@ -204,6 +243,22 @@ class QuickView(QtWidgets.QWidget):
             # get corrected index
             ds_idx = np.where(plotted)[0][point.index()]
             self.show_event(ds_idx)
+
+    def on_event_scatter_hover(self, pos):
+        """Update the image view in the polygon widget """
+        if self.rtdc_ds is not None and self.toolButton_poly.isChecked():
+            # plotted events
+            plotted = self.widget_scatter.events_plotted
+            spos = self.widget_scatter.scatter.mapFromView(pos)
+            point = self.widget_scatter.scatter.pointAt(spos)
+            # get corrected index
+            event = np.where(plotted)[0][point.index()]
+            if "image" in self.rtdc_ds:
+                cellimg, imkw = self.get_event_image(self.rtdc_ds, event)
+                self.imageView_image_poly.setImage(cellimg, **imkw)
+                self.imageView_image_poly.show()
+            else:
+                self.imageView_image_poly.hide()
 
     def on_event_scatter_spin(self, event):
         """Sping control for event selection changed"""
@@ -392,44 +447,13 @@ class QuickView(QtWidgets.QWidget):
 
         # Update selection point in scatter plot
         self.widget_scatter.setSelection(event)
-        imkw = self.imkw.copy()
         # dataset
         ds = self.rtdc_ds
         if self.tabWidget_event.currentIndex() == 0:
             # update image
             state = self.__getstate__()
             if "image" in ds:
-                cellimg = ds["image"][event]
-                if state["event"]["image auto contrast"]:
-                    imkw["levels"] = cellimg.min(), cellimg.max()
-                # convert to RGB
-                cellimg = cellimg.reshape(
-                    cellimg.shape[0], cellimg.shape[1], 1)
-                cellimg = np.repeat(cellimg, 3, axis=2)
-                # Only load contour data if there is an image column.
-                # We don't know how big the images should be so we
-                # might run into trouble displaying random contours.
-                if "mask" in ds and len(ds["mask"]) > event:
-                    mask = ds["mask"][event]
-                    if state["event"]["image contour"]:
-                        # compute contour image from mask
-                        cont = mask ^ binary_erosion(mask)
-                        # set red contour pixel values in original image
-                        cellimg[cont, 0] = int(imkw["levels"][1]*.7)
-                        cellimg[cont, 1] = 0
-                        cellimg[cont, 2] = 0
-                    if state["event"]["image zoom"]:
-                        xv, yv = np.where(mask)
-                        idminx = xv.min() - 5
-                        idminy = yv.min() - 5
-                        idmaxx = xv.max() + 5
-                        idmaxy = yv.max() + 5
-                        idminx = idminx if idminx >= 0 else 0
-                        idminy = idminy if idminy >= 0 else 0
-                        shx, shy = mask.shape
-                        idmaxx = idmaxx if idmaxx < shx else shx
-                        idmaxy = idmaxy if idmaxy < shy else shy
-                        cellimg = cellimg[idminx:idmaxx, idminy:idmaxy]
+                cellimg, imkw = self.get_event_image(ds, event)
                 self.imageView_image.setImage(cellimg, **imkw)
                 self.groupBox_image.show()
             else:

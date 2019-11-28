@@ -4,11 +4,6 @@ import pyqtgraph as pg
 
 class SimpleImageView(pg.ImageView):
     """Custom class for data visualization in Shape-Out
-
-    Modifications include:
-    - right click menu only with "Export..."
-    - white background
-    - top and right axes
     """
 
     def __init__(self, *args, **kwargs):

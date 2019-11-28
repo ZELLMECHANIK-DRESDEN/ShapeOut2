@@ -10,10 +10,13 @@ from ..simple_plot_widget import SimplePlotWidget, SimpleViewBox
 
 
 class QuickViewScatterWidget(SimplePlotWidget):
+    update_hover_pos = QtCore.pyqtSignal(QtCore.QPointF)
+
     def __init__(self, *args, **kwargs):
         self._view_box = QuickViewViewBox()
         super(QuickViewScatterWidget, self).__init__(viewBox=self._view_box,
                                                      *args, **kwargs)
+        self._view_box.update_hover_pos.connect(self.update_hover_pos)
         self.scatter = RTDCScatterPlot()
         self.select = pg.PlotDataItem(x=[1], y=[2], symbol="o")
         #: List of isoelasticity line plots
@@ -150,6 +153,7 @@ class QuickViewScatterWidget(SimplePlotWidget):
 class QuickViewViewBox(SimpleViewBox):
     set_scatter_point = QtCore.pyqtSignal(QtCore.QPointF)
     add_poly_vertex = QtCore.pyqtSignal(QtCore.QPointF)
+    update_hover_pos = QtCore.pyqtSignal(QtCore.QPointF)
 
     def __init__(self, *args, **kwds):
         super(QuickViewViewBox, self).__init__(*args, **kwds)
@@ -170,6 +174,11 @@ class QuickViewViewBox(SimpleViewBox):
         else:
             # right mouse button shows menu
             super(QuickViewViewBox, self).mouseClickEvent(ev)
+
+    def hoverEvent(self, ev):
+        if hasattr(ev, "_scenePos"):
+            pos = self.mapToView(ev.pos())
+            self.update_hover_pos.emit(pos)
 
 
 class RTDCScatterPlot(pg.ScatterPlotItem):

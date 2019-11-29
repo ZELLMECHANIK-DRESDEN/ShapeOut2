@@ -34,7 +34,7 @@ class Filter(object):
         #: box filters with features as keys; each item is a
         #: dictionary with the keys "start", "end", "active"
         self.boxdict = {}
-        #: polygon filter list; each item is an instance of
+        #: polygon filter list; each item is an identifier of
         #: :class:`dclab.PolygonFilter`
         self.polylist = []
         if identifier in Filter._instances:
@@ -143,5 +143,5 @@ class Filter(object):
                 cfgfilt["{} max".format(feat)] = self.boxdict[feat]["end"]
 
         # set polygon filters
-        for poly in self.polylist:
-            dataset.polygon_filter_add(poly)
+        for pid in self.polylist:
+            dataset.polygon_filter_add(pid)

@@ -21,8 +21,10 @@ from .matrix import BlockMatrix
 from . import pipeline_plot
 from . import quick_view
 
-from .. import settings
 from .. import pipeline
+from .. import session
+from .. import settings
+
 
 from .._version import version as __version__
 
@@ -62,7 +64,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.actionExportData.triggered.connect(self.on_action_export_data)
         self.actionExportFilter.triggered.connect(self.on_action_export_filter)
         self.actionExportPlot.triggered.connect(self.on_action_export_plot)
-        # Comput menu
+        # Import menu
+        self.actionImportFilter.triggered.connect(self.on_action_import_filter)
+        # Compute menu
         self.actionComputeStatistics.triggered.connect(
             self.on_action_compute_statistics)
         # Initially hide buttons
@@ -359,6 +363,14 @@ class ShapeOut2(QtWidgets.QMainWindow):
     def on_action_export_plot(self):
         dlg = export.ExportPlot(self, pipeline=self.pipeline)
         dlg.exec()
+
+    def on_action_import_filter(self):
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self, 'Select Filter', '', 'Filters formats (*.poly *.sof)')
+        if path:
+            session.import_filters(path, self.pipeline)
+            # update UI
+            self.adopt_pipeline(self.pipeline.__getstate__())
 
     def on_action_quit(self):
         """Determine what happens when the user wants to quit"""

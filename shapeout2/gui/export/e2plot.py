@@ -46,17 +46,19 @@ class ExportPlot(QtWidgets.QDialog):
         if self.comboBox_plot.currentData() == "all":
             path = QtWidgets.QFileDialog.getExistingDirectory(self,
                                                               'Output Folder')
-            for ii, plot in enumerate(self.pipeline.plots):
-                fn = "SO-plot_{}_{}.{}".format(ii, plot.name, fmt)
-                # remove bad characters from file name
-                fn = fn.replace(" ", "_").encode("utf-8").decode(
-                    "ascii", errors="replace").replace("\ufffd", "?")
-                fnames[plot.identifier] = pathlib.Path(path) / fn
+            if path:
+                for ii, plot in enumerate(self.pipeline.plots):
+                    fn = "SO-plot_{}_{}.{}".format(ii, plot.name, fmt)
+                    # remove bad characters from file name
+                    fn = fn.replace(" ", "_").encode("utf-8").decode(
+                        "ascii", errors="replace").replace("\ufffd", "?")
+                    fnames[plot.identifier] = pathlib.Path(path) / fn
         else:
             pp, _ = QtWidgets.QFileDialog.getSaveFileName(
                 self, 'Plot export file name', '',
                 self.comboBox_fmt.currentText())
-            fnames[self.comboBox_plot.currentData()] = pathlib.Path(pp)
+            if pp:
+                fnames[self.comboBox_plot.currentData()] = pathlib.Path(pp)
         # get PipelinePlot instance
         for plot_id in fnames:
             pipl = PipelinePlot.instances[plot_id]

@@ -11,6 +11,7 @@
  - fix: increase maximum size of plots by factor of 100
  - fix: editing a polygon filter deselected it from the filter
  - enh: Increased speed in QuickView when scrolling through events
+ - enh: Added pyqtgraph version check
 2.0.0a26
  - feat: implement plot export
  - feat: implement filter export

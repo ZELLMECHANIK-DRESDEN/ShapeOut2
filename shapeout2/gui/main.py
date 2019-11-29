@@ -115,6 +115,28 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # slot signals
         self.widget_ana_view.slot_changed.connect(self.adopt_slot)
 
+        # check pyqtgraph version
+        self._check_pg_version()
+
+    def _check_pg_version(self):
+        """Tells the user if the pyqtgraph version is not correct"""
+        pgdist = pkg_resources.get_distribution("pyqtgraph")
+        if pgdist.version not in ["0.11.0.dev0+g2f1c9fa",  # ZMDD
+                                  "0.11.0.dev0+gb81f6d6",  # paulmueller
+                                  ]:
+            msg = QtWidgets.QMessageBox()
+            msg.setIcon(QtWidgets.QMessageBox.Warning)
+            msg.setText("You are using an unexpected version of pyqtgraph. "
+                        + "Plot export may not work correctly!")
+            msg.setWindowTitle("pyqtgraph version mismatch")
+            msg.setDetailedText(
+                "If you have installed Shape-Out using pip, please "
+                + "install our pyqtgraph fork using: \n\n"
+                + "pip install "
+                + "git+git://github.com/ZELLMECHANIK-DRESDEN/pyqtgraph.git"
+            )
+            msg.exec_()
+
     @QtCore.pyqtSlot(dict)
     def adopt_filter(self, filt_state):
         filt_id = filt_state["identifier"]

@@ -10,6 +10,7 @@ from pyqtgraph.graphicsItems.GradientEditorItem import Gradients
 
 from ..pipeline import Plot
 from .. import plot_cache
+from .colorbar_widget import ColorBarWidget
 from .simple_plot_widget import SimplePlotItem
 
 
@@ -50,13 +51,11 @@ class PipelinePlot(QtWidgets.QWidget):
 
         # font size for plot title (default size + 2)
         size = "{}pt".format(QtGui.QFont().pointSize() + 2)
-        self.plot_layout.addLabel(lay["name"], colspan=2, size=size)
+        self.plot_layout.addLabel(lay["name"], colspan=3, size=size)
         self.plot_layout.nextRow()
 
         self.plot_layout.addLabel(labely, angle=-90)
         linner = self.plot_layout.addLayout()
-        self.plot_layout.nextRow()
-        self.plot_layout.addLabel(labelx, col=1)
 
         # limits in case of scatter plot and feature hue
         if lay["division"] == "merge":
@@ -106,6 +105,34 @@ class PipelinePlot(QtWidgets.QWidget):
                            rowspan=1,
                            colspan=1)
             pp.redraw(dslist, slot_states, plot_state_contour)
+
+        sca = plot_state["scatter"]
+        colorbar_kwds = {}
+
+        if sca["marker hue"] == "kde":
+            colorbar_kwds["vmin"] = 0
+            colorbar_kwds["vmax"] = 1
+            colorbar_kwds["label"] = "density"
+        elif sca["marker hue"] == "feature":
+            colorbar_kwds["vmin"] = sca["hue min"]
+            colorbar_kwds["vmax"] = sca["hue max"]
+            feat = sca["hue feature"]
+            colorbar_kwds["label"] = dclab.dfn.feature_name2label[feat]
+
+        if colorbar_kwds:
+            # add colorbar
+            sca = plot_state["scatter"]
+            colorbar = ColorBarWidget(
+                cmap=sca["colormap"],
+                width=15,
+                height=min(300, lay["size y"]//2),
+                **colorbar_kwds
+            )
+            self.plot_layout.addItem(colorbar)
+
+            self.plot_layout.nextRow()
+            self.plot_layout.addLabel(labelx, col=1)
+            self.update()
 
 
 class PipelinePlotItem(SimplePlotItem):
@@ -329,14 +356,14 @@ def add_scatter(plot_item, plot_state, rtdc_ds, slot_state):
             brush.append(cmap.mapToQColor(f))
     elif sca["marker hue"] == "dataset":
         alpha = int(sca["marker alpha"] * 255)
-        color = pg.mkColor(slot_state["color"])
-        color.setAlpha(alpha)
-        brush = pg.mkBrush(color)
+        colord = pg.mkColor(slot_state["color"])
+        colord.setAlpha(alpha)
+        brush = pg.mkBrush(colord)
     else:
         alpha = int(sca["marker alpha"] * 255)
-        color = pg.mkColor("k")
-        color.setAlpha(alpha)
-        brush = pg.mkBrush(color)
+        colork = pg.mkColor("#000000")
+        colork.setAlpha(alpha)
+        brush = pg.mkBrush(colork)
 
     # convert to log-scale if applicable
     if gen["scale x"] == "log":

@@ -7,11 +7,11 @@ import dclab
 DEFAULT_STATE = {
     "identifier": "no default",
     "layout": {
-        "column count": 3,
+        "column count": 2,
         "division": "multiscatter+contour",
         "label plots": True,
         "name": "no default",  # overridden by __init__
-        "size x": 500,
+        "size x": 600,
         "size y": 400,
     },
     "general": {
@@ -72,7 +72,8 @@ STATE_OPTIONS = {
         "scale y": ["linear", "log"],
     },
     "scatter": {
-        "colormap": ["inferno", "jet", "magma", "plasma", "viridis"],
+        "colormap": ["flame", "inferno", "magma", "plasma", "thermal",
+                     "viridis"],
         "downsampling": bool,
         "downsampling value": int,
         "enabled":  bool,

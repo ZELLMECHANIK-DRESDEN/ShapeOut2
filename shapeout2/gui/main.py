@@ -52,7 +52,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # Disable native menubar (e.g. on Mac)
         self.menubar.setNativeMenuBar(False)
         # File menu
+        self.actionClearSession.triggered.connect(self.on_action_clear)
+        self.actionOpenSession.triggered.connect(self.on_action_open)
         self.actionQuit.triggered.connect(self.on_action_quit)
+        self.actionSaveSession.triggered.connect(self.on_action_save)
         # Help menu
         self.actionDocumentation.triggered.connect(self.on_action_docs)
         self.actionSoftware.triggered.connect(self.on_action_software)
@@ -81,7 +84,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.init_analysis_view()
         self.mdiArea.cascadeSubWindows()
         self.showMaximized()
-        # ACTIONS
+        # BlockMatrix Actions
         self.actionLoadDataset.triggered.connect(self.add_dataslot)
         self.actionNewFilter.triggered.connect(self.add_filter)
         self.actionNewPlot.triggered.connect(self.add_plot)
@@ -120,8 +123,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     def _check_pg_version(self):
         """Tells the user if the pyqtgraph version is not correct"""
-        pgdist = pkg_resources.get_distribution("pyqtgraph")
-        if pgdist.version not in ["0.11.0.dev0+g2f1c9fa",  # ZMDD
+        if pg.__version__ not in ["0.11.0.dev0+g2f1c9fa",  # ZMDD
                                   "0.11.0.dev0+gb81f6d6",  # paulmueller
                                   ]:
             msg = QtWidgets.QMessageBox()
@@ -370,6 +372,19 @@ class ShapeOut2(QtWidgets.QMainWindow):
         msg.setWindowTitle("Restart Shape-Out")
         msg.exec_()
 
+    def on_action_clear(self):
+        buttonReply = QtWidgets.QMessageBox.question(
+            self, 'Clear Session', "All progress will be lost. Continue?",
+            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+            QtWidgets.QMessageBox.No)
+        if buttonReply == QtWidgets.QMessageBox.Yes:
+            session.clear_session(self.pipeline)
+            self.adopt_pipeline(self.pipeline.__getstate__())
+            ret = True
+        else:
+            ret = False
+        return ret
+
     def on_action_docs(self):
         webbrowser.open("https://shapeout2.readthedocs.io")
 
@@ -394,9 +409,30 @@ class ShapeOut2(QtWidgets.QMainWindow):
             # update UI
             self.adopt_pipeline(self.pipeline.__getstate__())
 
+    def on_action_open(self):
+        if self.pipeline.slots or self.pipeline.filters:
+            if not self.on_action_clear():
+                return
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self, 'Open session', '', 'Shape-Out 2 session (*.so2)')
+        if path:
+            session.open_session(path, self.pipeline)
+            self.adopt_pipeline(self.pipeline.__getstate__())
+
     def on_action_quit(self):
         """Determine what happens when the user wants to quit"""
+        if self.pipeline.slots or self.pipeline.filters:
+            if not self.on_action_clear():
+                return
         QtCore.QCoreApplication.quit()
+
+    def on_action_save(self):
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, 'Save session', '', 'Shape-Out 2 session (*.so2)')
+        if path:
+            if not path.endswith(".so2"):
+                path += ".so2"
+            session.save_session(path, self.pipeline)
 
     def on_action_software(self):
         libs = [appdirs,

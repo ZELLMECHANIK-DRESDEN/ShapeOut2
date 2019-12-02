@@ -44,7 +44,7 @@ class Filter(object):
 
     def __getstate__(self):
         state = {
-            "filter used": self.general["enable filters"],
+            "filter used": self.filter_used,
             "identifier": self.identifier,
             "limit events bool": self.limit_events[0],
             "limit events num": self.limit_events[1],
@@ -84,6 +84,14 @@ class Filter(object):
     @staticmethod
     def get_instances():
         return Filter._instances
+
+    @property
+    def filter_used(self):
+        return self.general["enable filters"]
+
+    @filter_used.setter
+    def filter_used(self, b):
+        self.general["enable filters"] = b
 
     @property
     def hash(self):

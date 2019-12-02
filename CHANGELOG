@@ -2,6 +2,7 @@
  - feat: add developer mode
  - feat: display images on hover in polygon window in QuickView
  - feat: implement loading of (polygon) filters from file
+ - feat: implement session saving and opening
  - fix: hide confusing "Advances Export" plot menu in developer mode
  - fix: only show scalar features in QuickView feature selection
  - fix: QuickView -> Event -> Features labels in table were drawn

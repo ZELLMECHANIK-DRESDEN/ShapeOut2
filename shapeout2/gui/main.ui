@@ -361,7 +361,6 @@
     <addaction name="separator"/>
     <addaction name="actionOpenSession"/>
     <addaction name="actionSaveSession"/>
-    <addaction name="actionNewSession"/>
     <addaction name="actionClearSession"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>

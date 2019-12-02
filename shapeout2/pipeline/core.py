@@ -37,14 +37,18 @@ class Pipeline(object):
         self.reset()
         for filt_state in state["filters"]:
             self.add_filter(filt_state)
-        self.filters_used = state["filters used"]
         for plot_state in state["plots"]:
             self.add_plot(plot_state)
         for slot_state in state["slots"]:
             self.add_slot(slot=slot_state)
-        self.slots_used = state["slots used"]
         # set element states at the end
         self.element_states = state["elements"]
+
+        # sanity checks
+        if set(self.filters_used) != set(state["filters used"]):
+            raise ValueError("Bad pipeline state ('filters used' don't match)")
+        if set(self.slots_used) != set(state["slots used"]):
+            raise ValueError("Bad pipeline state ('slots used' don't match)")
 
     def __getstate__(self):
         state = {}
@@ -61,12 +65,20 @@ class Pipeline(object):
         return [filt.identifier for filt in self.filters]
 
     @property
+    def filters_used(self):
+        return [filt.identifier for filt in self.filters if filt.filter_used]
+
+    @property
     def plot_ids(self):
         return [plot.identifier for plot in self.plots]
 
     @property
     def slot_ids(self):
         return [slot.identifier for slot in self.slots]
+
+    @property
+    def slots_used(self):
+        return [slot.identifier for slot in self.slots if slot.slot_used]
 
     @property
     def num_filters(self):
@@ -117,7 +129,6 @@ class Pipeline(object):
         filt_id = filt.identifier
         for slot_id in self.slot_ids:
             self.element_states[slot_id][filt_id] = False
-        self.filters_used.append(filt_id)
         return filt_id
 
     def add_plot(self, plot=None, index=None):
@@ -202,7 +213,6 @@ class Pipeline(object):
             self.element_states[slot_id][filt_id] = False
         for plot_id in self.plot_ids:
             self.element_states[slot_id][plot_id] = False
-        self.slots_used.append(slot_id)
         return slot.identifier
 
     def construct_matrix(self):
@@ -412,8 +422,6 @@ class Pipeline(object):
         """Remove a filter by filter identifier"""
         index = self.filter_ids.index(filt_id)
         self.filters.pop(index)
-        if filt_id in self.filters_used:
-            self.filters_used.remove(filt_id)
         for slot_id in self.element_states:
             if filt_id in self.element_states[slot_id]:
                 self.element_states[slot_id].pop(filt_id)
@@ -428,10 +436,8 @@ class Pipeline(object):
 
     def remove_slot(self, slot_id):
         """Remove a slot by slot identifier"""
-        index = self.filter_ids.index(slot_id)
-        self.filters.pop(index)
-        if slot_id in self.plots_used:
-            self.plots_used.remove(slot_id)
+        index = self.slot_ids.index(slot_id)
+        self.slots.pop(index)
         if slot_id in self.element_states:
             self.element_states.pop(slot_id)
 
@@ -439,13 +445,9 @@ class Pipeline(object):
         """Reset the pipeline"""
         #: Filters are instances of :class:`shapeout2.pipeline.Filter`
         self.filters = []
-        #: List of identifiers for filters that are used
-        self.filters_used = []
         #: Plots are instances of :class:`shapeout2.pipeline.Plot`
         self.plots = []
         #: Slots are instances of :class:`shapeout2.pipeline.Dataslot`
         self.slots = []
-        #: List of identifiers for slots that are used
-        self.slots_used = []
         #: individual element states
         self.element_states = {}

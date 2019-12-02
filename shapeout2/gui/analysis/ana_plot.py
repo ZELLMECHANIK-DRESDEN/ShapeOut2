@@ -9,7 +9,7 @@ from ...pipeline import Plot
 from ...pipeline.plot import STATE_OPTIONS
 
 
-COLORMAPS = ["jet"]
+COLORMAPS = STATE_OPTIONS["scatter"]["colormap"]
 
 
 class PlotPanel(QtWidgets.QWidget):

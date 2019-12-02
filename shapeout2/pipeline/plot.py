@@ -25,7 +25,7 @@ DEFAULT_STATE = {
         "scale y": "linear",
     },
     "scatter": {
-        "colormap": "jet",  # only applies when hue is "kde" or "feature"
+        "colormap": "viridis",  # only applies when hue is "kde" or "feature"
         "downsample": True,
         "downsampling value": 5000,
         "enabled": True,
@@ -70,7 +70,7 @@ STATE_OPTIONS = {
         "scale y": ["linear", "log"],
     },
     "scatter": {
-        "colormap": ["jet"],
+        "colormap": ["inferno", "jet", "magma", "plasma", "viridis"],
         "downsampling": bool,
         "downsampling value": int,
         "enabled":  bool,

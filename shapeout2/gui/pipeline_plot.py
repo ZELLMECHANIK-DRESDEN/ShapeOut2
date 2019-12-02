@@ -6,6 +6,7 @@ from dclab import kde_contours
 import numpy as np
 from PyQt5 import uic, QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
+from pyqtgraph.graphicsItems.GradientEditorItem import Gradients
 
 from ..pipeline import Plot
 from .. import plot_cache
@@ -303,23 +304,26 @@ def add_scatter(plot_item, plot_state, rtdc_ds, slot_state):
     )
     # define colormap
     # TODO:
-    # - improve speed?
     # - common code base with QuickView
+    cmap = pg.ColorMap(*zip(*Gradients[sca["colormap"]]["ticks"]))
     if sca["marker hue"] == "kde":
         brush = []
         kde -= kde.min()
         kde /= kde.max()
-        num_hues = 500
         for k in kde:
-            brush.append(pg.intColor(int(k*num_hues), num_hues))
+            brush.append(cmap.mapToQColor(k))
+        # Note, colors could also be digitized (does not seem to be faster):
+        # cbin = np.linspace(0, 1, 1000)
+        # dig = np.digitize(kde, cbin)
+        # for idx in dig:
+        #     brush.append(cmap.mapToQColor(cbin[idx]))
     elif sca["marker hue"] == "feature":
         brush = []
         feat = rtdc_ds[sca["hue feature"]][idx]
         feat -= feat.min()
         feat /= feat.max()
-        num_hues = 500
         for f in feat:
-            brush.append(pg.intColor(int(f*num_hues), num_hues))
+            brush.append(cmap.mapToQColor(f))
     elif sca["marker hue"] == "dataset":
         alpha = int(sca["marker alpha"] * 255)
         color = pg.mkColor(slot_state["color"])

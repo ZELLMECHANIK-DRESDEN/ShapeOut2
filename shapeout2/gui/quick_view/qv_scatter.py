@@ -1,7 +1,8 @@
 import dclab
 import numpy as np
-import pyqtgraph as pg
 from PyQt5 import QtCore
+import pyqtgraph as pg
+from pyqtgraph.graphicsItems.GradientEditorItem import Gradients
 
 from ... import plot_cache
 
@@ -68,14 +69,12 @@ class QuickViewScatterWidget(SimplePlotWidget):
         #: unfiltered y data
         self.data_y = self.rtdc_ds[self.yax]
         # define colormap
-        # TODO: improve speed?
         brush = []
+        cmap = pg.ColorMap(*zip(*Gradients["viridis"]["ticks"]))
         kde -= kde.min()
         kde /= kde.max()
-        num_hues = 500
         for k in kde:
-            color = pg.intColor(int(k*num_hues), num_hues)
-            brush.append(color)
+            brush.append(cmap.mapToQColor(k))
         # convert to log-scale if applicable
         if xscale == "log":
             x = np.log10(x)

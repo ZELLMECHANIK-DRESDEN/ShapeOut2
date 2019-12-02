@@ -184,7 +184,7 @@ class RangeControl(QtWidgets.QWidget):
                 lmax = np.int(np.ceil(np.log10(vmax))) + 1
                 vmaxh = 10**lmax
             else:
-                vmax = 0
+                vmaxh = 0
 
         self.setSpinLimits(vmin=vminh, vmax=vmaxh)
         # slider values

@@ -373,18 +373,21 @@ class Pipeline(object):
             features = sorted(features)
         return features
 
-    def get_min_max(self, feat):
+    def get_min_max(self, feat, plot_id=None):
+        if plot_id is not None:
+            dslist = self.get_plot_datasets(plot_id)[0]
+        else:
+            dslist = self.get_datasets()
         fmin = np.inf
         fmax = -np.inf
-        for slot_index in range(self.num_slots):
-            ds = self.get_dataset(slot_index=slot_index, filt_index=None)
+        for ds in dslist:
             if feat in ds:
                 vmin = np.nanmin(ds[feat])
                 vmax = np.nanmax(ds[feat])
                 fmin = np.min([fmin, vmin])
                 fmax = np.max([fmax, vmax])
             else:
-                warnings.warn("Dataset at index {} does ".format(slot_index)
+                warnings.warn("Dataset {} does ".format(ds.identifier)
                               + "not contain the feature '{}'!".format(feat))
         return [fmin, fmax]
 

@@ -4,6 +4,7 @@
  - feat: implement loading of (polygon) filters from file
  - feat: implement session saving and opening
  - feat: added perceptive colormaps and set viridis as default
+ - feat: allow to set hue range for feature-colored scatter plots
  - fix: hide confusing "Advances Export" plot menu in developer mode
  - fix: only show scalar features in QuickView feature selection
  - fix: QuickView -> Event -> Features labels in table were drawn

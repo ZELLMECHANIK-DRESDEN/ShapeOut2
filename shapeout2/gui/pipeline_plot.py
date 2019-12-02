@@ -58,6 +58,7 @@ class PipelinePlot(QtWidgets.QWidget):
         self.plot_layout.nextRow()
         self.plot_layout.addLabel(labelx, col=1)
 
+        # limits in case of scatter plot and feature hue
         if lay["division"] == "merge":
             pp = PipelinePlotItem(parent=linner)
             linner.addItem(item=pp,
@@ -147,7 +148,8 @@ class PipelinePlotItem(SimplePlotItem):
         self.setLogMode(x=gen["scale x"] == "log",
                         y=gen["scale y"] == "log")
         # Scatter data
-        if plot_state["scatter"]["enabled"]:
+        sca = plot_state["scatter"]
+        if sca["enabled"]:
             for rtdc_ds, ss in zip(dslist, slot_states):
                 sct = add_scatter(plot_item=self,
                                   rtdc_ds=rtdc_ds,
@@ -308,8 +310,9 @@ def add_scatter(plot_item, plot_state, rtdc_ds, slot_state):
     cmap = pg.ColorMap(*zip(*Gradients[sca["colormap"]]["ticks"]))
     if sca["marker hue"] == "kde":
         brush = []
-        kde -= kde.min()
-        kde /= kde.max()
+        # Note: we don't expand the density to [0, 1], because the
+        # colorbar will show "density" and because we don want to
+        # compute the density in this function and not someplace else.
         for k in kde:
             brush.append(cmap.mapToQColor(k))
         # Note, colors could also be digitized (does not seem to be faster):
@@ -319,9 +322,9 @@ def add_scatter(plot_item, plot_state, rtdc_ds, slot_state):
         #     brush.append(cmap.mapToQColor(cbin[idx]))
     elif sca["marker hue"] == "feature":
         brush = []
-        feat = rtdc_ds[sca["hue feature"]][idx]
-        feat -= feat.min()
-        feat /= feat.max()
+        feat = np.asarray(rtdc_ds[sca["hue feature"]][idx], dtype=float)
+        feat -= sca["hue min"]
+        feat /= sca["hue max"] - sca["hue min"]
         for f in feat:
             brush.append(cmap.mapToQColor(f))
     elif sca["marker hue"] == "dataset":

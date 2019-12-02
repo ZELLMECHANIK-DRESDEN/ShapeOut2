@@ -45,6 +45,8 @@ class PlotPanel(QtWidgets.QWidget):
         self.comboBox_plots.currentIndexChanged.connect(self.update_content)
         self.comboBox_marker_hue.currentIndexChanged.connect(
             self.on_hue_select)
+        self.comboBox_marker_feature.currentIndexChanged.connect(
+            self.on_hue_select)
         self.comboBox_axis_x.currentIndexChanged.connect(self.on_axis_select)
         self.comboBox_axis_y.currentIndexChanged.connect(self.on_axis_select)
 
@@ -54,6 +56,18 @@ class PlotPanel(QtWidgets.QWidget):
 
         rx = self.widget_range_x.__getstate__()
         ry = self.widget_range_y.__getstate__()
+
+        # hue min/max
+        marker_hue = self.comboBox_marker_hue.currentData()
+        if marker_hue == "kde":
+            hmin = 0
+            hmax = 1
+        elif marker_hue == "feature":
+            rstate = self.widget_range_feat.__getstate__()
+            hmin = rstate["start"]
+            hmax = rstate["end"]
+        else:
+            hmin = hmax = np.nan
 
         state = {
             "identifier": self.current_plot.identifier,
@@ -81,8 +95,10 @@ class PlotPanel(QtWidgets.QWidget):
                 "downsampling value": self.spinBox_downsample.value(),
                 "enabled": self.groupBox_scatter.isChecked(),
                 "hue feature": self.comboBox_marker_feature.currentData(),
+                "hue max": hmax,
+                "hue min": hmin,
                 "marker alpha": self.spinBox_alpha.value() / 100,
-                "marker hue": self.comboBox_marker_hue.currentData(),
+                "marker hue": marker_hue,
                 "marker size": self.doubleSpinBox_marker_size.value(),
                 "show event count": self.checkBox_event_count.isChecked(),
             },
@@ -136,11 +152,11 @@ class PlotPanel(QtWidgets.QWidget):
         self.comboBox_scale_x.setCurrentIndex(scx_index)
         scy_index = self.comboBox_scale_y.findData(gen["scale y"])
         self.comboBox_scale_y.setCurrentIndex(scy_index)
-        self._set_range_state(axis_x=gen["axis x"],
-                              axis_y=gen["axis y"],
-                              range_x=gen["range x"],
-                              range_y=gen["range y"],
-                              )
+        self._set_range_xy_state(axis_x=gen["axis x"],
+                                 axis_y=gen["axis y"],
+                                 range_x=gen["range x"],
+                                 range_y=gen["range y"],
+                                 )
 
         # Scatter
         sca = state["scatter"]
@@ -156,6 +172,8 @@ class PlotPanel(QtWidgets.QWidget):
         self.comboBox_colormap.setCurrentIndex(color_index)
         self.checkBox_event_count.setChecked(sca["show event count"])
         self.spinBox_alpha.setValue(sca["marker alpha"]*100)
+        self._set_range_feat_state(sca["hue feature"], sca["hue min"],
+                                   sca["hue max"])
 
         # Contour
         con = state["contour"]
@@ -223,13 +241,38 @@ class PlotPanel(QtWidgets.QWidget):
             self.comboBox_ls_1.addItem(l, l)
             self.comboBox_ls_2.addItem(l, l)
         # range controls
-        for rc in [self.widget_range_x, self.widget_range_y]:
+        for rc in [self.widget_range_x, self.widget_range_y,
+                   self.widget_range_feat]:
             rc.setLabel("")
             rc.setCheckable(False)
+        # hide feature label range selection
+        self.widget_range_feat.hide()
 
-    def _set_range_state(self, axis_x=None, range_x=None,
-                         axis_y=None, range_y=None):
-        """Set a proper state for the range controls"""
+    def _set_range_feat_state(self, feat, fmin=None, fmax=None):
+        """Set a proper state for the feature hue range control"""
+        if len(self.pipeline.slots) == 0:
+            self.setEnabled(False)
+            # do nothing
+            return
+        else:
+            self.setEnabled(True)
+        if feat is not None:
+            lim = self.pipeline.get_min_max(
+                feat=feat, plot_id=self.current_plot.identifier)
+            if not (np.isinf(lim[0]) or np.isinf(lim[1])):
+                self.widget_range_feat.setLimits(vmin=lim[0], vmax=lim[1])
+                if fmin is None:
+                    fmin = lim[0]
+                if fmax is None:
+                    fmax = lim[1]
+                self.widget_range_feat.__setstate__({"active": True,
+                                                     "start": fmin,
+                                                     "end": fmax,
+                                                     })
+
+    def _set_range_xy_state(self, axis_x=None, range_x=None,
+                            axis_y=None, range_y=None):
+        """Set a proper state for the x/y range controls"""
         if len(self.pipeline.slots) == 0:
             self.setEnabled(False)
             # do nothing
@@ -241,15 +284,17 @@ class PlotPanel(QtWidgets.QWidget):
                                   [self.widget_range_x, self.widget_range_y],
                                   ):
             if axis is not None:
-                lim = self.pipeline.get_min_max(feat=axis)
-                rc.setLimits(vmin=lim[0],
-                             vmax=lim[1])
-                if rang is None:
-                    rang = lim
-                rc.__setstate__({"active": True,
-                                 "start": rang[0],
-                                 "end": rang[1],
-                                 })
+                lim = self.pipeline.get_min_max(
+                    feat=axis, plot_id=self.current_plot.identifier)
+                if not (np.isinf(lim[0]) or np.isinf(lim[1])):
+                    rc.setLimits(vmin=lim[0],
+                                 vmax=lim[1])
+                    if rang is None:
+                        rang = lim
+                    rc.__setstate__({"active": True,
+                                     "start": rang[0],
+                                     "end": rang[1],
+                                     })
 
     def _set_contour_spacing(self, axis_x=None, axis_y=None):
         if len(self.pipeline.slots) == 0:
@@ -310,10 +355,10 @@ class PlotPanel(QtWidgets.QWidget):
     def on_axis_select(self):
         gen = self.__getstate__()["general"]
         if self.sender() == self.comboBox_axis_x:
-            self._set_range_state(axis_x=gen["axis x"])
+            self._set_range_xy_state(axis_x=gen["axis x"])
             self._set_contour_spacing(axis_x=gen["axis x"])
         elif self.sender() == self.comboBox_axis_y:
-            self._set_range_state(axis_y=gen["axis y"])
+            self._set_range_xy_state(axis_y=gen["axis y"])
             self._set_contour_spacing(axis_y=gen["axis y"])
 
     def on_duplicate_plot(self):
@@ -344,11 +389,16 @@ class PlotPanel(QtWidgets.QWidget):
         self.widget_dataset_alpha.hide()
         self.comboBox_colormap.hide()
         self.label_colormap.hide()
+        self.widget_range_feat.hide()
         # Only show feature selection if needed
         if selection == "feature":
             self.comboBox_marker_feature.show()
             self.comboBox_colormap.show()
             self.label_colormap.show()
+            self.widget_range_feat.show()
+            # set the range
+            self._set_range_feat_state(
+                feat=self.comboBox_marker_feature.currentData())
         elif selection == "kde":
             self.comboBox_colormap.show()
             self.label_colormap.show()

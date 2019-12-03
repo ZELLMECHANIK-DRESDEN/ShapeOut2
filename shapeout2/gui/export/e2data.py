@@ -94,8 +94,7 @@ class ExportData(QtWidgets.QDialog):
             self.path = None
 
     def on_radio(self):
-        scalar = self.file_format != "rtdc"
-        self.update_feature_list(scalar)
+        self.update_feature_list()
 
     def on_select_all(self):
         for ii in range(self.listWidget.count()):
@@ -108,8 +107,16 @@ class ExportData(QtWidgets.QDialog):
             wid.setCheckState(0)
 
     def update_feature_list(self, scalar=False):
-        self.features = self.pipeline.get_features(scalar=scalar, union=True,
-                                                   label_sort=True)
+        if self.file_format == "rtdc":
+            self.features = self.pipeline.get_features(union=True,
+                                                       label_sort=True)
+            # do not allow exporting event index, since it will be
+            # re-enumerated in any case.
+            self.features.remove("index")
+        else:
+            self.features = self.pipeline.get_features(scalar=True,
+                                                       union=True,
+                                                       label_sort=True)
 
         self.listWidget.clear()
         for feat in self.features:

@@ -287,7 +287,7 @@ class Pipeline(object):
         filt_index: int or None
             index of filter; if None, then the plain dataset is returned.
             If negative (default), then the last dataset in the pipeline
-            is returned (all filters set).
+            is returned (all selected filters applied).
         apply_filter: bool
             whether to call `dataset.apply_filter` in the end;
             if set to `False`, only the filtering configuration

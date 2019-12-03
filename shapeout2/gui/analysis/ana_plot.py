@@ -354,32 +354,6 @@ class PlotPanel(QtWidgets.QWidget):
             ids = []
         return ids
 
-    def get_col_row_count(self, state):
-        """Compute how many rows a plot layout requires
-
-        Parameters
-        ----------
-        state: dict or None
-            Output of :func:`Plot.__getstate__()`.
-        """
-        num_scat = len(self.pipeline.get_plot_datasets(
-            self.current_plot.identifier, apply_filter=False)[0])
-        div = state["layout"]["division"]
-        if div == "each":
-            num_plots = num_scat
-        elif div == "merge":
-            num_plots = 1
-        elif div == "multiscatter+contour":
-            num_plots = num_scat + 1
-        else:
-            raise ValueError("Unrecognized division: '{}'".format(div))
-
-        # column count
-        col_count = min(state["layout"]["column count"], num_plots)
-        # row count
-        row_count = int(np.ceil(num_plots/col_count))
-        return col_count, row_count
-
     def on_axis_select(self):
         gen = self.__getstate__()["general"]
         if self.sender() == self.comboBox_axis_x:
@@ -398,16 +372,21 @@ class PlotPanel(QtWidgets.QWidget):
         """
         # old parameters
         state = self.current_plot.__getstate__()
+        plot_id = state["identifier"]
+        plot_index = self.pipeline.plot_ids.index(plot_id)
         old_size_x = state["layout"]["size x"]
         old_size_y = state["layout"]["size y"]
-        old_ncol, old_nrow = self.get_col_row_count(state)
+        old_ncol, old_nrow = self.pipeline.get_plot_col_row_count(plot_id)
         # new parameters
-        new_ncol, new_nrow = self.get_col_row_count(self.__getstate__())
+        new_pipeline_state = self.pipeline.__getstate__()
+        new_pipeline_state["plots"][plot_index] = self.__getstate__()
+        new_ncol, new_nrow = self.pipeline.get_plot_col_row_count(
+            plot_id, new_pipeline_state)
         # size x (minimum of 400)
-        new_size_x = max(400, old_size_x + 150*(new_ncol - old_ncol))
+        new_size_x = max(400, old_size_x + 200*(new_ncol - old_ncol))
         self.spinBox_size_x.setValue(new_size_x)
         # size y
-        new_size_y = max(400, old_size_y + 150*(new_nrow - old_nrow))
+        new_size_y = max(400, old_size_y + 200*(new_nrow - old_nrow))
         self.spinBox_size_y.setValue(new_size_y)
 
     def on_duplicate_plot(self):

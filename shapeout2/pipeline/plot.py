@@ -11,7 +11,7 @@ DEFAULT_STATE = {
         "division": "multiscatter+contour",
         "label plots": True,
         "name": "no default",  # overridden by __init__
-        "size x": 600,
+        "size x": 400,
         "size y": 400,
     },
     "general": {

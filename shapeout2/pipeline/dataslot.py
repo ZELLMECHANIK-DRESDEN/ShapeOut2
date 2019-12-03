@@ -1,3 +1,5 @@
+import copy
+
 import dclab
 import numpy as np
 
@@ -64,7 +66,7 @@ class Dataslot(object):
                  "path": self.path,
                  "slot used": self.slot_used,
                  }
-        return state
+        return copy.deepcopy(state)
 
     def __setstate__(self, state):
         if self.identifier != state["identifier"]:

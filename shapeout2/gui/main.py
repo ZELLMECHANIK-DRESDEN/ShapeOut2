@@ -160,6 +160,16 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(dict)
     def adopt_pipeline(self, pipeline_state):
+        # If the number of subplots within a plot changed, update the
+        # plot size accordingly.
+        for plot_index, plot_id in enumerate(self.pipeline.plot_ids):
+            old_ncol, old_nrow = self.pipeline.get_plot_col_row_count(plot_id)
+            new_ncol, new_nrow = self.pipeline.get_plot_col_row_count(
+                plot_id, pipeline_state)
+            lay = pipeline_state["plots"][plot_index]["layout"]
+            lay["size x"] += 200*(new_ncol-old_ncol)
+            lay["size y"] += 200*(new_nrow-old_nrow)
+
         # Set the new state of the pipeline
         self.pipeline.__setstate__(pipeline_state)
         # Update BlockMatrix

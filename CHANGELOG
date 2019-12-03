@@ -1,4 +1,5 @@
 2.0.0b1
+ - feat: automatically rescale plot windows (#8)
  - fix: computing statistics not working (str vs Path)
  - fix: disallow exporting the event index to .rtdc
    (it would be re-enumerated and this be confusing) 

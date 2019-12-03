@@ -1,4 +1,5 @@
 """Keep record of all filters used"""
+import copy
 import warnings
 
 
@@ -53,7 +54,7 @@ class Filter(object):
             "box filters": self.boxdict.copy(),
             "polygon filters": self.polylist.copy(),
         }
-        return state
+        return copy.deepcopy(state)
 
     def __setstate__(self, state):
         if self.identifier != state["identifier"]:

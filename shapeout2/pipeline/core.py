@@ -1,3 +1,4 @@
+import copy
 import warnings
 
 import dclab
@@ -52,7 +53,7 @@ class Pipeline(object):
 
     def __getstate__(self):
         state = {}
-        state["elements"] = self.element_states
+        state["elements"] = copy.deepcopy(self.element_states)
         state["filters"] = [filt.__getstate__() for filt in self.filters]
         state["filters used"] = self.filters_used
         state["plots"] = [plot.__getstate__() for plot in self.plots]
@@ -132,7 +133,7 @@ class Pipeline(object):
         return filt_id
 
     def add_plot(self, plot=None, index=None):
-        """Add a filter to the pipeline
+        """Add a plot to the pipeline
 
         Parameters
         ----------
@@ -391,6 +392,12 @@ class Pipeline(object):
                               + "not contain the feature '{}'!".format(feat))
         return [fmin, fmax]
 
+    def get_plot(self, plot_id):
+        if plot_id not in self.plot_ids:
+            raise ValueError(
+                "Plot '{}' not part of this pipeline!".format(plot_id))
+        return self.plots[self.plot_ids.index(plot_id)]
+
     def get_plot_datasets(self, plot_id, apply_filter=True):
         """Return a list of datasets with slot states that belong to a plot"""
         datasets = []
@@ -408,6 +415,51 @@ class Pipeline(object):
                 datasets.append(ds)
                 states.append(slot.__getstate__())
         return datasets, states
+
+    def get_plot_col_row_count(self, plot_id, pipeline_state=None):
+        """Compute how many rows a plot layout requires
+
+        Parameters
+        ----------
+        plot_id: str
+            identifier of a plot in this pipeline
+        pipeline_state: dict
+            pipeline state to use; defaults to the current pipeline
+            state
+        """
+        if pipeline_state is None:
+            pipeline_state = self.__getstate__()
+
+        # plot state
+        for pstate in pipeline_state["plots"]:
+            if plot_id == pstate["identifier"]:
+                break
+        else:
+            raise ValueError(
+                "Plot '{}' not given in pipeline state!".format(plot_id))
+
+        # number of datasets in that plot
+        num_scat = 0
+        for slot_id in pipeline_state["elements"]:
+            num_scat += pipeline_state["elements"][slot_id][plot_id]
+
+        # additional plots
+        div = pstate["layout"]["division"]
+        if div == "each":
+            num_plots = num_scat
+        elif div == "merge":
+            num_plots = 1
+        elif div == "multiscatter+contour":
+            num_plots = num_scat + 1
+        else:
+            raise ValueError("Unrecognized division: '{}'".format(div))
+
+        # column count
+        col_count = min(pstate["layout"]["column count"], num_plots)
+
+        # row count
+        row_count = int(np.ceil(num_plots/col_count))
+        return col_count, row_count
 
     def get_slot(self, slot_id):
         """Return the Dataslot matching the RTDCBase identifier"""

@@ -391,7 +391,7 @@ class Pipeline(object):
                               + "not contain the feature '{}'!".format(feat))
         return [fmin, fmax]
 
-    def get_plot_datasets(self, plot_id):
+    def get_plot_datasets(self, plot_id, apply_filter=True):
         """Return a list of datasets with slot states that belong to a plot"""
         datasets = []
         states = []
@@ -404,7 +404,7 @@ class Pipeline(object):
                     and slot_id in self.slots_used):
                 ds = self.get_dataset(slot_index=slot_index,
                                       filt_index=filt_index,
-                                      apply_filter=True)
+                                      apply_filter=apply_filter)
                 datasets.append(ds)
                 states.append(slot.__getstate__())
         return datasets, states

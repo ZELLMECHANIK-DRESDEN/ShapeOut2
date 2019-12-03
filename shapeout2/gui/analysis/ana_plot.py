@@ -49,6 +49,7 @@ class PlotPanel(QtWidgets.QWidget):
             self.on_hue_select)
         self.comboBox_axis_x.currentIndexChanged.connect(self.on_axis_select)
         self.comboBox_axis_y.currentIndexChanged.connect(self.on_axis_select)
+        self.spinBox_column_count.valueChanged.connect(self.on_column_num)
 
     def __getstate__(self):
         feats_srt = self.pipeline.get_features(
@@ -133,7 +134,7 @@ class PlotPanel(QtWidgets.QWidget):
         for b in toblock:
             b.blockSignals(True)
 
-        # General
+        # Layout
         lay = state["layout"]
         self.spinBox_column_count.setValue(lay["column count"])
         idx = self.comboBox_division.findData(lay["division"])
@@ -142,6 +143,7 @@ class PlotPanel(QtWidgets.QWidget):
         self.lineEdit.setText(lay["name"])
         self.spinBox_size_x.setValue(lay["size x"])
         self.spinBox_size_y.setValue(lay["size y"])
+        # General
         gen = state["general"]
         self.comboBox_axis_x.setCurrentIndex(feats_srt.index(gen["axis x"]))
         self.comboBox_axis_y.setCurrentIndex(feats_srt.index(gen["axis y"]))
@@ -352,6 +354,32 @@ class PlotPanel(QtWidgets.QWidget):
             ids = []
         return ids
 
+    def get_col_row_count(self, state):
+        """Compute how many rows a plot layout requires
+
+        Parameters
+        ----------
+        state: dict or None
+            Output of :func:`Plot.__getstate__()`.
+        """
+        num_scat = len(self.pipeline.get_plot_datasets(
+            self.current_plot.identifier, apply_filter=False)[0])
+        div = state["layout"]["division"]
+        if div == "each":
+            num_plots = num_scat
+        elif div == "merge":
+            num_plots = 1
+        elif div == "multiscatter+contour":
+            num_plots = num_scat + 1
+        else:
+            raise ValueError("Unrecognized division: '{}'".format(div))
+
+        # column count
+        col_count = min(state["layout"]["column count"], num_plots)
+        # row count
+        row_count = int(np.ceil(num_plots/col_count))
+        return col_count, row_count
+
     def on_axis_select(self):
         gen = self.__getstate__()["general"]
         if self.sender() == self.comboBox_axis_x:
@@ -360,6 +388,27 @@ class PlotPanel(QtWidgets.QWidget):
         elif self.sender() == self.comboBox_axis_y:
             self._set_range_xy_state(axis_y=gen["axis y"])
             self._set_contour_spacing(axis_y=gen["axis y"])
+
+    def on_column_num(self):
+        """The user changed the number of columns
+
+        - increase/decrease self.spinBox_size_x by 150pt
+        - increase/decrease self.spinBox_size_y by 150pt if
+          the row count changes as well
+        """
+        # old parameters
+        state = self.current_plot.__getstate__()
+        old_size_x = state["layout"]["size x"]
+        old_size_y = state["layout"]["size y"]
+        old_ncol, old_nrow = self.get_col_row_count(state)
+        # new parameters
+        new_ncol, new_nrow = self.get_col_row_count(self.__getstate__())
+        # size x (minimum of 400)
+        new_size_x = max(400, old_size_x + 150*(new_ncol - old_ncol))
+        self.spinBox_size_x.setValue(new_size_x)
+        # size y
+        new_size_y = max(400, old_size_y + 150*(new_nrow - old_nrow))
+        self.spinBox_size_y.setValue(new_size_y)
 
     def on_duplicate_plot(self):
         # determine the new filter state

@@ -85,8 +85,8 @@ class ComputeStatistics(QtWidgets.QDialog):
                 QtWidgets.QApplication.processEvents()
         else:
             # from path
-            path = pathlib.Path(self.path)
-            files = sorted(path.rglob("*.rtdc"))
+            inpath = pathlib.Path(self.path)
+            files = sorted(inpath.rglob("*.rtdc"))
             prog.setMaximum(len(files))
             for ii, pp in enumerate(files):
                 ds = dclab.new_dataset(pp)
@@ -98,14 +98,15 @@ class ComputeStatistics(QtWidgets.QDialog):
                 values.append(v)
                 prog.setValue(ii + 1)
                 QtWidgets.QApplication.processEvents()
-        path, _ = QtWidgets.QFileDialog.getSaveFileName(
+        # Output path
+        opath, _ = QtWidgets.QFileDialog.getSaveFileName(
             self, 'Save statistics', '', 'tab-separated values (*.tsv)')
-        if not path:
+        if not opath:
             # Abort export
             return False
-        elif not path.endswith(".tsv"):
-            path += ".tsv"
-
+        elif not opath.endswith(".tsv"):
+            opath += ".tsv"
+        opath = pathlib.Path(opath)
         # Header
         header = ["Statistics Output",
                   "Shape-Out {}".format(version),
@@ -124,10 +125,10 @@ class ComputeStatistics(QtWidgets.QDialog):
                     line.append("{}".format(vi))
             data.append("\t".join(line))
         # Write BOM
-        with path.open("wb") as fd:
+        with opath.open("wb") as fd:
             fd.write(codecs.BOM_UTF8)
         # Write rest
-        with path.open("a", encoding="utf-8") as fd:
+        with opath.open("a", encoding="utf-8") as fd:
             for line in header:
                 fd.write("# " + line + "\r\n")
             for line in data:

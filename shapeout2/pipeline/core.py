@@ -176,7 +176,8 @@ class Pipeline(object):
         ----------
         slot: shapeout2.pipeline.Dataslot or dict
             Dataslot representing an experimental dataset or its
-            state from Dataslot.__getstate__()
+            state from Dataslot.__getstate__(); At least `slot`
+            or `path` need to be specified
         path: str or pathlib.Path
             Path to a measurement
         index: int
@@ -436,8 +437,8 @@ class Pipeline(object):
         fmax = -np.inf
         for ds in dslist:
             if feat in ds:
-                vmin = np.nanmin(ds[feat])
-                vmax = np.nanmax(ds[feat])
+                vmin = np.nanmin(ds[feat][ds.filter.all])
+                vmax = np.nanmax(ds[feat][ds.filter.all])
                 fmin = np.min([fmin, vmin])
                 fmax = np.max([fmax, vmax])
             else:
@@ -447,6 +448,7 @@ class Pipeline(object):
             diff = fmax - fmin
             fmin -= margin*diff
             fmax += margin*diff
+
         return [fmin, fmax]
 
     def get_plot(self, plot_id):
@@ -459,7 +461,6 @@ class Pipeline(object):
         """Return a list of datasets with slot states that belong to a plot"""
         datasets = []
         states = []
-        filt_index = self.num_filters - 1
         # keep the same order as in self.slots
         for slot_index in range(len(self.slots)):
             slot = self.slots[slot_index]
@@ -467,7 +468,6 @@ class Pipeline(object):
             if (self.element_states[slot_id][plot_id]
                     and slot_id in self.slots_used):
                 ds = self.get_dataset(slot_index=slot_index,
-                                      filt_index=filt_index,
                                       apply_filter=apply_filter)
                 datasets.append(ds)
                 states.append(slot.__getstate__())
@@ -563,3 +563,7 @@ class Pipeline(object):
         self.slots = []
         #: individual element states
         self.element_states = {}
+
+    def set_element_active(self, slot_id, filt_plot_id, active=True):
+        """Activate an element in the block matrix"""
+        self.element_states[slot_id][filt_plot_id] = active

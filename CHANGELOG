@@ -2,6 +2,8 @@
  - fix: don't use area_um, deform, and bright_avg box filters by
    default (#19)
  - fix: bug+regression when removing plots (#21)
+ - fix: `Pipeline.get_min_max` did not take into account final
+   filter set in filter ray (#22)
  - enh: include (polygon) filter names in file names when
    exporting filters (#20)
 2.0.0b1

@@ -1,9 +1,11 @@
 2.0.0b1
  - feat: automatically rescale plot windows (#8)
  - feat: add auto XY-range checkbox for plotting (#9)
+ - feat: allow to choose filter ray when computing statistics for
+   data that is not loaded in the session (#11)
  - fix: computing statistics not working (str vs Path)
  - fix: disallow exporting the event index to .rtdc
-   (it would be re-enumerated and this be confusing) 
+   (it would be re-enumerated and this can be confusing)
  - fix: plot layout not correctly resized sometimes
  - fix: size of plot part in block matrix not always adjusted
 2.0.0a27

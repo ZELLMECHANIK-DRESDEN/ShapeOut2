@@ -216,6 +216,34 @@ class Pipeline(object):
             self.element_states[slot_id][plot_id] = False
         return slot.identifier
 
+    def apply_filter_ray(self, rtdc_ds, slot_id):
+        """Convenience function for applying filters to other data
+
+        The filters that are currently set for a specific slot with
+        `slot_id` are applied to a dataset.
+
+        Parameters
+        ----------
+        rtdc_ds: dclab.rtdc_dataset.RTDCBase
+            Dataset
+        slot_id: str
+            Identifier of the slot from which the filters are taken
+        """
+        fstates = self.element_states[slot_id]
+        # keeps track of all datasets (useful for debugging)
+        datasets = []
+        ds = rtdc_ds
+        for filt in self.filters:
+            filt_id = filt.identifier
+            if fstates[filt_id] and filt_id in self.filters_used:
+                filt.update_dataset(ds)
+            else:
+                ds.config["filtering"]["enable filters"] = False
+            datasets.append(ds)
+            # generate next hierarchy child
+            ds = RTDC_Hierarchy(hparent=ds, apply_filter=True)
+        return ds
+
     def construct_matrix(self):
         """Construct the pipeline matrix
 

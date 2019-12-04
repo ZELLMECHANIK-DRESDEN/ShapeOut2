@@ -33,6 +33,12 @@ class ComputeStatistics(QtWidgets.QDialog):
             wid = QtWidgets.QListWidgetItem(meth)
             wid.setCheckState(2)
             self.listWidget_stats.addItem(wid)
+        # Populate filter ray comboBox
+        self.comboBox_filter_ray.clear()
+        self.comboBox_filter_ray.addItem("No filtering", None)
+        for ii, slot in enumerate(pipeline.slots):
+            raytext = "Ray {} ({})".format(ii, slot.name)
+            self.comboBox_filter_ray.addItem(raytext, slot.identifier)
         # initialize rest
         if len(self.pipeline.slots) == 0:
             self.comboBox.setCurrentIndex(1)
@@ -90,11 +96,17 @@ class ComputeStatistics(QtWidgets.QDialog):
             prog.setMaximum(len(files))
             for ii, pp in enumerate(files):
                 ds = dclab.new_dataset(pp)
+                title = ds.title
+                slot_id = self.comboBox_filter_ray.currentData()
+                if slot_id is not None:
+                    ds = self.pipeline.apply_filter_ray(rtdc_ds=ds,
+                                                        slot_id=slot_id)
+                    title += " ({})".format(slot_id)
                 h, v = dclab.statistics.get_statistics(ds,
                                                        methods=methods,
                                                        features=features)
                 h = ["Path", "Name"] + h
-                v = ["{}".format(ds.path), ds.title] + v
+                v = ["{}".format(pp), title] + v
                 values.append(v)
                 prog.setValue(ii + 1)
                 QtWidgets.QApplication.processEvents()
@@ -148,14 +160,16 @@ class ComputeStatistics(QtWidgets.QDialog):
 
     def on_combobox(self):
         if self.comboBox.currentIndex() == 1:
-            self.widget_path.show()
+            # Datasets from a folder
+            self.widget_other.show()
             if self.path is None:
                 self.on_browse()
             if self.path:
                 self.update_feature_list(use_pipeline=False)
                 # else, on_combobox is triggered again
         else:
-            self.widget_path.hide()
+            # Datasets from current session
+            self.widget_other.hide()
             self.update_feature_list(use_pipeline=True)
 
     def update_feature_list(self, use_pipeline=True):

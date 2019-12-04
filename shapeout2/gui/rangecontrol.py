@@ -5,6 +5,9 @@ from PyQt5 import uic, QtCore, QtWidgets
 
 
 class RangeControl(QtWidgets.QWidget):
+    #: Emitted when the range changed
+    range_changed = QtCore.pyqtSignal(float, float)
+
     def __init__(self, parent, label="feature", checkbox=True, integer=False,
                  data=None, *args, **kwargs):
         QtWidgets.QWidget.__init__(self, parent, *args, **kwargs)
@@ -133,9 +136,13 @@ class RangeControl(QtWidgets.QWidget):
 
     def on_range(self):
         self.map_range_slider_to_spin_values()
+        self.range_changed.emit(self.doubleSpinBox_min.value(),
+                                self.doubleSpinBox_max.value())
 
     def on_spinbox(self):
         self.map_spin_values_to_range_slider()
+        self.range_changed.emit(self.doubleSpinBox_min.value(),
+                                self.doubleSpinBox_max.value())
 
     def reset_range(self):
         self.doubleSpinBox_min.setValue(self.minimum)

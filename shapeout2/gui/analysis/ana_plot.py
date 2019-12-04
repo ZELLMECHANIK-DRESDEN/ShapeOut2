@@ -38,18 +38,21 @@ class PlotPanel(QtWidgets.QWidget):
         self.comboBox_division.setCurrentIndex(2)
 
         # signals
-        self.pushButton_duplicate.clicked.connect(self.on_duplicate_plot)
-        self.pushButton_remove.clicked.connect(self.on_remove_plot)
+        self.pushButton_duplicate.clicked.connect(self.on_plot_duplicated)
+        self.pushButton_remove.clicked.connect(self.on_plot_removed)
         self.pushButton_reset.clicked.connect(self.update_content)
         self.pushButton_apply.clicked.connect(self.write_plot)
         self.comboBox_plots.currentIndexChanged.connect(self.update_content)
         self.comboBox_marker_hue.currentIndexChanged.connect(
-            self.on_hue_select)
+            self.on_hue_selected)
         self.comboBox_marker_feature.currentIndexChanged.connect(
-            self.on_hue_select)
-        self.comboBox_axis_x.currentIndexChanged.connect(self.on_axis_select)
-        self.comboBox_axis_y.currentIndexChanged.connect(self.on_axis_select)
-        self.spinBox_column_count.valueChanged.connect(self.on_column_num)
+            self.on_hue_selected)
+        self.comboBox_axis_x.currentIndexChanged.connect(self.on_axis_selected)
+        self.comboBox_axis_y.currentIndexChanged.connect(self.on_axis_selected)
+        self.spinBox_column_count.valueChanged.connect(
+            self.on_column_num_changed)
+        self.widget_range_x.range_changed.connect(self.on_range_changed)
+        self.widget_range_y.range_changed.connect(self.on_range_changed)
 
     def __getstate__(self):
         feats_srt = self.pipeline.get_features(
@@ -81,6 +84,7 @@ class PlotPanel(QtWidgets.QWidget):
                 "size y": self.spinBox_size_y.value(),
             },
             "general": {
+                "auto range": self.checkBox_auto_range.isChecked(),
                 "axis x": feats_srt[self.comboBox_axis_x.currentIndex()],
                 "axis y": feats_srt[self.comboBox_axis_y.currentIndex()],
                 "isoelastics": self.checkBox_isoelastics.isChecked(),
@@ -129,6 +133,8 @@ class PlotPanel(QtWidgets.QWidget):
         toblock = [
             self.comboBox_axis_x,
             self.comboBox_axis_y,
+            self.widget_range_x,
+            self.widget_range_y,
         ]
 
         for b in toblock:
@@ -145,6 +151,7 @@ class PlotPanel(QtWidgets.QWidget):
         self.spinBox_size_y.setValue(lay["size y"])
         # General
         gen = state["general"]
+        self.checkBox_auto_range.setChecked(gen["auto range"])
         self.comboBox_axis_x.setCurrentIndex(feats_srt.index(gen["axis x"]))
         self.comboBox_axis_y.setCurrentIndex(feats_srt.index(gen["axis y"]))
         self.checkBox_isoelastics.setChecked(gen["isoelastics"])
@@ -281,18 +288,23 @@ class PlotPanel(QtWidgets.QWidget):
             return
         else:
             self.setEnabled(True)
+
+        plot_id = self.current_plot.identifier
+
         for axis, rang, rc in zip([axis_x, axis_y],
                                   [range_x, range_y],
                                   [self.widget_range_x, self.widget_range_y],
                                   ):
             if axis is not None:
-                lim = self.pipeline.get_min_max(
-                    feat=axis, plot_id=self.current_plot.identifier)
+                lim = self.pipeline.get_min_max(feat=axis, plot_id=plot_id)
                 if not (np.isinf(lim[0]) or np.isinf(lim[1])):
                     rc.setLimits(vmin=lim[0],
                                  vmax=lim[1])
-                    if rang is None:
-                        rang = lim
+                    if rang is None or rang[0] == rang[1]:
+                        # default range is limits + 5% margin
+                        rang = self.pipeline.get_min_max(feat=axis,
+                                                         plot_id=plot_id,
+                                                         margin=0.05)
                     rc.__setstate__({"active": True,
                                      "start": rang[0],
                                      "end": rang[1],
@@ -354,7 +366,7 @@ class PlotPanel(QtWidgets.QWidget):
             ids = []
         return ids
 
-    def on_axis_select(self):
+    def on_axis_selected(self):
         gen = self.__getstate__()["general"]
         if self.sender() == self.comboBox_axis_x:
             self._set_range_xy_state(axis_x=gen["axis x"])
@@ -363,7 +375,7 @@ class PlotPanel(QtWidgets.QWidget):
             self._set_range_xy_state(axis_y=gen["axis y"])
             self._set_contour_spacing(axis_y=gen["axis y"])
 
-    def on_column_num(self):
+    def on_column_num_changed(self):
         """The user changed the number of columns
 
         - increase/decrease self.spinBox_size_x by 150pt
@@ -389,27 +401,7 @@ class PlotPanel(QtWidgets.QWidget):
         new_size_y = max(400, old_size_y + 200*(new_nrow - old_nrow))
         self.spinBox_size_y.setValue(new_size_y)
 
-    def on_duplicate_plot(self):
-        # determine the new filter state
-        plot_state = self.__getstate__()
-        new_state = copy.deepcopy(plot_state)
-        new_plot = Plot()
-        new_state["identifier"] = new_plot.identifier
-        new_state["layout"]["name"] = new_plot.name
-        new_plot.__setstate__(new_state)
-        # determine the filter position
-        pos = self.pipeline.plot_ids.index(plot_state["identifier"])
-        self.pipeline.add_plot(new_plot, index=pos+1)
-        state = self.pipeline.__getstate__()
-        self.pipeline_changed.emit(state)
-
-    def on_remove_plot(self):
-        plot_state = self.__getstate__()
-        self.pipeline.remove_plot(plot_state["identifier"])
-        state = self.pipeline.__getstate__()
-        self.pipeline_changed.emit(state)
-
-    def on_hue_select(self):
+    def on_hue_selected(self):
         """Show/hide options for feature-based hue selection"""
         selection = self.comboBox_marker_hue.currentData()
         # hide everything
@@ -434,6 +426,30 @@ class PlotPanel(QtWidgets.QWidget):
             self.widget_dataset_alpha.show()
         else:
             raise ValueError("Unknown selection: '{}'".format(selection))
+
+    def on_plot_duplicated(self):
+        # determine the new filter state
+        plot_state = self.__getstate__()
+        new_state = copy.deepcopy(plot_state)
+        new_plot = Plot()
+        new_state["identifier"] = new_plot.identifier
+        new_state["layout"]["name"] = new_plot.name
+        new_plot.__setstate__(new_state)
+        # determine the filter position
+        pos = self.pipeline.plot_ids.index(plot_state["identifier"])
+        self.pipeline.add_plot(new_plot, index=pos+1)
+        state = self.pipeline.__getstate__()
+        self.pipeline_changed.emit(state)
+
+    def on_plot_removed(self):
+        plot_state = self.__getstate__()
+        self.pipeline.remove_plot(plot_state["identifier"])
+        state = self.pipeline.__getstate__()
+        self.pipeline_changed.emit(state)
+
+    def on_range_changed(self):
+        """User changed x/y range -> disable auto range checkbox"""
+        self.checkBox_auto_range.setChecked(False)
 
     def show_plot(self, plot_id):
         self.update_content(plot_index=self.plot_ids.index(plot_id))

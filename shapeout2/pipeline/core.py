@@ -374,7 +374,20 @@ class Pipeline(object):
             features = sorted(features)
         return features
 
-    def get_min_max(self, feat, plot_id=None):
+    def get_min_max(self, feat, plot_id=None, margin=0.0):
+        """Return minimum and maximum values for a feature
+
+        Parameters
+        ----------
+        feat: str
+            Feature name
+        plot_id: str
+            Plot identifier
+        margin: float
+            Fraction by which the minimum and maximum are
+            extended. E.g. for plotting with a 5% margin
+            use `margin=0.05`.
+        """
         if plot_id is not None:
             dslist = self.get_plot_datasets(plot_id)[0]
         else:
@@ -390,6 +403,10 @@ class Pipeline(object):
             else:
                 warnings.warn("Dataset {} does ".format(ds.identifier)
                               + "not contain the feature '{}'!".format(feat))
+        if margin:
+            diff = fmax - fmin
+            fmin -= margin*diff
+            fmax += margin*diff
         return [fmin, fmax]
 
     def get_plot(self, plot_id):

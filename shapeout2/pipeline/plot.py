@@ -15,12 +15,13 @@ DEFAULT_STATE = {
         "size y": 400,
     },
     "general": {
+        "auto range": True,  # this overrides range x and range y
         "axis x": "area_um",
         "axis y": "deform",
         "isoelastics": True,  # display isoelasticity lines
         "kde": "histogram",  # see dclab.kde_methods.methods
-        "range x": [0, 500],
-        "range y": [0, 0.2],
+        "range x": [0, 0],  # equal means no preference
+        "range y": [0, 0],
         "scale x": "linear",
         "scale y": "linear",
     },
@@ -62,6 +63,7 @@ STATE_OPTIONS = {
         "size y": float,
     },
     "general": {
+        "auto range": bool,
         "axis x": dclab.dfn.scalar_feature_names,
         "axis y": dclab.dfn.scalar_feature_names,
         "isoelastics": bool,

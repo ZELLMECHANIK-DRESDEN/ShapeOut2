@@ -206,6 +206,7 @@ class DataMatrix(QtWidgets.QWidget):
         self.fill_elements()
         self.plot_matrix.fill_elements()
         self.adjust_size()
+        self.plot_matrix.adjust_size()
         self.setUpdatesEnabled(True)
         self.publish_matrix()
         return md

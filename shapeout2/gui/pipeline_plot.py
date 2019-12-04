@@ -29,18 +29,29 @@ class PipelinePlot(QtWidgets.QWidget):
         PipelinePlot.instances[plot_id] = self
 
     def update_content(self):
+        parent = self.parent()
         dslist, slot_states = self.pipeline.get_plot_datasets(self.identifier)
         plot = Plot.get_instances()[self.identifier]
         plot_state = plot.__getstate__()
-        # Plot size and title
+
+        # abbreviations
+        gen = plot_state["general"]
         lay = plot_state["layout"]
-        parent = self.parent()
+        sca = plot_state["scatter"]
+
+        # auto range (overrides stored ranges)
+        if gen["auto range"]:
+            # default range is limits + 5% margin
+            gen["range x"] = self.pipeline.get_min_max(feat=gen["axis x"],
+                                                       plot_id=self.identifier,
+                                                       margin=.05)
+            gen["range y"] = self.pipeline.get_min_max(feat=gen["axis y"],
+                                                       plot_id=self.identifier,
+                                                       margin=0.05)
+
+        # title
         self.setWindowTitle(lay["name"])
-        self.setMinimumSize(lay["size x"], lay["size y"])
-        self.setMaximumSize(lay["size x"], lay["size y"])
-        size_hint = self.parent().sizeHint()
-        parent.setMinimumSize(size_hint)
-        parent.setMaximumSize(size_hint)
+
         # clear widget
         self.plot_layout.clear()
 
@@ -106,7 +117,7 @@ class PipelinePlot(QtWidgets.QWidget):
                            colspan=1)
             pp.redraw(dslist, slot_states, plot_state_contour)
 
-        sca = plot_state["scatter"]
+        # colorbar
         colorbar_kwds = {}
 
         if sca["marker hue"] == "kde":
@@ -121,7 +132,6 @@ class PipelinePlot(QtWidgets.QWidget):
 
         if colorbar_kwds:
             # add colorbar
-            sca = plot_state["scatter"]
             colorbar = ColorBarWidget(
                 cmap=sca["colormap"],
                 width=15,
@@ -130,9 +140,16 @@ class PipelinePlot(QtWidgets.QWidget):
             )
             self.plot_layout.addItem(colorbar)
 
-            self.plot_layout.nextRow()
-            self.plot_layout.addLabel(labelx, col=1)
-            self.update()
+        # x-axis label
+        self.plot_layout.nextRow()
+        self.plot_layout.addLabel(labelx, col=1)
+
+        # Set size in the end (after layout is populated)
+        self.setMinimumSize(lay["size x"], lay["size y"])
+        self.setMaximumSize(lay["size x"], lay["size y"])
+        size_hint = self.parent().sizeHint()
+        parent.setMinimumSize(size_hint)
+        parent.setMaximumSize(size_hint)
 
 
 class PipelinePlotItem(SimplePlotItem):

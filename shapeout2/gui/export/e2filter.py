@@ -61,13 +61,21 @@ class ExportFilter(QtWidgets.QDialog):
                                                               'Output Folder')
             if self.file_format == "poly":
                 for pf in dclab.PolygonFilter.instances:
-                    name = "SO-PolygonFilter_{}.poly".format(pf.unique_id)
-                    out = pathlib.Path(path) / name
+                    fn = "SO2-PolygonFilter_{}_{}.poly".format(pf.unique_id,
+                                                               pf.name)
+                    # remove bad characters from file name
+                    fn = fn.replace(" ", "_").encode("utf-8").decode(
+                        "ascii", errors="replace").replace("\ufffd", "?")
+                    out = pathlib.Path(path) / fn
                     pf.save(out)
             else:
-                for filt_id in self.pipeline.filter_ids:
-                    name = "SO-Filter_{}.sof".format(filt_id)
-                    out = pathlib.Path(path) / name
+                for filt_index, filt_id in enumerate(self.pipeline.filter_ids):
+                    filt = self.pipeline.filters[filt_index]
+                    fn = "SO2-Filter_{}_{}.sof".format(filt_index, filt.name)
+                    # remove bad characters from file name
+                    fn = fn.replace(" ", "_").encode("utf-8").decode(
+                        "ascii", errors="replace").replace("\ufffd", "?")
+                    out = pathlib.Path(path) / fn
                     session.export_filters(path=out,
                                            pipeline=self.pipeline,
                                            filt_ids=[filt_id])

@@ -2,6 +2,8 @@
  - fix: don't use area_um, deform, and bright_avg box filters by
    default (#19)
  - fix: bug+regression when removing plots (#21)
+ - enh: include (polygon) filter names in file names when
+   exporting filters (#20)
 2.0.0b1
  - feat: automatically rescale plot windows (#8)
  - feat: add auto XY-range checkbox for plotting (#9)

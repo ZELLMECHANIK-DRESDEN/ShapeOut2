@@ -291,6 +291,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.scrollArea_block.update()
 
     def add_filter(self):
+        """Add a filter using tool buttons"""
         filt_id = self.pipeline.add_filter()
         self.data_matrix.add_filter(identifier=filt_id)
         self.widget_ana_view.widget_filter.update_content()

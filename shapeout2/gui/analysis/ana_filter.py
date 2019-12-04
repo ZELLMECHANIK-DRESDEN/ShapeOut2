@@ -10,9 +10,6 @@ from ...pipeline import Filter
 from .. import rangecontrol
 from .. import idiom
 
-# features shown by default
-SHOW_FEATURES = ["deform", "area_um", "bright_avg"]
-
 
 class FilterPanel(QtWidgets.QWidget):
     #: Emitted when a shapeout2.pipeline.Filter is to be changed
@@ -81,9 +78,10 @@ class FilterPanel(QtWidgets.QWidget):
             if feat in box:
                 rc.show()
                 rc.__setstate__(box[feat])
-            elif not rc.isHidden():
-                # update range to limits
+            else:
+                rc.hide()
                 rc.reset_range()
+
         # polygon filters
         pflist = state["polygon filters"]
         for key in self._polygon_checkboxes:
@@ -92,7 +90,7 @@ class FilterPanel(QtWidgets.QWidget):
             else:
                 self._polygon_checkboxes[key].setChecked(False)
 
-    def _init_box_filters(self, show_features=SHOW_FEATURES):
+    def _init_box_filters(self):
         self._box_range_controls = {}
         feats = dclab.dfn.scalar_feature_names
         labs = [dclab.dfn.feature_name2label[f] for f in feats]
@@ -106,10 +104,9 @@ class FilterPanel(QtWidgets.QWidget):
                 integer=integer,
                 label=lab,
                 data=feat)
+            rc.checkBox.setChecked(False)
+            rc.setVisible(False)
             self.verticalLayout_box.addWidget(rc)
-            if feat not in show_features:
-                rc.checkBox.setChecked(False)
-                rc.setVisible(False)
             self._box_range_controls[feat] = rc
 
     @property

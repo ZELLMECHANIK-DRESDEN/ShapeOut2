@@ -407,6 +407,13 @@ class Pipeline(object):
             features = sorted(features)
         return features
 
+    def get_filter(self, filt_id):
+        """Return the Filter matching the identifier"""
+        if filt_id not in self.filter_ids:
+            raise ValueError(
+                "Filter '{}' not part of this pipeline!".format(filt_id))
+        return self.filters[self.filter_ids.index(filt_id)]
+
     def get_min_max(self, feat, plot_id=None, margin=0.0):
         """Return minimum and maximum values for a feature
 

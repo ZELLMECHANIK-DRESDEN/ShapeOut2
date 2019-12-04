@@ -86,11 +86,11 @@ class ComputeStatistics(QtWidgets.QDialog):
                                                            methods=methods,
                                                            features=features)
                     h = ["Path", "Slot", "Name"] + h
-                    v = ["{}".format(ds.path), ii, ds.title] + v
+                    v = ["{}".format(ds.path), slot_index, slot.name] + v
                     values.append(v)
                 if prog.wasCanceled():
                     break
-                prog.setValue(ii + 1)
+                prog.setValue(slot_index + 1)
                 QtWidgets.QApplication.processEvents()
         else:
             # from path

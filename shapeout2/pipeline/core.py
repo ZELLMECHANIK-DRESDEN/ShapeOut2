@@ -351,9 +351,14 @@ class Pipeline(object):
                 dsend.apply_filter()
         return dsend
 
-    def get_datasets(self):
-        """Return all datasets with filters applied"""
-        return [self.get_dataset(ii) for ii in range(len(self.slots))]
+    def get_datasets(self, filt_index=-1, apply_filter=True):
+        """Return all datasets with filters applied
+
+        The parameters are passed to :func:`Pipeline.get_dataset`.
+        """
+        kw = {"filt_index": filt_index,
+              "apply_filter": apply_filter}
+        return [self.get_dataset(ii, **kw) for ii in range(len(self.slots))]
 
     def get_features(self, scalar=False, label_sort=False, union=False,
                      plot_id=None):
@@ -419,7 +424,7 @@ class Pipeline(object):
         if plot_id is not None:
             dslist = self.get_plot_datasets(plot_id)[0]
         else:
-            dslist = self.get_datasets()
+            dslist = self.get_datasets(filt_index=None, apply_filter=False)
         fmin = np.inf
         fmax = -np.inf
         for ds in dslist:

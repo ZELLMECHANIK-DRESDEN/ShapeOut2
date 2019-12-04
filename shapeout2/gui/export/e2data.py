@@ -61,9 +61,14 @@ class ExportData(QtWidgets.QDialog):
         prog.setValue(0)
         QtWidgets.QApplication.processEvents()
         for slot_index in range(len(self.pipeline.slots)):
+            slot = self.pipeline.slots[slot_index]
             ds = self.pipeline.get_dataset(slot_index)
-            name = ds.path.with_suffix("." + self.file_format).name
-            path = out / "SO2-export_{}_{}".format(slot_index, name)
+            fn = "SO2-export_{}_{}.{}".format(slot_index, slot.name,
+                                              self.file_format)
+            # remove bad characters from file name
+            fn = fn.replace(" ", "_").encode("utf-8").decode(
+                "ascii", errors="replace").replace("\ufffd", "?")
+            path = out / fn
             if self.file_format == "rtdc":
                 ds.export.hdf5(path=path,
                                features=features,

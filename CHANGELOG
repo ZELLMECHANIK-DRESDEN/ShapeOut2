@@ -8,6 +8,7 @@
    (it would be re-enumerated and this can be confusing)
  - fix: plot layout not correctly resized sometimes
  - fix: size of plot part in block matrix not always adjusted
+ - fix: use sample names from session in export file names (#14)
 2.0.0a27
  - feat: add developer mode
  - feat: display images on hover in polygon window in QuickView

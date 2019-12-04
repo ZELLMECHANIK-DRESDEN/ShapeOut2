@@ -164,11 +164,16 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # plot size accordingly.
         for plot_index, plot_id in enumerate(self.pipeline.plot_ids):
             old_ncol, old_nrow = self.pipeline.get_plot_col_row_count(plot_id)
-            new_ncol, new_nrow = self.pipeline.get_plot_col_row_count(
-                plot_id, pipeline_state)
-            lay = pipeline_state["plots"][plot_index]["layout"]
-            lay["size x"] += 200*(new_ncol-old_ncol)
-            lay["size y"] += 200*(new_nrow-old_nrow)
+            try:
+                new_ncol, new_nrow = self.pipeline.get_plot_col_row_count(
+                    plot_id, pipeline_state)
+            except KeyError:
+                # the plot was removed
+                continue
+            else:
+                lay = pipeline_state["plots"][plot_index]["layout"]
+                lay["size x"] += 200*(new_ncol-old_ncol)
+                lay["size y"] += 200*(new_nrow-old_nrow)
 
         # Set the new state of the pipeline
         self.pipeline.__setstate__(pipeline_state)
@@ -219,10 +224,11 @@ class ShapeOut2(QtWidgets.QMainWindow):
         for plot_id in list(self.subwindows_plots.keys()):
             if plot_id not in plot_ids:
                 sub = self.subwindows_plots.pop(plot_id)
-                pw = sub.children()[-1]
-                # disconnect signals (check for attr, b/c not there on macOS)
-                if hasattr(pw, "update_content"):
-                    self.plots_changed.disconnect(pw.update_content)
+                for child in sub.children():
+                    # disconnect signals
+                    if isinstance(child, pipeline_plot.PipelinePlot):
+                        self.plots_changed.disconnect(child.update_content)
+                        break
                 sub.deleteLater()
         self.plots_changed.emit()
         # redraw

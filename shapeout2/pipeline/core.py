@@ -492,7 +492,7 @@ class Pipeline(object):
             if plot_id == pstate["identifier"]:
                 break
         else:
-            raise ValueError(
+            raise KeyError(
                 "Plot '{}' not given in pipeline state!".format(plot_id))
 
         # number of datasets in that plot

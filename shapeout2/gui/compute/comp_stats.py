@@ -37,8 +37,9 @@ class ComputeStatistics(QtWidgets.QDialog):
         self.comboBox_filter_ray.clear()
         self.comboBox_filter_ray.addItem("No filtering", None)
         for ii, slot in enumerate(pipeline.slots):
-            raytext = "Ray {} ({})".format(ii, slot.name)
-            self.comboBox_filter_ray.addItem(raytext, slot.identifier)
+            if slot.slot_used:
+                raytext = "Ray {} ({})".format(ii, slot.name)
+                self.comboBox_filter_ray.addItem(raytext, slot.identifier)
         # initialize rest
         if len(self.pipeline.slots) == 0:
             self.comboBox.setCurrentIndex(1)
@@ -76,15 +77,17 @@ class ComputeStatistics(QtWidgets.QDialog):
         values = []
         if self.comboBox.currentIndex() == 0:
             # from pipeline
-            datasets = self.pipeline.get_datasets()
-            prog.setMaximum(len(datasets))
-            for ii, ds in enumerate(datasets):
-                h, v = dclab.statistics.get_statistics(ds,
-                                                       methods=methods,
-                                                       features=features)
-                h = ["Path", "Slot", "Name"] + h
-                v = ["{}".format(ds.path), ii, ds.title] + v
-                values.append(v)
+            prog.setMaximum(len(self.pipeline.slots))
+            for slot_index in range(len(self.pipeline.slots)):
+                slot = self.pipeline.slots[slot_index]
+                if slot.slot_used:  # only export slots "used" (#15)
+                    ds = self.pipeline.get_dataset(slot_index)
+                    h, v = dclab.statistics.get_statistics(ds,
+                                                           methods=methods,
+                                                           features=features)
+                    h = ["Path", "Slot", "Name"] + h
+                    v = ["{}".format(ds.path), ii, ds.title] + v
+                    values.append(v)
                 if prog.wasCanceled():
                     break
                 prog.setValue(ii + 1)

@@ -62,27 +62,28 @@ class ExportData(QtWidgets.QDialog):
         QtWidgets.QApplication.processEvents()
         for slot_index in range(len(self.pipeline.slots)):
             slot = self.pipeline.slots[slot_index]
-            ds = self.pipeline.get_dataset(slot_index)
-            fn = "SO2-export_{}_{}.{}".format(slot_index, slot.name,
-                                              self.file_format)
-            # remove bad characters from file name
-            fn = fn.replace(" ", "_").encode("utf-8").decode(
-                "ascii", errors="replace").replace("\ufffd", "?")
-            path = out / fn
-            if self.file_format == "rtdc":
-                ds.export.hdf5(path=path,
-                               features=features,
-                               override=True)
-            elif self.file_format == "fcs":
-                ds.export.fcs(path=path,
-                              features=features,
-                              meta_data={"Shape-Out version": version},
-                              override=True)
-            else:
-                ds.export.tsv(path=path,
-                              features=features,
-                              meta_data={"Shape-Out version": version},
-                              override=True)
+            if slot.slot_used:  # only export slots "used" (#15)
+                ds = self.pipeline.get_dataset(slot_index)
+                fn = "SO2-export_{}_{}.{}".format(slot_index, slot.name,
+                                                  self.file_format)
+                # remove bad characters from file name
+                fn = fn.replace(" ", "_").encode("utf-8").decode(
+                    "ascii", errors="replace").replace("\ufffd", "?")
+                path = out / fn
+                if self.file_format == "rtdc":
+                    ds.export.hdf5(path=path,
+                                   features=features,
+                                   override=True)
+                elif self.file_format == "fcs":
+                    ds.export.fcs(path=path,
+                                  features=features,
+                                  meta_data={"Shape-Out version": version},
+                                  override=True)
+                else:
+                    ds.export.tsv(path=path,
+                                  features=features,
+                                  meta_data={"Shape-Out version": version},
+                                  override=True)
             if prog.wasCanceled():
                 break
             prog.setValue(slot_index + 1)

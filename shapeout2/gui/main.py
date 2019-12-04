@@ -548,11 +548,26 @@ class ShapeOut2(QtWidgets.QMainWindow):
         """Refresh quickview with the currently shown dataset"""
         slot_index, filt_index = self.data_matrix.get_quickview_indices()
         if slot_index is not None:
-            self.on_quickview_show_dataset(slot_index, filt_index)
+            self.on_quickview_show_dataset(slot_index, filt_index,
+                                           update_ana_filter=False)
 
     @QtCore.pyqtSlot(int, int)
-    def on_quickview_show_dataset(self, slot_index, filt_index):
-        """Update QuickView dataset (User selected new dataset)"""
+    def on_quickview_show_dataset(self, slot_index, filt_index,
+                                  update_ana_filter=True):
+        """Update QuickView dataset (User selected new dataset)
+
+        Parameters
+        ----------
+        slot_index: int
+            Index of the slot in `self.pipeline`
+        filt_index: int
+            Index of the filter in `self.pipeline`
+        update_ana_filter: bool
+            Whether to update the filter panel in the analysis view.
+            If True, matches the filter displayed in the panel to
+            the one where QuickView is currently set active. If
+            False, nothing is changed.
+        """
         ds = self.pipeline.get_dataset(slot_index=slot_index,
                                        filt_index=filt_index,
                                        apply_filter=True)
@@ -563,9 +578,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
         if not self.subwindows["quick_view"].isVisible():
             self.toolButton_quick_view.toggle()
             self.subwindows["quick_view"].setVisible(True)
-        # update FilterPanel
-        filt_id = self.pipeline.filters[filt_index].identifier
-        self.widget_ana_view.widget_filter.show_filter(filt_id=filt_id)
+        if update_ana_filter:
+            # update FilterPanel
+            filt_id = self.pipeline.filters[filt_index].identifier
+            self.widget_ana_view.widget_filter.show_filter(filt_id=filt_id)
 
     @QtCore.pyqtSlot()
     def on_splitter(self):

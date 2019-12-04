@@ -4,6 +4,8 @@
  - fix: bug+regression when removing plots (#21)
  - fix: `Pipeline.get_min_max` did not take into account final
    filter set in filter ray (#22)
+ - fix: Do not set the selected filter to the current QuickView
+   filter when hitting apply in the analysis view filter panel (#18)
  - enh: include (polygon) filter names in file names when
    exporting filters (#20)
 2.0.0b1

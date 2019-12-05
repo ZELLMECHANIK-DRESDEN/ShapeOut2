@@ -4,6 +4,7 @@ from shapeout2 import pipeline
 
 
 def test_get_min_max_plot():
+    """See #22"""
     path = pathlib.Path(__file__).parent / "data" / "calibration_beads_47.rtdc"
 
     # initiate the pipeline

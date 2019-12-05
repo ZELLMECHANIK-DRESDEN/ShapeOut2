@@ -33,7 +33,6 @@ class PipelinePlot(QtWidgets.QWidget):
         self.update_content()
         PipelinePlot.instances[plot_id] = self
 
-
     def update_content(self):
         """Update the current plot"""
         parent = self.parent()

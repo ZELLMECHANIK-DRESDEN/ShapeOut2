@@ -51,12 +51,13 @@ class Filter(object):
             "limit events num": self.limit_events[1],
             "name": self.name,
             "remove invalid events": self.general["remove invalid events"],
-            "box filters": self.boxdict.copy(),
-            "polygon filters": self.polylist.copy(),
+            "box filters": self.boxdict,
+            "polygon filters": self.polylist,
         }
         return copy.deepcopy(state)
 
     def __setstate__(self, state):
+        state = copy.deepcopy(state)
         if self.identifier != state["identifier"]:
             raise ValueError("Identifier mismatch: '{}' vs. '{}'".format(
                 self.identifier, state["identifier"]))
@@ -65,8 +66,8 @@ class Filter(object):
                              state["limit events num"]]
         self.name = state["name"]
         self.general["remove invalid events"] = state["remove invalid events"]
-        self.boxdict = state["box filters"].copy()
-        self.polylist = state["polygon filters"].copy()
+        self.boxdict = state["box filters"]
+        self.polylist = state["polygon filters"]
 
     @staticmethod
     def get_filter(identifier):

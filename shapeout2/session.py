@@ -1,3 +1,5 @@
+import functools
+import hashlib
 import json
 import os
 import pathlib
@@ -7,8 +9,14 @@ import zipfile
 
 import dclab
 
-from .pipeline import Dataslot, Filter, Plot
+from .pipeline import Dataslot, Filter, Pipeline, Plot
 from ._version import version
+
+
+class DataFileNotFoundError(BaseException):
+    def __init__(self, missing_paths, *args, **kwargs):
+        self.missing_paths = missing_paths
+        super(DataFileNotFoundError, self).__init__(*args, **kwargs)
 
 
 class PathlibJSONEncoder(json.JSONEncoder):
@@ -118,6 +126,22 @@ def import_filters(path, pipeline, strict=False):
                          + "'{}' for filters.".format(path.suffix))
 
 
+@functools.lru_cache(maxsize=1000)
+def hash_file_partially(path, size=524288):
+    """Hash parts of a file for basic identification
+
+    By default, the first and final 512kB are hashed.
+    """
+    fsize = path.stat().st_size
+    size = min(size, fsize)
+    with path.open("rb") as fd:
+        head = fd.read(size)
+        fd.seek(fsize-size)
+        tail = fd.read(size)
+        hexhash = hashlib.md5(head + tail).hexdigest()
+    return hexhash
+
+
 def save_session(path, pipeline):
     """Save an entire pipeline session"""
     path = pathlib.Path(path)
@@ -144,13 +168,21 @@ def save_session(path, pipeline):
     (tempdir / "matrix.json").write_text(mdump)
     # additional information
     search_paths = {}
+    dataset_hashes = {}
     for slot in pipeline.slots:
         try:
             rel = os.path.relpath(slot.path, path.parent)
         except (OSError, ValueError):
             rel = "."
         search_paths[slot.identifier] = rel
+        hash_size = 48128
+        dataset_hashes[slot.identifier] = {
+            # these are keyword arguments to find_file
+            "partial_hash": hash_file_partially(slot.path, size=hash_size),
+            "size_read": hash_size
+        }
     remarks = {"search paths": search_paths,
+               "file hashes": dataset_hashes,
                "version": version,
                }
     rdump = json.dumps(remarks,
@@ -167,10 +199,18 @@ def save_session(path, pipeline):
     shutil.rmtree(str(tempdir), ignore_errors=True)
 
 
-def clear_session(pipeline):
+def clear_session(pipeline=None):
     """Clear the entire analysis pipeline"""
-    # reset the pipeline
-    pipeline.reset()
+    if pipeline is not None:
+        # reset the pipeline
+        pipeline.reset()
+    # Close all file handles
+    for slot in Dataslot._instances.values():
+        # This only applies to HDF5 data
+        ds = slot._dataset
+        if ds is not None:
+            if isinstance(ds, dclab.rtdc_dataset.RTDC_HDF5):
+                ds._h5.close()
     # remove any existing filters, plots, or slots
     for cls in [Dataslot, Filter, Plot]:
         cls._instance_counter = 0
@@ -180,32 +220,97 @@ def clear_session(pipeline):
     dclab.PolygonFilter._instance_counter = 0
 
 
-def open_session(path, pipeline, search_paths={}):
+def find_file(original_path, search_paths, partial_hash, size_read):
+    """Find a file
+
+    Parameters
+    ----------
+    original_path: pathlib.Path
+        The original path to the file
+    search_paths: list
+        Directories or possible candidates for the file. In
+        directories, only files with the same name are searched.
+    partial_hash: str
+        Hash of the file, see :func:`hash_file_partially`
+
+    Returns a pathlib.Path object on success, False otherwise.
+    """
+    if original_path.exists():
+        # we boldly assume that the hash matches
+        path = original_path
+    else:
+        for pp in search_paths:
+            if pp.is_dir():
+                # look in the directory
+                newp = pp / original_path.name
+                if newp.exists():
+                    newh = hash_file_partially(newp, size=size_read)
+                    if newh == partial_hash:
+                        path = newp
+                        break
+            elif pp.exists():
+                # maybe this is the file?
+                newh = hash_file_partially(pp, size=size_read)
+                if newh == partial_hash:
+                    path = pp
+                    break
+        else:
+            path = False
+    return path
+
+
+def open_session(path, pipeline=None, search_paths=[]):
     """Load a session (optionally overriding an existing pipeline)
 
     Parameters
     ----------
     path: pathlib.Path or str
         Path to the session file
-    pipeline: shapeout2.pipeline.Pipeline
-        The pipeline will be reset before loading anything
-    search_paths: dict
-        Search path for each slot (slot identifiers as keys).
+    pipeline: shapeout2.pipeline.Pipeline or None
+        If a pipeline is given, it is reset before loading anything
+    search_paths: list
+        Paths to search for missing measurements; entries may be
+        directories or .rtdc files
     """
+    if pipeline is None:
+        pipeline = Pipeline()
     clear_session(pipeline)
     # extract the session data
     tempdir = tempfile.mkdtemp(prefix="ShapeOut2-session-open_")
     tempdir = pathlib.Path(tempdir)
     with zipfile.ZipFile(path, mode='r') as arc:
         arc.extractall(tempdir)
+    # remargs
+    remarks = json.loads((tempdir / "remarks.json").read_text())
     # load filters
     import_filters(tempdir / "filters.sof", pipeline, strict=True)
-    # load slots
+    # determine dataset paths from slot states
     slotpaths = sorted(tempdir.glob("slot_*.json"),
                        key=lambda x: int(x.name[5:-5]))  # according to index
+    slot_states = []
+    missing_paths = []
     for sp in slotpaths:
         sstate = json.loads(sp.read_text(),
                             cls=PathlibJSONDecoder)
+        slot_id = sstate["identifier"]
+        # also search relative paths
+        search_ap = path.parent / remarks["search paths"][slot_id]
+        newpath = find_file(original_path=sstate["path"],
+                            search_paths=search_paths + [search_ap],
+                            **remarks["file hashes"][slot_id])
+        if newpath:
+            sstate["path"] = newpath
+            slot_states.append(sstate)
+        else:
+            missing_paths.append(sstate["path"])
+    # raise an exception if data files are missing
+    if missing_paths:
+        # Which files are missing is stored as a property in the exception.
+        # By catching this exception, a GUI can request the user to select
+        # a search directory and try again.
+        raise DataFileNotFoundError(missing_paths, "Some files are missing!")
+    # load slots
+    for sstate in slot_states:
         slot = Dataslot(identifier=sstate["identifier"],
                         path=sstate["path"])
         slot.__setstate__(sstate)

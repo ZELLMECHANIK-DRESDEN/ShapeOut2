@@ -437,7 +437,28 @@ class ShapeOut2(QtWidgets.QMainWindow):
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
             self, 'Open session', '', 'Shape-Out 2 session (*.so2)')
         if path:
-            session.open_session(path, self.pipeline)
+            search_paths = []
+            while True:
+                try:
+                    session.open_session(path, self.pipeline, search_paths)
+                except session.DataFileNotFoundError as e:
+                    missds = "\r".join([str(pp) for pp in e.missing_paths])
+                    msg = QtWidgets.QMessageBox()
+                    msg.setIcon(QtWidgets.QMessageBox.Warning)
+                    msg.setText("Some datasets were not found! "
+                                + "Please specify a search location.")
+                    msg.setWindowTitle(
+                        "Missing {} dataset(s)".format(len(e.missing_paths)))
+                    msg.setDetailedText("Missing files: \n\n" + missds)
+                    msg.exec_()
+                    spath = QtWidgets.QFileDialog.getExistingDirectory(
+                        self, 'Data search path')
+                    if spath:
+                        search_paths.append(spath)
+                    else:
+                        break
+                else:
+                    break
             self.adopt_pipeline(self.pipeline.__getstate__())
 
     def on_action_quit(self):

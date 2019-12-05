@@ -247,6 +247,7 @@ def find_file(original_path, search_paths, partial_hash, size_read):
 
     Returns a pathlib.Path object on success, False otherwise.
     """
+    search_paths = [pathlib.Path(sp) for sp in search_paths]
     if original_path.exists():
         # we boldly assume that the hash matches
         path = original_path
@@ -284,15 +285,14 @@ def open_session(path, pipeline=None, search_paths=[]):
         Paths to search for missing measurements; entries may be
         directories or .rtdc files
     """
+    path = pathlib.Path(path)
     if pipeline is None:
         pipeline = Pipeline()
     clear_session(pipeline)
     # read data directly from the zip file
     with zipfile.ZipFile(path, mode='r') as arc:
-        # remargs
+        # remarks
         remarks = json.loads(arc.read("remarks.json"))
-        # load filters
-        import_filters(arc.open("filters.sof"), pipeline, strict=True)
         # determine dataset paths from slot states
         slotnames = sorted(
             [n for n in arc.namelist() if n.startswith("slot_")],
@@ -321,6 +321,8 @@ def open_session(path, pipeline=None, search_paths=[]):
                 missing_paths,
                 "Some files are missing! You can access them via the "
                 + "`missing_paths` property of this exception.")
+        # load filters
+        import_filters(arc.open("filters.sof"), pipeline, strict=True)
         # load slots
         for sstate in slot_states:
             slot = Dataslot(identifier=sstate["identifier"],

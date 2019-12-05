@@ -88,7 +88,7 @@ def test_file_hash():
     tempdir = pathlib.Path(tempfile.mkdtemp(prefix="test_shapeout2_session_"))
     # custom path to measurement
     p0 = pathlib.Path(__file__).parent / "data" / "calibration_beads_47.rtdc"
-    pp = pathlib.Path(tempdir) / "calibration_beads_47.rtdc"
+    pp = tempdir / "calibration_beads_47.rtdc"
     shutil.copy(p0, pp)
     hash1 = session.hash_file_partially(pp)
     session.hash_file_partially.cache_clear()  # force recomputation of hashes
@@ -106,7 +106,7 @@ def test_missing_path_in_session():
     spath = tempdir / "session.so2"
     # custom path to measurement
     p0 = pathlib.Path(__file__).parent / "data" / "calibration_beads_47.rtdc"
-    pp = pathlib.Path(tempdir) / "calibration_beads_47.rtdc"
+    pp = tempdir / "calibration_beads_47.rtdc"
     shutil.copy(p0, pp)
     pl = make_pipeline(paths=[pp])
     session.save_session(spath, pl)
@@ -132,12 +132,44 @@ def test_missing_path_in_session():
     shutil.rmtree(tempdir, ignore_errors=True)
 
 
+def test_relative_paths():
+    tempdir = pathlib.Path(tempfile.mkdtemp(prefix="test_shapeout2_session_"))
+    # custom path for data
+    p0 = pathlib.Path(__file__).parent / "data" / "calibration_beads_47.rtdc"
+    datadir = tempdir / "data"
+    datadir.mkdir()
+    pp = datadir / "calibration_beads_47.rtdc"
+    shutil.copy(p0, pp)
+    # custom path for session
+    sessiondir = tempdir / "session"
+    sessiondir.mkdir()
+    spath = sessiondir / "session.so2"
+    # pipeline
+    pl = make_pipeline(paths=[pp])
+    session.save_session(spath, pl)
+    session.clear_session(pl)
+    # new session directory
+    new_sessiondir = tempdir / "new" / "path" / "abracadabra"
+    new_sessiondir.mkdir(parents=True)
+    new_spath = new_sessiondir / spath.name
+    spath.rename(new_spath)
+    # new path directory (same relative path)
+    new_datadir = tempdir / "new" / "path" / "data"
+    new_datadir.mkdir(parents=True)
+    new_pp = new_datadir / pp.name
+    pp.rename(new_pp)
+    # and load it (without search_paths as arguments)
+    session.open_session(new_spath)
+    # cleanup
+    shutil.rmtree(tempdir, ignore_errors=True)
+
+
 def test_simple_save_open_session():
     pl = make_pipeline()
     old_state = pl.__getstate__()
 
-    tempdir = tempfile.mkdtemp(prefix="test_shapeout2_session_")
-    spath = pathlib.Path(tempdir) / "session.so2"
+    tempdir = pathlib.Path(tempfile.mkdtemp(prefix="test_shapeout2_session_"))
+    spath = tempdir / "session.so2"
 
     session.save_session(spath, pl)
 

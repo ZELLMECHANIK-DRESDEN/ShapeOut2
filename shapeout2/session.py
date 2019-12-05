@@ -1,5 +1,6 @@
 import functools
 import hashlib
+import io
 import json
 import os
 import pathlib
@@ -79,51 +80,66 @@ def import_filters(path, pipeline, strict=False):
         will be used - Raises a ValueError if the filter exists.
         For loading filters into a pipeline, this should be False.
         For loading session filters, this should be True.
+        Has no effect when `path` is a .poly file.
     """
-    path = pathlib.Path(path)
-    if path.suffix == ".poly":
-        # add a new polygon filter
-        dclab.PolygonFilter.import_all(path)
-    elif path.suffix == ".sof":
-        dump = path.read_text()
-        dump_state = json.loads(dump)
-        # add polygon filters from file
-        if not strict:
-            pf_dict = {}  # maps old to new identifiers
-        for pstate in dump_state["polygon filters"]:
-            pf = dclab.PolygonFilter(axes=(pstate["axis x"], pstate["axis y"]),
-                                     points=pstate["points"])
-            pid = pstate["identifier"]
-            if not strict:
-                # keep track of old and new identifiers
-                pf_dict[pid] = pf.unique_id
-            if pid != pf.unique_id:
-                if strict:
-                    if dclab.PolygonFilter.unique_id_exists(pid):
-                        raise ValueError("PolygonFilter with unique_id "
-                                         + "{} already exists!".format(pid))
-                    else:
-                        # change the unique_id to that of the original filter
-                        pf._set_unique_id(pid)
-                else:
-                    # use the unique_id of the newly-created filter
-                    pstate["identifier"] = pf.unique_id
-            pf.__setstate__(pstate)
-        # add a new filter set
-        for state in dump_state["filters"]:
-            if strict:
-                filt = Filter(identifier=state["identifier"])
-            else:
-                filt = Filter()
-                state["identifier"] = filt.identifier
-                # transform original polygon filter ids
-                newpids = [pf_dict[pid] for pid in state["polygon filters"]]
-                state["polygon filters"] = newpids
-            filt.__setstate__(state)
-            pipeline.add_filter(filt=filt)
+    if isinstance(path, io.IOBase):
+        import_filter_set(path, pipeline, strict)
     else:
-        raise ValueError("Unrecognized file extension "
-                         + "'{}' for filters.".format(path.suffix))
+        path = pathlib.Path(path)
+        if path.suffix == ".poly":
+            # add a new polygon filter
+            dclab.PolygonFilter.import_all(path)
+        elif path.suffix == ".sof":
+            import_filter_set(path, pipeline, strict)
+        else:
+            raise ValueError("Unrecognized file extension "
+                             + "'{}' for filters.".format(path.suffix))
+
+
+def import_filter_set(path, pipeline, strict=False):
+    """Import a filter set
+
+    See :func:`import_filters`
+    """
+    if isinstance(path, io.IOBase):
+        dump = path.read()
+    else:
+        dump = path.read_text()
+    dump_state = json.loads(dump)
+    # add polygon filters from file
+    if not strict:
+        pf_dict = {}  # maps old to new identifiers
+    for pstate in dump_state["polygon filters"]:
+        pf = dclab.PolygonFilter(axes=(pstate["axis x"], pstate["axis y"]),
+                                 points=pstate["points"])
+        pid = pstate["identifier"]
+        if not strict:
+            # keep track of old and new identifiers
+            pf_dict[pid] = pf.unique_id
+        if pid != pf.unique_id:
+            if strict:
+                if dclab.PolygonFilter.unique_id_exists(pid):
+                    raise ValueError("PolygonFilter with unique_id "
+                                     + "{} already exists!".format(pid))
+                else:
+                    # change the unique_id to that of the original filter
+                    pf._set_unique_id(pid)
+            else:
+                # use the unique_id of the newly-created filter
+                pstate["identifier"] = pf.unique_id
+        pf.__setstate__(pstate)
+    # add a new filter set
+    for state in dump_state["filters"]:
+        if strict:
+            filt = Filter(identifier=state["identifier"])
+        else:
+            filt = Filter()
+            state["identifier"] = filt.identifier
+            # transform original polygon filter ids
+            newpids = [pf_dict[pid] for pid in state["polygon filters"]]
+            state["polygon filters"] = newpids
+        filt.__setstate__(state)
+        pipeline.add_filter(filt=filt)
 
 
 @functools.lru_cache(maxsize=1000)
@@ -275,54 +291,55 @@ def open_session(path, pipeline=None, search_paths=[]):
     if pipeline is None:
         pipeline = Pipeline()
     clear_session(pipeline)
-    # extract the session data
-    tempdir = tempfile.mkdtemp(prefix="ShapeOut2-session-open_")
-    tempdir = pathlib.Path(tempdir)
+    # read data directly from the zip file
     with zipfile.ZipFile(path, mode='r') as arc:
-        arc.extractall(tempdir)
-    # remargs
-    remarks = json.loads((tempdir / "remarks.json").read_text())
-    # load filters
-    import_filters(tempdir / "filters.sof", pipeline, strict=True)
-    # determine dataset paths from slot states
-    slotpaths = sorted(tempdir.glob("slot_*.json"),
-                       key=lambda x: int(x.name[5:-5]))  # according to index
-    slot_states = []
-    missing_paths = []
-    for sp in slotpaths:
-        sstate = json.loads(sp.read_text(),
-                            cls=PathlibJSONDecoder)
-        slot_id = sstate["identifier"]
-        # also search relative paths
-        search_ap = path.parent / remarks["search paths"][slot_id]
-        newpath = find_file(original_path=sstate["path"],
-                            search_paths=search_paths + [search_ap],
-                            **remarks["file hashes"][slot_id])
-        if newpath:
-            sstate["path"] = newpath
-            slot_states.append(sstate)
-        else:
-            missing_paths.append(sstate["path"])
-    # raise an exception if data files are missing
-    if missing_paths:
-        # Which files are missing is stored as a property in the exception.
-        # By catching this exception, a GUI can request the user to select
-        # a search directory and try again.
-        raise DataFileNotFoundError(missing_paths, "Some files are missing!")
-    # load slots
-    for sstate in slot_states:
-        slot = Dataslot(identifier=sstate["identifier"],
-                        path=sstate["path"])
-        slot.__setstate__(sstate)
-        pipeline.add_slot(slot)
-    # load plots
-    plotpaths = sorted(tempdir.glob("plot_*.json"),
-                       key=lambda x: int(x.name[5:-5]))  # according to index
-    for pp in plotpaths:
-        pstate = json.loads(pp.read_text())
-        plot = Plot(identifier=pstate["identifier"])
-        plot.__setstate__(pstate)
-        pipeline.add_plot(plot)
-    # load element states
-    estates = json.loads((tempdir / "matrix.json").read_text())
-    pipeline.element_states = estates
+        # remargs
+        remarks = json.loads(arc.read("remarks.json"))
+        # load filters
+        import_filters(arc.open("filters.sof"), pipeline, strict=True)
+        # determine dataset paths from slot states
+        slotnames = sorted(
+            [n for n in arc.namelist() if n.startswith("slot_")],
+            key=lambda x: int(x[5:-5]))  # by index
+        slot_states = []
+        missing_paths = []
+        for sn in slotnames:
+            sstate = json.loads(arc.read(sn), cls=PathlibJSONDecoder)
+            slot_id = sstate["identifier"]
+            # also search relative paths
+            search_ap = path.parent / remarks["search paths"][slot_id]
+            newpath = find_file(original_path=sstate["path"],
+                                search_paths=search_paths + [search_ap],
+                                **remarks["file hashes"][slot_id])
+            if newpath:
+                sstate["path"] = newpath
+                slot_states.append(sstate)
+            else:
+                missing_paths.append(sstate["path"])
+        # raise an exception if data files are missing
+        if missing_paths:
+            # Which files are missing is stored as a property in the exception.
+            # By catching this exception, a GUI can request the user to select
+            # a search directory and try again.
+            raise DataFileNotFoundError(
+                missing_paths,
+                "Some files are missing! You can access them via the "
+                + "`missing_paths` property of this exception.")
+        # load slots
+        for sstate in slot_states:
+            slot = Dataslot(identifier=sstate["identifier"],
+                            path=sstate["path"])
+            slot.__setstate__(sstate)
+            pipeline.add_slot(slot)
+        # load plots
+        plotnames = sorted(
+            [n for n in arc.namelist() if n.startswith("plot_")],
+            key=lambda x: int(x[5:-5]))  # by index
+        for pn in plotnames:
+            pstate = json.loads(arc.read(pn))
+            plot = Plot(identifier=pstate["identifier"])
+            plot.__setstate__(pstate)
+            pipeline.add_plot(plot)
+        # load element states
+        estates = json.loads(arc.read("matrix.json"))
+        pipeline.element_states = estates

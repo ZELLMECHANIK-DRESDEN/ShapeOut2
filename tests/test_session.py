@@ -110,6 +110,7 @@ def test_missing_path_in_session():
     shutil.copy(p0, pp)
     pl = make_pipeline(paths=[pp])
     session.save_session(spath, pl)
+    session.clear_session(pl)
     # rename the file
     pc = pp.with_name("calibration_beads_47_moved.rtdc")
     pp.rename(pc)
@@ -122,7 +123,7 @@ def test_missing_path_in_session():
         assert False, "should have raised an error!"
     # try again with proper search path
     session.open_session(spath, search_paths=[pc])
-    # try again wwith a directory as search path
+    # try again with a directory as search path
     other = tempdir / "other"
     other.mkdir()
     pc.rename(other / pp.name)  # must have same name as `pp`
@@ -179,7 +180,7 @@ def test_wrong_hash():
         assert pp in e.missing_paths
     else:
         assert False, "should have raised an error!"
-
+    # cleanup
     shutil.rmtree(tempdir, ignore_errors=True)
 
 

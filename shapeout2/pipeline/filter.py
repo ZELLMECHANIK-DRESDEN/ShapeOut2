@@ -1,9 +1,9 @@
 """Keep record of all filters used"""
 import copy
-import warnings
-
 
 import dclab
+
+from ..util import hashobj
 
 
 class Filter(object):
@@ -98,8 +98,7 @@ class Filter(object):
     @property
     def hash(self):
         """Return the hash of the filter"""
-        warnings.warn("Filter hashing not implemented yet!")
-        return self.identifier
+        return hashobj(self.__getstate__())
 
     def add_box_filter(self, feature, start, end, active=True):
         """Add a box filter"""

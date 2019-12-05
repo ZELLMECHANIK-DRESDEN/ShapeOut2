@@ -4,6 +4,7 @@ import dclab
 import numpy as np
 
 from .. import meta_tool
+from ..util import hashobj
 
 
 class Dataslot(object):
@@ -99,6 +100,11 @@ class Dataslot(object):
             if isinstance(ds, dclab.rtdc_dataset.RTDC_HDF5):
                 ds._h5.close()
         Dataslot._instances.pop(slot_id)
+
+    @property
+    def hash(self):
+        """Return the hash of the slot"""
+        return hashobj(self.__getstate__())
 
     def get_dataset(self):
         """Return the corresponding dataset

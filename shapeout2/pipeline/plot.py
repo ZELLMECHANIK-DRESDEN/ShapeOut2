@@ -1,7 +1,8 @@
 import copy
-import warnings
 
 import dclab
+
+from ..util import hashobj
 
 
 DEFAULT_STATE = {
@@ -126,14 +127,6 @@ class Plot(object):
                              + "'{}' already exists!".format(identifier))
         Plot._instances[identifier] = self
 
-    @property
-    def name(self):
-        return self._state["layout"]["name"]
-
-    @name.setter
-    def name(self, value):
-        self._state["layout"]["name"] = value
-
     def __getstate__(self):
         state = copy.deepcopy(self._state)
         state["identifier"] = self.identifier
@@ -167,5 +160,12 @@ class Plot(object):
     @property
     def hash(self):
         """Return the hash of the plot"""
-        warnings.warn("Plot hashing not implemented yet!")
-        return self.identifier
+        return hashobj(self.__getstate__())
+
+    @property
+    def name(self):
+        return self._state["layout"]["name"]
+
+    @name.setter
+    def name(self, value):
+        self._state["layout"]["name"] = value

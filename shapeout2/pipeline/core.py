@@ -5,26 +5,15 @@ import dclab
 from dclab.rtdc_dataset.fmt_hierarchy import RTDC_Hierarchy
 import numpy as np
 
-from .. import util
-
 from .dataslot import Dataslot
 from .filter import Filter
+from .filter_ray import FilterRay
 from .plot import Plot
 
 
 class Pipeline(object):
     def __init__(self, state=None):
         self.reset()
-        #: Analysis matrix with dataset hierarchies. The first index
-        #: identifies the slot and the second index identifies the
-        #: filter
-        self.matrix = []
-        #: used for detecting changes in the matrix
-        self._matrix_hash = "None"
-        #: holds the slot identifiers of the current matrix
-        self._matrix_slots = []
-        #: holds the filter identifiers of the current matrix
-        self._matrix_filters = []
         #: previous state (see __setstate__)
         self._old_state = {}
         if state is not None:
@@ -245,68 +234,6 @@ class Pipeline(object):
             ds = RTDC_Hierarchy(hparent=ds, apply_filter=True)
         return ds
 
-    def construct_matrix(self):
-        """Construct the pipeline matrix
-
-        This generates dataset hierarchies and updates
-        the filters.
-        """
-        # TODO:
-        # - incremental updates
-        matrix_filters = [filt.identifier for filt in self.filters]
-        matrix_slots = [slot.identifier for slot in self.slots]
-        matrix_hash = util.hashobj([matrix_slots, matrix_filters])
-        n_filt_then = len(self._matrix_filters)
-        if self._matrix_hash != matrix_hash:
-            matrix = []
-            if self._matrix_filters == matrix_filters:
-                # only a slot was added/removed
-                for slot in self.slots:
-                    # find it in the old matrix
-                    for row in self.matrix:
-                        if row[0].identifier == slot.identifier:
-                            # use this row
-                            break
-                    else:
-                        # new dataset
-                        ds = slot.get_dataset()
-                        row = [ds]
-                        for _ in self.filters:
-                            # generate hierarchy children
-                            ds = RTDC_Hierarchy(hparent=ds,
-                                                apply_filter=False)
-                            row.append(ds)
-                    matrix.append(row)
-            elif (self._matrix_slots == matrix_slots
-                  and self._matrix_filters == matrix_filters[:n_filt_then]):
-                # only a filter was added
-                matrix = self.matrix
-                for ii in range(len(self.slots)):
-                    row = matrix[ii]
-                    for _ in self.filters[n_filt_then:]:
-                        ds = RTDC_Hierarchy(hparent=row[-1],
-                                            apply_filter=False)
-                        row.append(ds)
-            else:
-                # everything changed
-                for slot in self.slots:
-                    ds = slot.get_dataset()
-                    row = [ds]
-                    for _ in self.filters:
-                        # generate hierarchy children
-                        ds = RTDC_Hierarchy(hparent=ds,
-                                            apply_filter=False)
-                        row.append(ds)
-                    matrix.append(row)
-
-            self.matrix = matrix
-            self._matrix_hash = matrix_hash
-            self._matrix_slots = matrix_slots
-            self._matrix_filters = matrix_filters
-            # TODO:
-            # - if `self.elements_dict` is not complete, autocomplete it
-            #   (as it is done in gui.matrix.dm_dataset)
-
     def get_dataset(self, slot_index, filt_index=-1, apply_filter=True):
         """Return dataset with all filters updated (optionally applied)
 
@@ -327,30 +254,22 @@ class Pipeline(object):
         """
         slot = self.slots[slot_index]
         if filt_index is None or (filt_index == -1 and len(self.slots) == 0):
-            dsend = slot.get_dataset()
+            # return the unfiltered dataset
+            ds = slot.get_dataset()
         else:
             if filt_index < 0:
                 filt_index = len(self.filters) - 1
-            self.construct_matrix()
-            row = self.matrix[slot_index]
-            fstates = self.element_states[slot.identifier]
-            # set all necessary filters
-            for ii in range(filt_index + 1):  # +1 b/c range(0) is empty
-                row_idx = ii + 1  # +1 b/c row[0] is plain dataset
-                filt = self.filters[ii]
-                filt_id = filt.identifier
-                # TODO:
-                # - cache previously filter states and compare to new filter
-                #   states to avoid recomputation when `apply_filter`
-                #   is called.
-                if fstates[filt_id] and filt_id in self.filters_used:
-                    filt.update_dataset(row[row_idx])
-                else:
-                    row[row_idx].config["filtering"]["enable filters"] = False
-            dsend = row[filt_index+1]  # +1 b/c row[0] is plain dataset
-            if apply_filter:
-                dsend.apply_filter()
-        return dsend
+            slot_id = slot.identifier
+            # the filters used
+            filters = []
+            for filt_id in self.filter_ids[:filt_index+1]:
+                if (self.is_element_active(slot_id, filt_id)
+                        and filt_id in self.filters_used):
+                    filters.append(self.get_filter(filt_id))
+            # filter ray magic
+            ray = self.get_ray(slot.identifier)
+            ds = ray.get_dataset(filters, apply_filter=apply_filter)
+        return ds
 
     def get_datasets(self, filt_index=-1, apply_filter=True):
         """Return all datasets with filters applied
@@ -518,13 +437,21 @@ class Pipeline(object):
         row_count = int(np.ceil(num_plots/col_count))
         return col_count, row_count
 
+    def get_ray(self, slot_id):
+        """Convenience function that creates and returns a filter ray"""
+        # cleanup (just in case)
+        for key in list(self.rays.keys()):
+            if key not in self.slot_ids:
+                self.rays.pop(key)
+        if slot_id not in self.rays:
+            self.rays[slot_id] = FilterRay(self.get_slot(slot_id))
+        return self.rays[slot_id]
+
     def get_slot(self, slot_id):
         """Return the Dataslot matching the RTDCBase identifier"""
-        self.construct_matrix()
-        for slot, row in zip(self.slots, self.matrix):
-            ids = [ds.identifier for ds in row]
-            if slot_id in ids:
-                break
+        slot_id = slot_id.split("-")[0]  # this is how FilterRay names children
+        if slot_id in self.slot_ids:
+            slot = self.slots[self.slot_ids.index(slot_id)]
         else:
             raise ValueError("Unknown dataset identifier: "
                              + "`{}`".format(slot_id))
@@ -562,6 +489,8 @@ class Pipeline(object):
         self.filters = []
         #: Plots are instances of :class:`shapeout2.pipeline.Plot`
         self.plots = []
+        #: Filter rays of the current pipeline
+        self.rays = {}
         #: Slots are instances of :class:`shapeout2.pipeline.Dataslot`
         self.slots = []
         #: individual element states

@@ -98,7 +98,7 @@ class Dataslot(object):
         if ds is not None:
             if isinstance(ds, dclab.rtdc_dataset.RTDC_HDF5):
                 ds._h5.close()
-        Dataslot.instances.pop(slot_id)
+        Dataslot._instances.pop(slot_id)
 
     def get_dataset(self):
         """Return the corresponding dataset

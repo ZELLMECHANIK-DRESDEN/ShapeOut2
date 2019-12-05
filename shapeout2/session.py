@@ -221,13 +221,9 @@ def clear_session(pipeline=None):
         # reset the pipeline
         pipeline.reset()
     # Close all file handles
-    for slot in Dataslot._instances.values():
-        # This only applies to HDF5 data
-        ds = slot._dataset
-        if ds is not None:
-            if isinstance(ds, dclab.rtdc_dataset.RTDC_HDF5):
-                ds._h5.close()
-    # remove any existing filters, plots, or slots
+    for slot_id in list(Dataslot._instances.keys()):
+        Dataslot.remove_slot(slot_id)
+    # remove any existing filters, plots, or slots and reset their counters
     for cls in [Dataslot, Filter, Plot]:
         cls._instance_counter = 0
         cls._instances = {}

@@ -81,14 +81,24 @@ class Dataslot(object):
         self.slot_used = state["slot used"]
 
     @staticmethod
-    def get_slot(identifier):
+    def get_slot(slot_id):
         """Get the slot with the given identifier.
         """
-        return Dataslot._instances[identifier]
+        return Dataslot._instances[slot_id]
 
     @staticmethod
     def get_instances():
         return Dataslot._instances
+
+    @staticmethod
+    def remove_slot(slot_id):
+        """Remove a slot taking care of closing any opened files"""
+        slot = Dataslot.get_slot(slot_id)
+        ds = slot._dataset
+        if ds is not None:
+            if isinstance(ds, dclab.rtdc_dataset.RTDC_HDF5):
+                ds._h5.close()
+        Dataslot.instances.pop(slot_id)
 
     def get_dataset(self):
         """Return the corresponding dataset

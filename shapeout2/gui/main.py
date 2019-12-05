@@ -231,6 +231,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
                         break
                 sub.deleteLater()
         self.plots_changed.emit()
+        # Remove zombie slots
+        for slot_id in list(pipeline.Dataslot._instances.keys()):
+            if slot_id not in self.pipeline.slot_ids:
+                pipeline.Dataslot.remove_slot(slot_id)
         # redraw
         self.scrollArea_block.update()
         self.mdiArea.update()

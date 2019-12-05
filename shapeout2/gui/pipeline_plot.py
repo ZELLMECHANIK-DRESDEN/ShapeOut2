@@ -10,6 +10,8 @@ from pyqtgraph.graphicsItems.GradientEditorItem import Gradients
 
 from ..pipeline import Plot
 from .. import plot_cache
+from .. import util
+
 from .colorbar_widget import ColorBarWidget
 from .simple_plot_widget import SimplePlotItem
 
@@ -23,16 +25,38 @@ class PipelinePlot(QtWidgets.QWidget):
         path_ui = pkg_resources.resource_filename(
             "shapeout2.gui", "pipeline_plot.ui")
         uic.loadUi(path_ui, self)
+        # used to avoid unnecessary plotting
+        self._plot_data_hash = "unset"
+
         self.pipeline = pipeline
         self.identifier = plot_id
         self.update_content()
         PipelinePlot.instances[plot_id] = self
 
+
     def update_content(self):
+        """Update the current plot"""
         parent = self.parent()
         dslist, slot_states = self.pipeline.get_plot_datasets(self.identifier)
         plot = Plot.get_instances()[self.identifier]
         plot_state = plot.__getstate__()
+
+        # check whether anything changed
+        # 1. plot state and all relevant slot states
+        tohash = [slot_states, plot_state]
+        # 2. all relevant filter states
+        for slot_state in slot_states:
+            slot_id = slot_state["identifier"]
+            for filt_id in self.pipeline.filter_ids:
+                if self.pipeline.is_element_active(slot_id, filt_id):
+                    filt = self.pipeline.get_filter(filt_id)
+                    tohash.append([slot_id, filt_id, filt.__getstate__()])
+        plot_data_hash = util.hashobj(tohash)
+        if plot_data_hash == self._plot_data_hash:
+            # do nothing
+            return
+        else:
+            self._plot_data_hash = plot_data_hash
 
         # abbreviations
         gen = plot_state["general"]

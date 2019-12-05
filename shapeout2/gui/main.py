@@ -174,10 +174,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 lay = pipeline_state["plots"][plot_index]["layout"]
                 lay["size x"] += 200*(new_ncol-old_ncol)
                 lay["size y"] += 200*(new_nrow-old_nrow)
-
-        # Set the new state of the pipeline
+        # set the new state of the pipeline
         self.pipeline.__setstate__(pipeline_state)
-        # Update BlockMatrix
+        # update BlockMatrix
         if self.sender() != self.block_matrix:
             # Update BlockMatrix
             self.block_matrix.adopt_pipeline(pipeline_state)

@@ -530,6 +530,9 @@ class Pipeline(object):
                              + "`{}`".format(slot_id))
         return slot
 
+    def is_element_active(self, slot_id, filt_plot_id):
+        return self.element_states[slot_id][filt_plot_id]
+
     def remove_filter(self, filt_id):
         """Remove a filter by filter identifier"""
         index = self.filter_ids.index(filt_id)

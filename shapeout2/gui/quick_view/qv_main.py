@@ -554,7 +554,6 @@ class QuickView(QtWidgets.QWidget):
             # enable updates again
             self.tableWidget_feats.setUpdatesEnabled(True)
 
-    @QtCore.pyqtSlot(dclab.rtdc_dataset.RTDCBase)
     def show_rtdc(self, rtdc_ds, slot):
         """Display an RT-DC measurement given by `path` and `filters`"""
         # make things visible

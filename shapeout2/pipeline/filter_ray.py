@@ -16,6 +16,8 @@ class FilterRay(object):
         self.steps = []
         #: corresponds to hashes of the applied filters
         self.step_hashes = []
+        # used for testing (incremented when the ray is cut)
+        self._generation = 0
         # used for checking validity of the ray
         self._slot_hash = "unset"
         self._verify_slot()
@@ -26,6 +28,9 @@ class FilterRay(object):
         self.step_hashes.append(filt.hash)
         filt.update_dataset(ds)
         self.steps.append(ds)
+        return self._new_child(filt, ds)
+
+    def _new_child(self, filt, ds):
         identifier = self.slot.identifier + "-" + filt.identifier + "-child"
         ds = dclab.rtdc_dataset.RTDC_Hierarchy(
             ds, apply_filter=False, identifier=identifier)
@@ -41,6 +46,10 @@ class FilterRay(object):
 
     @property
     def root_child(self):
+        """This is the first element in self.steps
+
+        (Will return a dataset even if self.steps is empty)
+        """
         if self._root_child is None:
             ds = self.slot.get_dataset()
             identifier = self.slot.identifier + "-root"
@@ -56,8 +65,15 @@ class FilterRay(object):
         # only take into account active filters
         filters = [f for f in filters if f.filter_used]
 
-        ds = self.root_child
+        # Dear future self,
+        #
+        # don't even think about filter ray branching.
+        #
+        # Sincerely,
+        # past self
 
+        # the first filter will be applied to root_child
+        ds = self.root_child
         if filters:
             for ii, filt in enumerate(filters):
                 if len(self.steps) < ii+1:
@@ -69,13 +85,17 @@ class FilterRay(object):
                     self.steps = self.steps[:ii]
                     self.step_hashes = self.step_hashes[:ii]
                     ds = self._add_step(filt, ds)
+                    self._generation += 1  # for testing
                 else:
                     # the filters match so far
-                    ds = self.steps[ii]
+                    if len(self.steps) > ii + 2:  # next child exists
+                        ds = self.steps[ii + 1]
+                    else:  # next child does not exist
+                        ds = self._new_child(filt, ds)
             # we now have the entire filter pipeline in self.steps
             final_ds = self.steps[ii]  # not -1, the ray might be longer
             if apply_filter:
                 final_ds.apply_filter()
         else:
-            final_ds = ds
+            final_ds = self.slot.get_dataset()
         return final_ds

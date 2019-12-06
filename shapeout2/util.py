@@ -1,4 +1,5 @@
 import hashlib
+import numbers
 import pathlib
 
 import h5py
@@ -16,7 +17,7 @@ def obj2str(obj):
         return obj.encode("utf-8")
     elif isinstance(obj, pathlib.Path):
         return obj2str(str(obj))
-    elif isinstance(obj, (bool, int, float)):
+    elif isinstance(obj, (bool, numbers.Number)):
         return str(obj).encode("utf-8")
     elif obj is None:
         return b"none"

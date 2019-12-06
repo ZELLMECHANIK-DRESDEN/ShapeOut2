@@ -230,10 +230,18 @@ class ShapeOut2(QtWidgets.QMainWindow):
                         break
                 sub.deleteLater()
         self.plots_changed.emit()
+        self.widget_ana_view.widget_plot.update_content()
         # Remove zombie slots
         for slot_id in list(pipeline.Dataslot._instances.keys()):
             if slot_id not in self.pipeline.slot_ids:
                 pipeline.Dataslot.remove_slot(slot_id)
+        # enable buttons
+        if self.pipeline.slots:
+            self.toolButton_new_plot.setEnabled(True)
+            self.toolButton_new_plot2.setEnabled(True)
+        else:
+            self.toolButton_new_plot.setEnabled(False)
+            self.toolButton_new_plot2.setEnabled(False)
         # redraw
         self.scrollArea_block.update()
         self.mdiArea.update()
@@ -335,6 +343,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             sub.setWidget(pw)
             self.mdiArea.addSubWindow(sub)
             self.subwindows_plots[plot_id] = sub
+            sub.setFixedSize(sub.sizeHint())
         sub.show()
 
     def init_analysis_view(self):

@@ -8,7 +8,6 @@ from PyQt5 import uic, QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
 from pyqtgraph.graphicsItems.GradientEditorItem import Gradients
 
-from ..pipeline import Plot
 from .. import plot_cache
 from .. import util
 
@@ -37,7 +36,7 @@ class PipelinePlot(QtWidgets.QWidget):
         """Update the current plot"""
         parent = self.parent()
         dslist, slot_states = self.pipeline.get_plot_datasets(self.identifier)
-        plot = Plot.get_instances()[self.identifier]
+        plot = self.pipeline.get_plot(self.identifier)
         plot_state = plot.__getstate__()
 
         # check whether anything changed

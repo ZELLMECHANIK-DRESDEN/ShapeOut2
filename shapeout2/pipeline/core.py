@@ -2,7 +2,6 @@ import copy
 import warnings
 
 import dclab
-from dclab.rtdc_dataset.fmt_hierarchy import RTDC_Hierarchy
 import numpy as np
 
 from .dataslot import Dataslot
@@ -103,7 +102,7 @@ class Pipeline(object):
             indexing starts at "0".
         """
         if index is None:
-            index = len(self.filters)
+            index = self.num_filters
         if filt is None:
             filt = Filter()
         elif isinstance(filt, Filter):
@@ -138,7 +137,7 @@ class Pipeline(object):
             indexing starts at "0".
         """
         if index is None:
-            index = len(self.plots)
+            index = self.num_plots
         if plot is None:
             plot = Plot()
         elif isinstance(plot, Plot):
@@ -181,7 +180,7 @@ class Pipeline(object):
             identifier of the slot
         """
         if index is None:
-            index = len(self.slots)
+            index = self.num_slots
         if ((slot is None and path is None)
                 or (slot is not None and path is not None)):
             raise ValueError("Please specify either `slot` or `path`.")
@@ -219,19 +218,11 @@ class Pipeline(object):
         slot_id: str
             Identifier of the slot from which the filters are taken
         """
-        fstates = self.element_states[slot_id]
-        # keeps track of all datasets (useful for debugging)
-        datasets = []
-        ds = rtdc_ds
-        for filt in self.filters:
-            filt_id = filt.identifier
-            if fstates[filt_id] and filt_id in self.filters_used:
-                filt.update_dataset(ds)
-            else:
-                ds.config["filtering"]["enable filters"] = False
-            datasets.append(ds)
-            # generate next hierarchy child
-            ds = RTDC_Hierarchy(hparent=ds, apply_filter=True)
+        # make sure the current ray is built correctly
+        self.get_dataset(self.slot_ids.index(slot_id))
+        # get the ray
+        ray = self.get_ray(slot_id)
+        ds = ray.get_final_child(rtdc_ds)
         return ds
 
     def get_dataset(self, slot_index, filt_index=-1, apply_filter=True):
@@ -252,6 +243,9 @@ class Pipeline(object):
         ret_color: bool
             also return the color of the dataset as a string
         """
+        if not isinstance(slot_index, int):
+            raise ValueError(
+                "`slot_index` must be an integer, got '{}'".format(slot_index))
         slot = self.slots[slot_index]
         if filt_index is None or (filt_index == -1 and len(self.slots) == 0):
             # return the unfiltered dataset

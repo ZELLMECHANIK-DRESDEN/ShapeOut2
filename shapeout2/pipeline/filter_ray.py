@@ -55,6 +55,16 @@ class FilterRay(object):
         """filters currently used by the ray"""
         return self._filters
 
+    @property
+    def root_child(self):
+        """This is the first element in self.steps
+        (Will return a dataset even if self.steps is empty)
+        """
+        if self._root_child is None:
+            self._root_child = self._new_child(self.slot.get_dataset(),
+                                               apply_filter=True)
+        return self._root_child
+
     def get_final_child(self, rtdc_ds=None, apply_filter=True):
         """Return the final ray child of `rtdc_ds`
 
@@ -76,11 +86,12 @@ class FilterRay(object):
             # normal case
             external = False
             rtdc_ds = self.slot.get_dataset()
+            ds = self.root_child
         else:
             # ray is applied to other data
             external = True
-        # do not modify rtdc_ds (create a child to work with)
-        ds = self._new_child(rtdc_ds, apply_filter=True)
+            # do not modify rtdc_ds (create a child to work with)
+            ds = self._new_child(rtdc_ds, apply_filter=True)
 
         # Dear future self,
         #
@@ -99,7 +110,7 @@ class FilterRay(object):
                     # do not touch self.steps or self.step_hashes
                     filt.update_dataset(ds)
                     ds = self._new_child(ds, filt)
-                if len(self.steps) < ii+1:
+                elif len(self.steps) < ii+1:
                     # just create a new step
                     ds = self._add_step(ds, filt)
                 elif filt.hash != self.step_hashes[ii]:
@@ -111,14 +122,14 @@ class FilterRay(object):
                     self._generation += 1  # for testing
                 else:
                     # the filters match so far
-                    if len(self.steps) > ii + 2:  # next child exists
+                    if len(self.steps) > ii + 1:  # next child exists
                         ds = self.steps[ii + 1]
                     else:  # next child does not exist
                         ds = self._new_child(ds, filt)
             # we now have the entire filter pipeline in self.steps
             final_ds = prev_ds
         else:
-            final_ds = ds
+            final_ds = rtdc_ds
         if apply_filter:
             final_ds.apply_filter()
         return final_ds

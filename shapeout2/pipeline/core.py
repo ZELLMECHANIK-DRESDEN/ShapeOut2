@@ -219,7 +219,7 @@ class Pipeline(object):
             Identifier of the slot from which the filters are taken
         """
         # make sure the current ray is built correctly
-        self.get_dataset(self.slot_ids.index(slot_id))
+        self.get_dataset(self.slot_ids.index(slot_id), apply_filter=False)
         # get the ray
         ray = self.get_ray(slot_id)
         ds = ray.get_final_child(rtdc_ds)

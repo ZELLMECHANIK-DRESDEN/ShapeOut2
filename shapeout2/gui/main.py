@@ -278,13 +278,16 @@ class ShapeOut2(QtWidgets.QMainWindow):
             raise ValueError("Slot not in pipeline: {}".format(slot_id))
         self.adopt_pipeline(state)
 
-    def add_dataslot(self):
+    def add_dataslot(self, paths=None):
         """Adds a dataslot to the pipeline"""
-        fnames, _ = QtWidgets.QFileDialog.getOpenFileNames(
-            parent=self,
-            caption="Select an RT-DC measurement",
-            directory=self.settings.get_path(name="rtdc import dataset"),
-            filter="RT-DC Files (*.rtdc)")
+        if paths is None:
+            fnames, _ = QtWidgets.QFileDialog.getOpenFileNames(
+                parent=self,
+                caption="Select an RT-DC measurement",
+                directory=self.settings.get_path(name="rtdc import dataset"),
+                filter="RT-DC Files (*.rtdc)")
+        else:
+            fnames = paths
 
         if fnames:
             self.toolButton_new_plot.setEnabled(True)

@@ -50,6 +50,45 @@ class BlockMatrix(QtCore.QObject):
     def adopt_pipeline(self, pipeline_state):
         self.__setstate__(pipeline_state)
 
+    def get_widget(self, slot_id=None, filt_plot_id=None):
+        """Convenience function for testing"""
+        if slot_id is None and filt_plot_id is not None:
+            # get a filter or a plot
+            w = self.data_matrix.filter_widgets + self.plot_matrix.plot_widgets
+            for wi in w:
+                if wi.identifier == filt_plot_id:
+                    break
+            else:
+                raise KeyError(
+                    "Widget identifier '{}' not found!".format(filt_plot_id))
+            return wi
+        elif slot_id is not None and filt_plot_id is None:
+            # get a slot
+            for wi in self.data_matrix.dataset_widgets:
+                if wi.identifier == slot_id:
+                    break
+            else:
+                raise KeyError(
+                    "Widget identifier '{}' not found!".format(filt_plot_id))
+            return wi
+        elif slot_id is not None and filt_plot_id is not None:
+            # get a matrix element
+            wd = self.data_matrix.element_widget_dict
+            wp = self.plot_matrix.element_widget_dict
+            fpd = wd[slot_id]
+            fpp = wp[slot_id]
+            if filt_plot_id in fpp:
+                wi = fpp[filt_plot_id]
+            elif filt_plot_id in fpd:
+                wi = fpd[filt_plot_id]
+            else:
+                raise KeyError(
+                    "Widget identifier '{}' not found!".format(filt_plot_id))
+            return wi
+        else:
+            raise ValueError(
+                "One of `slot_id` or `filt_plot_id` must be specified!")
+
     def invalidate_elements(self, invalid_dm, invalid_pm):
         for slot_id, filt_id in invalid_dm:
             em = self.data_matrix.get_matrix_element(slot_id, filt_id)

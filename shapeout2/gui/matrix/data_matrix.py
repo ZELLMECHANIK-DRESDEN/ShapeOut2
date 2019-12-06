@@ -159,6 +159,17 @@ class DataMatrix(QtWidgets.QWidget):
         return width
 
     @property
+    def element_widget_dict(self):
+        els = {}
+        for ii, ws in enumerate(self.dataset_widgets):
+            elsd = {}
+            for jj, wf in enumerate(self.filter_widgets):
+                it = self.glo.itemAtPosition(ii+1, jj+1)
+                elsd[wf.identifier] = it.widget()
+            els[ws.identifier] = elsd
+        return els
+
+    @property
     def filter_widgets(self):
         filters = []
         for jj in range(self.glo.columnCount()):

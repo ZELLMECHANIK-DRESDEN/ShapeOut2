@@ -91,6 +91,17 @@ class PlotMatrix(QtWidgets.QWidget):
         return ch
 
     @property
+    def element_widget_dict(self):
+        els = {}
+        for ii, ws in enumerate(self.data_matrix.dataset_widgets):
+            elsd = {}
+            for jj, wf in enumerate(self.plot_widgets):
+                it = self.glo.itemAtPosition(ii+1, jj)
+                elsd[wf.identifier] = it.widget()
+            els[ws.identifier] = elsd
+        return els
+
+    @property
     def element_width(self):
         """Data matrix element width (without 2px spacing)"""
         return self.data_matrix.element_width

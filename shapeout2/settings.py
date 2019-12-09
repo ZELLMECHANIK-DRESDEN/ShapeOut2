@@ -9,6 +9,7 @@ NAME = "shapeout2.cfg"
 #: default configuration parameters
 DEFAULTS = {
     "developer mode": False,
+    "check update": True,
 }
 
 

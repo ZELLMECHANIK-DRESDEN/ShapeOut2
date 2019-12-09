@@ -20,6 +20,7 @@ from . import export
 from .matrix import BlockMatrix
 from . import pipeline_plot
 from . import quick_view
+from . import update
 
 from .. import pipeline
 from .. import session
@@ -43,6 +44,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self)
         path_ui = pkg_resources.resource_filename("shapeout2.gui", "main.ui")
         uic.loadUi(path_ui, self)
+        # update check
+        self._update_thread = None
+        self._update_worker = None
         #: Shape-Out settings
         self.settings = settings.SettingsFile()
         #: Analysis pipeline
@@ -59,9 +63,15 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # Help menu
         self.actionDocumentation.triggered.connect(self.on_action_docs)
         self.actionSoftware.triggered.connect(self.on_action_software)
+        # developer mode
         self.actionDeveloperMode.setChecked(
             self.settings.get_bool("developer mode"))
         self.actionDeveloperMode.triggered.connect(self.on_action_develop)
+        # check for updates
+        do_update = self.settings.get_bool("check update")
+        self.actionCheckUpdate.setChecked(do_update)
+        self.actionCheckUpdate.triggered.connect(self.on_action_check_update)
+        self.on_action_check_update(do_update)  # check for updates if True
         self.actionAbout.triggered.connect(self.on_action_about)
         # Export menu
         self.actionExportData.triggered.connect(self.on_action_export_data)
@@ -117,7 +127,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.plot_changed.connect(self.adopt_plot)
         # slot signals
         self.widget_ana_view.slot_changed.connect(self.adopt_slot)
-
         # check pyqtgraph version
         self._check_pg_version()
 
@@ -391,6 +400,52 @@ class ShapeOut2(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.about(self,
                                     "Shape-Out {}".format(__version__),
                                     about_text)
+
+    @QtCore.pyqtSlot(bool)
+    def on_action_check_update(self, b):
+        self.settings.set_bool("check update", b)
+        if b and self._update_thread is None:
+            self._update_thread = QtCore.QThread()
+            self._update_worker = update.UpdateWorker()
+            self._update_worker.moveToThread(self._update_thread)
+            self._update_worker.finished.connect(self._update_thread.quit)
+            self._update_worker.data_ready.connect(
+                self.on_action_check_update_finished)
+            self._update_thread.start()
+
+            version = "1"  # __version__
+            ghrepo = "ZELLMECHANIK-DRESDEN/ShapeOut2"
+
+            QtCore.QMetaObject.invokeMethod(self._update_worker,
+                                            'processUpdate',
+                                            QtCore.Qt.QueuedConnection,
+                                            QtCore.Q_ARG(str, version),
+                                            QtCore.Q_ARG(str, ghrepo),
+                                            )
+
+    @QtCore.pyqtSlot(dict)
+    def on_action_check_update_finished(self, mdict):
+        # cleanup
+        self._update_thread.quit()
+        self._update_thread.wait()
+        self._update_worker = None
+        self._update_thread = None
+        # display message box
+        ver = mdict["version"]
+        web = mdict["releases url"]
+        dlb = mdict["binary url"]
+        msg = QtWidgets.QMessageBox()
+        msg.setWindowTitle("Shape-Out {} available!".format(ver))
+        msg.setTextFormat(QtCore.Qt.RichText)
+        text = "You can install Shape-Out {} ".format(ver)
+        if dlb is not None:
+            text += 'from a <a href="{}">direct download</a>. '.format(dlb)
+        else:
+            text += 'by running `pip install --upgrade shapeout2`. '
+        text += "Visit the ".format(ver) \
+            + '<a href="{}">official release page</a>!'.format(web)
+        msg.setText(text)
+        msg.exec_()
 
     def on_action_compute_statistics(self):
         dlg = compute.ComputeStatistics(self, pipeline=self.pipeline)

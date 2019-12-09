@@ -381,8 +381,10 @@
     </property>
     <addaction name="actionDocumentation"/>
     <addaction name="actionSoftware"/>
-    <addaction name="actionDeveloperMode"/>
     <addaction name="actionAbout"/>
+    <addaction name="separator"/>
+    <addaction name="actionDeveloperMode"/>
+    <addaction name="actionCheckUpdate"/>
    </widget>
    <widget class="QMenu" name="menuExport">
     <property name="title">
@@ -531,6 +533,17 @@
    </property>
    <property name="text">
     <string>Developer Mode</string>
+   </property>
+  </action>
+  <action name="actionCheckUpdate">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Check for updates on startup</string>
    </property>
   </action>
  </widget>

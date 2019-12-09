@@ -348,7 +348,11 @@ class DataMatrix(QtWidgets.QWidget):
     def get_quickview_ids(self):
         current = MatrixElement._quick_view_instance
         if current is not None:
-            state = self.__getstate__()
+            try:
+                state = self.__getstate__()
+            except KeyError:
+                # the state is not valid (issue #25)
+                return None, None
             for slot_id in state["elements"]:
                 ds_state = state["elements"][slot_id]
                 for filt_id in ds_state:

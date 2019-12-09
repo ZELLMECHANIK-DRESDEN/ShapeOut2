@@ -1,18 +1,24 @@
 notifications:
   email: false
-sudo: required
+addons:
+  apt:
+    packages:
+    # These packages are required for testing PyQT5 applications on linux
+    - x11-utils
+    - libxkbcommon-x11-0
 matrix:
  include:
  - os: osx
    language: generic
    env: MAC_PYTHON_VERSION=3.6
+   sudo: required
  - os: linux
    language: python
    python: 3.6
-before_install:
+   services: xvfb
+install:
 # install other dependencies
 - source ./.travis/${TRAVIS_OS_NAME}_setup_python.sh $MAC_PYTHON_VERSION
-install:
 # install binary packages
 - travis_retry pip install --upgrade pip
 - travis_retry pip install setuptools wheel

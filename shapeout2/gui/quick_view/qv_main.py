@@ -26,20 +26,13 @@ class QuickView(QtWidgets.QWidget):
 
         self.setWindowTitle("Quick View (QV)")
 
-        # Initially, only show the info about how QuickView works
-        self.widget_tool.setEnabled(False)
-        self.widget_scatter.hide()
+        self._set_initial_ui()
 
         # Set scale options (with data)
         for cb in [self.comboBox_xscale, self.comboBox_yscale]:
             cb.clear()
             cb.addItem("linear", "linear")
             cb.addItem("logarithmic", "log")
-
-        # Hide settings/events by default
-        self.widget_event.setVisible(False)
-        self.widget_settings.setVisible(False)
-        self.widget_poly.setVisible(False)
 
         # settings button
         self.toolButton_event.toggled.connect(self.on_tool)
@@ -120,7 +113,7 @@ class QuickView(QtWidgets.QWidget):
                          )
 
         # set initial empty dataset
-        self.rtdc_ds = None
+        self._rtdc_ds = None
 
         # init events/features table
         self.tableWidget_feats.setColumnCount(2)
@@ -184,6 +177,34 @@ class QuickView(QtWidgets.QWidget):
             self.spinBox_event.setValue(event["index"])
             self.checkBox_trace_raw.setChecked(event["trace raw"])
             self.checkBox_trace_legend.setChecked(event["trace legend"])
+
+    def _set_initial_ui(self):
+        # Initially, only show the info about how QuickView works
+        self.widget_tool.setEnabled(False)
+        self.widget_scatter.hide()
+        # Hide settings/events by default
+        self.widget_event.hide()
+        self.widget_settings.hide()
+        self.widget_poly.hide()
+        # show the how-to label
+        self.label_howto.show()
+
+    @property
+    def rtdc_ds(self):
+        """Dataset to plot; set to None initially and if the file is closed"""
+        if self._rtdc_ds is not None:
+            if isinstance(self._rtdc_ds, dclab.rtdc_dataset.RTDC_HDF5):
+                if not self._rtdc_ds._h5:
+                    # the file is closed
+                    self._rtdc_ds = None
+        # now check again
+        if self._rtdc_ds is None:
+            self._set_initial_ui()
+        return self._rtdc_ds
+
+    @rtdc_ds.setter
+    def rtdc_ds(self, rtdc_ds):
+        self._rtdc_ds = rtdc_ds
 
     def get_event_image(self, ds, event):
         state = self.__getstate__()

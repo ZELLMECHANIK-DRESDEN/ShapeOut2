@@ -1,6 +1,7 @@
 2.0.0b3
  - enh: introduce FilterRay class for caching of hierarchy data (#6)
  - fix: minor plot updating issues
+ - fix: QuickView issues when removing datasets (#25)
 2.0.0b2
  - feat: support loading sessions with missing dataset paths (#5)
  - fix: don't use area_um, deform, and bright_avg box filters by

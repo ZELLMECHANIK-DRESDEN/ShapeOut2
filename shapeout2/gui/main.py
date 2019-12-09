@@ -278,6 +278,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             raise ValueError("Slot not in pipeline: {}".format(slot_id))
         self.adopt_pipeline(state)
 
+    @QtCore.pyqtSlot()
     def add_dataslot(self, paths=None):
         """Adds a dataslot to the pipeline"""
         if paths is None:
@@ -404,18 +405,20 @@ class ShapeOut2(QtWidgets.QMainWindow):
         msg.setWindowTitle("Restart Shape-Out")
         msg.exec_()
 
-    def on_action_clear(self):
-        buttonReply = QtWidgets.QMessageBox.question(
-            self, 'Clear Session', "All progress will be lost. Continue?",
-            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-            QtWidgets.QMessageBox.No)
-        if buttonReply == QtWidgets.QMessageBox.Yes:
+    @QtCore.pyqtSlot()
+    def on_action_clear(self, assume_yes=False):
+        if assume_yes:
+            yes = True
+        else:
+            buttonReply = QtWidgets.QMessageBox.question(
+                self, 'Clear Session', "All progress will be lost. Continue?",
+                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                QtWidgets.QMessageBox.No)
+            yes = buttonReply == QtWidgets.QMessageBox.Yes
+        if yes:
             session.clear_session(self.pipeline)
             self.adopt_pipeline(self.pipeline.__getstate__())
-            ret = True
-        else:
-            ret = False
-        return ret
+        return yes
 
     def on_action_docs(self):
         webbrowser.open("https://shapeout2.readthedocs.io")

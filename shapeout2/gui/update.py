@@ -45,12 +45,7 @@ def check_release(ghrepo="user/repo", version=None, timeout=20):
     try:
         data = request.urlopen(u, timeout=timeout).read()
     except BaseException:
-        errors = "Timeout or wrong URL"
-        try:
-            with open("shapeout2_check_update_error.log", "w") as fe:
-                fe.writelines(str(traceback.format_exc()))
-        except BaseException:
-            pass
+        errors = traceback.format_exc()
     else:
         j = json.loads(data)
 

@@ -17,6 +17,8 @@ def test_update_basic():
     mdict = update.check_release(ghrepo="ZELLMECHANIK-DRESDEN/ShapeOut2",
                                  version="2.0.0a1")
     assert mdict["update available"]
+    assert mdict["errors"] is None
     mdict = update.check_release(ghrepo="ZELLMECHANIK-DRESDEN/ShapeOut2",
                                  version="8472.0.0")
     assert not mdict["update available"]
+    assert mdict["errors"] is None

@@ -17,7 +17,6 @@ import pyqtgraph as pg
 from . import analysis
 from . import compute
 from . import export
-from .matrix import BlockMatrix
 from . import pipeline_plot
 from . import quick_view
 from . import update
@@ -94,25 +93,27 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.init_analysis_view()
         self.mdiArea.cascadeSubWindows()
         self.showMaximized()
+        # BLOCK MATRIX (wraps DataMatrix and PlotMatrix)
+        # BlockMatrix appearance
+        self.toolButton_dm.clicked.connect(self.on_data_matrix)
+        self.splitter.splitterMoved.connect(self.on_splitter)
         # BlockMatrix Actions
         self.actionLoadDataset.triggered.connect(self.add_dataslot)
         self.actionNewFilter.triggered.connect(self.add_filter)
         self.actionNewPlot.triggered.connect(self.add_plot)
+        self.block_matrix.toolButton_load_dataset.clicked.connect(
+            self.add_dataslot)
+        self.block_matrix.toolButton_new_filter.clicked.connect(
+            self.add_filter)
+        self.block_matrix.toolButton_new_plot.clicked.connect(self.add_plot)
+        # BlockMatrix default state
         self.toolButton_new_plot.setEnabled(False)
-        self.toolButton_new_plot2.setEnabled(False)
-        # BLOCK MATRIX
-        # BlockMatrix wraps DataMatrix and PlotMatrix
-        self.block_matrix = BlockMatrix(self.data_matrix, self.plot_matrix)
-        # signals
+        self.block_matrix.toolButton_new_plot.setEnabled(False)
+        # BlockMatrix other signals
         self.block_matrix.pipeline_changed.connect(self.adopt_pipeline)
-        # BlockMatrix buttons
-        self.toolButton_dm.clicked.connect(self.on_data_matrix)
-        self.splitter.splitterMoved.connect(self.on_splitter)
-        # DataMatrix
-        self.data_matrix.slot_modify_clicked.connect(self.on_modify_slot)
-        self.data_matrix.filter_modify_clicked.connect(self.on_modify_filter)
-        # Plot matrix
-        self.plot_matrix.plot_modify_clicked.connect(self.on_modify_plot)
+        self.block_matrix.slot_modify_clicked.connect(self.on_modify_slot)
+        self.block_matrix.filter_modify_clicked.connect(self.on_modify_filter)
+        self.block_matrix.plot_modify_clicked.connect(self.on_modify_plot)
         # ANALYSIS VIEW
         self.widget_ana_view.set_pipeline(self.pipeline)
         # filter signals
@@ -190,7 +191,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             # Update BlockMatrix
             self.block_matrix.adopt_pipeline(pipeline_state)
         # trigger redraw
-        self.scrollArea_block.update()
+        self.block_matrix.update()
         # Invalidate block matrix elements that do not make sense due to
         # filtering or plotting features.
         invalid_dm = []
@@ -247,12 +248,12 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # enable buttons
         if self.pipeline.slots:
             self.toolButton_new_plot.setEnabled(True)
-            self.toolButton_new_plot2.setEnabled(True)
+            self.block_matrix.toolButton_new_plot.setEnabled(True)
         else:
             self.toolButton_new_plot.setEnabled(False)
-            self.toolButton_new_plot2.setEnabled(False)
+            self.block_matrix.toolButton_new_plot.setEnabled(False)
         # redraw
-        self.scrollArea_block.update()
+        self.block_matrix.update()
         self.mdiArea.update()
         self.subwindows["analysis_view"].update()
 
@@ -301,7 +302,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
         if fnames:
             self.toolButton_new_plot.setEnabled(True)
-            self.toolButton_new_plot2.setEnabled(True)
+            self.block_matrix.toolButton_new_plot.setEnabled(True)
 
         # Create Dataslot instance and update block matrix
         for fn in fnames:
@@ -311,31 +312,31 @@ class ShapeOut2(QtWidgets.QMainWindow):
             if self.pipeline.num_filters == 0:
                 self.add_filter()
             slot_id = self.pipeline.add_slot(path=path)
-            self.data_matrix.add_dataset(slot_id=slot_id)
+            self.block_matrix.add_dataset(slot_id=slot_id)
 
         # Update box filter limits
         self.widget_ana_view.widget_filter.update_box_ranges()
         # Update dataslot in analysis view
         self.widget_ana_view.widget_slot.update_content()
         # redraw
-        self.scrollArea_block.update()
+        self.block_matrix.update()
 
     def add_filter(self):
         """Add a filter using tool buttons"""
         filt_id = self.pipeline.add_filter()
-        self.data_matrix.add_filter(identifier=filt_id)
+        self.block_matrix.add_filter(identifier=filt_id)
         self.widget_ana_view.widget_filter.update_content()
         # redraw
-        self.scrollArea_block.update()
+        self.block_matrix.update()
 
     def add_plot(self):
         plot_id = self.pipeline.add_plot()
-        self.plot_matrix.add_plot(identifier=plot_id)
+        self.block_matrix.add_plot(identifier=plot_id)
         self.add_plot_window(plot_id)
         # update UI contents
         self.widget_ana_view.widget_plot.update_content()
         # redraw
-        self.scrollArea_block.update()
+        self.block_matrix.update()
 
     def add_plot_window(self, plot_id):
         """Create a plot window if necessary and show it"""
@@ -384,7 +385,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.toolButton_quick_view.clicked.connect(self.on_quickview)
         self.subwindows["quick_view"] = sub
         # signals
-        self.data_matrix.quickviewed.connect(self.on_quickview_show_dataset)
+        self.block_matrix.quickviewed.connect(self.on_quickview_show_dataset)
         sub.setSystemMenu(None)
         sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
                            | QtCore.Qt.WindowTitleHint
@@ -575,7 +576,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # redraw
         self.splitter.update()
         self.mdiArea.update()
-        self.scrollArea_block.update()
+        self.block_matrix.update()
 
     def on_new_polygon_filter(self):
         if not self.pipeline.slots:
@@ -585,7 +586,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             msg.setWindowTitle("No dataset loaded")
             msg.exec_()
         else:
-            slot_index, _ = self.data_matrix.get_quickview_indices()
+            slot_index, _ = self.block_matrix.get_quickview_indices()
             if slot_index is None:
                 # show the first dataset
                 self.on_quickview_show_dataset(0, 0)
@@ -631,7 +632,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
     def on_quickview(self, view=True):
         """Show/Hide QuickView (User clicked the QuickView button)"""
         self.subwindows["quick_view"].setVisible(view)
-        self.data_matrix.enable_quickview(view)
+        self.block_matrix.enable_quickview(view)
         # redraw
         self.mdiArea.update()
         if view:
@@ -640,7 +641,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def on_quickview_refresh(self):
         """Refresh quickview with the currently shown dataset"""
-        slot_index, filt_index = self.data_matrix.get_quickview_indices()
+        slot_index, filt_index = self.block_matrix.get_quickview_indices()
         if slot_index is not None:
             self.on_quickview_show_dataset(slot_index, filt_index,
                                            update_ana_filter=False)

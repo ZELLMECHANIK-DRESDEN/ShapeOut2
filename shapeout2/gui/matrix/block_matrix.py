@@ -1,20 +1,35 @@
 import copy
+import pkg_resources
 
-from PyQt5 import QtCore
+from PyQt5 import uic, QtCore, QtWidgets
 
 
-class BlockMatrix(QtCore.QObject):
+class BlockMatrix(QtWidgets.QWidget):
     pipeline_changed = QtCore.pyqtSignal(dict)
+    quickviewed = QtCore.pyqtSignal(int, int)
 
-    def __init__(self, data_matrix, plot_matrix, *args, **kwargs):
+    filter_modify_clicked = QtCore.pyqtSignal(str)
+    plot_modify_clicked = QtCore.pyqtSignal(str)
+    slot_modify_clicked = QtCore.pyqtSignal(str)
+
+    def __init__(self, *args, **kwargs):
         """Helper class that wraps DataMatrix and PlotMatrix"""
         super(BlockMatrix, self).__init__(*args, **kwargs)
-        self.data_matrix = data_matrix
-        self.plot_matrix = plot_matrix
+        path_ui = pkg_resources.resource_filename(
+            "shapeout2.gui.matrix", "block_matrix.ui")
+        uic.loadUi(path_ui, self)
+
         self._old_state = {}
         # Signals
+        # DataMatrix
         self.data_matrix.matrix_changed.connect(self.on_matrix_changed)
+        self.data_matrix.filter_modify_clicked.connect(
+            self.filter_modify_clicked)
+        self.data_matrix.slot_modify_clicked.connect(self.slot_modify_clicked)
+        self.data_matrix.quickviewed.connect(self.quickviewed)
+        # PlotMatrix
         self.plot_matrix.matrix_changed.connect(self.on_matrix_changed)
+        self.plot_matrix.plot_modify_clicked.connect(self.plot_modify_clicked)
 
     def __getstate__(self):
         state = self.data_matrix.__getstate__()
@@ -47,8 +62,23 @@ class BlockMatrix(QtCore.QObject):
                 statep["elements"][slot_id].pop(filt_id)
         self.plot_matrix.__setstate__(statep)
 
+    def add_dataset(self, *args, **kwargs):
+        self.data_matrix.add_dataset(*args, **kwargs)
+
+    def add_filter(self, *args, **kwargs):
+        self.data_matrix.add_filter(*args, **kwargs)
+
+    def add_plot(self, *args, **kwargs):
+        self.plot_matrix.add_plot(*args, **kwargs)
+
     def adopt_pipeline(self, pipeline_state):
         self.__setstate__(pipeline_state)
+
+    def enable_quickview(self, view):
+        self.data_matrix.enable_quickview(view)
+
+    def get_quickview_indices(self):
+        return self.data_matrix.get_quickview_indices()
 
     def get_widget(self, slot_id=None, filt_plot_id=None):
         """Convenience function for testing"""
@@ -104,3 +134,7 @@ class BlockMatrix(QtCore.QObject):
     def on_matrix_changed(self):
         state = self.__getstate__()
         self.pipeline_changed.emit(state)
+
+    def update(self, *args, **kwargs):
+        self.scrollArea_block.update()
+        super(BlockMatrix, self).update(*args, **kwargs)

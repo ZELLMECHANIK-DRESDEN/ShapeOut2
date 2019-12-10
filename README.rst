@@ -14,7 +14,7 @@ Documentation
 -------------
 
 The documentation, including the code reference and examples, is available at
-`shapeout2.readthedocs.io <https://shapeout2.readthedocs.io/en/stable/>`__.
+`shapeout2.readthedocs.io <https://shapeout2.readthedocs.io>`__.
 
 
 Installation

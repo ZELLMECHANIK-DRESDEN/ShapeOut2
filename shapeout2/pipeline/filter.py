@@ -52,7 +52,7 @@ class Filter(object):
             "name": self.name,
             "remove invalid events": self.general["remove invalid events"],
             "box filters": self.boxdict,
-            "polygon filters": self.polylist,
+            "polygon filters": sorted(self.polylist),
         }
         return copy.deepcopy(state)
 

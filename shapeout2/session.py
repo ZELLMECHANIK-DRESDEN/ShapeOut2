@@ -228,8 +228,7 @@ def clear_session(pipeline=None):
         cls._instance_counter = 0
         cls._instances = {}
     # remove polygon filters
-    dclab.PolygonFilter.instances = []
-    dclab.PolygonFilter._instance_counter = 0
+    dclab.PolygonFilter.clear_all_filters()
 
 
 def find_file(original_path, search_paths, partial_hash, size_read):

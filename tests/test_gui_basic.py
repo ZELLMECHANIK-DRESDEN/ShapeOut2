@@ -4,6 +4,18 @@ import pathlib
 from PyQt5 import QtCore
 
 from shapeout2.gui.main import ShapeOut2
+from shapeout2 import session
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def run_around_tests():
+    # Code that will run before your test, for example:
+    session.clear_session()
+    # A test function will be run at this point
+    yield
+    # Code that will run after your test, for example:
+    session.clear_session()
 
 
 def test_simple(qtbot):

@@ -48,7 +48,12 @@ class PipelinePlot(QtWidgets.QWidget):
             for filt_id in self.pipeline.filter_ids:
                 if self.pipeline.is_element_active(slot_id, filt_id):
                     filt = self.pipeline.get_filter(filt_id)
-                    tohash.append([slot_id, filt_id, filt.__getstate__()])
+                    filt_state = filt.__getstate__()
+                    tohash.append([slot_id, filt_id, filt_state])
+                    # also check whether the polygon filters changed (#26)
+                    for pid in filt_state["polygon filters"]:
+                        pf = dclab.PolygonFilter.get_instance_from_id(pid)
+                        tohash.append(pf.__getstate__())
         plot_data_hash = util.hashobj(tohash)
         if plot_data_hash == self._plot_data_hash:
             # do nothing

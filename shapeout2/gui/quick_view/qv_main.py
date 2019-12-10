@@ -11,7 +11,8 @@ from .. import idiom
 
 
 class QuickView(QtWidgets.QWidget):
-    new_polygon_filter_created = QtCore.pyqtSignal()
+    polygon_filter_created = QtCore.pyqtSignal()
+    polygon_filter_modified = QtCore.pyqtSignal()
 
     def __init__(self, *args, **kwargs):
         QtWidgets.QWidget.__init__(self)
@@ -339,17 +340,22 @@ class QuickView(QtWidgets.QWidget):
             if idp is None:
                 dclab.PolygonFilter(axes=axes, points=points, name=name,
                                     inverted=inverted)
+                mode = "create"
             else:
                 pf = dclab.PolygonFilter.get_instance_from_id(idp)
                 pf.name = name
                 pf.inverted = inverted
                 pf.points = points
+                mode = "modify"
         # remove the PolyLineRoi
         self.widget_scatter.removeItem(self.widget_scatter.poly_line_roi)
         self.widget_scatter.poly_line_roi = None
         self.widget_scatter.set_mouse_click_mode("scatter")
         self.update_polygon_panel()
-        self.new_polygon_filter_created.emit()
+        if mode == "create":
+            self.polygon_filter_created.emit()
+        else:
+            self.polygon_filter_modified.emit()
 
     def on_poly_modify(self):
         """User wants to modify a polygon filter"""

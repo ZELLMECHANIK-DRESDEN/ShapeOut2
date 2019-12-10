@@ -122,8 +122,14 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # polygon filter creation
         self.widget_ana_view.widget_filter.request_new_polygon_filter.connect(
             self.on_new_polygon_filter)
-        self.widget_quick_view.new_polygon_filter_created.connect(
+        self.widget_quick_view.polygon_filter_created.connect(
             self.widget_ana_view.widget_filter.update_polygon_filters)
+        self.widget_quick_view.polygon_filter_modified.connect(
+            self.widget_ana_view.widget_filter.update_polygon_filters)
+        self.widget_quick_view.polygon_filter_modified.connect(
+            self.on_quickview_refresh)  # might be an active filter (#26)
+        self.widget_quick_view.polygon_filter_modified.connect(
+            self.plots_changed)  # might be an active filter (#26)
         # plot signals
         self.widget_ana_view.plot_changed.connect(self.adopt_plot)
         # slot signals
@@ -473,7 +479,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             yes = buttonReply == QtWidgets.QMessageBox.Yes
         if yes:
             session.clear_session(self.pipeline)
-            self.adopt_pipeline(self.pipeline.__getstate__())
+            self.reload_pipeline()
         return yes
 
     def on_action_docs(self):
@@ -498,7 +504,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         if path:
             session.import_filters(path, self.pipeline)
             # update UI
-            self.adopt_pipeline(self.pipeline.__getstate__())
+            self.reload_pipeline()
 
     def on_action_open(self):
         if self.pipeline.slots or self.pipeline.filters:
@@ -529,7 +535,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                         break
                 else:
                     break
-            self.adopt_pipeline(self.pipeline.__getstate__())
+            self.reload_pipeline()
 
     def on_action_quit(self):
         """Determine what happens when the user wants to quit"""
@@ -684,6 +690,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.toolButton_dm.setChecked(False)
         else:
             self.toolButton_dm.setChecked(True)
+
+    def reload_pipeline(self):
+        """Convenience function for reloading the current pipeline"""
+        self.adopt_pipeline(self.pipeline.__getstate__())
 
 
 def excepthook(etype, value, trace):

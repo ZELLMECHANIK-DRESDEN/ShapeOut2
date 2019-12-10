@@ -1,5 +1,6 @@
 2.0.0b4
  - feat: add automated update checker
+ - fix: modifying a polygon filter did not update the plots (#26)
  - ref: refactor BlockMatrix (#10)
 2.0.0b3
  - enh: introduce FilterRay class for caching of hierarchy data (#6)

@@ -310,6 +310,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.toolButton_new_plot.setEnabled(True)
             self.block_matrix.toolButton_new_plot.setEnabled(True)
 
+        slot_ids = []
         # Create Dataslot instance and update block matrix
         for fn in fnames:
             path = pathlib.Path(fn)
@@ -319,6 +320,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 self.add_filter()
             slot_id = self.pipeline.add_slot(path=path)
             self.block_matrix.add_dataset(slot_id=slot_id)
+            slot_ids.append(slot_id)
 
         # Update box filter limits
         self.widget_ana_view.widget_filter.update_box_ranges()
@@ -326,6 +328,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.widget_slot.update_content()
         # redraw
         self.block_matrix.update()
+        return slot_ids
 
     def add_filter(self):
         """Add a filter using tool buttons"""
@@ -334,6 +337,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.widget_filter.update_content()
         # redraw
         self.block_matrix.update()
+        return filt_id
 
     def add_plot(self):
         plot_id = self.pipeline.add_plot()
@@ -343,6 +347,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.widget_plot.update_content()
         # redraw
         self.block_matrix.update()
+        return plot_id
 
     def add_plot_window(self, plot_id):
         """Create a plot window if necessary and show it"""

@@ -10,6 +10,14 @@ from .filter_ray import FilterRay
 from .plot import Plot
 
 
+class EmptyDatasetWarning(UserWarning):
+    pass
+
+
+class MissingFeatureWarning(UserWarning):
+    pass
+
+
 class Pipeline(object):
     def __init__(self, state=None):
         self.reset()
@@ -341,6 +349,13 @@ class Pipeline(object):
             Fraction by which the minimum and maximum are
             extended. E.g. for plotting with a 5% margin
             use `margin=0.05`.
+
+        Returns
+        -------
+        [fmin, fmax]: list of float
+            Minimum and maximum values of the feature. If the feature
+            is empty or only-nan, an :class:`EmptyDatasetWarning` is
+            issued and both return values are set to zero.
         """
         if plot_id is not None:
             dslist = self.get_plot_datasets(plot_id)[0]
@@ -349,19 +364,28 @@ class Pipeline(object):
         fmin = np.inf
         fmax = -np.inf
         for ds in dslist:
-            if feat in ds:
-                vmin = np.nanmin(ds[feat][ds.filter.all])
-                vmax = np.nanmax(ds[feat][ds.filter.all])
-                fmin = np.min([fmin, vmin])
-                fmax = np.max([fmax, vmax])
+            if np.sum(ds.filter.all):
+                if feat in ds:
+                    vmin = np.nanmin(ds[feat][ds.filter.all])
+                    vmax = np.nanmax(ds[feat][ds.filter.all])
+                    fmin = np.min([fmin, vmin])
+                    fmax = np.max([fmax, vmax])
+                else:
+                    warnings.warn("Dataset {} does not ".format(ds.identifier)
+                                  + "contain the feature '{}'!".format(feat),
+                                  MissingFeatureWarning)
             else:
-                warnings.warn("Dataset {} does ".format(ds.identifier)
-                              + "not contain the feature '{}'!".format(feat))
+                warnings.warn("Dataset {} does not ".format(ds.identifier)
+                              + "contain any events when filtered!",
+                              EmptyDatasetWarning)
         if margin:
             diff = fmax - fmin
             fmin -= margin*diff
             fmax += margin*diff
 
+        if np.any(np.isinf([fmin, fmax])):
+            # Set values to 0 if no
+            fmin = fmax = 0
         return [fmin, fmax]
 
     def get_plot(self, plot_id):

@@ -1,6 +1,7 @@
 import copy
 
 import dclab
+import numpy as np
 
 from ..util import hashobj
 
@@ -137,6 +138,11 @@ class Plot(object):
         if self.identifier != state["identifier"]:
             raise ValueError("Identifier mismatch: '{}' vs. '{}'".format(
                 self.identifier, state["identifier"]))
+        # disallow nan-values
+        if np.any(np.isinf(state["general"]["range x"])):
+            state["general"]["range x"] = [0, 0]
+        if np.any(np.isinf(state["general"]["range y"])):
+            state["general"]["range y"] = [0, 0]
         self._state = state
 
     @staticmethod

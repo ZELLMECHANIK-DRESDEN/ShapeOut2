@@ -38,7 +38,6 @@ class PipelinePlot(QtWidgets.QWidget):
         dslist, slot_states = self.pipeline.get_plot_datasets(self.identifier)
         plot = self.pipeline.get_plot(self.identifier)
         plot_state = plot.__getstate__()
-
         # check whether anything changed
         # 1. plot state and all relevant slot states
         tohash = [slot_states, plot_state]
@@ -277,16 +276,20 @@ class PipelinePlotItem(SimplePlotItem):
 def add_contour(plot_item, plot_state, rtdc_ds, slot_state, legend=None):
     gen = plot_state["general"]
     con = plot_state["contour"]
-    x, y, density = plot_cache.get_contour_data(
-        rtdc_ds=rtdc_ds,
-        xax=gen["axis x"],
-        yax=gen["axis y"],
-        xacc=con["spacing x"],
-        yacc=con["spacing y"],
-        xscale=gen["scale x"],
-        yscale=gen["scale y"],
-        kde_type=gen["kde"],
-    )
+    try:
+        x, y, density = plot_cache.get_contour_data(
+            rtdc_ds=rtdc_ds,
+            xax=gen["axis x"],
+            yax=gen["axis y"],
+            xacc=con["spacing x"],
+            yacc=con["spacing y"],
+            xscale=gen["scale x"],
+            yscale=gen["scale y"],
+            kde_type=gen["kde"],
+        )
+    except ValueError:
+        # most-likely there is nothing to compute a contour for
+        return []
     plev = kde_contours.get_quantile_levels(
         density=density,
         x=x,

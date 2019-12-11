@@ -7,7 +7,7 @@ import dclab
 
 from ...pipeline import Filter
 
-from .. import rangecontrol
+from ..widgets import RangeControl
 from .. import idiom
 
 
@@ -98,7 +98,7 @@ class FilterPanel(QtWidgets.QWidget):
 
         for lab, feat in sorted(zip(labs, feats)):
             integer = True if feat in idiom.INTEGER_FEATURES else False
-            rc = rangecontrol.RangeControl(
+            rc = RangeControl(
                 self,
                 checkbox=False,  # checkbox is used in on_moreless
                 integer=integer,

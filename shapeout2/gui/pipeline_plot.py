@@ -11,8 +11,7 @@ from pyqtgraph.graphicsItems.GradientEditorItem import Gradients
 from .. import plot_cache
 from .. import util
 
-from .colorbar_widget import ColorBarWidget
-from .simple_plot_widget import SimplePlotItem
+from .widgets import ColorBarWidget, SimplePlotItem
 
 
 class PipelinePlot(QtWidgets.QWidget):

@@ -7,7 +7,7 @@ from pyqtgraph.graphicsItems.GradientEditorItem import Gradients
 from ... import plot_cache
 
 from .. import pipeline_plot
-from ..simple_plot_widget import SimplePlotWidget, SimpleViewBox
+from ..widgets import SimplePlotWidget, SimpleViewBox
 
 
 class QuickViewScatterWidget(SimplePlotWidget):

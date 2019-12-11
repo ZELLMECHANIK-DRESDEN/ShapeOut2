@@ -576,7 +576,7 @@
   <customwidget>
    <class>DoubleSpinBoxNan</class>
    <extends>QDoubleSpinBox</extends>
-   <header>shapeout2.gui.double_spin_box_nan</header>
+   <header>shapeout2.gui.widgets</header>
   </customwidget>
   <customwidget>
    <class>ColorButton</class>

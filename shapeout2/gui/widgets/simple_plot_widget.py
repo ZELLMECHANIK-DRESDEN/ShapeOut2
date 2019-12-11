@@ -2,7 +2,7 @@ from PyQt5 import QtCore, QtWidgets
 import pyqtgraph as pg
 from pyqtgraph import exporters
 
-from ..settings import SettingsFile
+from ...settings import SettingsFile
 
 
 class SimplePlotItem(pg.PlotItem):

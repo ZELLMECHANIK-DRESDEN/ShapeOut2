@@ -12,7 +12,7 @@ class RangeControl(QtWidgets.QWidget):
                  data=None, *args, **kwargs):
         QtWidgets.QWidget.__init__(self, parent, *args, **kwargs)
         path_ui = pkg_resources.resource_filename(
-            "shapeout2.gui", "rangecontrol.ui")
+            "shapeout2.gui.widgets", "rangecontrol.ui")
         uic.loadUi(path_ui, self)
 
         # arbitrary data

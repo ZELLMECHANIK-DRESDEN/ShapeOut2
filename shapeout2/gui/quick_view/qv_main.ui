@@ -900,12 +900,12 @@
   <customwidget>
    <class>SimplePlotWidget</class>
    <extends>QGraphicsView</extends>
-   <header>shapeout2.gui.simple_plot_widget</header>
+   <header>shapeout2.gui.widgets</header>
   </customwidget>
   <customwidget>
    <class>SimpleImageView</class>
    <extends>QGraphicsView</extends>
-   <header>shapeout2.gui.simple_image_view</header>
+   <header>shapeout2.gui.widgets</header>
   </customwidget>
   <customwidget>
    <class>QuickViewScatterWidget</class>

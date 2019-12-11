@@ -88,3 +88,4 @@ class MatrixPlot(QtWidgets.QWidget):
         """Reset tool tips and title"""
         self.label.setToolTip(self.name)
         self.set_label_string(self.name)
+        self.update()

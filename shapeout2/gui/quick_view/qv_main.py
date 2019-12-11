@@ -440,7 +440,6 @@ class QuickView(QtWidgets.QWidget):
         mdiwin.adjustSize()
         mdiwin.update()
 
-
     def plot(self):
         """Update the plot using the current state of the UI"""
         plot = self.__getstate__()["plot"]

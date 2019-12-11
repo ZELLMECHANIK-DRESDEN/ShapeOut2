@@ -1,5 +1,6 @@
 2.0.0b5
  - fix: correctly handle empty plots (#27)
+ - fix: version check checked against version 1 (#30)
 2.0.0b4
  - feat: add automated update checker
  - feat: show basic statistics in QuickView (#13)

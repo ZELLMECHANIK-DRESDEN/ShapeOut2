@@ -425,7 +425,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 self.on_action_check_update_finished)
             self._update_thread.start()
 
-            version = "1"  # __version__
+            version = __version__
             ghrepo = "ZELLMECHANIK-DRESDEN/ShapeOut2"
 
             QtCore.QMetaObject.invokeMethod(self._update_worker,

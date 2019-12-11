@@ -137,4 +137,5 @@ class BlockMatrix(QtWidgets.QWidget):
 
     def update(self, *args, **kwargs):
         self.scrollArea_block.update()
+        self.plot_matrix.update()  # force redraw (try to fix #28)
         super(BlockMatrix, self).update(*args, **kwargs)

@@ -342,31 +342,10 @@
        </widget>
       </item>
       <item>
-       <widget class="QTableWidget" name="tableWidget_stat">
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
+       <widget class="KeyValueTableWidget" name="tableWidget_stat">
         <property name="sizeAdjustPolicy">
          <enum>QAbstractScrollArea::AdjustToContents</enum>
         </property>
-        <property name="alternatingRowColors">
-         <bool>true</bool>
-        </property>
-        <property name="verticalScrollMode">
-         <enum>QAbstractItemView::ScrollPerPixel</enum>
-        </property>
-        <property name="horizontalScrollMode">
-         <enum>QAbstractItemView::ScrollPerPixel</enum>
-        </property>
-        <attribute name="horizontalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="verticalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="verticalHeaderHighlightSections">
-         <bool>false</bool>
-        </attribute>
        </widget>
       </item>
       <item>
@@ -666,44 +645,7 @@
            <number>9</number>
           </property>
           <item>
-           <widget class="QTableWidget" name="tableWidget_feats">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Plain</enum>
-            </property>
-            <property name="lineWidth">
-             <number>1</number>
-            </property>
-            <property name="horizontalScrollBarPolicy">
-             <enum>Qt::ScrollBarAsNeeded</enum>
-            </property>
-            <property name="sizeAdjustPolicy">
-             <enum>QAbstractScrollArea::AdjustIgnored</enum>
-            </property>
-            <property name="alternatingRowColors">
-             <bool>true</bool>
-            </property>
-            <property name="verticalScrollMode">
-             <enum>QAbstractItemView::ScrollPerPixel</enum>
-            </property>
-            <property name="horizontalScrollMode">
-             <enum>QAbstractItemView::ScrollPerPixel</enum>
-            </property>
-            <attribute name="horizontalHeaderVisible">
-             <bool>false</bool>
-            </attribute>
-            <attribute name="horizontalHeaderStretchLastSection">
-             <bool>false</bool>
-            </attribute>
-            <attribute name="verticalHeaderVisible">
-             <bool>false</bool>
-            </attribute>
-            <attribute name="verticalHeaderHighlightSections">
-             <bool>false</bool>
-            </attribute>
-           </widget>
+           <widget class="KeyValueTableWidget" name="tableWidget_feats"/>
           </item>
          </layout>
         </widget>
@@ -912,6 +854,11 @@
    <extends>QWidget</extends>
    <header>shapeout2.gui.quick_view.qv_scatter</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>KeyValueTableWidget</class>
+   <extends>QTableWidget</extends>
+   <header>shapeout2.gui.widgets</header>
   </customwidget>
  </customwidgets>
  <resources/>

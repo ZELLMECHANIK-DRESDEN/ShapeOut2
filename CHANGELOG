@@ -1,7 +1,9 @@
+2.0.0b6
+ - ref: move custom widgets to separate submodule (#24)
 2.0.0b5
  - fix: correctly handle empty plots (#27)
  - fix: version check checked against version 1 (#30)
- - fix: QuickView window resize incorrect (#31)
+ - fix: QuickView window resize incorrect (partly #31)
 2.0.0b4
  - feat: add automated update checker
  - feat: show basic statistics in QuickView (#13)

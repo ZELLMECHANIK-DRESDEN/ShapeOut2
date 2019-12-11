@@ -1,5 +1,6 @@
 from .colorbar_widget import ColorBarWidget  # noqa: F401
 from .double_spin_box_nan import DoubleSpinBoxNan  # noqa: F401
+from .key_value_table_widget import KeyValueTableWidget  # noqa: F401
 from .qrangeslider import QRangeSlider  # noqa: F401
 from .rangecontrol import RangeControl  # noqa: F401
 from .simple_image_view import SimpleImageView  # noqa: F401

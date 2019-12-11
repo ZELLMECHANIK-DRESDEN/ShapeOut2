@@ -1,0 +1,12 @@
+/* This did not work (overlap with grid line). I used spaced for padding instead. */
+/*
+QTableView::item
+{
+  border: 0px;
+  padding: 5px;
+}
+*/
+
+QTableView {
+  gridline-color: white;
+}

@@ -1,4 +1,3 @@
-import numbers
 import pathlib
 import pkg_resources
 
@@ -116,14 +115,6 @@ class QuickView(QtWidgets.QWidget):
 
         # set initial empty dataset
         self._rtdc_ds = None
-
-        # init table widgets
-        for tw in [self.tableWidget_feats, self.tableWidget_stat]:
-            tw.setColumnCount(2)
-            header = tw.horizontalHeader()
-            header.setSectionResizeMode(
-                0, QtWidgets.QHeaderView.ResizeToContents)
-            header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
 
     def __getstate__(self):
         plot = {
@@ -540,49 +531,19 @@ class QuickView(QtWidgets.QWidget):
             else:
                 self.groupBox_trace.hide()
         else:
-            # update features tab
-            # Disable updates which look ugly when the user switches quickly
-            self.tableWidget_feats.setUpdatesEnabled(False)
             # only use computed features (speed)
             fcands = ds.features_loaded
-            # restrict to scalar features
             feats = [f for f in fcands if f in dclab.dfn.scalar_feature_names]
             lf = sorted([(dclab.dfn.feature_name2label[f], f) for f in feats])
-            self.tableWidget_feats.setRowCount(len(feats))
-            for ii, (lii, fii) in enumerate(lf):
-                # name
-                name_vis = lii if len(lii) < 20 else lii[:17] + "..."
-                label_name = self.tableWidget_feats.cellWidget(ii, 0)
-                if label_name is None:
-                    label_name = QtWidgets.QLabel(name_vis)
-                    self.tableWidget_feats.setCellWidget(ii, 0, label_name)
-                else:
-                    if label_name.text() != name_vis:
-                        label_name.setText(name_vis)
-                label_name.setToolTip(lii)
-                # value
-                value = ds[fii][event]
-                if np.isnan(value) or np.isinf(value):
-                    fmt = "{}"
-                elif fii in idiom.INTEGER_FEATURES:
-                    fmt = "{:.0f}"
-                elif value == 0:
-                    fmt = "{:.1f}"
-                else:
-                    dec = -int(np.ceil(np.log(np.abs(value)))) + 3
-                    if dec <= 0:
-                        dec = 1
-                    fmt = "{:." + "{}".format(dec) + "f}"
-                value_vis = fmt.format(value)
-                label_value = self.tableWidget_feats.cellWidget(ii, 1)
-                if label_value is None:
-                    label_value = QtWidgets.QLabel(value_vis)
-                    self.tableWidget_feats.setCellWidget(ii, 1, label_value)
-                else:
-                    label_value.setText(value_vis)
-                label_value.setToolTip(lii)
-            # enable updates again
-            self.tableWidget_feats.setUpdatesEnabled(True)
+            keys = []
+            vals = []
+            for lii, fii in lf:
+                keys.append(lii)
+                val = ds[fii][event]
+                if fii in idiom.INTEGER_FEATURES:
+                    val = int(np.round(val))
+                vals.append(val)
+            self.tableWidget_feats.set_key_vals(keys, vals)
 
     def show_rtdc(self, rtdc_ds, slot):
         """Display an RT-DC measurement given by `path` and `filters`"""
@@ -642,42 +603,7 @@ class QuickView(QtWidgets.QWidget):
                         self.comboBox_y.currentData()]
             h, v = dclab.statistics.get_statistics(ds=self.rtdc_ds,
                                                    features=features)
-            self.tableWidget_stat.setUpdatesEnabled(False)
-
-            self.tableWidget_stat.setRowCount(len(h))
-            for ii, (hi, vi) in enumerate(zip(h, v)):
-                # name
-                name_vis = hi if len(hi) < 20 else hi[:17] + "..."
-                label_name = self.tableWidget_stat.cellWidget(ii, 0)
-                if label_name is None:
-                    label_name = QtWidgets.QLabel(name_vis)
-                    self.tableWidget_stat.setCellWidget(ii, 0, label_name)
-                else:
-                    if label_name.text() != name_vis:
-                        label_name.setText(name_vis)
-                label_name.setToolTip(hi)
-                # value
-                if np.isnan(vi) or np.isinf(vi):
-                    fmt = "{}"
-                elif isinstance(vi, numbers.Integral):
-                    fmt = "{}"
-                elif vi == 0:
-                    fmt = "{:.1f}"
-                else:
-                    dec = -int(np.ceil(np.log(np.abs(vi)))) + 3
-                    if dec <= 0:
-                        dec = 1
-                    fmt = "{:." + "{}".format(dec) + "f}"
-                value_vis = fmt.format(vi)
-                label_value = self.tableWidget_stat.cellWidget(ii, 1)
-                if label_value is None:
-                    label_value = QtWidgets.QLabel(value_vis)
-                    self.tableWidget_stat.setCellWidget(ii, 1, label_value)
-                else:
-                    label_value.setText(value_vis)
-                label_value.setToolTip(hi)
-            # enable updates again
-            self.tableWidget_stat.setUpdatesEnabled(True)
+            self.tableWidget_stat.set_key_vals(keys=h, vals=v)
 
     def update_feature_choices(self):
         """Updates the axes comboboxes choices

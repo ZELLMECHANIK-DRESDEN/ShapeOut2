@@ -401,14 +401,11 @@ class QuickView(QtWidgets.QWidget):
         show_settings = False
         sender = self.sender()
         if sender == self.toolButton_event:
-            if self.toolButton_event.isChecked():
-                show_event = True
+            show_event = self.toolButton_event.isChecked()
         elif sender == self.toolButton_poly:
-            if self.toolButton_poly.isChecked():
-                show_poly = True
+            show_poly = self.toolButton_poly.isChecked()
         elif sender == self.toolButton_settings:
-            if self.toolButton_settings.isChecked():
-                show_settings = True
+            show_settings = self.toolButton_settings.isChecked()
         else:
             # keep everything as-is but update the sizes
             show_event = self.widget_event.isVisible()
@@ -432,14 +429,17 @@ class QuickView(QtWidgets.QWidget):
 
         for b in toblock:
             b.blockSignals(False)
-
         # set size
-        show = show_event or show_settings or show_poly
+        self.update()
+        ws = self.sizeHint()
         mdiwin = self.parent()
         geom = mdiwin.geometry()
-        geom.setWidth(geom.width() - (-1)**show * 350)
+        geom.setWidth(ws.width())
+        geom.setHeight(ws.height())
         mdiwin.setGeometry(geom)
         mdiwin.adjustSize()
+        mdiwin.update()
+
 
     def plot(self):
         """Update the plot using the current state of the UI"""

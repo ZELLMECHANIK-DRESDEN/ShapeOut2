@@ -1,3 +1,4 @@
+import numbers
 import pathlib
 import pkg_resources
 
@@ -116,11 +117,13 @@ class QuickView(QtWidgets.QWidget):
         # set initial empty dataset
         self._rtdc_ds = None
 
-        # init events/features table
-        self.tableWidget_feats.setColumnCount(2)
-        header = self.tableWidget_feats.horizontalHeader()
-        header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
+        # init table widgets
+        for tw in [self.tableWidget_feats, self.tableWidget_stat]:
+            tw.setColumnCount(2)
+            header = tw.horizontalHeader()
+            header.setSectionResizeMode(
+                0, QtWidgets.QHeaderView.ResizeToContents)
+            header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
 
     def __getstate__(self):
         plot = {
@@ -456,6 +459,7 @@ class QuickView(QtWidgets.QWidget):
         # update polygon filter axis names
         self.label_poly_x.setText(dclab.dfn.feature_name2label[plot["axis x"]])
         self.label_poly_y.setText(dclab.dfn.feature_name2label[plot["axis y"]])
+        self.show_statistics()
 
     def show_event(self, event):
         """Display the event data (image, contour, trace)
@@ -556,7 +560,7 @@ class QuickView(QtWidgets.QWidget):
                 else:
                     if label_name.text() != name_vis:
                         label_name.setText(name_vis)
-                        label_name.setToolTip(lii)
+                label_name.setToolTip(lii)
                 # value
                 value = ds[fii][event]
                 if np.isnan(value) or np.isinf(value):
@@ -632,6 +636,49 @@ class QuickView(QtWidgets.QWidget):
         # this only updates the size of the tools (because there is no
         # sender)
         self.on_tool()
+
+    def show_statistics(self):
+        if self.rtdc_ds is not None:
+            features = [self.comboBox_x.currentData(),
+                        self.comboBox_y.currentData()]
+            h, v = dclab.statistics.get_statistics(ds=self.rtdc_ds,
+                                                   features=features)
+            self.tableWidget_stat.setUpdatesEnabled(False)
+
+            self.tableWidget_stat.setRowCount(len(h))
+            for ii, (hi, vi) in enumerate(zip(h, v)):
+                # name
+                name_vis = hi if len(hi) < 20 else hi[:17] + "..."
+                label_name = self.tableWidget_stat.cellWidget(ii, 0)
+                if label_name is None:
+                    label_name = QtWidgets.QLabel(name_vis)
+                    self.tableWidget_stat.setCellWidget(ii, 0, label_name)
+                else:
+                    if label_name.text() != name_vis:
+                        label_name.setText(name_vis)
+                label_name.setToolTip(hi)
+                # value
+                if np.isnan(vi) or np.isinf(vi):
+                    fmt = "{}"
+                elif isinstance(vi, numbers.Integral):
+                    fmt = "{}"
+                elif vi == 0:
+                    fmt = "{:.1f}"
+                else:
+                    dec = -int(np.ceil(np.log(np.abs(vi)))) + 3
+                    if dec <= 0:
+                        dec = 1
+                    fmt = "{:." + "{}".format(dec) + "f}"
+                value_vis = fmt.format(vi)
+                label_value = self.tableWidget_stat.cellWidget(ii, 1)
+                if label_value is None:
+                    label_value = QtWidgets.QLabel(value_vis)
+                    self.tableWidget_stat.setCellWidget(ii, 1, label_value)
+                else:
+                    label_value.setText(value_vis)
+                label_value.setToolTip(hi)
+            # enable updates again
+            self.tableWidget_stat.setUpdatesEnabled(True)
 
     def update_feature_choices(self):
         """Updates the axes comboboxes choices

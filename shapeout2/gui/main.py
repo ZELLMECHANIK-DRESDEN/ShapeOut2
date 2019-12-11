@@ -363,6 +363,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
             pw.update_content()
             sub.setSystemMenu(None)
             sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
+                               | QtCore.Qt.Window
+                               | QtCore.Qt.BypassWindowManagerHint
                                | QtCore.Qt.WindowTitleHint
                                | QtCore.Qt.Tool)
             sub.setWidget(pw)
@@ -377,6 +379,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view = analysis.AnalysisView()
         sub.setSystemMenu(None)
         sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
+                           | QtCore.Qt.Window
+                           | QtCore.Qt.BypassWindowManagerHint
                            | QtCore.Qt.WindowTitleHint
                            | QtCore.Qt.Tool)
         sub.setWidget(self.widget_ana_view)
@@ -399,6 +403,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.block_matrix.quickviewed.connect(self.on_quickview_show_dataset)
         sub.setSystemMenu(None)
         sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
+                           | QtCore.Qt.Window
+                           | QtCore.Qt.BypassWindowManagerHint
                            | QtCore.Qt.WindowTitleHint
                            | QtCore.Qt.Tool)
 

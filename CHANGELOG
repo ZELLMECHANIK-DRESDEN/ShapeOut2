@@ -1,3 +1,5 @@
+2.0.0b7
+ - fix: disable close buttons of MDI subwindows on macOS (#29)
 2.0.0b6
  - ref: move custom widgets to separate submodule (#24)
  - fix: bad alignment when selecting "Plot" in QuickView (#31)

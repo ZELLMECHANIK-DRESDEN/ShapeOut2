@@ -367,6 +367,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                                | QtCore.Qt.BypassWindowManagerHint
                                | QtCore.Qt.WindowTitleHint
                                | QtCore.Qt.Tool)
+            sub.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
             sub.setWidget(pw)
             self.mdiArea.addSubWindow(sub)
             self.subwindows_plots[plot_id] = sub
@@ -377,26 +378,26 @@ class ShapeOut2(QtWidgets.QMainWindow):
         sub = QtWidgets.QMdiSubWindow(self)
         sub.hide()
         self.widget_ana_view = analysis.AnalysisView()
+        self.subwindows["analysis_view"] = sub
         sub.setSystemMenu(None)
         sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
                            | QtCore.Qt.Window
                            | QtCore.Qt.BypassWindowManagerHint
                            | QtCore.Qt.WindowTitleHint
                            | QtCore.Qt.Tool)
+        sub.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
         sub.setWidget(self.widget_ana_view)
         self.mdiArea.addSubWindow(sub)
         self.toolButton_ana_view.clicked.connect(sub.setVisible)
         # applying a new filter triggers updating QuickView
         self.widget_ana_view.widget_filter.pushButton_apply.clicked.connect(
             self.on_quickview_refresh)
-        self.subwindows["analysis_view"] = sub
 
     def init_quick_view(self):
         sub = QtWidgets.QMdiSubWindow(self)
         sub.hide()
         self.widget_quick_view = quick_view.QuickView()
         sub.setWidget(self.widget_quick_view)
-        self.mdiArea.addSubWindow(sub)
         self.toolButton_quick_view.clicked.connect(self.on_quickview)
         self.subwindows["quick_view"] = sub
         # signals
@@ -407,6 +408,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
                            | QtCore.Qt.BypassWindowManagerHint
                            | QtCore.Qt.WindowTitleHint
                            | QtCore.Qt.Tool)
+        sub.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
+        self.mdiArea.addSubWindow(sub)
 
     def on_action_about(self):
         about_text = "Shape-Out 2 is the successor of Shape-Out, " \

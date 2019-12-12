@@ -2,6 +2,14 @@ from . import dm_element
 
 
 class MatrixElement(dm_element.MatrixElement):
+    def mousePressEvent(self, event):
+        # toggle selection
+        if not self.invalid:
+            self.active = not self.active
+            self.element_changed.emit()
+            self.update_content()
+            event.accept()
+
     def update_content(self, quickview=False):
         if self.invalid:
             color = "#DCDCDC"  # gray

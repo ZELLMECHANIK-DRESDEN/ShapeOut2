@@ -105,7 +105,7 @@ def format_config_key_value(section, key, value):
         if dckey == key:
             break
     else:
-        raise ValueError("Unknwon key: [{}]: {}".format(section, key))
+        raise KeyError("Unknwon key [{}]: {}".format(section, key))
     tip = ""
     # Value formatting
     if dctype == float:  # pretty-print floats

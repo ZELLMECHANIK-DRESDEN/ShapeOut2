@@ -13,8 +13,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         NET_AVAILABLE = False
 
 
-@pytest.mark.skipif(os.getenv("TRAVIS_OS_NAME") == "osx",
-                    reason="does not run on travis osx")
+@pytest.mark.xfail(os.getenv("TRAVIS") == "true",
+                   reason="does not always run on travisCI")
 @pytest.mark.skipif(not NET_AVAILABLE, reason="No network connection!")
 def test_update_basic():
     mdict = update.check_release(ghrepo="ZELLMECHANIK-DRESDEN/ShapeOut2",

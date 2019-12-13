@@ -153,7 +153,14 @@ class PipelinePlot(QtWidgets.QWidget):
             colorbar_kwds["vmin"] = sca["hue min"]
             colorbar_kwds["vmax"] = sca["hue max"]
             feat = sca["hue feature"]
-            colorbar_kwds["label"] = dclab.dfn.feature_name2label[feat]
+            label = dclab.dfn.feature_name2label[feat]
+            fl_names = slot_states[0]["fl names"]
+            if label.count("FL"):
+                for key in fl_names:
+                    if key in label:
+                        label = label.replace(key, fl_names[key])
+                        break
+            colorbar_kwds["label"] = label
 
         if colorbar_kwds:
             # add colorbar

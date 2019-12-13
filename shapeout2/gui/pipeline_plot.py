@@ -435,8 +435,8 @@ def get_axes_labels(plot_state, slot_states):
                 break
     if labely.count("FL"):
         for key in fl_names:
-            if key in labelx:
-                labelx = labelx.replace(key, fl_names[key])
+            if key in labely:
+                labely = labely.replace(key, fl_names[key])
                 break
     return labelx, labely
 

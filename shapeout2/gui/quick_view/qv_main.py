@@ -115,6 +115,7 @@ class QuickView(QtWidgets.QWidget):
 
         # set initial empty dataset
         self._rtdc_ds = None
+        self.slot = None
 
     def __getstate__(self):
         plot = {
@@ -433,23 +434,27 @@ class QuickView(QtWidgets.QWidget):
 
     def plot(self):
         """Update the plot using the current state of the UI"""
-        plot = self.__getstate__()["plot"]
-        downsample = plot["downsampling"] * plot["downsampling value"]
+        if self.rtdc_ds is not None:
+            plot = self.__getstate__()["plot"]
+            downsample = plot["downsampling"] * plot["downsampling value"]
 
-        self.widget_scatter.plot_data(rtdc_ds=self.rtdc_ds,
-                                      slot=self.slot,
-                                      downsample=downsample,
-                                      xax=plot["axis x"],
-                                      yax=plot["axis y"],
-                                      xscale=plot["scale x"],
-                                      yscale=plot["scale y"],
-                                      isoelastics=plot["isoelastics"])
-        # make sure the correct plot items are visible (e.g. scatter select)
-        self.on_tool()
-        # update polygon filter axis names
-        self.label_poly_x.setText(dclab.dfn.feature_name2label[plot["axis x"]])
-        self.label_poly_y.setText(dclab.dfn.feature_name2label[plot["axis y"]])
-        self.show_statistics()
+            self.widget_scatter.plot_data(rtdc_ds=self.rtdc_ds,
+                                          slot=self.slot,
+                                          downsample=downsample,
+                                          xax=plot["axis x"],
+                                          yax=plot["axis y"],
+                                          xscale=plot["scale x"],
+                                          yscale=plot["scale y"],
+                                          isoelastics=plot["isoelastics"])
+            # make sure the correct plot items are visible
+            # (e.g. scatter select)
+            self.on_tool()
+            # update polygon filter axis names
+            self.label_poly_x.setText(
+                dclab.dfn.feature_name2label[plot["axis x"]])
+            self.label_poly_y.setText(
+                dclab.dfn.feature_name2label[plot["axis y"]])
+            self.show_statistics()
 
     def show_event(self, event):
         """Display the event data (image, contour, trace)

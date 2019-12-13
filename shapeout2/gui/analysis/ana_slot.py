@@ -2,6 +2,7 @@ import copy
 import pkg_resources
 
 import dclab
+import numpy as np
 from PyQt5 import uic, QtCore, QtWidgets
 
 from ... import meta_tool
@@ -29,11 +30,19 @@ class SlotPanel(QtWidgets.QWidget):
         self.pushButton_reset.clicked.connect(self.update_content)
         self.comboBox_slots.currentIndexChanged.connect(self.update_content)
         # init
-        self.update_content()
         self._init_emodulus()
+        self.update_content()
 
     def __getstate__(self):
         slot_state = self.current_slot_state
+        if self.comboBox_temp.currentData() in ["manual", "config"]:
+            emod_temp = self.doubleSpinBox_temp.value()
+        else:
+            emod_temp = np.nan
+        if self.comboBox_medium.currentData() == "other":
+            emod_visc = self.doubleSpinBox_visc.value()
+        else:
+            emod_visc = np.nan
         state = {
             "identifier": slot_state["identifier"],
             "name": self.lineEdit_name.text(),
@@ -55,8 +64,8 @@ class SlotPanel(QtWidgets.QWidget):
             "emodulus": {
                 "emodulus model": "elastic sphere",
                 "emodulus medium": self.comboBox_medium.currentData(),
-                "emodulus temperature": self.doubleSpinBox_temp.value(),
-                "emodulus viscosity": self.doubleSpinBox_visc.value(),
+                "emodulus temperature": emod_temp,
+                "emodulus viscosity": emod_visc,
             }
         }
         return state
@@ -64,7 +73,7 @@ class SlotPanel(QtWidgets.QWidget):
     def __setstate__(self, state):
         cur_state = self.current_slot_state
         if cur_state["identifier"] != state["identifier"]:
-            raise ValueError("Slot dentifier mismatch!")
+            raise ValueError("Slot identifier mismatch!")
         self.lineEdit_name.setText(state["name"])
         self.lineEdit_path.setText(str(state["path"]))
         self.pushButton_color.setColor(state["color"])
@@ -81,11 +90,23 @@ class SlotPanel(QtWidgets.QWidget):
         self.doubleSpinBox_ct31.setValue(crosstalk["crosstalk fl31"])
         self.doubleSpinBox_ct32.setValue(crosstalk["crosstalk fl32"])
         # emodulus
+        # https://dclab.readthedocs.io/en/latest/sec_av_emodulus.html
         emodulus = state["emodulus"]
         idx = self.comboBox_medium.findData(emodulus["emodulus medium"])
         self.comboBox_medium.setCurrentIndex(idx)
-        self.doubleSpinBox_temp.setValue(emodulus["emodulus temperature"])
-        self.doubleSpinBox_visc.setValue(emodulus["emodulus viscosity"])
+        temperature = emodulus["emodulus temperature"]
+        viscosity = emodulus["emodulus viscosity"]
+        ds = self.get_dataset()
+        if np.isnan(temperature):
+            if "temp" in ds:
+                # feature
+                index = self.comboBox_temp.findData("feature")
+            else:
+                # manual
+                index = self.comboBox_temp.findData("manual")
+            self.comboBox_temp.setCurrentIndex(index)
+        self.doubleSpinBox_temp.setValue(temperature)
+        self.doubleSpinBox_visc.setValue(viscosity)
 
         # Fluorescence data visibility
         features = meta_tool.get_rtdc_features(state["path"])
@@ -124,8 +145,11 @@ class SlotPanel(QtWidgets.QWidget):
         self.comboBox_medium.addItem("CellCarrier B", "CellCarrierB")  # [sic]
         self.comboBox_medium.addItem("water", "water")
         self.comboBox_medium.addItem("other", "other")
+        self.comboBox_medium.addItem("not defined", "undefined")
         self.comboBox_medium.currentIndexChanged.connect(self.on_medium)
         self.comboBox_temp.clear()
+        self.comboBox_temp.addItem("From feature", "feature")
+        self.comboBox_temp.addItem("From meta data", "config")
         self.comboBox_temp.addItem("Manual", "manual")
         self.comboBox_temp.currentIndexChanged.connect(self.on_temperature)
         self.doubleSpinBox_temp.valueChanged.connect(self.on_temperature)
@@ -159,6 +183,12 @@ class SlotPanel(QtWidgets.QWidget):
         else:
             return [slot.name for slot in self.pipeline.slots]
 
+    def get_dataset(self):
+        """Return dataset associated with the current slot index"""
+        slot_index = self.comboBox_slots.currentIndex()
+        slot = self.pipeline.slots[slot_index]
+        return slot.get_dataset()
+
     def on_anew_slot(self):
         slot_state = self.__getstate__()
         new_slot = Dataslot(slot_state["path"])
@@ -191,29 +221,57 @@ class SlotPanel(QtWidgets.QWidget):
         """Called if the user chose a different medium"""
         medium = self.comboBox_medium.currentData()
         if medium == "undefined":
+            self.doubleSpinBox_temp.setValue(np.nan)
             self.doubleSpinBox_temp.setEnabled(False)
+            self.comboBox_temp.setEnabled(False)
             self.doubleSpinBox_visc.setEnabled(False)
         elif medium == "other":
+            self.doubleSpinBox_temp.setValue(np.nan)
             self.doubleSpinBox_temp.setEnabled(False)
+            self.comboBox_temp.setEnabled(False)
             self.doubleSpinBox_visc.setEnabled(True)
         else:
             self.doubleSpinBox_temp.setEnabled(True)
+            self.comboBox_temp.setEnabled(True)
             self.doubleSpinBox_visc.setEnabled(True)
+            self.on_temperature()
 
     def on_temperature(self):
         """Called on temperature selections (comboBox, doubleSpinBox)"""
         medium = self.comboBox_medium.currentData()
-        if medium in dclab.features.emodulus_viscosity.KNOWN_MEDIA:
-            # compute viscosity
-            state = self.__getstate__()
-            cfg = meta_tool.get_rtdc_config(state["path"])
-            visc = dclab.features.emodulus_viscosity.get_viscosity(
-                medium=medium,
-                channel_width=cfg["setup"]["channel width"],
-                flow_rate=cfg["setup"]["flow rate"],
-                temperature=self.doubleSpinBox_temp.value())
-            self.doubleSpinBox_visc.setValue(visc)
-            self.doubleSpinBox_visc.setReadOnly(True)
+        tselec = self.comboBox_temp.currentData()
+        if tselec in ["manual", "config"]:
+            if tselec == "manual":
+                temperature = self.doubleSpinBox_temp.value()
+                self.doubleSpinBox_temp.setReadOnly(False)
+                self.doubleSpinBox_temp.setEnabled(True)
+            else:
+                # get temperature from dataset
+                ds = self.get_dataset()
+                if "temperature" not in ds.config["setup"]:
+                    raise ValueError("Dataset has no temperature entry!")
+                temperature = ds.config["setup"]["temperature"]
+                self.doubleSpinBox_temp.setReadOnly(True)
+                self.doubleSpinBox_temp.setEnabled(True)
+                self.doubleSpinBox_temp.setValue(temperature)
+            # For user convenience, also show the viscosity
+            if medium in dclab.features.emodulus_viscosity.KNOWN_MEDIA:
+                # compute viscosity
+                state = self.__getstate__()
+                cfg = meta_tool.get_rtdc_config(state["path"])
+                visc = dclab.features.emodulus_viscosity.get_viscosity(
+                    medium=medium,
+                    channel_width=cfg["setup"]["channel width"],
+                    flow_rate=cfg["setup"]["flow rate"],
+                    temperature=temperature)
+                self.doubleSpinBox_visc.setValue(visc)
+                self.doubleSpinBox_visc.setReadOnly(True)
+                self.doubleSpinBox_visc.setEnabled(True)
+        else:  # feature
+            self.doubleSpinBox_temp.setValue(np.nan)
+            self.doubleSpinBox_temp.setEnabled(False)
+            self.doubleSpinBox_visc.setValue(np.nan)
+            self.doubleSpinBox_visc.setEnabled(False)
 
     def set_pipeline(self, pipeline):
         self._pipeline = pipeline
@@ -247,7 +305,11 @@ class SlotPanel(QtWidgets.QWidget):
                 self.comboBox_medium.setCurrentIndex(idx)
                 self.comboBox_medium.setEnabled(False)  # prevent modification
                 # compute viscosity if possible
+                self.on_medium()
                 self.on_temperature()
+            else:
+                self.comboBox_medium.setEnabled(True)
+                self.on_medium()
         else:
             self.setEnabled(False)
 
@@ -255,5 +317,9 @@ class SlotPanel(QtWidgets.QWidget):
         """Update the shapeout2.pipeline.Dataslot instance"""
         # get current index
         slot_state = self.__getstate__()
+        slot = self.pipeline.get_slot(slot_state["identifier"])
+        # This is important, otherwise update_content will not have the
+        # latest state.
+        slot.__setstate__(slot_state)
         self.update_content()  # update slot combobox and visible fl names
         self.slot_changed.emit(slot_state)

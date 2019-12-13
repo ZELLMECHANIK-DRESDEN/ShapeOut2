@@ -22,7 +22,6 @@ class FilterRay(object):
         self._generation = 0
         # used for checking validity of the ray
         self._slot_hash = "unset"
-        self._verify_slot()
         self._root_child = None
 
     def _add_step(self, ds, filt):
@@ -42,14 +41,6 @@ class FilterRay(object):
             ds, apply_filter=apply_filter, identifier=identifier)
         return ds
 
-    def _verify_slot(self):
-        """Reset things if necessary"""
-        # TODO: Is this really necessary because of emodulus recomputation?
-        if self.slot.hash != self._slot_hash:
-            self.steps = []
-            self.step_hashes = []
-            self._slot_hash = self.slot.hash
-
     @property
     def filters(self):
         """filters currently used by the ray"""
@@ -60,9 +51,13 @@ class FilterRay(object):
         """This is the first element in self.steps
         (Will return a dataset even if self.steps is empty)
         """
-        if self._root_child is None:
+        if self._slot_hash != self.slot.hash:
+            # reset everything (e.g. emodulus recipe might have changed)
+            self.steps = []
+            self.step_hashes = []
             self._root_child = self._new_child(self.slot.get_dataset(),
                                                apply_filter=True)
+            self._slot_hash = self.slot.hash
         return self._root_child
 
     def get_final_child(self, rtdc_ds=None, apply_filter=True):
@@ -143,8 +138,6 @@ class FilterRay(object):
             Filters used for computing the dataset hierarchy. If set
             to None, the current filters in `self.filters` are used.
         """
-        # make sure the slot did not change
-        self._verify_slot()
         if filters is not None:
             # put the filters in place
             self.set_filters(filters)

@@ -57,6 +57,15 @@ class Dataslot(object):
             }
         }
 
+        # use the emodulus medium and temperature values
+        ds = self.get_dataset()
+        calc = self.config["emodulus"]
+        if "medium" in ds.config["setup"]:
+            calc["emodulus medium"] = ds.config["setup"]["medium"]
+        if "temperature" in ds.config["setup"] and "temp" not in ds:
+            # only set this value if the temperature feature is not available
+            calc["emodulus temperature"] = ds.config["setup"]["temperature"]
+
     def __getstate__(self):
         state = {"color": self.color,
                  "crosstalk": self.config["crosstalk"],
@@ -106,6 +115,34 @@ class Dataslot(object):
         """Return the hash of the slot"""
         return hashobj(self.__getstate__())
 
+    def _set_emodulus_config(self, dataset):
+        """Set the Young's modulus data options
+
+        The three cases in the dclab docs apply:
+        https://dclab.readthedocs.io/en/latest/sec_av_emodulus.html
+        """
+        # remove any information
+        for key in self.config["emodulus"]:
+            if key in dataset.config["calculation"]:
+                dataset.config["calculation"].pop(key)
+
+        calc = self.config["emodulus"]
+        # it is safe to set the model
+        model = calc["emodulus model"]
+        dataset.config["calculation"]["emodulus model"] = model
+        # known media
+        medium = calc["emodulus medium"]
+        if medium in dclab.features.emodulus_viscosity.KNOWN_MEDIA:
+            dataset.config["calculation"]["emodulus medium"] = medium
+        # temperature
+        temp = calc["emodulus temperature"]
+        if not np.isnan(temp):
+            dataset.config["calculation"]["emodulus temperature"] = temp
+        # viscosity
+        visc = calc["emodulus viscosity"]
+        if not np.isnan(visc):
+            dataset.config["calculation"]["emodulus viscosity"] = visc
+
     def get_dataset(self):
         """Return the corresponding dataset
 
@@ -129,18 +166,8 @@ class Dataslot(object):
         the Young's modulus and fluorescence crosstalk.
         """
         # emodulus
-        medium = self.config["emodulus"]["emodulus medium"]
-        temp = self.config["emodulus"]["emodulus temperature"]
-        visc = self.config["emodulus"]["emodulus viscosity"]
-        if ((medium == "other" and not np.isnan(visc))
-            or (medium in dclab.features.emodulus_viscosity.KNOWN_MEDIA
-                and not np.isnan(temp))):
-            dataset.config["calculation"].update(self.config["emodulus"])
-        else:
-            # remove any information
-            for key in self.config["emodulus"]:
-                if key in dataset.config["calculation"]:
-                    dataset.config["calculation"].pop(key)
+        self._set_emodulus_config(dataset)
+
         # crosstalk
         if np.sum(list(self.config["crosstalk"].values())):
             dataset.config["calculation"].update(self.config["crosstalk"])

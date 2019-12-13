@@ -130,6 +130,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.on_quickview_refresh)  # might be an active filter (#26)
         self.widget_quick_view.polygon_filter_modified.connect(
             self.plots_changed)  # might be an active filter (#26)
+        # This is important, because if meta data such as emodulus recipe
+        # is changed, the QuickView must be updated as well.
+        self.plots_changed.connect(self.widget_quick_view.plot)
         # plot signals
         self.widget_ana_view.plot_changed.connect(self.adopt_plot)
         # slot signals

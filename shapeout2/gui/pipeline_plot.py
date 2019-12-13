@@ -215,14 +215,25 @@ class PipelinePlotItem(SimplePlotItem):
                                   channel_width=cfg["setup"]["channel width"],
                                   pixel_size=cfg["imaging"]["pixel size"])
             self._plot_elements += els
-        # Set Range
-        self.setRange(xRange=gen["range x"],
-                      yRange=gen["range y"],
-                      padding=0,
-                      )
         # Set Log scale
         self.setLogMode(x=gen["scale x"] == "log",
                         y=gen["scale y"] == "log")
+        # Modifications in log mode
+        range_x = np.array(gen["range x"])
+        range_y = np.array(gen["range y"])
+        if gen["scale x"] == "log":
+            if range_x[0] == 0:
+                range_x[0] = 1e-3
+            range_x = np.log10(range_x)
+        if gen["scale y"] == "log":
+            if range_y[0] == 0:
+                range_y[0] = 1e-3
+            range_y = np.log10(range_y)
+        # Set Range
+        self.setRange(xRange=range_x,
+                      yRange=range_y,
+                      padding=0,
+                      )
         # Scatter data
         sca = plot_state["scatter"]
         if sca["enabled"]:

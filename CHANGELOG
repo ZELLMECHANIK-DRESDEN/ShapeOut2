@@ -1,7 +1,9 @@
+2.0.0b9
+ - try to figure out #29
 2.0.0b8
  - feat: automatically set parameters for Young's modulus computation
 2.0.0b7
- - fix: disable close buttons of MDI subwindows on macOS (#29)
+ - fix: try to disable close buttons of MDI subwindows on macOS (#29)
  - fix: allow Shift+click on plot matrix element
  - fix: support temperature key (dclab 0.19.1.post2)
 2.0.0b6

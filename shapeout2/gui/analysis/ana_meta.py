@@ -55,17 +55,21 @@ class MetaPanel(QtWidgets.QWidget):
                 item.deleteLater()
         # populate
         items = sort_config_section_items(section, config[section].items())
-        for key, value in items:
-            k, v, t = format_config_key_value(section, key, value)
-            widget = QtWidgets.QWidget()
-            widget.setToolTip(t)
-            hbox = QtWidgets.QHBoxLayout()
-            hbox.setAlignment(QtCore.Qt.AlignLeft)
-            hbox.setContentsMargins(0, 0, 0, 0)
-            hbox.addWidget(QtWidgets.QLabel(k + ": "))
-            hbox.addWidget(QtWidgets.QLabel(v))
-            widget.setLayout(hbox)
-            group_box.layout().addWidget(widget)
+        if items:
+            for key, value in items:
+                k, v, t = format_config_key_value(section, key, value)
+                widget = QtWidgets.QWidget()
+                widget.setToolTip(t)
+                hbox = QtWidgets.QHBoxLayout()
+                hbox.setAlignment(QtCore.Qt.AlignLeft)
+                hbox.setContentsMargins(0, 0, 0, 0)
+                hbox.addWidget(QtWidgets.QLabel(k + ": "))
+                hbox.addWidget(QtWidgets.QLabel(v))
+                widget.setLayout(hbox)
+                group_box.layout().addWidget(widget)
+            group_box.show()
+        else:
+            group_box.hide()
 
     def update_content(self, event=None, slot_index=None):
         if self.slot_ids:

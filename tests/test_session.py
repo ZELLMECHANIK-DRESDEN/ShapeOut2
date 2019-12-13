@@ -122,12 +122,14 @@ def test_missing_path_in_session():
     else:
         assert False, "should have raised an error!"
     # try again with proper search path
-    session.open_session(spath, search_paths=[pc])
+    pl3 = session.open_session(spath, search_paths=[pc])
+    session.clear_session(pl3)
     # try again with a directory as search path
     other = tempdir / "other"
     other.mkdir()
     pc.rename(other / pp.name)  # must have same name as `pp`
-    session.open_session(spath, search_paths=[other])
+    pl4 = session.open_session(spath, search_paths=[other])
+    session.clear_session(pl4)
     # cleanup
     shutil.rmtree(tempdir, ignore_errors=True)
 

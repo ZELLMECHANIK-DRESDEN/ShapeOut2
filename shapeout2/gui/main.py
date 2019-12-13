@@ -365,9 +365,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.plots_changed.connect(pw.update_content)
             pw.update_content()
             sub.setSystemMenu(None)
-            sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
-                               | ~QtCore.Qt.WindowCloseButtonHint
-                               )
+            sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint)
             sub.setWidget(pw)
             self.mdiArea.addSubWindow(sub)
             self.subwindows_plots[plot_id] = sub
@@ -379,9 +377,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view = analysis.AnalysisView()
         self.subwindows["analysis_view"] = sub
         sub.setSystemMenu(None)
-        sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
-                           | ~QtCore.Qt.WindowCloseButtonHint
-                           )
+        sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint)
+        sub.setWindowFlags(sub.windowFlags()
+                           & ~QtCore.Qt.WindowCloseButtonHint)
         sub.setWidget(self.widget_ana_view)
         sub.hide()
         self.mdiArea.addSubWindow(sub)
@@ -400,7 +398,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.block_matrix.quickviewed.connect(self.on_quickview_show_dataset)
         sub.setSystemMenu(None)
         sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
-                           | ~QtCore.Qt.WindowCloseButtonHint
+                           & ~QtCore.Qt.WindowCloseButtonHint
                            | QtCore.Qt.WindowTitleHint
                            )
         sub.hide()

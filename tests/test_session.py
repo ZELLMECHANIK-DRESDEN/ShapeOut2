@@ -203,7 +203,8 @@ def test_wrong_hash():
     with h5py.File(pp, mode="a") as h5:
         h5.attrs["setup:medium"] = "unknown"
     # opening modified file should just work if the path matches
-    session.open_session(spath)
+    pl2 = session.open_session(spath)
+    session.clear_session(pl2)
     # but when the directory changes, the hash is checked
     other = tempdir / "other"
     other.mkdir()

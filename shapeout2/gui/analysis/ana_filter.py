@@ -265,6 +265,7 @@ class FilterPanel(QtWidgets.QWidget):
         for ii in reversed(range(self.verticalLayout_poly.count())):
             item = self.verticalLayout_poly.itemAt(ii).widget()
             if item is not None:
+                item.hide()
                 item.deleteLater()
         self._polygon_checkboxes = {}  # must come after getting the state
         if dclab.PolygonFilter.instances:

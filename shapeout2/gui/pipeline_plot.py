@@ -168,8 +168,6 @@ class PipelinePlot(QtWidgets.QWidget):
             colorbar_kwds["vmax"] = 1
             colorbar_kwds["label"] = "density [a.u.]"
         elif sca["marker hue"] == "feature":
-            colorbar_kwds["vmin"] = sca["hue min"]
-            colorbar_kwds["vmax"] = sca["hue max"]
             feat = sca["hue feature"]
             label = dclab.dfn.feature_name2label[feat]
             fl_names = slot_states[0]["fl names"]
@@ -179,6 +177,12 @@ class PipelinePlot(QtWidgets.QWidget):
                         label = label.replace(key, fl_names[key])
                         break
             colorbar_kwds["label"] = label
+            if label.endswith("[a.u.]"):
+                colorbar_kwds["vmin"] = 0
+                colorbar_kwds["vmax"] = 1
+            else:
+                colorbar_kwds["vmin"] = sca["hue min"]
+                colorbar_kwds["vmax"] = sca["hue max"]
 
         if colorbar_kwds:
             # add colorbar

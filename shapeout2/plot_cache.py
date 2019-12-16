@@ -58,11 +58,11 @@ def get_scatter_data(rtdc_ds, downsample, xax, yax, xscale, yscale,
             kde_kwargs=kde_kwargs,
             xscale=xscale,
             yscale=yscale)
+        if kde.size and kde.min() != kde.max():
+            kde -= kde.min()
+            kde /= kde.max()
         # save in cache
         cache_data[shash] = x, y, kde, idx
-    if kde.size:
-        kde -= kde.min()
-        kde /= kde.max()
     return x, y, kde, idx
 
 

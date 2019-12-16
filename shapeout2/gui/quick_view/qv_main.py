@@ -25,7 +25,7 @@ class QuickView(QtWidgets.QWidget):
         self.groupBox_image.setStyleSheet(stylesheet)
         self.groupBox_trace.setStyleSheet(stylesheet)
 
-        self.setWindowTitle("Quick View (QV)")
+        self.setWindowTitle("Quick View")
 
         self._set_initial_ui()
 

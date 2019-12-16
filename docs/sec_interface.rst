@@ -54,4 +54,110 @@ your data analysis from Shape-Out 1 to Shape-Out 2:
 
 Basic usage
 ===========
-TODO
+.. image:: scrots/ui_main.png
+    :target: _images/ui_main.png
+    :align: right
+    :scale: 20%
+
+The user interface is split into several parts: the menu bar and the tool
+bar at the top, the Block Matrix on the left, and the Workspace on the right
+(example data taken from :cite:`NawUrb2019`, :cite:`NawUrb2019data`).
+
+
+Menu bar and tool bar
+---------------------
+The menu bar is used for session management (File menu)
+and makes additional functionalities available, such as data statistics,
+data export, plot export, or filter import/export.
+The tool bar contains shortcuts for adding new datasets,
+filters, or plots (left part) and allows to hide/show the
+:ref:`sec_block_matrix` as well as the :ref:`sec_quick_view` and
+:ref:`sec_analysis_view` windows.
+
+
+.. _sec_block_matrix:
+
+Block Matrix
+------------
+.. image:: scrots/ui_block_matrix.png
+    :target: _images/ui_block_matrix.png
+    :align: right
+    :scale: 50%
+
+The Block Matrix on the left gives an overview of the current analysis
+pipeline. Each row represents a dataset. The purple rectangular area
+at the beginning of each row allows you to perform dataset operations
+in your analysis pipeline: To modify a dataset, click on the *modify*
+button. You can duplicate, insert anew (unmodified), or remove datasets
+using the dropdown menu. You can also exclude a dataset from an analysis
+via the check box.
+The columns represent either filters (yellow) or plots (blue) of your
+pipeline. Filters can also be modified, copied, removed and disabled.
+
+By default, all filters are disabled when they are created. To apply a filter
+to a dataset, click on the corresponding matrix element. The element changes
+its color from gray to green to indicate that the filter is active. All
+filters that are applied to a dataset are called a **filter ray**. In the
+above example, the filter ray only consists of a single filter for each
+dataset. Filter rays may be different for each dataset. 
+
+To add a plot, click on the *New Plot* button in the tool bar. This adds
+a plot column with a blue header to the Block Matrix and creates an empty
+plot window. You can add datasets to your plot by clicking on the
+corresponding matrix elements. In the above example, both datasets are
+being used in all three plots. 
+
+The modification of datasets, filters, and plots are discussed below.
+
+
+Workspace
+---------
+The Workspace is designed as an infinite scrollable area and contains all
+plot windows as well as the :ref:`sec_quick_view` and Analysis View windows.
+
+
+.. _sec_analysis_view:
+
+Analysis View
+-------------
+The analysis view is separated into four tabs (see screenshots below).
+
+- The **Meta** tab displays all metadata of the selected dataset that
+  is stored in the original .rtdc file.
+- The **Dataset** tab allows to
+  specify additional metadata, such as unique colors used for plotting and
+  additional metadata for computing the Young's modulus or correcting
+  for fluorescence cross-talk. It also allows to specify fluorescence
+  channel labels that will then be used for labeling the axes of plots.
+- The **Filter** tab is used to modify the filters of the pipeline.
+  New box filters can be added by selecting *Choose box filters...*.
+  Polygon filters are created in the :ref:`sec_quick_view` window.
+- The **Plot** tab allows to specify all plotting parameters. Please
+  take special note of the *Division* option in the *Layout* section (defines
+  the arangement of the subplots) and the *Marker hue* option in the
+  *Scatter plot* section (allows you the specify whether the scatter
+  data points are colored according to a kernel density estimate (KDE),
+  another feature dimension, or the dataset color specified in the
+  *Dataset* tab.
+
+.. image:: scrots/ui_ana_meta.png
+    :target: _images/ui_ana_meta.png
+    :scale: 65%
+
+.. image:: scrots/ui_ana_slot.png
+    :target: _images/ui_ana_slot.png
+    :scale: 65%
+
+.. image:: scrots/ui_ana_filter.png
+    :target: _images/ui_ana_filter.png
+    :scale: 65%
+
+.. image:: scrots/ui_ana_plot.png
+    :target: _images/ui_ana_plot.png
+    :scale: 65%
+
+
+.. _sec_quick_view:
+
+Quick View
+----------

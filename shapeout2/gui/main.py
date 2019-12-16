@@ -142,9 +142,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     def _check_pg_version(self):
         """Tells the user if the pyqtgraph version is not correct"""
-        if pg.__version__ not in ["0.11.0.dev0+g2f1c9fa",  # ZMDD
-                                  "0.11.0.dev0+gb81f6d6",  # paulmueller
-                                  ]:
+        if (not self.settings.get_bool("check pgversion")
+                and  pg.__version__ != "0.11.0.dev0+g1c63ae5"):
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Warning)
             msg.setText("You are using an unexpected version of pyqtgraph. "

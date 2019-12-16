@@ -9,7 +9,8 @@ NAME = "shapeout2.cfg"
 #: default configuration parameters
 DEFAULTS = {
     "developer mode": False,
-    "check update": True,
+    "check pgversion": True,  # check for correct pyqtgraph version
+    "check update": True,  # check for updates
 }
 
 

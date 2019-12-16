@@ -56,6 +56,8 @@ class QuickViewScatterWidget(SimplePlotWidget):
         self.slot = slot
         self.xax = xax
         self.yax = yax
+        self.xscale = xscale
+        self.yscale = yscale
         x, y, kde, idx = plot_cache.get_scatter_data(
             rtdc_ds=self.rtdc_ds,
             downsample=downsample,
@@ -75,24 +77,15 @@ class QuickViewScatterWidget(SimplePlotWidget):
         kde /= kde.max()
         for k in kde:
             brush.append(cmap.mapToQColor(k))
-        # convert to log-scale if applicable
-        if xscale == "log":
-            x = np.log10(x)
-        if yscale == "log":
-            y = np.log10(y)
+        # set viewbox
+        pipeline_plot.set_viewbox(plot=self,
+                                  range_x=(x.min(), x.max()),
+                                  range_y=(y.min(), y.max()),
+                                  scale_x=self.xscale,
+                                  scale_y=self.yscale,
+                                  padding=0.05)
         # set data
-        self.scatter.setData(x=x, y=y, brush=brush)
-        # set log mode
-        self.plotItem.setLogMode(x=xscale == "log",
-                                 y=yscale == "log")
-        # reset range (in case user modified it manually)
-        # (For some reason, we have to do this twice...)
-        self.plotItem.setRange(xRange=(x.min(), x.max()),
-                               yRange=(y.min(), y.max()),
-                               padding=.05)
-        self.plotItem.setRange(xRange=(x.min(), x.max()),
-                               yRange=(y.min(), y.max()),
-                               padding=.05)
+        self.setData(x, y, brush=brush)
         # set axes labels (replace with user-defined flourescence names)
         left = dclab.dfn.feature_name2label[self.yax]
         bottom = dclab.dfn.feature_name2label[self.xax]
@@ -135,6 +128,15 @@ class QuickViewScatterWidget(SimplePlotWidget):
                 raise ValueError("Please set self.poly_line_roi before "
                                  + "setting the click mode!")
         self._view_box.mode = mode
+
+    def setData(self, x, y, **kwargs):
+        # convert to log-scale if applicable
+        if self.xscale == "log":
+            x = np.log10(x)
+        if self.yscale == "log":
+            y = np.log10(y)
+        # set data
+        self.scatter.setData(x=x, y=y, **kwargs)
 
     def setSelection(self, event_index):
         x = self.data_x[event_index]

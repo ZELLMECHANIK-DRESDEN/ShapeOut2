@@ -2,6 +2,7 @@
  - fix: fluorescence label for y axis not updated with custom value
  - fix: fluorescence label of colorbar not updated with custom value 
  - fix: set correct plotting range in log mode
+ - fix: always normalize density for KDE plots
 2.0.0b9
  - try to figure out #29
 2.0.0b8

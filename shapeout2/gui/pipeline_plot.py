@@ -148,7 +148,7 @@ class PipelinePlot(QtWidgets.QWidget):
         if sca["marker hue"] == "kde":
             colorbar_kwds["vmin"] = 0
             colorbar_kwds["vmax"] = 1
-            colorbar_kwds["label"] = "density"
+            colorbar_kwds["label"] = "density [a.u.]"
         elif sca["marker hue"] == "feature":
             colorbar_kwds["vmin"] = sca["hue min"]
             colorbar_kwds["vmax"] = sca["hue max"]
@@ -215,25 +215,12 @@ class PipelinePlotItem(SimplePlotItem):
                                   channel_width=cfg["setup"]["channel width"],
                                   pixel_size=cfg["imaging"]["pixel size"])
             self._plot_elements += els
-        # Set Log scale
-        self.setLogMode(x=gen["scale x"] == "log",
-                        y=gen["scale y"] == "log")
         # Modifications in log mode
-        range_x = np.array(gen["range x"])
-        range_y = np.array(gen["range y"])
-        if gen["scale x"] == "log":
-            if range_x[0] == 0:
-                range_x[0] = 1e-3
-            range_x = np.log10(range_x)
-        if gen["scale y"] == "log":
-            if range_y[0] == 0:
-                range_y[0] = 1e-3
-            range_y = np.log10(range_y)
-        # Set Range
-        self.setRange(xRange=range_x,
-                      yRange=range_y,
-                      padding=0,
-                      )
+        set_viewbox(self,
+                    range_x=gen["range x"],
+                    range_y=gen["range y"],
+                    scale_x=gen["scale x"],
+                    scale_y=gen["scale y"])
         # Scatter data
         sca = plot_state["scatter"]
         if sca["enabled"]:
@@ -395,6 +382,8 @@ def add_scatter(plot_item, plot_state, rtdc_ds, slot_state):
         yscale=gen["scale y"],
         kde_type=kde_type,
     )
+    kde -= kde.min()
+    kde /= kde.max()
     # define colormap
     # TODO:
     # - common code base with QuickView
@@ -457,6 +446,34 @@ def get_axes_labels(plot_state, slot_states):
                 labely = labely.replace(key, fl_names[key])
                 break
     return labelx, labely
+
+
+def set_viewbox(plot, range_x, range_y, scale_x="linear", scale_y="linear",
+                padding=0):
+    # Set Log scale
+    plot.setLogMode(x=scale_x == "log",
+                    y=scale_y == "log")
+    range_x = np.array(range_x)
+    range_y = np.array(range_y)
+    if scale_x == "log":
+        if range_x[0] <= 0:
+            if range_x[1] > 10:
+                range_x[0] = 1e-1
+            else:
+                range_x[0] = 1e-3
+        range_x = np.log10(range_x)
+    if scale_y == "log":
+        if range_y[0] <= 0:
+            if range_y[1] > 10:
+                range_y[0] = 1e-1
+            else:
+                range_y[0] = 1e-3
+        range_y = np.log10(range_y)
+    # Set Range
+    plot.setRange(xRange=range_x,
+                  yRange=range_y,
+                  padding=padding,
+                  )
 
 
 linestyles = {

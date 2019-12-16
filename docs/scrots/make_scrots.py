@@ -26,8 +26,8 @@ mw.reload_pipeline()
 # block matrix
 mw.block_matrix.setFixedSize(425, 350)
 mw.block_matrix.repaint()
-mw.block_matrix.scrollArea_block.grab().save("_block_matrix.png")
 QApplication.processEvents()
+mw.block_matrix.scrollArea_block.grab().save("_block_matrix.png")
 
 # analysis view
 mw.on_modify_slot(mw.pipeline.slot_ids[0])

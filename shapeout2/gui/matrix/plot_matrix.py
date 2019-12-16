@@ -146,14 +146,15 @@ class PlotMatrix(QtWidgets.QWidget):
         ncols = self.num_plots
         nrows = self.data_matrix.num_datasets
         if ncols and nrows:
-            hwidth = self.element_width + 2
+            width1 = self.glo.itemAt(0).widget().width()
+            width = (width1 + 2)*ncols - 2
             height = self.data_matrix.sizeHint().height()
             QtWidgets.QApplication.processEvents()
-            self.setMinimumSize(ncols*hwidth, height)
-            self.setFixedSize(ncols*hwidth, height)
+            self.setMinimumSize(width, height)
+            self.setFixedSize(width, height)
             QtWidgets.QApplication.processEvents()
-            self.setMinimumSize(ncols*hwidth, height)
-            self.setFixedSize(ncols*hwidth, height)
+            self.setMinimumSize(width, height)
+            self.setFixedSize(width, height)
 
     @QtCore.pyqtSlot()
     def changed_element(self):

@@ -4,6 +4,7 @@
  - fix: set correct plotting range in log mode
  - fix: always normalize density for KDE plots
  - fix: plots sometimes loaded in wrong order into session
+ - enh: improve Block Matrix size adjustment
  - enh: pretty-print log scale axes tick labels
    (https://github.com/pyqtgraph/pyqtgraph/pull/1097)
  - enh: add single-color-colormaps for labeling

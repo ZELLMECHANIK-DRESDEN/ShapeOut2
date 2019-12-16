@@ -56,6 +56,11 @@ class Filter(object):
         }
         return copy.deepcopy(state)
 
+    def __repr__(self):
+        repre = "<Pipeline Filter '{}' at {}>".format(self.identifier,
+                                                      hex(id(self)))
+        return repre
+
     def __setstate__(self, state):
         state = copy.deepcopy(state)
         if self.identifier != state["identifier"]:

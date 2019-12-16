@@ -83,7 +83,7 @@ class Pipeline(object):
 
     @property
     def num_plots(self):
-        return len(self.filters)
+        return len(self.plots)
 
     @property
     def num_slots(self):

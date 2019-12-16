@@ -78,6 +78,11 @@ class Dataslot(object):
                  }
         return copy.deepcopy(state)
 
+    def __repr__(self):
+        repre = "<Pipeline Slot '{}' at {}>".format(self.identifier,
+                                                    hex(id(self)))
+        return repre
+
     def __setstate__(self, state):
         if self.identifier != state["identifier"]:
             raise ValueError("Identifier mismatch: '{}' vs. '{}'".format(

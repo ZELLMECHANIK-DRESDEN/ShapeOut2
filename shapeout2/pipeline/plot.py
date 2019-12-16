@@ -133,6 +133,11 @@ class Plot(object):
         state["identifier"] = self.identifier
         return state
 
+    def __repr__(self):
+        repre = "<Pipeline Plot '{}' at {}>".format(self.identifier,
+                                                    hex(id(self)))
+        return repre
+
     def __setstate__(self, state):
         state = copy.deepcopy(state)
         if self.identifier != state["identifier"]:

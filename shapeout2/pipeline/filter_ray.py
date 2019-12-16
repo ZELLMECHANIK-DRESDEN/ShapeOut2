@@ -24,6 +24,11 @@ class FilterRay(object):
         self._slot_hash = "unset"
         self._root_child = None
 
+    def __repr__(self):
+        repre = "<Pipeline Filter Ray '{}' at {}>".format(self.identifier,
+                                                          hex(id(self)))
+        return repre
+
     def _add_step(self, ds, filt):
         """Add a filter step"""
         self.step_hashes.append(filt.hash)

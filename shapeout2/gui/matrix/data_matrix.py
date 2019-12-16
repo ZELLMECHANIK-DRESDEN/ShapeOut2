@@ -217,7 +217,7 @@ class DataMatrix(QtWidgets.QWidget):
         self.fill_elements()
         self.plot_matrix.fill_elements()
         self.adjust_size()
-        self.plot_matrix.adjust_size()
+        self.plot_matrix.adjust_size()  # important when opt/removing slots
         self.setUpdatesEnabled(True)
         self.publish_matrix()
         return md
@@ -232,6 +232,7 @@ class DataMatrix(QtWidgets.QWidget):
         self.glo.addWidget(mf, 0, self.num_filters+1)
         self.fill_elements()
         self.adjust_size()
+        self.plot_matrix.adjust_size()  # important when opt/removing filters
         self.setUpdatesEnabled(True)
         self.publish_matrix()
         return mf

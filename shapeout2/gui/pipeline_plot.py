@@ -14,6 +14,24 @@ from .. import util
 from .widgets import ColorBarWidget, SimplePlotItem
 
 
+# Register custom colormaps
+Gradients["grayblue"] = {'ticks': [(0.0, (100, 100, 100, 255)),
+                                   (1.0, (0, 0, 255, 255))],
+                         'mode': 'rgb'}
+
+Gradients["graygreen"] = {'ticks': [(0.0, (100, 100, 100, 255)),
+                                    (1.0, (0, 180, 0, 255))],
+                          'mode': 'rgb'}
+
+Gradients["grayorange"] = {'ticks': [(0.0, (100, 100, 100, 255)),
+                                     (1.0, (210, 110, 0, 255))],
+                           'mode': 'rgb'}
+
+Gradients["grayred"] = {'ticks': [(0.0, (100, 100, 100, 255)),
+                                  (1.0, (200, 0, 0, 255))],
+                        'mode': 'rgb'}
+
+
 class PipelinePlot(QtWidgets.QWidget):
     """Implements the plotting pipeline using pyqtgraph"""
     instances = {}
@@ -382,8 +400,6 @@ def add_scatter(plot_item, plot_state, rtdc_ds, slot_state):
         yscale=gen["scale y"],
         kde_type=kde_type,
     )
-    kde -= kde.min()
-    kde /= kde.max()
     # define colormap
     # TODO:
     # - common code base with QuickView

@@ -73,8 +73,6 @@ class QuickViewScatterWidget(SimplePlotWidget):
         # define colormap
         brush = []
         cmap = pg.ColorMap(*zip(*Gradients["viridis"]["ticks"]))
-        kde -= kde.min()
-        kde /= kde.max()
         for k in kde:
             brush.append(cmap.mapToQColor(k))
         # set viewbox

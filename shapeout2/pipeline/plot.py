@@ -76,8 +76,8 @@ STATE_OPTIONS = {
         "scale y": ["linear", "log"],
     },
     "scatter": {
-        "colormap": ["flame", "inferno", "magma", "plasma", "thermal",
-                     "viridis"],
+        "colormap": ["bipolar", "grayblue", "graygreen", "grayorange",
+                     "grayred", "inferno", "plasma", "viridis"],
         "downsampling": bool,
         "downsampling value": int,
         "enabled":  bool,

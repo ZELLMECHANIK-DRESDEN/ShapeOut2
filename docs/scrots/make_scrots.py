@@ -52,9 +52,12 @@ QApplication.processEvents()
 mw.widget_ana_view.grab().save("_ui_ana_meta.png")
 
 # plots
-mw.subwindows_plots[mw.pipeline.plot_ids[0]].widget().grab().save("_ui_plot1.png")
-mw.subwindows_plots[mw.pipeline.plot_ids[1]].widget().grab().save("_ui_plot2.png")
-mw.subwindows_plots[mw.pipeline.plot_ids[2]].widget().grab().save("_ui_plot3.png")
+mw.subwindows_plots[mw.pipeline.plot_ids[0]].widget().grab().save(
+    "_ui_plot1.png")
+mw.subwindows_plots[mw.pipeline.plot_ids[1]].widget().grab().save(
+    "_ui_plot2.png")
+mw.subwindows_plots[mw.pipeline.plot_ids[2]].widget().grab().save(
+    "_ui_plot3.png")
 
 # quick view
 me = mw.block_matrix.get_widget(mw.pipeline.slot_ids[1],

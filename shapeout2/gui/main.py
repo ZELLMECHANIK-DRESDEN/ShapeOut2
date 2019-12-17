@@ -232,6 +232,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.adopt_pipeline(pipeline_state)
         # Update QuickView choices
         self.widget_quick_view.update_feature_choices()
+        # update list of polygon filters in Quick View
+        self.widget_quick_view.update_polygon_panel()
         # Show Plot Windows
         # create and show
         for plot_state in pipeline_state["plots"]:

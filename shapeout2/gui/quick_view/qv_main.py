@@ -302,13 +302,7 @@ class QuickView(QtWidgets.QWidget):
         self.lineEdit_poly.setText("Polygon Filter {}".format(
             dclab.PolygonFilter._instance_counter + 1))
         self.checkBox_poly.setChecked(False)
-        if self.widget_scatter.poly_line_roi is None:
-            # add ROI only if there is nothing going on already
-            plr = pg.PolyLineROI([], closed=True)
-            plr.setPen("k")
-            self.widget_scatter.poly_line_roi = plr
-            self.widget_scatter.addItem(plr)
-            self.widget_scatter.set_mouse_click_mode("poly-create")
+        self.widget_scatter.activate_poly_mode()
         # trigger resize and redraw
         mdiwin = self.parent()
         mdiwin.adjustSize()
@@ -324,8 +318,7 @@ class QuickView(QtWidgets.QWidget):
         self.pushButton_poly_cancel.setVisible(False)
         if self.sender() == self.pushButton_poly_save:
             # save the polygon filter
-            plr_state = self.widget_scatter.poly_line_roi.getState()
-            points = [[p.x(), p.y()] for p in plr_state["points"]]
+            points = self.widget_scatter.get_poly_points()
             name = self.lineEdit_poly.text()
             inverted = self.checkBox_poly.isChecked()
             axes = self.widget_scatter.xax, self.widget_scatter.yax
@@ -342,14 +335,14 @@ class QuickView(QtWidgets.QWidget):
                 pf.inverted = inverted
                 pf.points = points
                 mode = "modify"
+        else:
+            mode = "none"
         # remove the PolyLineRoi
-        self.widget_scatter.removeItem(self.widget_scatter.poly_line_roi)
-        self.widget_scatter.poly_line_roi = None
-        self.widget_scatter.set_mouse_click_mode("scatter")
+        self.widget_scatter.activate_scatter_mode()
         self.update_polygon_panel()
         if mode == "create":
             self.polygon_filter_created.emit()
-        else:
+        elif mode == "modify":
             self.polygon_filter_modified.emit()
 
     def on_poly_modify(self):
@@ -373,11 +366,7 @@ class QuickView(QtWidgets.QWidget):
         self.__setstate__(state)
         self.plot()
         # add ROI
-        plr = pg.PolyLineROI(pf.points, closed=True)
-        plr.setPen("k")
-        self.widget_scatter.poly_line_roi = plr
-        self.widget_scatter.addItem(plr)
-        self.widget_scatter.set_mouse_click_mode("poly-modify")
+        self.widget_scatter.activate_poly_mode(pf.points)
 
     def on_tool(self):
         """Show and hide tools when the user selected a tool button"""
@@ -421,6 +410,9 @@ class QuickView(QtWidgets.QWidget):
 
         for b in toblock:
             b.blockSignals(False)
+
+        if not show_poly:
+            self.on_poly_done()
         # set size
         self.update()
         ws = self.sizeHint()

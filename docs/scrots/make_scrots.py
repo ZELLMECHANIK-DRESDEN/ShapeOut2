@@ -6,9 +6,9 @@ Data available at https://doi.org/10.6084/m9.figshare.11302595.v1
 import pathlib
 import sys
 
+import dclab
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication
-
 from shapeout2.gui.main import ShapeOut2
 from shapeout2 import session
 
@@ -55,6 +55,32 @@ mw.widget_ana_view.grab().save("_ui_ana_meta.png")
 mw.subwindows_plots[mw.pipeline.plot_ids[0]].widget().grab().save("_ui_plot1.png")
 mw.subwindows_plots[mw.pipeline.plot_ids[1]].widget().grab().save("_ui_plot2.png")
 mw.subwindows_plots[mw.pipeline.plot_ids[2]].widget().grab().save("_ui_plot3.png")
+
+# quick view
+me = mw.block_matrix.get_widget(mw.pipeline.slot_ids[1],
+                                mw.pipeline.filter_ids[0])
+me.update_content(quickview=True)
+mw.widget_quick_view.toolButton_settings.toggle()
+idx = mw.widget_quick_view.comboBox_x.findData("fl3_max_ctc")
+mw.widget_quick_view.comboBox_x.setCurrentIndex(idx)
+idy = mw.widget_quick_view.comboBox_y.findData("fl2_max_ctc")
+mw.widget_quick_view.comboBox_y.setCurrentIndex(idy)
+mw.widget_quick_view.comboBox_xscale.setCurrentIndex(1)
+mw.widget_quick_view.comboBox_yscale.setCurrentIndex(1)
+QApplication.processEvents()
+mw.widget_quick_view.grab().save("_ui_qv_settings.png")
+mw.widget_quick_view.toolButton_event.toggle()
+mw.widget_quick_view.spinBox_event.setValue(4829)
+QApplication.processEvents()
+mw.widget_quick_view.grab().save("_ui_qv_event.png")
+# manually create a polygon filter with points from the poly file
+mw.widget_quick_view.toolButton_poly.toggle()
+pf = dclab.PolygonFilter(filename="CD66+_CD14-.poly")
+mw.widget_quick_view.pushButton_poly_create.click()
+mw.widget_quick_view.lineEdit_poly.setText("CD66⁺/CD14⁻")
+mw.widget_quick_view.widget_scatter.set_poly_points(pf.points)
+QApplication.processEvents()
+mw.widget_quick_view.grab().save("_ui_qv_poly.png")
 
 # block matrix
 mw.block_matrix.setFixedSize(425, 350)

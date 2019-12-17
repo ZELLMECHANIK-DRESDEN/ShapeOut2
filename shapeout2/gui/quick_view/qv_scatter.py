@@ -44,10 +44,40 @@ class QuickViewScatterWidget(SimplePlotWidget):
         # let view box update self.poly_line_roi
         self._view_box.add_poly_vertex.connect(self.add_poly_vertex)
 
+    def activate_poly_mode(self, points=[]):
+        if self.poly_line_roi is None:
+            self.poly_line_roi = pg.PolyLineROI([], closed=True)
+            self.poly_line_roi.setPen("k")
+        self.addItem(self.poly_line_roi)
+        if len(points):
+            mode = "poly-modify"
+            self.set_poly_points(points)
+        else:
+            mode = "poly-create"
+        self.set_mouse_click_mode(mode)
+        return self.poly_line_roi
+
+    def activate_scatter_mode(self):
+        if self.poly_line_roi is not None:
+            self.removeItem(self.poly_line_roi)
+            self.poly_line_roi = None
+        self.set_mouse_click_mode("scatter")
+
     def add_poly_vertex(self, pos):
         state = self.poly_line_roi.getState()
         state["points"].append([pos.x(), pos.y()])
         self.poly_line_roi.setState(state)
+
+    def get_poly_points(self):
+        if self.poly_line_roi is None:
+            raise ValueError("No polygon selection active!")
+        state = self.poly_line_roi.getState()
+        points = np.array([[p.x(), p.y()] for p in state["points"]])
+        if self.xscale == "log":
+            points[:, 0] = 10**points[:, 0]
+        if self.yscale == "log":
+            points[:, 1] = 10**points[:, 1]
+        return points
 
     def plot_data(self, rtdc_ds, slot, xax="area_um", yax="deform",
                   xscale="linear", yscale="linear",  downsample=False,
@@ -127,6 +157,19 @@ class QuickViewScatterWidget(SimplePlotWidget):
                                  + "setting the click mode!")
         self._view_box.mode = mode
 
+    def set_poly_points(self, points):
+        if self.poly_line_roi is None:
+            raise ValueError("No polygon selection active!")
+        points = np.array(points, copy=True)
+        if points.size:
+            if self.xscale == "log":
+                points[:, 0] = np.log10(points[:, 0])
+            if self.yscale == "log":
+                points[:, 1] = np.log10(points[:, 1])
+            state = self.poly_line_roi.getState()
+            state["points"] = points.tolist()
+            self.poly_line_roi.setState(state)
+
     def setData(self, x, y, **kwargs):
         # convert to log-scale if applicable
         if self.xscale == "log":
@@ -139,13 +182,6 @@ class QuickViewScatterWidget(SimplePlotWidget):
     def setSelection(self, event_index):
         x = self.data_x[event_index]
         y = self.data_y[event_index]
-        # workaround, because ScatterPlotItem does somehow not support
-        # logarithmic scaling. Surprisingly, this works very well when
-        # the log-scaling is changed (data is rescaled).
-        if self.xscale == "log":
-            x = 10**x
-        if self.yscale == "log":
-            y = 10**y
         self.select.setData([x], [y])
 
 

@@ -72,19 +72,19 @@ def test_update_polygon_filter_issue_26(qtbot):
     assert mw.toolButton_quick_view.isChecked()
 
     # Add a polygon filter
+    assert len(dclab.PolygonFilter.instances) == 0
     qv = mw.widget_quick_view
     qtbot.mouseClick(qv.toolButton_poly, QtCore.Qt.LeftButton)
     qtbot.mouseClick(qv.pushButton_poly_create, QtCore.Qt.LeftButton)
     # three positions (not sure how to do this with mouse clicks)
-    roi = qv.widget_scatter.poly_line_roi
     points = [[22, 0.01],
               [30, 0.01],
               [30, 0.014],
               ]
-    roi.setPoints(points)
+    qv.widget_scatter.set_poly_points(points)
     qtbot.mouseClick(qv.pushButton_poly_save, QtCore.Qt.LeftButton)
-    roi = None
     # did that work?
+    assert len(dclab.PolygonFilter.instances) == 1
     pf = dclab.PolygonFilter.instances[0]
     assert np.allclose(pf.points, points)
 
@@ -102,16 +102,17 @@ def test_update_polygon_filter_issue_26(qtbot):
     assert np.sum(ds.filter.all) == 15
 
     # Modify the polygon filter
-    qtbot.mouseClick(qv.toolButton_poly, QtCore.Qt.LeftButton)
     qv.comboBox_poly.setCurrentIndex(1)
-    roi2 = qv.widget_scatter.poly_line_roi
     points2 = [[22, 0.01],
                [30, 0.01],
                [30, 0.012],
                ]
-    roi2.setPoints(points2)
+    qv.widget_scatter.set_poly_points(points2)
     qtbot.mouseClick(qv.pushButton_poly_save, QtCore.Qt.LeftButton)
-    roi2 = None
+    assert len(dclab.PolygonFilter.instances) == 1
+    pf2 = dclab.PolygonFilter.instances[0]
+    assert np.allclose(pf2.points, points2)
+    assert pf is pf2
     # now the filter should be updated (this worked already)
     ds2 = mw.pipeline.get_dataset(slot_index=0, filt_index=0,
                                   apply_filter=True)

@@ -10,7 +10,7 @@ name = 'shapeout2'
 year = "2019"
 
 sys.path.insert(0, realpath(dirname(__file__))+"/"+name)
-from _version import version
+from _version import version  # noqa: E402
 
 setup(
     name=name,
@@ -31,18 +31,15 @@ setup(
                       "numpy>=1.9.0",
                       "pyqt5",
                       "pyqtgraph>=0.10.0",
-                      # using this will make it impossible to upload to PyPI:
-                      #"pyqtgraph @ git+https://github.com/pyqtgraph/pyqtgraph.git@1ec175385e31c4e1e8dbe829b4387e4ac560082c",
                       "scipy>=0.13.0"],
     python_requires='>=3.6, <4',
     setup_requires=['pytest-runner'],
     tests_require=["pytest", "pytest-qt"],
-    entry_points={"gui_scripts" : ['shapeout2 = shapeout2.__main__:main']},
+    entry_points={"gui_scripts": ['shapeout2 = shapeout2.__main__:main']},
     keywords=["RT-DC", "deformability", "cytometry", "zellmechanik"],
-    classifiers= ['Operating System :: OS Independent',
-                  'Programming Language :: Python :: 3',
-                  'Intended Audience :: Science/Research',
-                  ],
+    classifiers=['Operating System :: OS Independent',
+                 'Programming Language :: Python :: 3',
+                 'Intended Audience :: Science/Research',
+                 ],
     platforms=['ALL']
     )
-

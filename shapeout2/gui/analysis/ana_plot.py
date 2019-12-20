@@ -47,8 +47,10 @@ class PlotPanel(QtWidgets.QWidget):
             self.on_hue_selected)
         self.comboBox_marker_feature.currentIndexChanged.connect(
             self.on_hue_selected)
-        self.comboBox_axis_x.currentIndexChanged.connect(self.on_axis_selected)
-        self.comboBox_axis_y.currentIndexChanged.connect(self.on_axis_selected)
+        self.comboBox_axis_x.currentIndexChanged.connect(self.on_axis_changed)
+        self.comboBox_axis_y.currentIndexChanged.connect(self.on_axis_changed)
+        self.comboBox_scale_x.currentIndexChanged.connect(self.on_axis_changed)
+        self.comboBox_scale_y.currentIndexChanged.connect(self.on_axis_changed)
         self.spinBox_column_count.valueChanged.connect(
             self.on_column_num_changed)
         self.widget_range_x.range_changed.connect(self.on_range_changed)
@@ -196,19 +198,8 @@ class PlotPanel(QtWidgets.QWidget):
         self.comboBox_ls_1.setCurrentIndex(ls1_index)
         ls2_index = self.comboBox_ls_2.findData(con["line styles"][1])
         self.comboBox_ls_2.setCurrentIndex(ls2_index)
-        for control, spacing in zip([self.doubleSpinBox_spacing_x,
-                                     self.doubleSpinBox_spacing_y],
-                                    [con["spacing x"],
-                                     con["spacing y"]]):
-            if spacing >= 1:
-                dec = 2
-            else:
-                dec = -np.int(np.log10(spacing)) + 3
-            control.setDecimals(dec)
-            control.setMinimum(10**-dec)
-            control.setSingleStep(10**-dec)
-            control.setValue(spacing)
-
+        self._set_contour_spacing(spacing_x=con["spacing x"],
+                                  spacing_y=con["spacing y"])
         for b in toblock:
             b.blockSignals(False)
 
@@ -310,29 +301,67 @@ class PlotPanel(QtWidgets.QWidget):
                                      "end": rang[1],
                                      })
 
-    def _set_contour_spacing(self, axis_x=None, axis_y=None):
+    def _set_contour_spacing(self, spacing_x=None, spacing_y=None):
+        """Set the contour spacing in the spin boxes
+
+        - sets spinbox limits first
+        - sets number of digits
+        - sets step
+        - sets value in the end
+        """
+        for spacing, spinBox in zip([spacing_x, spacing_y],
+                                    [self.doubleSpinBox_spacing_x,
+                                     self.doubleSpinBox_spacing_y]):
+            if spacing is None:
+                continue
+            else:
+                if spacing >= 1:
+                    dec = 2
+                else:
+                    dec = -np.int(np.log10(spacing)) + 3
+                spinBox.setDecimals(dec)
+                spinBox.setMinimum(10**-dec)
+                spinBox.setMaximum(max(10*spacing, 10))
+                spinBox.setSingleStep(10**(-dec + 1))
+                spinBox.setValue(spacing)
+
+    def _set_contour_spacing_auto(self, axis_x=None, axis_y=None):
+        """automatically set the contour spacing
+
+        - uses :func:`dclab.kde_methods.bin_width_percentile`
+        - uses _set_contour_spacing
+        """
         if len(self.pipeline.slots) == 0:
             self.setEnabled(False)
             # do nothing
             return
         else:
             self.setEnabled(True)
-        for axis, doubleSpinBox in zip([axis_x, axis_y],
-                                       [self.doubleSpinBox_spacing_x,
-                                        self.doubleSpinBox_spacing_y]):
+        spacings_xy = []
+        for axis, scaleCombo in zip([axis_x, axis_y],
+                                    [self.comboBox_scale_x,
+                                     self.comboBox_scale_y]):
             if axis is None:
                 # nothing to do
-                continue
+                spacings_xy.append(None)
             else:
                 # determine good approximation
                 dslist, _ = self.pipeline.get_plot_datasets(
                     self.current_plot.identifier)
                 spacings = []
                 for ds in dslist:
-                    spa = dclab.kde_methods.bin_width_percentile(ds[axis])
+                    spa = ds.get_kde_spacing(
+                        a=ds[axis],
+                        feat=axis,
+                        scale=scaleCombo.currentData(),
+                        method=dclab.kde_methods.bin_width_percentile,
+                    )
                     spacings.append(spa)
-                if spacings:
-                    doubleSpinBox.setValue(np.min(spacings))
+                spacings_xy.append(np.min(spacings))
+        spacing_x, spacing_y = spacings_xy
+        # sets the limits before setting the value
+        self._set_contour_spacing(spacing_x=spacing_x,
+                                  spacing_y=spacing_y)
 
     @property
     def current_plot(self):
@@ -366,14 +395,18 @@ class PlotPanel(QtWidgets.QWidget):
             ids = []
         return ids
 
-    def on_axis_selected(self):
+    def on_axis_changed(self):
         gen = self.__getstate__()["general"]
         if self.sender() == self.comboBox_axis_x:
             self._set_range_xy_state(axis_x=gen["axis x"])
-            self._set_contour_spacing(axis_x=gen["axis x"])
+            self._set_contour_spacing_auto(axis_x=gen["axis x"])
         elif self.sender() == self.comboBox_axis_y:
             self._set_range_xy_state(axis_y=gen["axis y"])
-            self._set_contour_spacing(axis_y=gen["axis y"])
+            self._set_contour_spacing_auto(axis_y=gen["axis y"])
+        elif self.sender() == self.comboBox_scale_x:
+            self._set_contour_spacing_auto(axis_x=gen["axis x"])
+        elif self.sender() == self.comboBox_scale_y:
+            self._set_contour_spacing_auto(axis_y=gen["axis y"])
 
     def on_column_num_changed(self):
         """The user changed the number of columns
@@ -498,11 +531,6 @@ class PlotPanel(QtWidgets.QWidget):
             plot = Plot.get_plot(identifier=self.plot_ids[plot_index])
             state = plot.__getstate__()
             self.__setstate__(state)
-            # set default contour spacings
-            gen = state["general"]
-            self._set_contour_spacing(axis_x=gen["axis x"],
-                                      axis_y=gen["axis y"])
-
         else:
             self.setEnabled(False)
 

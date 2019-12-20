@@ -1,5 +1,6 @@
 import copy
 import pkg_resources
+import warnings
 
 import dclab
 from dclab import kde_contours
@@ -30,6 +31,10 @@ Gradients["grayorange"] = {'ticks': [(0.0, (100, 100, 100, 255)),
 Gradients["grayred"] = {'ticks': [(0.0, (100, 100, 100, 255)),
                                   (1.0, (200, 0, 0, 255))],
                         'mode': 'rgb'}
+
+
+class ContourSpacingTooLarge(UserWarning):
+    pass
 
 
 class PipelinePlot(QtWidgets.QWidget):
@@ -316,6 +321,10 @@ def add_contour(plot_item, plot_state, rtdc_ds, slot_state, legend=None):
     except ValueError:
         # most-likely there is nothing to compute a contour for
         return []
+    if density.shape[0] < 3 or density.shape[1] < 3:
+        warnings.warn("Contour not possible; spacing may be too large!",
+                      ContourSpacingTooLarge)
+        return []
     plev = kde_contours.get_quantile_levels(
         density=density,
         x=x,
@@ -326,8 +335,12 @@ def add_contour(plot_item, plot_state, rtdc_ds, slot_state, legend=None):
         normalize=True)
     contours = []
     for level in plev:
-        cc = kde_contours.find_contours_level(density, x=x, y=y, level=level)
-        contours.append(cc)
+        # make sure that the contour levels are not at the boundaries
+        if not (np.allclose(level, 0, atol=1e-12, rtol=0)
+                or np.allclose(level, 1, atol=1e-12, rtol=0)):
+            cc = kde_contours.find_contours_level(
+                density, x=x, y=y, level=level)
+            contours.append(cc)
 
     elements = []
     for ii in range(len(contours)):

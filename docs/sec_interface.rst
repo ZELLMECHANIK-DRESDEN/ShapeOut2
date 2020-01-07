@@ -84,22 +84,28 @@ Block Matrix
     :align: right
     :scale: 65%
 
-The Block Matrix on the left gives an overview of the current analysis
-pipeline. Each row represents a dataset. The purple rectangular area
-at the beginning of each row allows you to perform dataset operations
-in your analysis pipeline: To modify a dataset, click on the *modify*
+The Block Matrix gives an overview of the current analysis
+pipeline. Each row represents a dataset (purple). The columns represent
+either filters (yellow) or plots (blue) of your pipeline.
+
+You can perform dataset operations in the purple rectangular area
+at the beginning of each row: To modify a dataset, click on the *modify*
 button. You can duplicate, insert anew (unmodified), or remove datasets
 using the dropdown menu. You can also exclude a dataset from an analysis
 via the check box.
 
-The columns represent either filters (yellow) or plots (blue) of your
-pipeline. Filters can also be modified, copied, removed and disabled.
+Filters can also be modified, copied, removed and disabled.
 By default, all filters are disabled when they are created. To apply a filter
 to a dataset, click on the corresponding matrix element. The element changes
-its color from gray to green to indicate that the filter is active. In
-Shape-Out, all filters that are applied to a dataset are called a **filter ray**.
+its color from gray (incactive) to green (active). In Shape-Out, all
+filters that are applied to a dataset are called a **filter ray**.
 In the above example, the filter ray only consists of a single filter for each
 dataset. Filter rays may be different for each dataset. 
+
+By holding down the *Shift* key while clicking on a matrix element, you
+can activate the :ref:`Quick View <sec_quick_view>` for the specific
+dataset (with filters applied up until the selected column). The block matrix
+element is then colored pink.
 
 To add a plot, click on the *New Plot* button in the tool bar. This adds
 a plot column with a blue header to the Block Matrix and creates an empty
@@ -138,7 +144,7 @@ The analysis view is separated into four tabs (see screenshots below).
   *Scatter plot* section (allows you the specify whether the scatter
   data points are colored according to a kernel density estimate (KDE),
   another feature dimension, or the dataset color specified in the
-  *Dataset* tab. In this example, contour plots are not used.
+  *Dataset* tab). In this example, contour plots are not used.
 
 .. image:: scrots/ui_ana_meta.png
     :target: _images/ui_ana_meta.png
@@ -161,16 +167,32 @@ The analysis view is separated into four tabs (see screenshots below).
 
 Quick View
 ----------
+The Quick View is meant for dataset exploration. It consists of a scatter plot
+on the left and a set of tool panels that are accessible via the corresponding
+tool buttons on the right.
+
+
+Use the **Plot** panel to define all plot parameters. It also displays
+common statistics of the two features plotted.
 
 .. image:: scrots/ui_qv_settings.png
     :target: _images/ui_qv_settings.png
     :scale: 65%
 
+The **Event** panel displays all parameters of an individual event. You can
+select single events by clicking in the scatter plot or by scrolling through
+*Index* spin control. If available, the event image is shown alongside the
+fluorescence trace of the event. All features of the event are listed in a
+separate tab.
+
 .. image:: scrots/ui_qv_event.png
     :target: _images/ui_qv_event.png
     :scale: 65%
 
+The **Polygon Filter** panel allows you to create and modify polygon filters.
+When the panel is active you can move the mouse pointer across the scatter
+plot and the image of the event closest to the mouse pointer is displayed.
+
 .. image:: scrots/ui_qv_poly.png
     :target: _images/ui_qv_poly.png
     :scale: 65%
-        

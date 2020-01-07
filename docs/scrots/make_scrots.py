@@ -82,6 +82,12 @@ pf = dclab.PolygonFilter(filename="CD66+_CD14-.poly")
 mw.widget_quick_view.pushButton_poly_create.click()
 mw.widget_quick_view.lineEdit_poly.setText("CD66⁺/CD14⁻")
 mw.widget_quick_view.widget_scatter.set_poly_points(pf.points)
+# show an even
+cellimg, imkw = mw.widget_quick_view.get_event_image(
+    mw.widget_quick_view.rtdc_ds,
+    42)
+mw.widget_quick_view.imageView_image_poly.setImage(cellimg, **imkw)
+mw.widget_quick_view.imageView_image_poly.show()
 QApplication.processEvents()
 mw.widget_quick_view.grab().save("_ui_qv_poly.png")
 

@@ -7,6 +7,7 @@ from PyQt5 import uic, QtCore, QtWidgets
 import pyqtgraph as pg
 from scipy.ndimage import binary_erosion
 
+from ..compute.comp_stats import STAT_METHODS
 from .. import idiom
 
 
@@ -599,7 +600,8 @@ class QuickView(QtWidgets.QWidget):
             features = [self.comboBox_x.currentData(),
                         self.comboBox_y.currentData()]
             h, v = dclab.statistics.get_statistics(ds=self.rtdc_ds,
-                                                   features=features)
+                                                   features=features,
+                                                   methods=STAT_METHODS)
             self.tableWidget_stat.set_key_vals(keys=h, vals=v)
 
     def update_feature_choices(self):

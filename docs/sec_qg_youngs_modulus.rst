@@ -7,6 +7,9 @@ With Shape-Out, it is possible to translate the measured area and deformation
 to the Young's modulus based on numerical simulation for
 fully elastic spheres according to Mokbel et al. :cite:`Mokbel2017`.
 
+Usage
+-----
+
 .. _qg_emodulus_config:
 .. figure:: scrots/qg_emodulus_config.png
     :target: _images/qg_emodulus_config.png

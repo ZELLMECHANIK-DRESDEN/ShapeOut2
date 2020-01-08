@@ -89,6 +89,9 @@ class QuickView(QtWidgets.QWidget):
                 w.stateChanged.connect(self.plot)
             elif hasattr(w, "valueChanged"):
                 w.valueChanged.connect(self.plot)
+        # copy statistics to clipboard
+        self.toolButton_stats2clipboard.clicked.connect(
+            self.on_stats2clipboard)
 
         # Set individual plots
         kw0 = dict(x=np.arange(10), y=np.arange(10))
@@ -239,6 +242,17 @@ class QuickView(QtWidgets.QWidget):
                 cellimg = cellimg[idminx:idmaxx, idminy:idmaxy]
         return cellimg, imkw
 
+    def get_statistics(self):
+        if self.rtdc_ds is not None:
+            features = [self.comboBox_x.currentData(),
+                        self.comboBox_y.currentData()]
+            h, v = dclab.statistics.get_statistics(ds=self.rtdc_ds,
+                                                   features=features,
+                                                   methods=STAT_METHODS)
+            return h, v
+        else:
+            return None, None
+
     def on_event_scatter_clicked(self, plot, point):
         """User clicked on scatter plot
 
@@ -368,6 +382,16 @@ class QuickView(QtWidgets.QWidget):
         self.plot()
         # add ROI
         self.widget_scatter.activate_poly_mode(pf.points)
+
+    def on_stats2clipboard(self):
+        """Copy the statistics as tsv data to the clipboard"""
+        h, v = self.get_statistics()
+        if h is not None:
+            # assemble tsv data
+            tsv = ""
+            for hi, vi in zip(h, v):
+                tsv += "{}\t{:.7g}\n".format(hi, vi)
+            QtWidgets.qApp.clipboard().setText(tsv)
 
     def on_tool(self):
         """Show and hide tools when the user selected a tool button"""
@@ -596,12 +620,8 @@ class QuickView(QtWidgets.QWidget):
         self.on_tool()
 
     def show_statistics(self):
-        if self.rtdc_ds is not None:
-            features = [self.comboBox_x.currentData(),
-                        self.comboBox_y.currentData()]
-            h, v = dclab.statistics.get_statistics(ds=self.rtdc_ds,
-                                                   features=features,
-                                                   methods=STAT_METHODS)
+        h, v = self.get_statistics()
+        if h is not None:
             self.tableWidget_stat.set_key_vals(keys=h, vals=v)
 
     def update_feature_choices(self):

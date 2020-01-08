@@ -1,9 +1,8 @@
-import numbers
 import pathlib
 import pkg_resources
 
 import numpy as np
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 
 class KeyValueTableWidget(QtWidgets.QTableWidget):
@@ -17,6 +16,7 @@ class KeyValueTableWidget(QtWidgets.QTableWidget):
         self.horizontalHeader().hide()
         self.verticalHeader().hide()
         self.setAlternatingRowColors(True)
+        self.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         # For some reason this does not work here.
         # self.setColumnCount(2)
         # header = self.horizontalHeader()
@@ -40,10 +40,11 @@ class KeyValueTableWidget(QtWidgets.QTableWidget):
                 name_vis = hi[:max_key_len-3] + "..."
             # pad with spaces (b/c css padding caused overlap)
             name_vis = " " + name_vis + " "
-            label_name = self.cellWidget(ii, 0)
+            label_name = self.item(ii, 0)
             if label_name is None:
-                label_name = QtWidgets.QLabel(name_vis)
-                self.setCellWidget(ii, 0, label_name)
+                label_name = QtWidgets.QTableWidgetItem(name_vis)
+                label_name.setFlags(QtCore.Qt.ItemIsEnabled)
+                self.setItem(ii, 0, label_name)
             else:
                 if label_name.text() != name_vis:
                     label_name.setText(name_vis)
@@ -51,20 +52,14 @@ class KeyValueTableWidget(QtWidgets.QTableWidget):
             # value
             if np.isnan(vi) or np.isinf(vi):
                 fmt = "{}"
-            elif isinstance(vi, numbers.Integral):
-                fmt = "{}"
-            elif vi == 0:
-                fmt = "{:.1f}"
             else:
-                dec = -int(np.ceil(np.log(np.abs(vi)))) + 3
-                if dec <= 0:
-                    dec = 1
-                fmt = "{:." + "{}".format(dec) + "f}"
+                fmt = "{:.7g}"
             value_vis = fmt.format(vi)
-            label_value = self.cellWidget(ii, 1)
+            label_value = self.item(ii, 1)
             if label_value is None:
-                label_value = QtWidgets.QLabel(value_vis)
-                self.setCellWidget(ii, 1, label_value)
+                label_value = QtWidgets.QTableWidgetItem(value_vis)
+                label_value.setFlags(QtCore.Qt.ItemIsEnabled)
+                self.setItem(ii, 1, label_value)
             else:
                 label_value.setText(value_vis)
             label_value.setToolTip(hi)

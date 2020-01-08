@@ -20,6 +20,7 @@ from . import export
 from . import pipeline_plot
 from . import quick_view
 from . import update
+from . import widgets
 
 from .. import pipeline
 from .. import session
@@ -359,15 +360,12 @@ class ShapeOut2(QtWidgets.QMainWindow):
             sub = self.subwindows_plots[plot_id]
         else:
             # create subwindow
-            sub = QtWidgets.QMdiSubWindow(self)
+            sub = widgets.MDISubWindowWOButtons(self)
             pw = pipeline_plot.PipelinePlot(parent=sub,
                                             pipeline=self.pipeline,
                                             plot_id=plot_id)
             self.plots_changed.connect(pw.update_content)
             pw.update_content()
-            sub.setSystemMenu(None)
-            sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
-                               | QtCore.Qt.WindowTitleHint)
             sub.setWidget(pw)
             self.mdiArea.addSubWindow(sub)
             self.subwindows_plots[plot_id] = sub
@@ -375,12 +373,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         sub.show()
 
     def init_analysis_view(self):
-        sub = QtWidgets.QMdiSubWindow(self)
+        sub = widgets.MDISubWindowWOButtons(self)
         self.widget_ana_view = analysis.AnalysisView()
         self.subwindows["analysis_view"] = sub
-        sub.setSystemMenu(None)
-        sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
-                           | QtCore.Qt.WindowTitleHint)
         sub.setWidget(self.widget_ana_view)
         sub.hide()
         self.mdiArea.addSubWindow(sub)
@@ -390,16 +385,13 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.on_quickview_refresh)
 
     def init_quick_view(self):
-        sub = QtWidgets.QMdiSubWindow(self)
+        sub = widgets.MDISubWindowWOButtons(self)
         self.widget_quick_view = quick_view.QuickView()
         sub.setWidget(self.widget_quick_view)
         self.toolButton_quick_view.clicked.connect(self.on_quickview)
         self.subwindows["quick_view"] = sub
         # signals
         self.block_matrix.quickviewed.connect(self.on_quickview_show_dataset)
-        sub.setSystemMenu(None)
-        sub.setWindowFlags(QtCore.Qt.CustomizeWindowHint
-                           | QtCore.Qt.WindowTitleHint)
         sub.hide()
         self.mdiArea.addSubWindow(sub)
 

@@ -38,8 +38,6 @@ acquisition and are stored alongside the raw image data.
 Here, only the most important features are discussed. A full list of the
 features available in Shape-Out is maintained in the
 :ref:`dclab documentation <dclab:sec_features>`.
-Please note that some of the features are only available in
-:ref:`expert mode <ui_expert>`.
 
 
 Area and porosity

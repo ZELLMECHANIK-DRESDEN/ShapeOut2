@@ -1,43 +1,41 @@
 .. _sec_qg_batch_stats:
 
 
-==============================
-Batch-mode statistical summary
-==============================
+==================
+Compute statistics
+==================
 
-.. warning:: This section is outdated.
+The :ref:`Quick View window <sec_quick_view>` quantifies the statistics for
+the features shown there. If you need access to statistics for more features of
+a dataset or if you need to quantify the statistics for multiple datasets
+on disk, you can use the *Statistics* tool available via the *Compute* menu. 
 
-.. image:: scrots/qg_batch_statistics.png
-    :target: _images/qg_batch_statistics.png
+.. _qg_statistics_init:
+.. figure:: scrots/qg_statistics_init.png
+    :target: _images/qg_statistics_init.png
     :align: right
-    :scale: 50%
 
-The Statistical information of the current analysis is displayed in the
-:ref:`Statistics configuration tab <sec_ui_cfg_statistics>` and can also
-be exported via the `Export Data` menu.
+    Statistics export of current session
 
-With the statistical summary tool (accessible via the menu
-*Batch* → *Statistical summary*), you may compute the statistics
-for multiple measurements on disk, without loading them into an
-analysis session in Shape-Out:
+There are two modes of operation. The first mode exports statistical data
+from the current session (:numref:`qg_statistics_init`).
+Statistics are always computed after the filter
+ray has been applied. You may select the features in the table on the
+left and the desired statistics in the table on the right.
 
-1. Select the filter settings to use. At the time of this writing,
-   only the filter settings of a measurement in the current session can be used.
+.. _qg_statistics_folder:
+.. figure:: scrots/qg_statistics_folder.png
+    :target: _images/qg_statistics_folder.png
+    :align: right
 
-2. Click *Browse* to select an input folder that contains RT-DC measurement
-   data. This folder will be recursively searched for measurements (\*.tdms
-   and \*.rtdc files). The number of measurements found is then shown in
-   the dropdown box below.
+    Statistics export for other data
 
-3. If applicable, select the flow rate and the chip region for which you
-   need the statistics summary.
+The second mode computes statistics for .rtdc data on disk
+(:numref:`qg_statistics_folder`).
+Select the *All datasets in a directory* option and (optionally) a filter ray
+from the current session that you would like to apply before computing the
+statistics.
 
-4. Select the features for which to compute the statistics and the
-   statistical parameters to extract.
-
-5. Click *Browse* at the bottom to select the output file and click on
-   *Assemble statistical summary* to start the computation.
-
-Note that depending on the number of measurements and on the data type
-(\*.rtdc data is loaded faster than \*.tdms data), the computation may
-take some time.
+Note that statistics may not be available for all selected features in all
+datasets. In such a case, statistics are exported as *nan* values in the
+resulting .tsv file.

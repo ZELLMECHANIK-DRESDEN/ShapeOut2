@@ -28,7 +28,7 @@ left and the desired statistics in the table on the right.
     :target: _images/qg_statistics_folder.png
     :align: right
 
-    Statistics export for other data
+    Compute statistics for other data
 
 The second mode computes statistics for .rtdc data on disk
 (:numref:`qg_statistics_folder`).

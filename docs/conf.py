@@ -55,10 +55,14 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.napoleon',
               'sphinxcontrib.bibtex',
               'matplotlib.sphinxext.plot_directive',
+             # 'numfig',
               'fancy_include',
               'github_changelog',
               'rtd_pdf',
               ]
+
+# enable enumeration of figures
+numfig = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

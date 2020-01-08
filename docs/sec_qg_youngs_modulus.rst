@@ -1,34 +1,73 @@
 .. _sec_qg_youngs_modulus:
 
-
 ===============
 Young's Modulus
 ===============
-
-.. warning:: This section is outdated.
-
-With Shape-Out, it is possible to convert deformation values to values
-of the Young's modulus based on numerical simulation for
+With Shape-Out, it is possible to translate the measured area and deformation
+to the Young's modulus based on numerical simulation for
 fully elastic spheres according to Mokbel et al. :cite:`Mokbel2017`.
 
-
-.. image:: scrots/qg_youngs_modulus_controls.png
-    :target: _images/qg_youngs_modulus_controls.png
+.. _qg_emodulus_config:
+.. figure:: scrots/qg_emodulus_config.png
+    :target: _images/qg_emodulus_config.png
     :align: right
 
+    Temperature taken from the meta data.
 
-The "Calculate" tab  allows you to obtain
-the Young's modulus for the samples in the current analysis.
-After choosing the type of measurement medium you must set the
-right temperature or – in case you choose "Other" – the correct
-viscosity. For CellCarrier media, the correct viscosity is
-automatically calculated, taking shear-thinning
-into account as discussed in :cite:`Herold2017`.
+.. _qg_emodulus_feature:
+.. figure:: scrots/qg_emodulus_feature.png
+    :target: _images/qg_emodulus_feature.png
+    :align: right
 
-Once "Compute elastic modulus" is clicked, the Young's modulus will become
-available for plotting and data analysis.
+    Use the temperature (temp) feature.
 
-**Validity**:
+The parameters for computing the Young's modulus can be set in the
+*Dataset* tab of the :ref:`Analysis View <sec_analysis_view>`.
+The Young's modulus is computed using a precomputed look-up table and
+additionally depends on channel width, flow rate, pixel size (pixelation
+correction), and viscosity. For known media, such as CellCarrier, the
+viscosity can be derived from channel width, flow rate, and temperature.
+In some RT-DC setups, the chip temperature is recorded during the measurement.
+For instance, in :numref:`qg_emodulus_config`, the average chip temperature
+of 22.5°C from the [setup] meta data section is used. The value of the
+resulting viscosity is shown below.
+If the chip temperature is recorded for each event, then the user may select
+the *From feature* option (:numref:`qg_emodulus_feature`). In this case,
+the Young's modulus is computed from the individual viscosities for each event. 
+
+
+.. _qg_emodulus_badtemp:
+.. figure:: scrots/qg_emodulus_badtemp.png
+    :target: _images/qg_emodulus_badtemp.png
+    :align: right
+
+    Temperature outside of known range.
+
+If the temperature is not given as a feature or as meta data, then
+you may select the temperature manually. This case is visualized in
+:numref:`qg_emodulus_badtemp`. Here, the temperature is purposely set outside of
+the known range defined in :cite:`Herold2017`, which is highlighted by
+coloring the viscosity red.
+
+.. _qg_emodulus_other:
+.. figure:: scrots/qg_emodulus_other.png
+    :target: _images/qg_emodulus_other.png
+    :align: right
+
+    Manually set the viscosity.
+
+You may also set the viscosity manually by selecting *other* as a medium
+(:numref:`qg_emodulus_other`).
+In this case, the values for temperature are irrelevant. Please only use
+this option if you know what you are doing (e.g. you have considered
+shear-thinning :cite:`Herold2017`).
+
+Click *Apply* for any changes to take effect. The Young's modulus is then
+available for the selected dataset.
+
+
+Validity
+--------
 
 The computation of the Young's modulus is valid only for objects that
 initially have a spherical shape. In addition, the deformation and
@@ -72,3 +111,12 @@ and flow rates are shown:
 
 .. figure:: figures/qg_youngs_modulus_40um.png
     :target: images/qg_youngs_modulus_40um.png
+
+
+Implementation
+--------------
+As described above, the Young's modulus can be derived in multiple ways,
+for known media and global or event-based temperature values.
+The underlying implementation is described in the :ref:`dclab docs
+<dclab:sec_av_emodulus>`.
+

@@ -151,7 +151,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="groupBox_2">
+      <widget class="QGroupBox" name="groupBox_emod">
        <property name="toolTip">
         <string>These values are used to compute the Young's modulus.</string>
        </property>

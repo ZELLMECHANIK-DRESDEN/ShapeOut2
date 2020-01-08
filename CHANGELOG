@@ -4,6 +4,8 @@
  - fix: polygon filters were not stored correctly in log mode
  - fix: several issues related to contour plots, contour spacing,
    and log-scales
+ - enh+docs: make Young's modulus computation more user convenient and
+   update the section in the docs
 2.0.0b10
  - fix: fluorescence label for y axis not updated with custom value
  - fix: fluorescence label of colorbar not updated with custom value 

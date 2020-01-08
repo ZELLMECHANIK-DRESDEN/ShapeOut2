@@ -57,7 +57,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="tab_slot">
       <attribute name="title">
        <string>Dataset</string>
       </attribute>

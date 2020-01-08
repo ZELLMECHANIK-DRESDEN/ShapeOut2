@@ -1,5 +1,6 @@
 import copy
 import pkg_resources
+import warnings
 
 import dclab
 import numpy as np
@@ -64,6 +65,7 @@ class SlotPanel(QtWidgets.QWidget):
             "emodulus": {
                 "emodulus model": "elastic sphere",
                 "emodulus medium": self.comboBox_medium.currentData(),
+                "emodulus scenario": self.comboBox_temp.currentData(),
                 "emodulus temperature": emod_temp,
                 "emodulus viscosity": emod_visc,
             }
@@ -90,23 +92,15 @@ class SlotPanel(QtWidgets.QWidget):
         self.doubleSpinBox_ct31.setValue(crosstalk["crosstalk fl31"])
         self.doubleSpinBox_ct32.setValue(crosstalk["crosstalk fl32"])
         # emodulus
-        # https://dclab.readthedocs.io/en/latest/sec_av_emodulus.html
         emodulus = state["emodulus"]
-        idx = self.comboBox_medium.findData(emodulus["emodulus medium"])
-        self.comboBox_medium.setCurrentIndex(idx)
-        temperature = emodulus["emodulus temperature"]
-        viscosity = emodulus["emodulus viscosity"]
-        ds = self.get_dataset()
-        if np.isnan(temperature):
-            if "temp" in ds:
-                # feature
-                index = self.comboBox_temp.findData("feature")
-            else:
-                # manual
-                index = self.comboBox_temp.findData("manual")
-            self.comboBox_temp.setCurrentIndex(index)
-        self.doubleSpinBox_temp.setValue(temperature)
-        self.doubleSpinBox_visc.setValue(viscosity)
+        idx_med = self.comboBox_medium.findData(emodulus["emodulus medium"])
+        self.comboBox_medium.setCurrentIndex(idx_med)
+        self._init_emodulus_temp_choices()
+        self.doubleSpinBox_temp.setValue(emodulus["emodulus temperature"])
+        self.doubleSpinBox_visc.setValue(emodulus["emodulus viscosity"])
+        # https://dclab.readthedocs.io/en/latest/sec_av_emodulus.html
+        idx_scen = self.comboBox_temp.findData(emodulus["emodulus scenario"])
+        self.comboBox_temp.setCurrentIndex(idx_scen)
 
         # Fluorescence data visibility
         features = meta_tool.get_rtdc_features(state["path"])
@@ -147,12 +141,28 @@ class SlotPanel(QtWidgets.QWidget):
         self.comboBox_medium.addItem("other", "other")
         self.comboBox_medium.addItem("not defined", "undefined")
         self.comboBox_medium.currentIndexChanged.connect(self.on_medium)
-        self.comboBox_temp.clear()
-        self.comboBox_temp.addItem("From feature", "feature")
-        self.comboBox_temp.addItem("From meta data", "config")
-        self.comboBox_temp.addItem("Manual", "manual")
+        self._init_emodulus_temp_choices()
         self.comboBox_temp.currentIndexChanged.connect(self.on_temperature)
         self.doubleSpinBox_temp.valueChanged.connect(self.on_temperature)
+
+    def _init_emodulus_temp_choices(self):
+        """populate the temperature comboBox with all available entries
+
+        The previous selection is preserved. Signals are blocked.
+        """
+        self.comboBox_temp.blockSignals(True)
+        cursel = self.comboBox_temp.currentData()
+        self.comboBox_temp.clear()
+        ds = self.get_dataset()
+        if ds is not None:
+            if "temp" in ds:
+                self.comboBox_temp.addItem("From feature", "feature")
+            if "temperature" in ds.config["setup"]:
+                self.comboBox_temp.addItem("From meta data", "config")
+        self.comboBox_temp.addItem("Manual", "manual")
+        idx = self.comboBox_temp.findData(cursel)
+        self.comboBox_temp.setCurrentIndex(idx)
+        self.comboBox_temp.blockSignals(False)
 
     @property
     def current_slot_state(self):
@@ -184,10 +194,16 @@ class SlotPanel(QtWidgets.QWidget):
             return [slot.name for slot in self.pipeline.slots]
 
     def get_dataset(self):
-        """Return dataset associated with the current slot index"""
-        slot_index = self.comboBox_slots.currentIndex()
-        slot = self.pipeline.slots[slot_index]
-        return slot.get_dataset()
+        """Return dataset associated with the current slot index
+
+        Returns None if there is no dataset in the pipeline.
+        """
+        if self.pipeline is not None and self.pipeline.slots:
+            slot_index = self.comboBox_slots.currentIndex()
+            slot = self.pipeline.slots[slot_index]
+            return slot.get_dataset()
+        else:
+            return None
 
     def on_anew_slot(self):
         slot_state = self.__getstate__()
@@ -225,15 +241,19 @@ class SlotPanel(QtWidgets.QWidget):
             self.doubleSpinBox_temp.setEnabled(False)
             self.comboBox_temp.setEnabled(False)
             self.doubleSpinBox_visc.setEnabled(False)
+            self.doubleSpinBox_visc.setStyleSheet("border-width: 2px")
         elif medium == "other":
             self.doubleSpinBox_temp.setValue(np.nan)
             self.doubleSpinBox_temp.setEnabled(False)
             self.comboBox_temp.setEnabled(False)
             self.doubleSpinBox_visc.setEnabled(True)
+            self.doubleSpinBox_visc.setReadOnly(False)
+            self.doubleSpinBox_visc.setStyleSheet("border-width: 2px")
         else:
             self.doubleSpinBox_temp.setEnabled(True)
             self.comboBox_temp.setEnabled(True)
             self.doubleSpinBox_visc.setEnabled(True)
+            self.doubleSpinBox_visc.setReadOnly(True)
             self.on_temperature()
 
     def on_temperature(self):
@@ -245,27 +265,40 @@ class SlotPanel(QtWidgets.QWidget):
                 temperature = self.doubleSpinBox_temp.value()
                 self.doubleSpinBox_temp.setReadOnly(False)
                 self.doubleSpinBox_temp.setEnabled(True)
-            else:
+            elif tselec == "config":
                 # get temperature from dataset
                 ds = self.get_dataset()
-                if "temperature" not in ds.config["setup"]:
-                    raise ValueError("Dataset has no temperature entry!")
                 temperature = ds.config["setup"]["temperature"]
                 self.doubleSpinBox_temp.setReadOnly(True)
                 self.doubleSpinBox_temp.setEnabled(True)
+                self.doubleSpinBox_temp.setValue(temperature)
+            elif tselec == "feature":
+                temperature = np.nan
+                self.doubleSpinBox_temp.setEnabled(False)
                 self.doubleSpinBox_temp.setValue(temperature)
             # For user convenience, also show the viscosity
             if medium in dclab.features.emodulus_viscosity.KNOWN_MEDIA:
                 # compute viscosity
                 state = self.__getstate__()
                 cfg = meta_tool.get_rtdc_config(state["path"])
-                visc = dclab.features.emodulus_viscosity.get_viscosity(
-                    medium=medium,
-                    channel_width=cfg["setup"]["channel width"],
-                    flow_rate=cfg["setup"]["flow rate"],
-                    temperature=temperature)
+                with warnings.catch_warnings(record=True) as w:
+                    # Warn the user if the temperature is out-of-range
+                    warnings.simplefilter("always")
+                    visc = dclab.features.emodulus_viscosity.get_viscosity(
+                        medium=medium,
+                        channel_width=cfg["setup"]["channel width"],
+                        flow_rate=cfg["setup"]["flow rate"],
+                        temperature=temperature)
+                    for wi in w:
+                        if issubclass(wi.category,
+                                      dclab.features.emodulus_viscosity.
+                                      TemperatureOutOfRangeWarning):
+                            vstyle = "color: #950000; border-width: 2px"
+                            break
+                    else:
+                        vstyle = "border-width: 2px"
+                self.doubleSpinBox_visc.setStyleSheet(vstyle)
                 self.doubleSpinBox_visc.setValue(visc)
-                self.doubleSpinBox_visc.setReadOnly(True)
                 self.doubleSpinBox_visc.setEnabled(True)
         else:  # feature
             self.doubleSpinBox_temp.setValue(np.nan)

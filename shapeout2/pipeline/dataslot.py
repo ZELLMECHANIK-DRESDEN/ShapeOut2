@@ -52,19 +52,30 @@ class Dataslot(object):
                 # emodulus
                 "emodulus model": "elastic sphere",
                 "emodulus medium": "undefined",
+                # https://dclab.readthedocs.io/en/latest/sec_av_emodulus.html
+                # possible values are:
+                # - feature: scenario A
+                # - config: scenario C (temperature taken from config)
+                # - manual: scenario C (temperature entered manually)
+                # -> secnario B is when "emodulus medium" is "other".
+                "emodulus scenario": "manual",
                 "emodulus temperature": np.nan,
                 "emodulus viscosity": np.nan,
             }
         }
 
-        # use the emodulus medium and temperature values
+        # use the emodulus medium and temperature values as defaults
         ds = self.get_dataset()
         calc = self.config["emodulus"]
         if "medium" in ds.config["setup"]:
             calc["emodulus medium"] = ds.config["setup"]["medium"]
-        if "temperature" in ds.config["setup"] and "temp" not in ds:
-            # only set this value if the temperature feature is not available
+        if "temp" in ds:
+            # use the "temp" feature
+            calc["emodulus scenario"] = "feature"
+        elif "temperature" in ds.config["setup"]:
+            # use the average temperature
             calc["emodulus temperature"] = ds.config["setup"]["temperature"]
+            calc["emodulus scenario"] = "config"
 
     def __getstate__(self):
         state = {"color": self.color,

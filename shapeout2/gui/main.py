@@ -143,7 +143,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     def _check_pg_version(self):
         """Tells the user if the pyqtgraph version is not correct"""
-        if (not self.settings.get_bool("check pgversion")
+        if (self.settings.get_bool("check pgversion")
                 and pg.__version__ != "0.11.0.dev0+g1c63ae5"):
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Warning)

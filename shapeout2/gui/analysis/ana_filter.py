@@ -36,6 +36,7 @@ class FilterPanel(QtWidgets.QWidget):
         self.pushButton_reset.clicked.connect(self.update_content)
         self.comboBox_filters.currentIndexChanged.connect(self.update_content)
         self.toolButton_moreless.clicked.connect(self.on_moreless)
+        self.label_box_edit.setVisible(False)
         self._box_edit_view = False
         self.update_content()
         self.setUpdatesEnabled(True)
@@ -185,6 +186,7 @@ class FilterPanel(QtWidgets.QWidget):
                     rc.doubleSpinBox_max.setEnabled(False)
                     rc.range_slider.setEnabled(False)
             self.toolButton_moreless.setText("...Finish editing")
+            self.label_box_edit.setVisible(True)
             self._box_edit_view = True
         else:
             # Hide all filters that are not active
@@ -196,6 +198,7 @@ class FilterPanel(QtWidgets.QWidget):
                 rc.doubleSpinBox_max.setEnabled(True)
                 rc.range_slider.setEnabled(True)
             self.toolButton_moreless.setText("Choose filters...")
+            self.label_box_edit.setVisible(False)
             self._box_edit_view = False
             # Update box filter ranges
             self.update_box_ranges()

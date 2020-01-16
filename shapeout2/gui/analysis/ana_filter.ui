@@ -211,7 +211,7 @@
              <x>0</x>
              <y>0</y>
              <width>649</width>
-             <height>81</height>
+             <height>68</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -223,9 +223,16 @@
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="label_box_edit">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#a40000;&quot;&gt;You are currently selecting box filters. Click &amp;quot;&lt;/span&gt;&lt;span style=&quot; font-style:italic; color:#a40000;&quot;&gt;...Finish editing&lt;/span&gt;&lt;span style=&quot; color:#a40000;&quot;&gt;&amp;quot;&lt;br/&gt;below to start using them.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QToolButton" name="toolButton_moreless">
           <property name="text">
-           <string>Choose box filters...</string>
+           <string>Select box filters...</string>
           </property>
          </widget>
         </item>
@@ -270,7 +277,7 @@
              <x>0</x>
              <y>0</y>
              <width>649</width>
-             <height>111</height>
+             <height>84</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">

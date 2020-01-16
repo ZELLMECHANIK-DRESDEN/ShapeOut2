@@ -239,6 +239,7 @@ class PipelinePlotItem(SimplePlotItem):
         explot = PipelinePlotItem()
         explot.redraw(self.dslist, self.slot_states, self.plot_state)
         win.addItem(explot)
+        win.addLabel("")  # spacer to avoid cut tick labels on the right(#7)
         win.nextRow()
         win.addLabel(labelx, col=1)
         # Update the UI (do it twice, otherwise the tick labels overlap)

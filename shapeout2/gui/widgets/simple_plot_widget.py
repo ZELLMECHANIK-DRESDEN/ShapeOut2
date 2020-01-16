@@ -44,6 +44,7 @@ class SimplePlotItem(pg.PlotItem):
             self.axes[kax]["item"].setZValue(200)
 
     def on_export(self, suffix):
+        """Export subplots as original figures (with axes labels, etc)"""
         file, _ = QtWidgets.QFileDialog.getSaveFileName(
             None,
             'Save {} file'.format(suffix.upper()),
@@ -51,11 +52,15 @@ class SimplePlotItem(pg.PlotItem):
             '{} file (*.{})'.format(suffix.upper(), suffix))
         if not file.endswith("." + suffix):
             file += "." + suffix
+        self.perform_export(file)
+
+    def perform_export(self, file):
+        suffix = file[-3:]
         if suffix == "png":
             exp = exporters.ImageExporter(self)
             # translate from screen resolution (80dpi) to 300dpi
             exp.params["width"] = int(exp.params["width"] / 72 * 300)
-        if suffix == "svg":
+        elif suffix == "svg":
             exp = exporters.SVGExporter(self)
         exp.export(file)
 

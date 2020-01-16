@@ -1,5 +1,6 @@
 2.0.0b12
  - feat: add button to copy Quick View statistics to clipboard
+ - fix: export subplots with axes labels (#7)
  - enh: be more verbose when user wants to add box filters (#34)
 2.0.0b11
  - fix: imported polygon filters did not immediately show up in

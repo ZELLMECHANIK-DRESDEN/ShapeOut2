@@ -7,7 +7,9 @@ from dclab import kde_contours
 import numpy as np
 from PyQt5 import uic, QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
+from pyqtgraph import exporters
 from pyqtgraph.graphicsItems.GradientEditorItem import Gradients
+
 
 from .. import plot_cache
 from .. import util
@@ -211,6 +213,7 @@ class PipelinePlot(QtWidgets.QWidget):
         parent.setMaximumSize(size_hint)
 
 
+
 class PipelinePlotItem(SimplePlotItem):
     def __init__(self, *args, **kwargs):
         super(PipelinePlotItem, self).__init__(*args, **kwargs)
@@ -221,6 +224,38 @@ class PipelinePlotItem(SimplePlotItem):
         # Keep track of all elements (for redraw)
         self._plot_elements = []
 
+    def perform_export(self, file):
+        """Performs export in new layout with axes labels set
+
+        Overrides the basic functionality of SimplePlotItem.
+        See https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/7
+        """
+        # Create a plot window
+        win = pg.GraphicsLayoutWidget(
+            size=(self.width() + 100, self.height() + 100),
+            show=True)
+        # fill layout
+        labelx, labely = get_axes_labels(self.plot_state, self.slot_states)
+        win.addLabel(labely, angle=-90)
+        explot = PipelinePlotItem()
+        explot.redraw(self.dslist, self.slot_states, self.plot_state)
+        win.addItem(explot)
+        win.nextRow()
+        win.addLabel(labelx, col=1)
+        # Update the UI (do it twice, otherwise the tick labels overlap)
+        QtWidgets.QApplication.processEvents()
+        QtWidgets.QApplication.processEvents()
+        win.hide()
+        # perform actual export
+        suffix = file[-3:]
+        if suffix == "png":
+            exp = exporters.ImageExporter(win.scene())
+            # translate from screen resolution (80dpi) to 300dpi
+            exp.params["width"] = int(exp.params["width"] / 72 * 300)
+        elif suffix == "svg":
+            exp = exporters.SVGExporter(win.scene())
+        exp.export(file)
+
     def redraw(self, dslist, slot_states, plot_state):
         # Remove everything
         for el in self._plot_elements:
@@ -228,6 +263,10 @@ class PipelinePlotItem(SimplePlotItem):
 
         if not dslist:
             return
+
+        self.dslist = dslist
+        self.slot_states = slot_states
+        self.plot_state = plot_state
 
         # General
         gen = plot_state["general"]

@@ -213,7 +213,6 @@ class PipelinePlot(QtWidgets.QWidget):
         parent.setMaximumSize(size_hint)
 
 
-
 class PipelinePlotItem(SimplePlotItem):
     def __init__(self, *args, **kwargs):
         super(PipelinePlotItem, self).__init__(*args, **kwargs)

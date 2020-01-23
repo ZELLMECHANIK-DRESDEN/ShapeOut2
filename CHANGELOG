@@ -1,2 +1,4 @@
+2.0.1
+ - fix: correctly distinguish prereleases when checking for new versions
 2.0.0
  - initial release

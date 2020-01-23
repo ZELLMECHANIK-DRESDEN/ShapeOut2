@@ -1,4 +1,4 @@
-from distutils.version import LooseVersion
+from distutils.version import LooseVersion, StrictVersion
 import json
 import struct
 import sys
@@ -52,8 +52,12 @@ def check_release(ghrepo="user/repo", version=None, timeout=20):
         newversion = j["tag_name"]
 
         if version is not None:
-            new = LooseVersion(newversion)
-            old = LooseVersion(version)
+            try:
+                new = StrictVersion(newversion)
+                old = StrictVersion(version)
+            except ValueError:
+                new = LooseVersion(newversion)
+                old = LooseVersion(version)
             if new > old:
                 update = True
                 new_version = newversion

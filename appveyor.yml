@@ -29,8 +29,6 @@ install:
   - "appveyor-retry pip install -e ."
   - "appveyor-retry pip install git+git://github.com/ZELLMECHANIK-DRESDEN/dclab.git"
   - "appveyor-retry pip install git+git://github.com/ZELLMECHANIK-DRESDEN/pyqtgraph.git"
-  # Install pyinstaller (includes dependency for pywin32)
-  - "appveyor-retry pip install pyinstaller==3.6"
   # Show the installed packages
   - "pip freeze"
 
@@ -51,6 +49,8 @@ after_test:
   - "python setup.py bdist_wheel"
   - "python setup.py sdist"
   - ps: "ls dist"
+  # Install pyinstaller (includes dependency for pywin32)
+  - "appveyor-retry pip install pyinstaller==3.6"
   # Run pyinstaller
   - "pyinstaller -y --log-level=WARN .appveyor\\shapeout2.spec"
   # Create InnoSetup installers

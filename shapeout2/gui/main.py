@@ -372,6 +372,26 @@ class ShapeOut2(QtWidgets.QMainWindow):
             sub.setFixedSize(sub.sizeHint())
         sub.show()
 
+    def dragEnterEvent(self, e):
+        """Whether files are accepted"""
+        if e.mimeData().hasUrls():
+            e.accept()
+        else:
+            e.ignore()
+
+    def dropEvent(self, e):
+        """Add dropped files to view"""
+        urls = e.mimeData().urls()
+        pathlist = []
+        for ff in urls:
+            pp = pathlib.Path(ff.toLocalFile())
+            if pp.is_dir():
+                pathlist += list(pp.rglob("*.rtdc"))
+            elif pp.suffix == ".rtdc":
+                pathlist.append(pp)
+        if pathlist:
+            self.add_dataslot(paths=sorted(pathlist))
+
     def init_analysis_view(self):
         sub = widgets.MDISubWindowWOButtons(self)
         self.widget_ana_view = analysis.AnalysisView()

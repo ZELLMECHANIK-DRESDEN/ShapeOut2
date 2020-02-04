@@ -68,3 +68,34 @@ def test_handle_empty_plots_issue_27(qtbot):
     with pytest.warns(pipeline.core.EmptyDatasetWarning):
         # this now only throws a warning
         qtbot.mouseClick(pe, QtCore.Qt.LeftButton)  # activate (raises #27)
+
+
+def test_remove_plots_issue_36(qtbot):
+    """Correctly handle empty plots
+
+    https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/36
+
+    Traceback (most recent call last):
+      File "/home/paul/repos/ShapeOut2/shapeout2/gui/main.py",
+        line 193, in adopt_pipeline
+        lay = pipeline_state["plots"][plot_index]["layout"]
+    IndexError: list index out of range
+    """
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+
+    # add a dataslots
+    path = pathlib.Path(__file__).parent / "data" / "calibration_beads_47.rtdc"
+    mw.add_dataslot(paths=[path, path, path])
+
+    assert len(mw.pipeline.slot_ids) == 3, "we added those"
+    assert len(mw.pipeline.filter_ids) == 1, "automatically added"
+
+    # now create a plot window
+    plot_id = mw.add_plot()
+    # and another one
+    mw.add_plot()
+
+    # remove a plot
+    pw = mw.block_matrix.get_widget(filt_plot_id=plot_id)
+    pw.action_remove()

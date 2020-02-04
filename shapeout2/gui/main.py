@@ -186,11 +186,11 @@ class ShapeOut2(QtWidgets.QMainWindow):
             try:
                 new_ncol, new_nrow = self.pipeline.get_plot_col_row_count(
                     plot_id, pipeline_state)
-            except KeyError:
+                lay = pipeline_state["plots"][plot_index]["layout"]
+            except (KeyError, IndexError):
                 # the plot was removed
                 continue
             else:
-                lay = pipeline_state["plots"][plot_index]["layout"]
                 lay["size x"] += 200*(new_ncol-old_ncol)
                 lay["size y"] += 200*(new_nrow-old_nrow)
         # set the new state of the pipeline

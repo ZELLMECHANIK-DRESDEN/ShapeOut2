@@ -1,4 +1,4 @@
-"""Test of data set functionalities"""
+"""Test of Quick View set functionalities"""
 import pathlib
 
 from PyQt5 import QtCore
@@ -51,23 +51,30 @@ def test_clear_session_issue_25(qtbot):
 
 
 def test_update_polygon_filter_issue_26(qtbot):
-    """https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/26"""
+    """https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/26
+
+    The recomputation of the filter ray was not triggered for some
+    reason.
+    """
     mw = ShapeOut2()
     qtbot.addWidget(mw)
 
     # add a dataslot
     path = pathlib.Path(__file__).parent / "data" / "calibration_beads_47.rtdc"
-    mw.add_dataslot(paths=[path])
+    filt_id = mw.add_filter()
+    slot_ids = mw.add_dataslot(paths=[path])
 
     assert len(mw.pipeline.slot_ids) == 1, "we added that"
     assert len(mw.pipeline.filter_ids) == 1, "automatically added"
 
     # activate a dataslot
-    slot_id = mw.pipeline.slot_ids[0]
-    filt_id = mw.pipeline.filter_ids[0]
+    slot_id = slot_ids[0]
     em = mw.block_matrix.get_widget(slot_id, filt_id)
-    qtbot.mouseClick(em, QtCore.Qt.LeftButton)  # activate
     qtbot.mouseClick(em, QtCore.Qt.LeftButton, QtCore.Qt.ShiftModifier)
+
+    em = mw.block_matrix.get_widget(slot_id, filt_id)
+    qtbot.mouseClick(em, QtCore.Qt.LeftButton)
+
     # did that work?
     assert mw.toolButton_quick_view.isChecked()
 

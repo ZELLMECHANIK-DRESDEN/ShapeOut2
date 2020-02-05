@@ -1,5 +1,6 @@
 2.0.2
  - fix: IndexError when removing a plot (#36)
+ - fix: ValueError wehn filtering all events in Quick View (#37)
 2.0.1
  - fix: correctly distinguish prereleases when checking for new versions
  - enh: allow loading data via drag&drop

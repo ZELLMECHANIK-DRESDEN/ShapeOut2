@@ -117,7 +117,7 @@ class BlockMatrix(QtWidgets.QWidget):
             return wi
         else:
             raise ValueError(
-                "One of `slot_id` or `filt_plot_id` must be specified!")
+                "At least one of `slot_id`, `filt_plot_id` must be specified!")
 
     def invalidate_elements(self, invalid_dm, invalid_pm):
         for slot_id, filt_id in invalid_dm:

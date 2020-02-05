@@ -360,6 +360,9 @@ class DataMatrix(QtWidgets.QWidget):
                     me = self.get_matrix_element(slot_id, filt_id)
                     if current == me:
                         return slot_id, filt_id
+            else:
+                # no valid QuickView selection (issue #38)
+                return None, None
         else:
             return None, None
 

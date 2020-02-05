@@ -105,13 +105,14 @@ class QuickViewScatterWidget(SimplePlotWidget):
         cmap = pg.ColorMap(*zip(*Gradients["viridis"]["ticks"]))
         for k in kde:
             brush.append(cmap.mapToQColor(k))
-        # set viewbox
-        pipeline_plot.set_viewbox(plot=self,
-                                  range_x=(x.min(), x.max()),
-                                  range_y=(y.min(), y.max()),
-                                  scale_x=self.xscale,
-                                  scale_y=self.yscale,
-                                  padding=0.05)
+        if x.size:  # test for empty x/y (#37)
+            # set viewbox
+            pipeline_plot.set_viewbox(plot=self,
+                                      range_x=(x.min(), x.max()),
+                                      range_y=(y.min(), y.max()),
+                                      scale_x=self.xscale,
+                                      scale_y=self.yscale,
+                                      padding=0.05)
         # set data
         self.setData(x, y, brush=brush)
         # set axes labels (replace with user-defined flourescence names)

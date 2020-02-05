@@ -178,6 +178,18 @@ class QuickView(QtWidgets.QWidget):
             self.checkBox_trace_raw.setChecked(event["trace raw"])
             self.checkBox_trace_legend.setChecked(event["trace legend"])
 
+    def _check_file_open(self, rtdc_ds):
+        """Check whether a dataset is still open"""
+        if isinstance(rtdc_ds, dclab.rtdc_dataset.RTDC_HDF5):
+            if rtdc_ds._h5:
+                # the file is open
+                isopen = True
+            else:
+                isopen = False
+        elif isinstance(rtdc_ds, dclab.rtdc_dataset.RTDC_Hierarchy):
+            isopen = self._check_file_open(rtdc_ds.hparent)
+        return isopen
+
     def _set_initial_ui(self):
         # Initially, only show the info about how QuickView works
         self.widget_tool.setEnabled(False)
@@ -193,10 +205,8 @@ class QuickView(QtWidgets.QWidget):
     def rtdc_ds(self):
         """Dataset to plot; set to None initially and if the file is closed"""
         if self._rtdc_ds is not None:
-            if isinstance(self._rtdc_ds, dclab.rtdc_dataset.RTDC_HDF5):
-                if not self._rtdc_ds._h5:
-                    # the file is closed
-                    self._rtdc_ds = None
+            if not self._check_file_open(self._rtdc_ds):
+                self._rtdc_ds = None
         # now check again
         if self._rtdc_ds is None:
             self._set_initial_ui()

@@ -3,6 +3,7 @@
  - fix: ValueError when filtering all events in Quick View (#37)
  - fix: TypeError when removing datasets and opening Quick View (#38)
  - fix: RuntimeError when removing datasets and opening Quick View (#38)
+ - fix: ValueError when removing activated datasets and opening Quick View
 2.0.1
  - fix: correctly distinguish prereleases when checking for new versions
  - enh: allow loading data via drag&drop

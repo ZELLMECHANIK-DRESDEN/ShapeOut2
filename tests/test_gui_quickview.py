@@ -103,6 +103,57 @@ def test_no_events_issue_37(qtbot):
     mw.close()
 
 
+def test_remove_dataset_h5py_error(qtbot):
+    """Removing an activated dataset and activating Quick View fails
+
+    Unhandled exception in Shape-Out version 2.0.1.post2:
+    Traceback (most recent call last):
+      File "/home/paul/repos/ShapeOut2/shapeout2/gui/main.py", line 235,
+        in adopt_pipeline
+        self.widget_quick_view.update_feature_choices()
+      File "/home/paul/repos/ShapeOut2/shapeout2/gui/quick_view/qv_main.py",
+        line 635, in update_feature_choices
+        ds_feats = [f for f in self.rtdc_ds.features if f in feats_scalar]
+    [...]
+      File "/home/paul/repos/dclab/dclab/rtdc_dataset/fmt_hdf5.py", line 101,
+        in _is_defective_feature
+        if attr in self._h5.attrs:
+    [...]
+      File "h5py/_objects.pyx", line 55, in h5py._objects.with_phil.wrapper
+      File "h5py/h5o.pyx", line 190, in h5py.h5o.open
+    ValueError: Not a location (invalid object ID)
+    """
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+
+    # add a dataslot
+    path = pathlib.Path(__file__).parent / "data" / "calibration_beads_47.rtdc"
+    mw.add_dataslot(paths=[path, path])
+
+    assert len(mw.pipeline.slot_ids) == 2, "we added those"
+    assert len(mw.pipeline.filter_ids) == 1, "automatically added"
+
+    # activate a dataslot
+    slot_id = mw.pipeline.slot_ids[0]
+    filt_id = mw.pipeline.filter_ids[0]
+    em = mw.block_matrix.get_widget(slot_id, filt_id)
+    qtbot.mouseClick(em, QtCore.Qt.LeftButton)  # activate
+    qtbot.mouseClick(em, QtCore.Qt.LeftButton, QtCore.Qt.ShiftModifier)
+    # did that work?
+    assert mw.pipeline.is_element_active(slot_id, filt_id)
+
+    # close Quick View
+    qtbot.mouseClick(mw.toolButton_quick_view, QtCore.Qt.LeftButton)
+
+    # now remove the dataset
+    pw = mw.block_matrix.get_widget(slot_id=slot_id)
+    pw.action_remove()
+
+    # open Quick View
+    qtbot.mouseClick(mw.toolButton_quick_view, QtCore.Qt.LeftButton)
+    mw.close()
+
+
 def test_update_polygon_filter_issue_26(qtbot):
     """https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/26
 

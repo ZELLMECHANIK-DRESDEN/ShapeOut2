@@ -1,6 +1,8 @@
 2.0.2
  - fix: IndexError when removing a plot (#36)
- - fix: ValueError wehn filtering all events in Quick View (#37)
+ - fix: ValueError when filtering all events in Quick View (#37)
+ - fix: TypeError when removing datasets and opening Quick View (#38)
+ - fix: RuntimeError when removing datasets and opening Quick View (#38)
 2.0.1
  - fix: correctly distinguish prereleases when checking for new versions
  - enh: allow loading data via drag&drop

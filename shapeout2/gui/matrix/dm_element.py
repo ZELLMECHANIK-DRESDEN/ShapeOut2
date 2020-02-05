@@ -87,7 +87,11 @@ class MatrixElement(QtWidgets.QWidget):
                 # reset color of old quick view instance
                 if curinst is not None and self is not curinst:
                     MatrixElement._quick_view_instance = None
-                    curinst.update_content()
+                    try:
+                        curinst.update_content()
+                    except RuntimeError:
+                        # element has been deleted
+                        pass
                 MatrixElement._quick_view_instance = self
                 do_quickview = True
             else:

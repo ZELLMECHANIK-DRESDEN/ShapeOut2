@@ -3,6 +3,7 @@ import pkg_resources
 import warnings
 
 import dclab
+from dclab.rtdc_dataset.check import VALID_CHOICES
 import numpy as np
 from PyQt5 import uic, QtCore, QtWidgets
 
@@ -135,10 +136,12 @@ class SlotPanel(QtWidgets.QWidget):
 
     def _init_emodulus(self):
         self.comboBox_medium.clear()
-        self.comboBox_medium.addItem("CellCarrier", "CellCarrier")
-        self.comboBox_medium.addItem("CellCarrier B", "CellCarrierB")  # [sic]
-        self.comboBox_medium.addItem("water", "water")
-        self.comboBox_medium.addItem("other", "other")
+        for choice in VALID_CHOICES["setup"]["medium"]:
+            if choice == "CellCarrierB":
+                name = "CellCarrier B"  # [sic]
+            else:
+                name = choice
+            self.comboBox_medium.addItem(name, choice)
         self.comboBox_medium.addItem("not defined", "undefined")
         self.comboBox_medium.currentIndexChanged.connect(self.on_medium)
         self._init_emodulus_temp_choices()

@@ -1,5 +1,6 @@
 2.0.3
- - setup: bump dclab from 0.20.3 to 0.20.4
+ - setup: bump dclab from 0.20.3 to 0.21.1
+ - docs: add terminology section (#12)
 2.0.2
  - fix: IndexError when removing a plot (#36)
  - fix: ValueError when filtering all events in Quick View (#37)

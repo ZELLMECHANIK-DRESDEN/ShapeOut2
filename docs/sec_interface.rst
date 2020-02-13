@@ -52,6 +52,42 @@ your data analysis from Shape-Out 1 to Shape-Out 2:
   which might be more intuitive to understand.
 
 
+
+Terminology
+===========
+Shape-Out 2 introduces several terms in the user interface that also play
+a role in data analysis and are consequently used in the entire code base.
+
+block matrix
+    The :ref:`sec_block_matrix` is a visualization of the analysis
+    pipeline. It is divided into data matrix (filters) and plot matrix (plots).
+
+dataslot or slot
+    A slot holds all information about a measurement: the path to the
+    .rtdc file, fluorescence labels, display color, etc. (see the
+    *Dataset* tab in the :ref:`sec_analysis_view`).
+
+filter
+    A filter is a set of filtering options (box filter, polygon filter,
+    downsampling, etc.) that can be applied to a slot (see the
+    *Filter* tab in the :ref:`sec_analysis_view`). Filters can be exported
+    and imported again in Shape-Out 2 (.sof file format).
+
+filter ray
+    A filter ray is a list of filters that can be applied to a slot.
+    In Shape-Out 2, each row in the :ref:`sec_block_matrix` contains
+    one filter ray.
+
+pipeline
+    A pipeline consists of all filters, slots, plots, and the filter rays
+    (the filter selection) applied to each slot. A Shape-Out 2 session file
+    (.so2) stores all information necessary to rebuild a pipeline.
+
+plot
+    A plot is a user-defined visualization of a slot/filter ray combination.
+
+
+
 Basic usage
 ===========
 .. image:: scrots/ui_main.png

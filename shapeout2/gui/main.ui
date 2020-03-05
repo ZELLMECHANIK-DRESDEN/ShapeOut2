@@ -227,6 +227,7 @@
      <string>&amp;File</string>
     </property>
     <addaction name="actionLoadDataset"/>
+    <addaction name="actionLoadDCOR"/>
     <addaction name="separator"/>
     <addaction name="actionOpenSession"/>
     <addaction name="actionSaveSession"/>
@@ -413,6 +414,14 @@
    </property>
    <property name="text">
     <string>Check for updates on startup</string>
+   </property>
+  </action>
+  <action name="actionLoadDCOR">
+   <property name="text">
+    <string>Load DCOR data</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
  </widget>

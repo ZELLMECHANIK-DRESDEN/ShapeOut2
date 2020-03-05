@@ -1,4 +1,5 @@
-2.0.4
+2.1.0
+ - feat: basic DCOR support
  - enh: export event image via context menu in Quick View (#35)
 2.0.3
  - setup: bump dclab from 0.20.3 to 0.21.1

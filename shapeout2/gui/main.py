@@ -16,6 +16,7 @@ import pyqtgraph as pg
 
 from . import analysis
 from . import compute
+from . import dcor
 from . import export
 from . import pipeline_plot
 from . import quick_view
@@ -49,6 +50,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self._update_worker = None
         #: Shape-Out settings
         self.settings = settings.SettingsFile()
+        # Register user-defined DCOR API Key in case the user wants to
+        # open a session with private data.
+        api_key = self.settings.get_string("dcor api key")
+        dclab.rtdc_dataset.fmt_dcor.APIHandler.add_api_key(api_key)
         #: Analysis pipeline
         self.pipeline = pipeline.Pipeline()
         # GUI
@@ -89,11 +94,13 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.subwindows = {}
         # Subwindows for plots
         self.subwindows_plots = {}
-        # Initialize a few thigns
+        # Initialize a few things
         self.init_quick_view()
         self.init_analysis_view()
         self.mdiArea.cascadeSubWindows()
         self.showMaximized()
+        # DCOR Dialog
+        self.actionLoadDCOR.triggered.connect(self.on_action_dcor)
         # BLOCK MATRIX (wraps DataMatrix and PlotMatrix)
         # BlockMatrix appearance
         self.toolButton_dm.clicked.connect(self.on_data_matrix)
@@ -300,8 +307,18 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.adopt_pipeline(state)
 
     @QtCore.pyqtSlot()
-    def add_dataslot(self, paths=None):
-        """Adds a dataslot to the pipeline"""
+    def add_dataslot(self, paths=None, is_dcor=False):
+        """Adds a dataslot to the pipeline
+
+        Parameters
+        ----------
+        paths: list of str or None
+            If specified, no file dialog is displayed and the files
+            specified are loaded. Can also be DCOR URL.
+        is_dcor: bool
+            If set to True, `paths` will be treated as a list of
+            DCOR URLs. Does not have any effect if `paths` is None.
+        """
         if paths is None:
             fnames, _ = QtWidgets.QFileDialog.getOpenFileNames(
                 parent=self,
@@ -318,8 +335,12 @@ class ShapeOut2(QtWidgets.QMainWindow):
         slot_ids = []
         # Create Dataslot instance and update block matrix
         for fn in fnames:
-            path = pathlib.Path(fn)
-            self.settings.set_path(wd=path.parent, name="rtdc import dataset")
+            if is_dcor:
+                path = fn
+            else:
+                path = pathlib.Path(fn)
+                self.settings.set_path(wd=path.parent,
+                                       name="rtdc import dataset")
             # add a filter if we don't have one already
             if self.pipeline.num_filters == 0:
                 self.add_filter()
@@ -499,6 +520,11 @@ class ShapeOut2(QtWidgets.QMainWindow):
             session.clear_session(self.pipeline)
             self.reload_pipeline()
         return yes
+
+    def on_action_dcor(self):
+        """Show the DCOR import dialog"""
+        dlg = dcor.DCORLoader(self)
+        dlg.exec()
 
     def on_action_docs(self):
         webbrowser.open("https://shapeout2.readthedocs.io")

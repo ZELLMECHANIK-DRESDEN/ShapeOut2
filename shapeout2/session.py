@@ -185,20 +185,27 @@ def save_session(path, pipeline):
     # additional information
     search_paths = {}
     dataset_hashes = {}
+    dataset_formats = {}
     for slot in pipeline.slots:
-        try:
-            rel = os.path.relpath(slot.path, path.parent)
-        except (OSError, ValueError):
-            rel = "."
-        search_paths[slot.identifier] = rel
-        hash_size = 48128
-        dataset_hashes[slot.identifier] = {
-            # these are keyword arguments to find_file
-            "partial_hash": hash_file_partially(slot.path, size=hash_size),
-            "size_read": hash_size
-        }
+        # format (hdf5 or dcor)
+        dataset_formats[slot.identifier] = slot.format
+        if slot.format == "hdf5":
+            # search path
+            try:
+                rel = os.path.relpath(slot.path, path.parent)
+            except (OSError, ValueError):
+                rel = "."
+            search_paths[slot.identifier] = rel
+            # file hash
+            hash_size = 48128
+            dataset_hashes[slot.identifier] = {
+                # these are keyword arguments to find_file
+                "partial_hash": hash_file_partially(slot.path, size=hash_size),
+                "size_read": hash_size
+            }
     remarks = {"search paths": search_paths,
                "file hashes": dataset_hashes,
+               "formats": dataset_formats,
                "version": version,
                }
     rdump = json.dumps(remarks,
@@ -301,16 +308,19 @@ def open_session(path, pipeline=None, search_paths=[]):
         for sn in slotnames:
             sstate = json.loads(arc.read(sn), cls=PathlibJSONDecoder)
             slot_id = sstate["identifier"]
-            # also search relative paths
-            search_ap = path.parent / remarks["search paths"][slot_id]
-            newpath = find_file(original_path=sstate["path"],
-                                search_paths=search_paths + [search_ap],
-                                **remarks["file hashes"][slot_id])
-            if newpath:
-                sstate["path"] = newpath
-                slot_states.append(sstate)
+            if remarks["formats"][slot_id] == "hdf5":
+                # also search relative paths
+                search_ap = path.parent / remarks["search paths"][slot_id]
+                newpath = find_file(original_path=sstate["path"],
+                                    search_paths=search_paths + [search_ap],
+                                    **remarks["file hashes"][slot_id])
+                if newpath:
+                    sstate["path"] = newpath
+                    slot_states.append(sstate)
+                else:
+                    missing_paths.append(sstate["path"])
             else:
-                missing_paths.append(sstate["path"])
+                slot_states.append(sstate)
         # raise an exception if data files are missing
         if missing_paths:
             # Which files are missing is stored as a property in the exception.

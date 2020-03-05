@@ -31,6 +31,7 @@ setup(
                       "numpy>=1.9.0",
                       "pyqt5",
                       "pyqtgraph>=0.10.0",
+                      "requests",
                       "scipy>=0.13.0"],
     python_requires='>=3.6, <4',
     setup_requires=['pytest-runner'],

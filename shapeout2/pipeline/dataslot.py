@@ -15,6 +15,7 @@ class Dataslot(object):
     def __init__(self, path, identifier=None, name=None):
         Dataslot._instance_counter += 1
         self.path = path
+        self.format = "dcor" if isinstance(path, str) else "hdf5"
         self._dataset = None
         if identifier is None:
             identifier = "Dataslot_{}".format(Dataslot._instance_counter)

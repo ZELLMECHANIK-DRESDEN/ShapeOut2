@@ -8,9 +8,14 @@ NAME = "shapeout2.cfg"
 
 #: default configuration parameters
 DEFAULTS = {
-    "developer mode": False,
-    "check pgversion": True,  # check for correct pyqtgraph version
-    "check update": True,  # check for updates
+    "bool": {
+        "developer mode": False,
+        "check pgversion": True,  # check for correct pyqtgraph version
+        "check update": True,  # check for updates
+    },
+    "string_list": {
+        "dcor servers": ["dcor.mpl.mpg.de"]
+    },
 }
 
 
@@ -31,17 +36,6 @@ class SettingsFile(object):
         self.defaults = defaults
         self.working_directories = {}
 
-    def load(self):
-        """Loads the settings file returning a dictionary"""
-        with self.cfgfile.open() as fop:
-            fc = fop.readlines()
-        cdict = {}
-        for line in fc:
-            line = line.strip()
-            var, val = line.split("=", 1)
-            cdict[var.lower().strip()] = val.strip()
-        return cdict
-
     def get_bool(self, key):
         """Returns boolean configuration key"""
         key = key.lower()
@@ -55,7 +49,7 @@ class SettingsFile(object):
             else:
                 ret = False
         else:
-            ret = self.defaults[key]
+            ret = self.defaults["bool"][key]
         return ret
 
     def get_int(self, key):
@@ -82,6 +76,39 @@ class SettingsFile(object):
             wd = "./"
 
         return wd
+
+    def get_string(self, key):
+        """Return string"""
+        cdict = self.load()
+        if key in cdict:
+            val = cdict[key]
+        else:
+            val = ""
+        return val
+
+    def get_string_list(self, key):
+        """Returns list of strings"""
+        key = key.lower()
+        cdict = self.load()
+        if key in cdict:
+            val = cdict[key]
+            ret = val.split("\t")
+        elif key in self.defaults["string_list"]:
+            return self.defaults["string_list"][key]
+        else:
+            ret = []
+        return ret
+
+    def load(self):
+        """Loads the settings file returning a dictionary"""
+        with self.cfgfile.open() as fop:
+            fc = fop.readlines()
+        cdict = {}
+        for line in fc:
+            line = line.strip()
+            var, val = line.split("=", 1)
+            cdict[var.lower().strip()] = val.strip()
+        return cdict
 
     def save(self, cdict):
         """Save a settings dictionary into a file"""
@@ -113,6 +140,24 @@ class SettingsFile(object):
         cdict = self.load()
         wdkey = "path {}".format(name.lower())
         cdict[wdkey] = wd
+        self.save(cdict)
+
+    def set_string(self, key, value=""):
+        """Set the path in the settings file"""
+        if value.strip():
+            cdict = self.load()
+            cdict[key] = value
+            self.save(cdict)
+
+    def set_string_list(self, key, value):
+        """Set a list of strings"""
+        if not isinstance(value, list):
+            raise ValueError("`value` must be a list!")
+        for ch in ["\t", "\n"]:
+            if "".join(value).count(ch):
+                raise ValueError("List items must not contain {}!".format(ch))
+        cdict = self.load()
+        cdict[key.lower()] = "\t".join(value)
         self.save(cdict)
 
 

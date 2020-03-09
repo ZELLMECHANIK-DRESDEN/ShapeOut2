@@ -153,14 +153,15 @@ class DCORLoader(QtWidgets.QDialog):
             c = api_base + "/action/dcserv?id={}&query=valid".format(res["id"])
             req = requests.get(c, headers=api_headers)
             if req.ok:
-                name = "{}: {} <{}@{}>".format(
-                    pkg["title"],
-                    res["name"],
-                    pkg["name"],
-                    pkg["organization"]["name"],
-                )
-                ru = api_base + "/action/dcserv?id={}".format(res["id"])
-                res_list.append([ru, name])
+                if req.json()["result"]:  # only use valid data
+                    name = "{}: {} <{}@{}>".format(
+                        pkg["title"],
+                        res["name"],
+                        pkg["name"],
+                        pkg["organization"]["name"],
+                    )
+                    ru = api_base + "/action/dcserv?id={}".format(res["id"])
+                    res_list.append([ru, name])
             else:
                 failed.append("{}: {}".format(res["id"], req.reason))
         if failed:

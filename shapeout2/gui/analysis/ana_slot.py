@@ -100,7 +100,8 @@ class SlotPanel(QtWidgets.QWidget):
         self.doubleSpinBox_temp.setValue(emodulus["emodulus temperature"])
         self.doubleSpinBox_visc.setValue(emodulus["emodulus viscosity"])
         # https://dclab.readthedocs.io/en/latest/sec_av_emodulus.html
-        idx_scen = self.comboBox_temp.findData(emodulus["emodulus scenario"])
+        scenario = emodulus.get("emodulus scenario", "manual")
+        idx_scen = self.comboBox_temp.findData(scenario)
         self.comboBox_temp.setCurrentIndex(idx_scen)
 
         # Fluorescence data visibility

@@ -308,7 +308,10 @@ def open_session(path, pipeline=None, search_paths=[]):
         for sn in slotnames:
             sstate = json.loads(arc.read(sn), cls=PathlibJSONDecoder)
             slot_id = sstate["identifier"]
-            if remarks["formats"][slot_id] == "hdf5":
+            # "formats" was added in 2.1.0 (when dcor format was added)
+            ishdf5 = ("formats" not in remarks
+                      or remarks["formats"][slot_id] == "hdf5")
+            if ishdf5:
                 # also search relative paths
                 search_ap = path.parent / remarks["search paths"][slot_id]
                 newpath = find_file(original_path=sstate["path"],

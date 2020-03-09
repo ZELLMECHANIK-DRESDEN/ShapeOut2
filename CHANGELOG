@@ -1,7 +1,9 @@
 2.1.0
  - feat: basic DCOR support
+ - fix: improved session support (older pre-release sessions)
+ - docs: add DCOR guick guide 
  - enh: export event image via context menu in Quick View (#35)
- - setup: bump dclab from 0.21.1 to 0.22.0 (DCOR support)
+ - setup: bump dclab from 0.21.1 to 0.22.1 (DCOR support)
 2.0.3
  - setup: bump dclab from 0.20.3 to 0.21.1
  - docs: add terminology section (#12)

@@ -1,6 +1,5 @@
 .. _sec_qg_batch_stats:
 
-
 ==================
 Compute statistics
 ==================

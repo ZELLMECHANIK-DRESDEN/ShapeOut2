@@ -1,3 +1,5 @@
+2.1.1
+ - fix: include private datasets when searching with API Key
 2.1.0
  - feat: basic DCOR support
  - fix: improved session support (older pre-release sessions)

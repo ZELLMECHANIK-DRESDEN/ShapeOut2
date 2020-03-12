@@ -116,6 +116,8 @@ class DCORLoader(QtWidgets.QDialog):
             url = api_base + "/action/package_search?q={}".format(string)
             # limit to 20 rows
             url += "&rows=20"
+            # include private data
+            url += "&include_private=True"
             urls = [url]
         else:
             urls = [

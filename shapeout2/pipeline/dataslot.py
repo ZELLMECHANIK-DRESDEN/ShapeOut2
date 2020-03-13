@@ -15,7 +15,6 @@ class Dataslot(object):
     def __init__(self, path, identifier=None, name=None):
         Dataslot._instance_counter += 1
         self.path = path
-        self.format = "dcor" if isinstance(path, str) else "hdf5"
         self._dataset = None
         if identifier is None:
             identifier = "Dataslot_{}".format(Dataslot._instance_counter)
@@ -77,6 +76,9 @@ class Dataslot(object):
             # use the average temperature
             calc["emodulus temperature"] = ds.config["setup"]["temperature"]
             calc["emodulus scenario"] = "config"
+
+        #: data file format
+        self.format = self.get_dataset().format
 
     def __getstate__(self):
         state = {"color": self.color,

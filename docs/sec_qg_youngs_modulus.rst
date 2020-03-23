@@ -7,6 +7,12 @@ With Shape-Out, it is possible to translate the measured area and deformation
 to the Young's modulus based on numerical simulation for
 fully elastic spheres according to Mokbel et al. :cite:`Mokbel2017`.
 
+
+.. note::
+
+    For reservoir data, the Young's modulus cannot be computed and the
+    corresponding options are hidden.
+
 Usage
 -----
 

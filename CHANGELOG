@@ -1,6 +1,9 @@
 2.1.1
- - fix: include private datasets when searching with API Key
- - setup: bump dclab from 0.22.1 to 0.23.4 (improve contour retrieval
+ - fix: include private datasets when searching with DCOR API Key
+ - fix: remove UI option to compute Young's modulus for reservoir data
+   (new "emodulus enabled" key in pipeline slot)
+ - fix: `Pipeline` object not returned by `session.open_session`
+ - setup: bump dclab from 0.22.1 to 0.22.5 (improve contour retrieval
    for mask images with artefacts, disable computation of Young's
    modulus for reservoir measurements)
 2.1.0

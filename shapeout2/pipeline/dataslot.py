@@ -21,9 +21,9 @@ class Dataslot(object):
             while identifier in Dataslot._instances:
                 Dataslot._instance_counter += 1
                 identifier = "Dataslot_{}".format(Dataslot._instance_counter)
-
+        cfg = meta_tool.get_rtdc_config(path)
         if name is None:
-            name = meta_tool.get_rtdc_config(path)["experiment"]["sample"]
+            name = cfg["experiment"]["sample"]
         #: unique identifier of the filter
         self.identifier = identifier
         #: user-defined name of the filter
@@ -38,6 +38,7 @@ class Dataslot(object):
         self.fl_name_dict = {"FL-1": "FL-1",
                              "FL-2": "FL-2",
                              "FL-3": "FL-3"}
+        is_channel = cfg["setup"]["chip region"] == "channel"
         self.config = {
             "crosstalk": {
                 # crosstalk
@@ -50,6 +51,7 @@ class Dataslot(object):
             },
             "emodulus": {
                 # emodulus
+                "emodulus enabled": is_channel,  # False for reservoir
                 "emodulus model": "elastic sphere",
                 "emodulus medium": "undefined",
                 # https://dclab.readthedocs.io/en/latest/sec_av_emodulus.html
@@ -102,8 +104,8 @@ class Dataslot(object):
             raise ValueError("Identifier mismatch: '{}' vs. '{}'".format(
                 self.identifier, state["identifier"]))
         self.color = state["color"]
-        self.config["crosstalk"] = state["crosstalk"]
-        self.config["emodulus"] = state["emodulus"]
+        self.config["crosstalk"].update(state["crosstalk"])
+        self.config["emodulus"].update(state["emodulus"])
         self.fl_name_dict = state["fl names"]
         self.name = state["name"]
         self.path = state["path"]

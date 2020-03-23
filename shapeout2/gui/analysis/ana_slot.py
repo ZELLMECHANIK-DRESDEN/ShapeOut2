@@ -64,6 +64,7 @@ class SlotPanel(QtWidgets.QWidget):
                 "crosstalk fl32": self.doubleSpinBox_ct32.value(),
             },
             "emodulus": {
+                "emodulus enabled": slot_state["emodulus"]["emodulus enabled"],
                 "emodulus model": "elastic sphere",
                 "emodulus medium": self.comboBox_medium.currentData(),
                 "emodulus scenario": self.comboBox_temp.currentData(),
@@ -94,6 +95,7 @@ class SlotPanel(QtWidgets.QWidget):
         self.doubleSpinBox_ct32.setValue(crosstalk["crosstalk fl32"])
         # emodulus
         emodulus = state["emodulus"]
+        self.groupBox_emod.setVisible(emodulus["emodulus enabled"])
         idx_med = self.comboBox_medium.findData(emodulus["emodulus medium"])
         self.comboBox_medium.setCurrentIndex(idx_med)
         self._init_emodulus_temp_choices()

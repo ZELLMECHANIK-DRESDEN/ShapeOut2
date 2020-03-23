@@ -353,3 +353,4 @@ def open_session(path, pipeline=None, search_paths=[]):
         # load element states
         estates = json.loads(arc.read("matrix.json"))
         pipeline.element_states = estates
+    return pipeline

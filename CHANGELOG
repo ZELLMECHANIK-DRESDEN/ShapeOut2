@@ -5,6 +5,7 @@
    contains nan values
  - fix: search path in session should not be filename but its
    directory
+ - setup: bump dclab from 0.22.5 to 0.23.0 (possible HDF5 export issue)
 2.1.1
  - fix: include private datasets when searching with DCOR API Key
  - fix: remove UI option to compute Young's modulus for reservoir data

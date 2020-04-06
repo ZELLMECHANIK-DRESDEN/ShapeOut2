@@ -550,12 +550,13 @@ class ShapeOut2(QtWidgets.QMainWindow):
             # update UI
             self.reload_pipeline()
 
-    def on_action_open(self):
+    def on_action_open(self, path=None):
         if self.pipeline.slots or self.pipeline.filters:
             if not self.on_action_clear():
                 return
-        path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, 'Open session', '', 'Shape-Out 2 session (*.so2)')
+        if path is None:
+            path, _ = QtWidgets.QFileDialog.getOpenFileName(
+                self, 'Open session', '', 'Shape-Out 2 session (*.so2)')
         if path:
             search_paths = []
             while True:

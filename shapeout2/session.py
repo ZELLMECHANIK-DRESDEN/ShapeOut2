@@ -192,7 +192,7 @@ def save_session(path, pipeline):
         if slot.format == "hdf5":
             # search path
             try:
-                rel = os.path.relpath(slot.path, path.parent)
+                rel = os.path.relpath(slot.path.parent, path.parent)
             except (OSError, ValueError):
                 rel = "."
             search_paths[slot.identifier] = rel

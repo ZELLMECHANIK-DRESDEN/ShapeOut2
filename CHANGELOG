@@ -1,3 +1,10 @@
+2.1.2
+ - fix: ValueError when trying to compute contour spacing, because no
+   datasets are selected for a plot
+ - fix: coloring scatter plot by feature did not work when the feature
+   contains nan values
+ - fix: search path in session should not be filename but its
+   directory
 2.1.1
  - fix: include private datasets when searching with DCOR API Key
  - fix: remove UI option to compute Young's modulus for reservoir data

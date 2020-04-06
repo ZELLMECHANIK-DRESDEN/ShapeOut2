@@ -478,7 +478,10 @@ def add_scatter(plot_item, plot_state, rtdc_ds, slot_state):
         feat -= sca["hue min"]
         feat /= sca["hue max"] - sca["hue min"]
         for f in feat:
-            brush.append(cmap.mapToQColor(f))
+            if np.isnan(f):
+                brush.append(pg.mkColor("#FF0000"))
+            else:
+                brush.append(cmap.mapToQColor(f))
     elif sca["marker hue"] == "dataset":
         alpha = int(sca["marker alpha"] * 255)
         colord = pg.mkColor(slot_state["color"])

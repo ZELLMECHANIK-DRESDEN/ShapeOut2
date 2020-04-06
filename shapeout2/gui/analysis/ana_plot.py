@@ -337,31 +337,32 @@ class PlotPanel(QtWidgets.QWidget):
             return
         else:
             self.setEnabled(True)
-        spacings_xy = []
-        for axis, scaleCombo in zip([axis_x, axis_y],
-                                    [self.comboBox_scale_x,
-                                     self.comboBox_scale_y]):
-            if axis is None:
-                # nothing to do
-                spacings_xy.append(None)
-            else:
-                # determine good approximation
-                dslist, _ = self.pipeline.get_plot_datasets(
-                    self.current_plot.identifier)
-                spacings = []
-                for ds in dslist:
-                    spa = ds.get_kde_spacing(
-                        a=ds[axis],
-                        feat=axis,
-                        scale=scaleCombo.currentData(),
-                        method=dclab.kde_methods.bin_width_percentile,
-                    )
-                    spacings.append(spa)
-                spacings_xy.append(np.min(spacings))
-        spacing_x, spacing_y = spacings_xy
-        # sets the limits before setting the value
-        self._set_contour_spacing(spacing_x=spacing_x,
-                                  spacing_y=spacing_y)
+        dslist, _ = self.pipeline.get_plot_datasets(
+            self.current_plot.identifier)
+        if dslist:
+            spacings_xy = []
+            for axis, scaleCombo in zip([axis_x, axis_y],
+                                        [self.comboBox_scale_x,
+                                         self.comboBox_scale_y]):
+                if axis is None:
+                    # nothing to do
+                    spacings_xy.append(None)
+                else:
+                    # determine good approximation
+                    spacings = []
+                    for ds in dslist:
+                        spa = ds.get_kde_spacing(
+                            a=ds[axis],
+                            feat=axis,
+                            scale=scaleCombo.currentData(),
+                            method=dclab.kde_methods.bin_width_percentile,
+                        )
+                        spacings.append(spa)
+                    spacings_xy.append(np.min(spacings))
+            spacing_x, spacing_y = spacings_xy
+            # sets the limits before setting the value
+            self._set_contour_spacing(spacing_x=spacing_x,
+                                      spacing_y=spacing_y)
 
     @property
     def current_plot(self):

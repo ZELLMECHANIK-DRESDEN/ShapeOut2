@@ -283,21 +283,21 @@ class SlotPanel(QtWidgets.QWidget):
                 self.doubleSpinBox_temp.setEnabled(False)
                 self.doubleSpinBox_temp.setValue(temperature)
             # For user convenience, also show the viscosity
-            if medium in dclab.features.emodulus_viscosity.KNOWN_MEDIA:
+            if medium in dclab.features.emodulus.viscosity.KNOWN_MEDIA:
                 # compute viscosity
                 state = self.__getstate__()
                 cfg = meta_tool.get_rtdc_config(state["path"])
                 with warnings.catch_warnings(record=True) as w:
                     # Warn the user if the temperature is out-of-range
                     warnings.simplefilter("always")
-                    visc = dclab.features.emodulus_viscosity.get_viscosity(
+                    visc = dclab.features.emodulus.viscosity.get_viscosity(
                         medium=medium,
                         channel_width=cfg["setup"]["channel width"],
                         flow_rate=cfg["setup"]["flow rate"],
                         temperature=temperature)
                     for wi in w:
                         if issubclass(wi.category,
-                                      dclab.features.emodulus_viscosity.
+                                      dclab.features.emodulus.viscosity.
                                       TemperatureOutOfRangeWarning):
                             vstyle = "color: #950000; border-width: 2px"
                             break

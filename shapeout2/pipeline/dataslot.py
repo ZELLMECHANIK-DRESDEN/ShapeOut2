@@ -153,7 +153,7 @@ class Dataslot(object):
         dataset.config["calculation"]["emodulus model"] = model
         # known media
         medium = calc["emodulus medium"]
-        if medium in dclab.features.emodulus_viscosity.KNOWN_MEDIA:
+        if medium in dclab.features.emodulus.viscosity.KNOWN_MEDIA:
             dataset.config["calculation"]["emodulus medium"] = medium
         # temperature
         temp = calc["emodulus temperature"]

@@ -550,6 +550,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             # update UI
             self.reload_pipeline()
 
+    @QtCore.pyqtSlot()
     def on_action_open(self, path=None):
         if self.pipeline.slots or self.pipeline.filters:
             if not self.on_action_clear():

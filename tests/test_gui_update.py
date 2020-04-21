@@ -13,7 +13,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         NET_AVAILABLE = False
 
 
-@pytest.mark.xfail(os.getenv("APPVEYOR").lower() == "true",
+@pytest.mark.xfail(os.getenv("APPVEYOR") in ["true", "True"],
                    reason="does not always run on Appveyor")
 @pytest.mark.xfail(os.getenv("TRAVIS") == "true",
                    reason="does not always run on travisCI")

@@ -1,6 +1,7 @@
 2.1.3
- - setup: bump dclab from 0.23.0 to 0.24.2 (equidistant isoelastics,
-   faster polygon filtering)
+ - setup: bump dclab from 0.23.0 to 0.24.3 (equidistant isoelastics,
+   faster polygon filtering, crosstalk correction failed due to
+   improper configuration update)
  - fix: opening sessions did not work due to missing slot decorator
 2.1.2
  - fix: ValueError when trying to compute contour spacing, because no

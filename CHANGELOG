@@ -4,6 +4,8 @@
    correctly written to the UI for individual slots when switching
    between slots with fundamentally different settings (e.g. channel
    and reservoir)
+ - fix: KeyError when switching between slots with different
+   temperature options
  - setup: bump dclab from 0.23.0 to 0.24.7 (equidistant isoelastics,
    faster polygon filtering, crosstalk correction failed due to
    improper configuration update)

@@ -94,15 +94,19 @@ class SlotPanel(QtWidgets.QWidget):
         self.doubleSpinBox_ct31.setValue(crosstalk["crosstalk fl31"])
         self.doubleSpinBox_ct32.setValue(crosstalk["crosstalk fl32"])
         # emodulus
+        # this has to be done first, because self.comboBox_medium
+        # triggers on_medium which triggers on_temperature
+        self._init_emodulus_temp_choices()
         emodulus = state["emodulus"]
         self.groupBox_emod.setVisible(emodulus["emodulus enabled"])
         idx_med = self.comboBox_medium.findData(emodulus["emodulus medium"])
         self.comboBox_medium.setCurrentIndex(idx_med)
-        self._init_emodulus_temp_choices()
         # https://dclab.readthedocs.io/en/latest/sec_av_emodulus.html
         scenario = emodulus.get("emodulus scenario", "manual")
         idx_scen = self.comboBox_temp.findData(scenario)
+        self.comboBox_temp.blockSignals(True)
         self.comboBox_temp.setCurrentIndex(idx_scen)
+        self.comboBox_temp.blockSignals(False)
         # This has to be done after setting the scenario
         # (otherwise it might be overridden in the frontend)
         self.doubleSpinBox_temp.setValue(emodulus["emodulus temperature"])

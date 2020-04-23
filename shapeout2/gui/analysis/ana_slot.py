@@ -99,12 +99,14 @@ class SlotPanel(QtWidgets.QWidget):
         idx_med = self.comboBox_medium.findData(emodulus["emodulus medium"])
         self.comboBox_medium.setCurrentIndex(idx_med)
         self._init_emodulus_temp_choices()
-        self.doubleSpinBox_temp.setValue(emodulus["emodulus temperature"])
-        self.doubleSpinBox_visc.setValue(emodulus["emodulus viscosity"])
         # https://dclab.readthedocs.io/en/latest/sec_av_emodulus.html
         scenario = emodulus.get("emodulus scenario", "manual")
         idx_scen = self.comboBox_temp.findData(scenario)
         self.comboBox_temp.setCurrentIndex(idx_scen)
+        # This has to be done after setting the scenario
+        # (otherwise it might be overridden in the frontend)
+        self.doubleSpinBox_temp.setValue(emodulus["emodulus temperature"])
+        self.doubleSpinBox_visc.setValue(emodulus["emodulus viscosity"])
 
         # Fluorescence data visibility
         features = meta_tool.get_rtdc_features(state["path"])

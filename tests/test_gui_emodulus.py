@@ -2,7 +2,7 @@
 import pathlib
 import tempfile
 
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtWidgets
 
 import dclab
 import h5py
@@ -12,7 +12,8 @@ from shapeout2 import session
 import pytest
 
 
-def make_dataset(medium="CellCarrier", temp=22.5, temp_range=[22, 23]):
+def make_dataset(medium="CellCarrier", temp=22.5, temp_range=[22, 23],
+                 chip_region="channel"):
     # create a fake dataset
     path = pathlib.Path(__file__).parent / "data" / "calibration_beads_47.rtdc"
     ds = dclab.new_dataset(path)
@@ -22,6 +23,7 @@ def make_dataset(medium="CellCarrier", temp=22.5, temp_range=[22, 23]):
         h5["events/temp"] = np.linspace(temp_range[0], temp_range[1], len(ds))
         h5.attrs["setup:medium"] = medium
         h5.attrs["setup:temperature"] = temp
+        h5.attrs["setup:chip region"] = chip_region
     return pathlib.Path(tmp)
 
 
@@ -84,5 +86,50 @@ def test_simple(qtbot):
 
     try:
         path.unlink()
+    except BaseException:
+        pass
+
+
+def test_switch_and_update(qtbot):
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+
+    # add fake measurement
+    path1 = make_dataset(medium="CellCarrier", temp=22.5, temp_range=[22, 23],
+                         chip_region="channel")
+    path2 = make_dataset(medium="CellCarrier", temp=22.5, temp_range=[22, 23],
+                         chip_region="reservoir")
+
+    slot_id1, slot_id2 = mw.add_dataslot(paths=[path1, path2])
+    wsl = mw.widget_ana_view.widget_slot
+
+    # select the first slot
+    em1 = mw.block_matrix.get_widget(slot_id=slot_id1)
+    em2 = mw.block_matrix.get_widget(slot_id=slot_id2)
+    qtbot.mouseClick(em1.toolButton_modify, QtCore.Qt.LeftButton)
+    # set temperature manually
+    idm = wsl.comboBox_temp.findData("manual")
+    wsl.comboBox_temp.setCurrentIndex(idm)
+    assert wsl.comboBox_temp.currentData() == "manual"
+    wsl.doubleSpinBox_temp.setValue(20.0)
+    assert wsl.doubleSpinBox_temp.value() == 20
+    qtbot.mouseClick(wsl.pushButton_apply, QtCore.Qt.LeftButton)
+    QtWidgets.QApplication.processEvents()
+    # check whether that worked
+    assert wsl.get_dataset(
+    ).config["calculation"]["emodulus temperature"] == 20
+
+    # switch to the second (reservoir) measurement
+    qtbot.mouseClick(em2.toolButton_modify, QtCore.Qt.LeftButton)
+    assert not wsl.groupBox_emod.isVisible()
+    # now switch back
+    qtbot.mouseClick(em1.toolButton_modify, QtCore.Qt.LeftButton)
+
+    # This is the actual test
+    assert wsl.doubleSpinBox_temp.value() == 20
+
+    try:
+        path1.unlink()
+        path2.unlink()
     except BaseException:
         pass

@@ -8,7 +8,7 @@
    temperature options
  - setup: bump dclab from 0.23.0 to 0.24.7 (equidistant isoelastics,
    faster polygon filtering, crosstalk correction failed due to
-   improper configuration update)
+   improper configuration update since Shape-Out 2.1.1)
 2.1.2
  - fix: ValueError when trying to compute contour spacing, because no
    datasets are selected for a plot

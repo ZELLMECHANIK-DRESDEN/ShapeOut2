@@ -19,7 +19,7 @@ The documentation, including the code reference and examples, is available at
 
 Installation
 ------------
-Installers for Shape-Out 2 are available at the `release page <https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/releases>`__.
+Installers for Windows and macOS are available at the `release page <https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/releases>`__.
 
 If you have Python 3 installed, you can install Shape-Out 2 with
 

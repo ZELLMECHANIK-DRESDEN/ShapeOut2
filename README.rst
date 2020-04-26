@@ -19,10 +19,33 @@ The documentation, including the code reference and examples, is available at
 
 Installation
 ------------
+Installers for Shape-Out 2 are available at the `release page <https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/releases>`__.
+
+If you have Python 3 installed, you can install Shape-Out 2 with
 
 ::
 
     pip install shapeout2
+
+
+Citing Shape-Out
+----------------
+Please cite Shape-Out either in-line
+
+::
+
+  (...) using the analysis software Shape-Out version 2.X.X (available at
+  https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2).
+
+or in a bibliography
+
+::
+
+  Paul Müller and others (2019), Shape-Out version 2.X.X: Analysis software
+  for real-time deformability cytometry [Software]. Available at
+  https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2.
+
+and replace ``2.X.X`` with the version of Shape-Out that you used.
 
 
 Testing

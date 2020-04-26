@@ -7,7 +7,7 @@
 **Shape-Out 2** is the successor of
 `Shape-Out <https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut>`__,
 a graphical user interface for the analysis and visualization of RT-DC data sets.
-For more informaion please visit https://zellmechanik.com/.
+For more information please visit https://zellmechanik.com/.
 
 
 Documentation

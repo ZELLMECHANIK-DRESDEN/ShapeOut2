@@ -53,6 +53,8 @@ after_test:
   - "appveyor-retry pip install pyinstaller==3.6"
   # Run pyinstaller
   - "pyinstaller -y --log-level=WARN .appveyor\\shapeout2.spec"
+  # Run the binary (the most simple test)
+  - "dist\\ShapeOut2\\ShapeOut2.exe --version"
   # Create InnoSetup installers
   # Generate iss file
   - "python .appveyor\\make_iss.py"

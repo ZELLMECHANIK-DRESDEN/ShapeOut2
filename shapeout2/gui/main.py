@@ -42,6 +42,12 @@ class ShapeOut2(QtWidgets.QMainWindow):
     plots_changed = QtCore.pyqtSignal()
 
     def __init__(self):
+        """Initialize Shape-Out 2
+
+        If you pass the "--version" command line argument, the
+        application will print the version after initialization
+        and exit.
+        """
         QtWidgets.QMainWindow.__init__(self)
         path_ui = pkg_resources.resource_filename("shapeout2.gui", "main.ui")
         uic.loadUi(path_ui, self)
@@ -147,6 +153,11 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.slot_changed.connect(self.adopt_slot)
         # check pyqtgraph version
         self._check_pg_version()
+        # if "--version" was specified, print the version and exit
+        if "--version" in sys.argv:
+            print(__version__)
+            QtWidgets.QApplication.processEvents()
+            sys.exit(0)
 
     def _check_pg_version(self):
         """Tells the user if the pyqtgraph version is not correct"""

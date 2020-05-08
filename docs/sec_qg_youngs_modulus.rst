@@ -113,13 +113,13 @@ In the following, additional visualizations for commonly used channel sizes
 and flow rates are shown:
 
 .. figure:: figures/qg_youngs_modulus_20um.png
-    :target: images/qg_youngs_modulus_20um.png
+    :target: _images/qg_youngs_modulus_20um.png
 
 .. figure:: figures/qg_youngs_modulus_30um.png
-    :target: images/qg_youngs_modulus_30um.png
+    :target: _images/qg_youngs_modulus_30um.png
 
 .. figure:: figures/qg_youngs_modulus_40um.png
-    :target: images/qg_youngs_modulus_40um.png
+    :target: _images/qg_youngs_modulus_40um.png
 
 
 Implementation

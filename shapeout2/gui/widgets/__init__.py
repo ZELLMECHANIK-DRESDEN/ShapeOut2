@@ -8,3 +8,4 @@ from .simple_image_view import SimpleImageView  # noqa: F401
 from .simple_plot_widget import (SimplePlotItem,  # noqa: F401
                                  SimplePlotWidget,  # noqa: F401
                                  SimpleViewBox)  # noqa: F401
+from .wait_cursor import show_wait_cursor  # noqa: F401

@@ -29,6 +29,7 @@ from .. import settings
 
 
 from .._version import version as __version__
+from shapeout2.gui.widgets.wait_cursor import ShowWaitCursor, show_wait_cursor
 
 
 # global plotting configuration parameters
@@ -176,6 +177,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             )
             msg.exec_()
 
+    @show_wait_cursor
     @QtCore.pyqtSlot(dict)
     def adopt_filter(self, filt_state):
         filt_id = filt_state["identifier"]
@@ -195,6 +197,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             raise ValueError("Filter not in pipeline: {}".format(filt_id))
         self.adopt_pipeline(state)
 
+    @show_wait_cursor
     @QtCore.pyqtSlot(dict)
     def adopt_pipeline(self, pipeline_state):
         # If the number of subplots within a plot changed, update the
@@ -286,6 +289,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.mdiArea.update()
         self.subwindows["analysis_view"].update()
 
+    @show_wait_cursor
     @QtCore.pyqtSlot(dict)
     def adopt_plot(self, plot_state):
         plot_id = plot_state["identifier"]
@@ -298,6 +302,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             raise ValueError("Plot not in pipeline: {}".format(plot_id))
         self.adopt_pipeline(state)
 
+    @show_wait_cursor
     @QtCore.pyqtSlot(dict)
     def adopt_slot(self, slot_state):
         slot_id = slot_state["identifier"]
@@ -317,6 +322,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             raise ValueError("Slot not in pipeline: {}".format(slot_id))
         self.adopt_pipeline(state)
 
+    @show_wait_cursor
     @QtCore.pyqtSlot()
     def add_dataslot(self, paths=None, is_dcor=False):
         """Adds a dataslot to the pipeline
@@ -499,8 +505,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             text += 'from a <a href="{}">direct download</a>. '.format(dlb)
         else:
             text += 'by running `pip install --upgrade shapeout2`. '
-        text += "Visit the ".format(ver) \
-            + '<a href="{}">official release page</a>!'.format(web)
+        text += 'Visit the <a href="{}">official release page</a>!'.format(web)
         msg.setText(text)
         msg.exec_()
 
@@ -568,12 +573,15 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 return
         if path is None:
             path, _ = QtWidgets.QFileDialog.getOpenFileName(
-                self, 'Open session', '', 'Shape-Out 2 session (*.so2)')
+                self, 'Open session', '', 'Shape-Out 2 session (*.so2)',
+                'Shape-Out 2 session (*.so2)',
+                QtWidgets.QFileDialog.DontUseNativeDialog)
         if path:
             search_paths = []
             while True:
                 try:
-                    session.open_session(path, self.pipeline, search_paths)
+                    with ShowWaitCursor():
+                        session.open_session(path, self.pipeline, search_paths)
                 except session.DataFileNotFoundError as e:
                     missds = "\r".join([str(pp) for pp in e.missing_paths])
                     msg = QtWidgets.QMessageBox()
@@ -629,6 +637,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                                           "Software",
                                           sw_text)
 
+    @show_wait_cursor
     @QtCore.pyqtSlot()
     def on_data_matrix(self):
         """Show/hide data matrix (User clicked Data Matrix button)"""
@@ -658,6 +667,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             # adjusts QuickView size correctly
             self.widget_quick_view.on_tool()
 
+    @show_wait_cursor
     @QtCore.pyqtSlot(str)
     def on_modify_filter(self, filt_id):
         self.widget_ana_view.tabWidget.setCurrentIndex(2)
@@ -669,6 +679,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.mdiArea.update()
         self.subwindows["analysis_view"].update()
 
+    @show_wait_cursor
     @QtCore.pyqtSlot(str)
     def on_modify_plot(self, plot_id):
         self.widget_ana_view.tabWidget.setCurrentIndex(3)
@@ -680,6 +691,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.mdiArea.update()
         self.subwindows["analysis_view"].update()
 
+    @show_wait_cursor
     @QtCore.pyqtSlot(str)
     def on_modify_slot(self, slot_id):
         self.widget_ana_view.tabWidget.setCurrentIndex(1)
@@ -691,6 +703,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.mdiArea.update()
         self.subwindows["analysis_view"].update()
 
+    @show_wait_cursor
     @QtCore.pyqtSlot(bool)
     def on_quickview(self, view=True):
         """Show/Hide QuickView (User clicked the QuickView button)"""
@@ -701,6 +714,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         if view:
             self.subwindows["quick_view"].update()
 
+    @show_wait_cursor
     @QtCore.pyqtSlot()
     def on_quickview_refresh(self):
         """Refresh quickview with the currently shown dataset"""
@@ -709,6 +723,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.on_quickview_show_dataset(slot_index, filt_index,
                                            update_ana_filter=False)
 
+    @show_wait_cursor
     @QtCore.pyqtSlot(int, int)
     def on_quickview_show_dataset(self, slot_index, filt_index,
                                   update_ana_filter=True):

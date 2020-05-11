@@ -1,4 +1,5 @@
 2.1.4
+ - enh: add busy cursors wherever it seems fitting
  - setup: bump dclab from 0.24.7 to 0.26.0 (volume-deformation
    isoelasticity lines)
 2.1.3

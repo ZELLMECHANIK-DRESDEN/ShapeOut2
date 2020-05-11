@@ -9,6 +9,7 @@ from scipy.ndimage import binary_erosion
 
 from ..compute.comp_stats import STAT_METHODS
 from .. import idiom
+from ..widgets import show_wait_cursor
 
 
 class QuickView(QtWidgets.QWidget):
@@ -406,6 +407,8 @@ class QuickView(QtWidgets.QWidget):
                 tsv += "{}\t{:.7g}\n".format(hi, vi)
             QtWidgets.qApp.clipboard().setText(tsv)
 
+    @show_wait_cursor
+    @QtCore.pyqtSlot()
     def on_tool(self):
         """Show and hide tools when the user selected a tool button"""
         toblock = [self.toolButton_event,
@@ -462,6 +465,8 @@ class QuickView(QtWidgets.QWidget):
         mdiwin.adjustSize()
         mdiwin.update()
 
+    @show_wait_cursor
+    @QtCore.pyqtSlot()
     def plot(self):
         """Update the plot using the current state of the UI"""
         if self.rtdc_ds is not None:
@@ -486,12 +491,14 @@ class QuickView(QtWidgets.QWidget):
                 dclab.dfn.feature_name2label[plot["axis y"]])
             self.show_statistics()
 
+    @show_wait_cursor
+    @QtCore.pyqtSlot(int)
     def show_event(self, event):
         """Display the event data (image, contour, trace)
 
         Parameters
         ----------
-        event: int or None
+        event: int
             Event index of the dataset; indices start at 0
             If set to None, the index from `self.spinBox_event`
             will be used.
@@ -580,6 +587,7 @@ class QuickView(QtWidgets.QWidget):
                 vals.append(val)
             self.tableWidget_feats.set_key_vals(keys, vals)
 
+    @show_wait_cursor
     def show_rtdc(self, rtdc_ds, slot):
         """Display an RT-DC measurement given by `path` and `filters`"""
         # make things visible

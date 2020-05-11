@@ -237,9 +237,9 @@ class PlotPanel(QtWidgets.QWidget):
         lstyles = STATE_OPTIONS["contour"]["line styles"][0]
         self.comboBox_ls_1.clear()
         self.comboBox_ls_2.clear()
-        for l in lstyles:
-            self.comboBox_ls_1.addItem(l, l)
-            self.comboBox_ls_2.addItem(l, l)
+        for ls in lstyles:
+            self.comboBox_ls_1.addItem(ls, ls)
+            self.comboBox_ls_2.addItem(ls, ls)
         # range controls
         for rc in [self.widget_range_x, self.widget_range_y,
                    self.widget_range_feat]:

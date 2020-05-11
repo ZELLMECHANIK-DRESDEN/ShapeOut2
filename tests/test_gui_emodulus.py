@@ -37,6 +37,8 @@ def run_around_tests():
     session.clear_session()
 
 
+@pytest.mark.filterwarnings(
+    'ignore::dclab.features.emodulus.YoungsModulusLookupTableExceededWarning')
 def test_simple(qtbot):
     mw = ShapeOut2()
     qtbot.addWidget(mw)

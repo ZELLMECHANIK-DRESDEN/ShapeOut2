@@ -5,7 +5,9 @@ import pkg_resources
 import time
 
 import dclab
-from PyQt5 import uic, QtWidgets
+from PyQt5 import uic, QtCore, QtWidgets
+
+from ..widgets import show_wait_cursor
 
 from ...pipeline import Pipeline
 from ..._version import version
@@ -55,6 +57,8 @@ class ComputeStatistics(QtWidgets.QDialog):
         if success:
             super(ComputeStatistics, self).done(r)
 
+    @show_wait_cursor
+    @QtCore.pyqtSlot()
     def export_statistics(self):
         """Export statistics to .tsv"""
         # get features

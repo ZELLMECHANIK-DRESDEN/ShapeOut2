@@ -3,9 +3,10 @@ import requests
 import urllib.parse
 
 import dclab
-from PyQt5 import uic, QtWidgets
+from PyQt5 import uic, QtCore, QtWidgets
 
 from ... import settings
+from ..widgets import show_wait_cursor
 
 
 class DCORLoader(QtWidgets.QDialog):
@@ -41,6 +42,8 @@ class DCORLoader(QtWidgets.QDialog):
         self.comboBox_server.addItems(servs)
         self.comboBox_server.setCurrentIndex(0)
 
+    @show_wait_cursor
+    @QtCore.pyqtSlot(int)
     def done(self, r):
         if r:
             for ii in range(self.listWidget.count()):
@@ -50,6 +53,8 @@ class DCORLoader(QtWidgets.QDialog):
                         paths=[self.search_results[ii][0]], is_dcor=True)
         super(DCORLoader, self).done(r)
 
+    @show_wait_cursor
+    @QtCore.pyqtSlot()
     def on_search(self):
         # update server list
         servs = self.settings.get_string_list("dcor servers")

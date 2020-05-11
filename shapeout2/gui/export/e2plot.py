@@ -1,8 +1,10 @@
 import pathlib
 import pkg_resources
 
-from PyQt5 import uic, QtWidgets
+from PyQt5 import uic, QtCore, QtWidgets
 import pyqtgraph.exporters as pge
+
+from ..widgets import show_wait_cursor
 
 from ..pipeline_plot import PipelinePlot
 
@@ -38,6 +40,8 @@ class ExportPlot(QtWidgets.QDialog):
             self.export_plots()
         super(ExportPlot, self).done(r)
 
+    @show_wait_cursor
+    @QtCore.pyqtSlot()
     def export_plots(self):
         # show dialog
         fmt = self.comboBox_fmt.currentData()

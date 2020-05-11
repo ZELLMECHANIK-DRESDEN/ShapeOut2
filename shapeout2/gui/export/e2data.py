@@ -6,6 +6,8 @@ from PyQt5 import uic, QtCore, QtWidgets
 
 import dclab
 
+from ..widgets import show_wait_cursor
+
 from ..._version import version
 
 
@@ -43,6 +45,8 @@ class ExportData(QtWidgets.QDialog):
             self.export_data()
         super(ExportData, self).done(r)
 
+    @show_wait_cursor
+    @QtCore.pyqtSlot()
     def export_data(self):
         """Export data to the desired file format"""
         out = pathlib.Path(self.path)

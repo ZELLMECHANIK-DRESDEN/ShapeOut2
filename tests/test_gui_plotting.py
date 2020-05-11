@@ -112,6 +112,8 @@ def test_handle_empty_plots_issue_27(qtbot):
         qtbot.mouseClick(pe, QtCore.Qt.LeftButton)  # activate (raises #27)
 
 
+@pytest.mark.filterwarnings(
+    'ignore::dclab.features.emodulus.YoungsModulusLookupTableExceededWarning')
 def test_handle_nan_valued_feature_color(qtbot):
     """User wants to color scatter data points with feature containing nans"""
     spath = datapath / "version_2_1_2_plot_color_emodulus.so2"

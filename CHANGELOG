@@ -1,7 +1,7 @@
 2.1.4
  - enh: add busy cursors wherever it seems fitting
- - setup: bump dclab from 0.24.7 to 0.26.0 (volume-deformation
-   isoelasticity lines)
+ - setup: bump dclab from 0.24.7 to 0.26.1 (volume-deformation
+   isoelasticity lines, improved DCOR caching)
 2.1.3
  - fix: opening sessions did not work due to missing slot decorator
  - fix: in some cases the temperature/viscosity setting was not

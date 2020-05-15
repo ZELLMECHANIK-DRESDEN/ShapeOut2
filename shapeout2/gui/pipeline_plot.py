@@ -216,6 +216,8 @@ class PipelinePlot(QtWidgets.QWidget):
 class PipelinePlotItem(SimplePlotItem):
     def __init__(self, *args, **kwargs):
         super(PipelinePlotItem, self).__init__(*args, **kwargs)
+        # circumvent problems with removed plots
+        self.setAcceptHoverEvents(False)
         # Disable user interaction
         self.setMouseEnabled(x=False, y=False)
         # bring axes to front
@@ -440,6 +442,7 @@ def add_scatter(plot_item, plot_state, rtdc_ds, slot_state):
                                  pen=pg.mkPen(color=(0, 0, 0, 0)),
                                  brush=pg.mkBrush("k"),
                                  symbol="s")
+    scatter.setAcceptHoverEvents(False)
     plot_item.addItem(scatter)
 
     if sca["marker hue"] == "kde":

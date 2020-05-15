@@ -1,6 +1,8 @@
 """Test of data set functionalities"""
 import pathlib
+import tempfile
 
+import dclab
 import numpy as np
 from PyQt5 import QtCore
 import pytest
@@ -125,6 +127,36 @@ def test_handle_nan_valued_feature_color(qtbot):
     # OverflowError: argument 4 overflowed: value must be in the range
     # -2147483648 to 2147483647
     mw.on_action_open(spath)
+
+
+def test_hue_feature_not_computed_if_not_selected(qtbot):
+    # generate .rtdc file without bright_avg feature
+    tmp = tempfile.mktemp(".rtdc", prefix="example_hue_")
+    with dclab.new_dataset(datapath / "calibration_beads_47.rtdc") as ds:
+        ds.export.hdf5(tmp, features=["area_um", "pos_x", "pos_y", "image",
+                                      "mask", "deform"])
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+    # add dataset
+    slot_id = mw.add_dataslot([tmp])[0]
+    # add plot
+    plot_id = mw.add_plot()
+    # and activate it
+    pw = mw.block_matrix.get_widget(filt_plot_id=plot_id, slot_id=slot_id)
+    qtbot.mouseClick(pw, QtCore.Qt.LeftButton)
+    # get the dataset
+    ds = mw.pipeline.get_dataset(slot_index=0)
+    # check whether the item has been plotted
+    datasets, _ = mw.pipeline.get_plot_datasets(plot_id)
+    assert datasets[0] is ds
+    # now check whether "bright_avg" has been computed
+    assert "bright_avg" in ds.features
+    assert "bright_avg" not in ds.features_loaded
+
+    try:
+        pathlib.Path(tmp).unlink()
+    except OSError:
+        pass
 
 
 def test_remove_plots_issue_36(qtbot):

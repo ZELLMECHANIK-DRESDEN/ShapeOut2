@@ -6,6 +6,7 @@ from PyQt5 import uic, QtWidgets
 import dclab
 
 from ... import session
+from ...util import get_valid_filename
 
 
 class ExportFilter(QtWidgets.QDialog):
@@ -64,8 +65,7 @@ class ExportFilter(QtWidgets.QDialog):
                     fn = "SO2-PolygonFilter_{}_{}.poly".format(pf.unique_id,
                                                                pf.name)
                     # remove bad characters from file name
-                    fn = fn.replace(" ", "_").encode("utf-8").decode(
-                        "ascii", errors="replace").replace("\ufffd", "?")
+                    fn = get_valid_filename(fn)
                     out = pathlib.Path(path) / fn
                     pf.save(out)
             else:
@@ -73,8 +73,7 @@ class ExportFilter(QtWidgets.QDialog):
                     filt = self.pipeline.filters[filt_index]
                     fn = "SO2-Filter_{}_{}.sof".format(filt_index, filt.name)
                     # remove bad characters from file name
-                    fn = fn.replace(" ", "_").encode("utf-8").decode(
-                        "ascii", errors="replace").replace("\ufffd", "?")
+                    fn = get_valid_filename(fn)
                     out = pathlib.Path(path) / fn
                     session.export_filters(path=out,
                                            pipeline=self.pipeline,

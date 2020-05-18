@@ -4,9 +4,10 @@ import pkg_resources
 from PyQt5 import uic, QtCore, QtWidgets
 import pyqtgraph.exporters as pge
 
+from ..pipeline_plot import PipelinePlot
 from ..widgets import show_wait_cursor
 
-from ..pipeline_plot import PipelinePlot
+from ...util import get_valid_filename
 
 
 EXPORTERS = {
@@ -54,8 +55,7 @@ class ExportPlot(QtWidgets.QDialog):
                 for ii, plot in enumerate(self.pipeline.plots):
                     fn = "SO-plot_{}_{}.{}".format(ii, plot.name, fmt)
                     # remove bad characters from file name
-                    fn = fn.replace(" ", "_").encode("utf-8").decode(
-                        "ascii", errors="replace").replace("\ufffd", "?")
+                    fn = get_valid_filename(fn)
                     fnames[plot.identifier] = pathlib.Path(path) / fn
         else:
             pp, _ = QtWidgets.QFileDialog.getSaveFileName(

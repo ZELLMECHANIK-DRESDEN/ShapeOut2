@@ -8,6 +8,7 @@ import dclab
 
 from ..widgets import show_wait_cursor
 
+from ...util import get_valid_filename
 from ..._version import version
 
 
@@ -68,11 +69,11 @@ class ExportData(QtWidgets.QDialog):
             slot = self.pipeline.slots[slot_index]
             if slot.slot_used:  # only export slots "used" (#15)
                 ds = self.pipeline.get_dataset(slot_index)
-                fn = "SO2-export_{}_{}.{}".format(slot_index, slot.name,
+                fn = "SO2-export_{}_{}.{}".format(slot_index,
+                                                  slot.name,
                                                   self.file_format)
                 # remove bad characters from file name
-                fn = fn.replace(" ", "_").encode("utf-8").decode(
-                    "ascii", errors="replace").replace("\ufffd", "?")
+                fn = get_valid_filename(fn)
                 path = out / fn
                 if self.file_format == "rtdc":
                     ds.export.hdf5(path=path,

@@ -36,3 +36,33 @@ def obj2str(obj):
     else:
         raise ValueError("No rule to convert object '{}' to string.".
                          format(obj.__class__))
+
+
+def get_valid_filename(value):
+    """
+    Return the given string converted to a string that can be used
+    for a clean filename.
+    """
+    ret = ""
+
+    valid = "abcdefghijklmnopqrstuvwxyz" \
+            + "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
+            + "0123456789" \
+            + "._-()"
+    replace = {
+        " ": "_",
+        "[": "(",
+        "]": ")",
+        "µ": "u",
+        }
+
+    for ch in value:
+        if ch in valid:
+            ret += ch
+        elif ch in replace:
+            ret += replace[ch]
+        else:
+            ret += "?"
+
+    ret = ret.strip(".")
+    return ret

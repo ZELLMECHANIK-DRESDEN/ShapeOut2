@@ -115,7 +115,7 @@ class QuickView(QtWidgets.QWidget):
 
         #: default parameters for the event image
         self.imkw = dict(autoLevels=False,
-                         levels=(0, 254),
+                         levels=(0, 255),
                          )
 
         # set initial empty dataset
@@ -224,12 +224,17 @@ class QuickView(QtWidgets.QWidget):
         state = self.__getstate__()
         imkw = self.imkw.copy()
         cellimg = ds["image"][event]
+        # automatic contrast
         if state["event"]["image auto contrast"]:
-            imkw["levels"] = cellimg.min(), cellimg.max()
+            vmin, vmax = cellimg.min(), cellimg.max()
+            cellimg = (cellimg - vmin) / (vmax - vmin) * 255
         # convert to RGB
         cellimg = cellimg.reshape(
             cellimg.shape[0], cellimg.shape[1], 1)
         cellimg = np.repeat(cellimg, 3, axis=2)
+        # convert to int
+        cellimg = np.require(cellimg, np.uint8, 'C')
+
         # Only load contour data if there is an image column.
         # We don't know how big the images should be so we
         # might run into trouble displaying random contours.
@@ -239,7 +244,7 @@ class QuickView(QtWidgets.QWidget):
                 # compute contour image from mask
                 cont = mask ^ binary_erosion(mask)
                 # set red contour pixel values in original image
-                cellimg[cont, 0] = int(imkw["levels"][1]*.7)
+                cellimg[cont, 0] = int(255*.7)
                 cellimg[cont, 1] = 0
                 cellimg[cont, 2] = 0
             if state["event"]["image zoom"]:

@@ -27,9 +27,8 @@ class SimpleImageView(pg.ImageView):
             self, '', '', 'PNG image (*.png)', '')
         if not path.endswith(".png"):
             path += ".png"
-        vmin, vmax = self.getLevels()
-        arr = (self.image - vmin) / (vmax-vmin) * 255
-        img = np.require(arr, np.uint8, 'C')
+
+        img = np.require(self.image, np.uint8, 'C')
         height, width, _ = self.image.shape
 
         qImg = QtGui.QImage(img, width, height, width *

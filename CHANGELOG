@@ -5,6 +5,7 @@
  - fix: avoid pyqtgraph error messages in pipeline plots by disabling
    hovering events (not used anyway)
  - fix: plot export did not work for single plots
+ - fix: exported event images sometimes had wrong contrast
 2.1.4
  - enh: add busy cursors wherever it seems fitting
  - setup: bump dclab from 0.24.7 to 0.26.1 (volume-deformation

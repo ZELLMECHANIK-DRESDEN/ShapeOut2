@@ -1,6 +1,7 @@
 """Test plot export"""
 import os
 import pathlib
+import shutil
 import tempfile
 
 from PyQt5 import QtWidgets
@@ -53,3 +54,6 @@ def test_export_single_plot(qtbot, monkeypatch):
 
     dlg.export_plots()
     assert pathlib.Path(tmpf).with_suffix(".png").exists()
+
+    # cleanup
+    shutil.rmtree(tmpd, ignore_errors=True)

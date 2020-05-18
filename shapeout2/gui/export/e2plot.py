@@ -63,6 +63,7 @@ class ExportPlot(QtWidgets.QDialog):
                 self.comboBox_fmt.currentText())
             if pp:
                 fnames[self.comboBox_plot.currentData()] = pathlib.Path(pp)
+
         # get PipelinePlot instance
         for plot_id in fnames:
             pipl = PipelinePlot.instances[plot_id]
@@ -71,7 +72,10 @@ class ExportPlot(QtWidgets.QDialog):
                 dpi = self.spinBox_dpi.value()
                 exp.params["width"] = int(exp.params["width"] / 72 * dpi)
                 exp.params["antialias"] = self.checkBox_aa.isChecked()
-            exp.export(str(fnames[plot_id]))
+            pout = str(fnames[plot_id])
+            if not pout.endswith(fmt):
+                pout += "."+fmt
+            exp.export(pout)
 
     def on_format(self):
         if self.comboBox_fmt.currentData() == "png":

@@ -1,4 +1,4 @@
-"""Test of data set functionalities"""
+"""Plotting GUI tests"""
 import pathlib
 import tempfile
 

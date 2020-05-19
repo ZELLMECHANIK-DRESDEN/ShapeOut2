@@ -4,6 +4,8 @@
    (statistics were computed correctly though)
  - fix: Quick View was not very informative when all events were
    filtered away - a message is now shown
+ - setup: bump dclab from 0.26.1 to 0.26.2 (fix bin num computation
+   using Doane's formula)
 2.1.5
  - fix: marker hue feature data min/max was always computed even if
    not selected; for datasets without bright_avg (standard hue) this

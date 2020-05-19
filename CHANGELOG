@@ -1,5 +1,9 @@
 2.1.6
  - fix: export file names were allowed to have invalid characters
+ - fix: Quick View showed filtered events that were not plotted
+   (statistics were computed correctly though)
+ - fix: Quick View was not very informative when all events were
+   filtered away - a message is now shown
 2.1.5
  - fix: marker hue feature data min/max was always computed even if
    not selected; for datasets without bright_avg (standard hue) this

@@ -10,6 +10,9 @@ from shapeout2 import session
 import pytest
 
 
+datapath = pathlib.Path(__file__).parent / "data"
+
+
 @pytest.fixture(autouse=True)
 def run_around_tests():
     # Code that will run before your test, for example:
@@ -48,6 +51,40 @@ def test_clear_session_issue_25(qtbot):
 
     # now clear the session (this raised the errror in #25)
     mw.on_action_clear(assume_yes=True)
+
+
+@pytest.mark.filterwarnings('ignore::RuntimeWarning')  # 0-div in kde-methods
+@pytest.mark.filterwarnings('ignore::shapeout2.pipeline.core.'
+                            + 'EmptyDatasetWarning')
+def test_no_events_disable(qtbot):
+    """When all events are removed, a message should be displayed"""
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+
+    # This session also contains a plot, so this is essentially
+    # also a test for empty plots.
+    spath = datapath / "version_2_1_6_no_events.so2"
+    mw.on_action_open(spath)
+
+    # Matrix widgets
+    slot_id1 = mw.pipeline.slot_ids[0]
+    slot_id2 = mw.pipeline.slot_ids[1]
+    filt_id = mw.pipeline.filter_ids[0]
+    em1 = mw.block_matrix.get_widget(slot_id1, filt_id)
+    em2 = mw.block_matrix.get_widget(slot_id2, filt_id)
+
+    # Now activate Quick View
+    qtbot.mouseClick(em1, QtCore.Qt.LeftButton, QtCore.Qt.ShiftModifier)
+
+    # Get Quick View instance
+    qv = mw.widget_quick_view
+
+    # This will display the "Hoppla!" message
+    assert qv.label_noevents.isVisible()
+
+    # Check the reverse
+    qtbot.mouseClick(em2, QtCore.Qt.LeftButton, QtCore.Qt.ShiftModifier)
+    assert not qv.label_noevents.isVisible()
 
 
 def test_no_events_issue_37(qtbot):

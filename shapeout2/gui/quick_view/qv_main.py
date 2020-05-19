@@ -204,6 +204,8 @@ class QuickView(QtWidgets.QWidget):
         self.widget_poly.hide()
         # show the how-to label
         self.label_howto.show()
+        # hide the no events label
+        self.label_noevents.hide()
 
     @property
     def rtdc_ds(self):
@@ -414,7 +416,7 @@ class QuickView(QtWidgets.QWidget):
 
     @show_wait_cursor
     @QtCore.pyqtSlot()
-    def on_tool(self):
+    def on_tool(self, collapse=False):
         """Show and hide tools when the user selected a tool button"""
         toblock = [self.toolButton_event,
                    self.toolButton_poly,
@@ -433,6 +435,9 @@ class QuickView(QtWidgets.QWidget):
             show_poly = self.toolButton_poly.isChecked()
         elif sender == self.toolButton_settings:
             show_settings = self.toolButton_settings.isChecked()
+        elif collapse:
+            # show nothing
+            pass
         else:
             # keep everything as-is but update the sizes
             show_event = self.widget_event.isVisible()
@@ -508,6 +513,12 @@ class QuickView(QtWidgets.QWidget):
             If set to None, the index from `self.spinBox_event`
             will be used.
         """
+        # dataset
+        ds = self.rtdc_ds
+        event_count = ds.config["experiment"]["event count"]
+        if event_count == 0:
+            # nothing to do
+            return
         # Update spin box data
         self.spinBox_event.blockSignals(True)
         self.spinBox_event.setValue(event + 1)
@@ -515,8 +526,6 @@ class QuickView(QtWidgets.QWidget):
 
         # Update selection point in scatter plot
         self.widget_scatter.setSelection(event)
-        # dataset
-        ds = self.rtdc_ds
         if self.tabWidget_event.currentIndex() == 0:
             # update image
             state = self.__getstate__()
@@ -595,16 +604,28 @@ class QuickView(QtWidgets.QWidget):
     @show_wait_cursor
     def show_rtdc(self, rtdc_ds, slot):
         """Display an RT-DC measurement given by `path` and `filters`"""
-        # make things visible
-        self.label_howto.hide()
-        self.widget_scatter.show()
-        self.widget_tool.setEnabled(True)
+        # Create a hierarchy child so that the user can browse
+        # comfortably through the data without seeing hidden events.
+        self.rtdc_ds = dclab.new_dataset(rtdc_ds)
+        event_count = self.rtdc_ds.config["experiment"]["event count"]
+        if event_count == 0:
+            self.widget_scatter.hide()
+            self.widget_tool.setEnabled(False)
+            self.label_noevents.show()
+            self.on_tool(collapse=True)
+            return
+        else:
+            # make things visible
+            self.label_noevents.hide()
+            self.label_howto.hide()
+            self.widget_scatter.show()
+            self.widget_tool.setEnabled(True)
         # get the state
         state = self.__getstate__()
         plot = state["plot"]
         # remove event state (ill-defined for different datasets)
         state.pop("event")
-        self.rtdc_ds = rtdc_ds
+
         self.slot = slot
         # default features (plot axes)
         if plot["axis x"] is None:
@@ -612,7 +633,7 @@ class QuickView(QtWidgets.QWidget):
         if plot["axis y"] is None:
             plot["axis y"] = "deform"
         # check whether axes exist in ds and change them if necessary
-        ds_features = rtdc_ds.features
+        ds_features = self.rtdc_ds.features
         if plot["axis x"] not in ds_features:
             for feat in dclab.dfn.scalar_feature_names:
                 if feat in ds_features:
@@ -627,8 +648,6 @@ class QuickView(QtWidgets.QWidget):
                         # have set the state to a reasonable value.
                         break
         # set control ranges
-        event_count = rtdc_ds.config["experiment"]["event count"]
-
         self.spinBox_event.blockSignals(True)
         self.spinBox_event.setMaximum(event_count)
         self.spinBox_event.setToolTip("total: {}".format(event_count))

@@ -131,6 +131,6 @@ class ExportData(QtWidgets.QDialog):
 
         self.listWidget.clear()
         for feat in self.features:
-            wid = QtWidgets.QListWidgetItem(dclab.dfn.feature_name2label[feat])
+            wid = QtWidgets.QListWidgetItem(dclab.dfn.get_feature_label(feat))
             wid.setCheckState(2)
             self.listWidget.addItem(wid)

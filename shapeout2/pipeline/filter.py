@@ -107,7 +107,7 @@ class Filter(object):
 
     def add_box_filter(self, feature, start, end, active=True):
         """Add a box filter"""
-        if feature not in dclab.dfn.scalar_feature_names:
+        if not dclab.dfn.scalar_feature_exists(feature):
             raise ValueError("Unknown scalar feature: {}".format(feature))
         self.boxdict[feature] = {
             "start": start,

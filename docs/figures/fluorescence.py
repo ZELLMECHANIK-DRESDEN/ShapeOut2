@@ -40,8 +40,8 @@ ds.apply_filter()
 filt = ds.filter.all
 axs.scatter(ds["fl2_area"][filt]/1000, ds["fl2_max"][filt]/100, c="k",
             marker=".", alpha=.05)
-axs.set_xlabel(dclab.dfn.feature_name2label["fl2_area"])
-axs.set_ylabel(dclab.dfn.feature_name2label["fl2_max"])
+axs.set_xlabel(dclab.dfn.get_feature_label("fl2_area"))
+axs.set_ylabel(dclab.dfn.get_feature_label("fl2_max"))
 
 fig.text(0, 1, "A",
          fontsize=17,

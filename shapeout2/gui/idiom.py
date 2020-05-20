@@ -10,6 +10,7 @@ INTEGER_FEATURES = [
     "fl3_npeaks",
     "frame",
     "index",
+    "ml_class",
     "nevents",
 ]
 

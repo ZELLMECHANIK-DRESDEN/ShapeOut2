@@ -30,12 +30,12 @@ def get_rtdc_config(path):
 @functools.lru_cache(maxsize=100)
 def get_rtdc_features(path, scalar=True, only_loaded=False):
     """Return available features in a dataset"""
-    if scalar:
-        features = dclab.dfn.scalar_feature_names
-    else:
-        features = dclab.dfn.feature_names
     av_feat = []
     with dclab.new_dataset(path) as ds:
+        if scalar:
+            features = ds.features_scalar
+        else:
+            features = ds.features
         for feat in features:
             if only_loaded:
                 if feat in ds.features_loaded:
@@ -62,7 +62,7 @@ def get_rtdc_features_minmax(path, *features):
         if len(features) == 0:
             features = ds.features_loaded
         for feat in features:
-            assert feat in dclab.dfn.scalar_feature_names
+            assert dclab.dfn.scalar_feature_exists(feat)
             if feat in ds:
                 mmdict[feat] = ds[feat].min(), ds[feat].max()
     return mmdict

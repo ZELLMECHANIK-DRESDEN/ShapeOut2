@@ -283,7 +283,7 @@ class Pipeline(object):
         return [self.get_dataset(ii, **kw) for ii in range(len(self.slots))]
 
     def get_features(self, scalar=False, label_sort=False, union=False,
-                     plot_id=None):
+                     plot_id=None, ret_labels=False):
         """Return a list of features in the pipeline
 
         Parameters
@@ -301,33 +301,43 @@ class Pipeline(object):
             If set, only datasets that are part of the matching Plot
             instance are used. If None, all datasets of the pipeline
             are used.
+        ret_labels: bool
+            If True, return the labels as well
         """
-        if scalar:
-            base_features = dclab.dfn.scalar_feature_names
-        else:
-            base_features = dclab.dfn.feature_names
         if union:
             features = set()
         else:
-            features = set(base_features)
+            features = None
         for slot_index in range(self.num_slots):
             slot_id = self.slot_ids[slot_index]
             if (plot_id is None
                 or (self.element_states[slot_id][plot_id]
                     and slot_id in self.slots_used)):
                 ds = self.get_dataset(slot_index=slot_index, filt_index=None)
-                ds_features = set(ds.features) & set(base_features)
+                if scalar:
+                    ds_features = set(ds.features_scalar)
+                else:
+                    ds_features = set(ds.features)
                 if union:
                     features |= ds_features
                 else:
-                    features &= ds_features
+                    if features is None:
+                        features = ds_features
+                    else:
+                        features &= ds_features
+            else:
+                features = dclab.dfn.scalar_feature_names
+        labs = [dclab.dfn.get_feature_label(f) for f in features]
         if label_sort:
-            labs = [dclab.dfn.feature_name2label[f] for f in features]
             lf = sorted(zip(labs, features))
             features = [it[1] for it in lf]
+            labs = [it[0] for it in lf]
         else:
             features = sorted(features)
-        return features
+        if ret_labels:
+            return features, labs
+        else:
+            return features
 
     def get_filter(self, filt_id):
         """Return the Filter matching the identifier"""

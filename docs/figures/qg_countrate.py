@@ -12,8 +12,8 @@ ax1.plot([ds["time"][0], ds["time"][-1]],
          label="constant slope",
          lw=3)
 ax1.plot(ds["time"], ds["index"], label="data")
-ax1.set_xlabel(dclab.dfn.feature_name2label["time"])
-ax1.set_ylabel(dclab.dfn.feature_name2label["index"])
+ax1.set_xlabel(dclab.dfn.get_feature_label("time"))
+ax1.set_ylabel(dclab.dfn.get_feature_label("index"))
 ax1.legend()
 
 plt.tight_layout()

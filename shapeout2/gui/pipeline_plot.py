@@ -176,7 +176,7 @@ class PipelinePlot(QtWidgets.QWidget):
             colorbar_kwds["label"] = "density [a.u.]"
         elif sca["marker hue"] == "feature":
             feat = sca["hue feature"]
-            label = dclab.dfn.feature_name2label[feat]
+            label = dclab.dfn.get_feature_label(feat)
             fl_names = slot_states[0]["fl names"]
             if label.count("FL"):
                 for key in fl_names:
@@ -509,8 +509,8 @@ def add_scatter(plot_item, plot_state, rtdc_ds, slot_state):
 
 def get_axes_labels(plot_state, slot_states):
     gen = plot_state["general"]
-    labelx = dclab.dfn.feature_name2label[gen["axis x"]]
-    labely = dclab.dfn.feature_name2label[gen["axis y"]]
+    labelx = dclab.dfn.get_feature_label(gen["axis x"])
+    labely = dclab.dfn.get_feature_label(gen["axis y"])
     # replace FL-? with user-defined names
     fl_names = slot_states[0]["fl names"]
     if labelx.count("FL"):

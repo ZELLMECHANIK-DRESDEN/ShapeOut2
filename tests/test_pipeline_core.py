@@ -35,7 +35,7 @@ def test_apply_filter_ray():
     ds_ext = pl.apply_filter_ray(ds0, slot_id)  # this should do the same thing
 
     for feat in ds_ref.features_loaded:
-        if feat in dclab.dfn.scalar_feature_names:
+        if dclab.dfn.scalar_feature_exists(feat):
             assert np.allclose(ds_ref[feat], ds_ext[feat]), feat
     assert np.all(ds_ref.filter.all == ds_ext.filter.all)
 

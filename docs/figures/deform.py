@@ -53,8 +53,8 @@ for ax in [ax1, ax2]:
     for ss in iso:
         ax.plot(ss[:, 0], ss[:, 1], color="gray", zorder=0)
     # axes labels
-    ax.set_xlabel(dclab.dfn.feature_name2label["area_um"])
-    ax.set_ylabel(dclab.dfn.feature_name2label["deform"])
+    ax.set_xlabel(dclab.dfn.get_feature_label("area_um"))
+    ax.set_ylabel(dclab.dfn.get_feature_label("deform"))
     # axes limits
     ax.set_xlim(25, 280)
     ax.set_ylim(0.0, 0.12)

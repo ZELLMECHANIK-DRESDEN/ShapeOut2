@@ -16,14 +16,14 @@ fig = plt.figure(figsize=(7, 3))
 
 ax1 = plt.subplot(121)
 ax1.scatter(ds["time"], ds["deform"], c=kde1, **scatkw)
-ax1.set_xlabel(dclab.dfn.feature_name2label["time"])
-ax1.set_ylabel(dclab.dfn.feature_name2label["deform"])
+ax1.set_xlabel(dclab.dfn.get_feature_label("time"))
+ax1.set_ylabel(dclab.dfn.get_feature_label("deform"))
 
 
 ax2 = plt.subplot(122)
 ax2.scatter(ds["time"], ds["area_um"], c=kde2, **scatkw)
-ax2.set_xlabel(dclab.dfn.feature_name2label["time"])
-ax2.set_ylabel(dclab.dfn.feature_name2label["area_um"])
+ax2.set_xlabel(dclab.dfn.get_feature_label("time"))
+ax2.set_ylabel(dclab.dfn.get_feature_label("area_um"))
 
 
 plt.tight_layout()

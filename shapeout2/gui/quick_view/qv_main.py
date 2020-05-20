@@ -496,9 +496,9 @@ class QuickView(QtWidgets.QWidget):
             self.on_tool()
             # update polygon filter axis names
             self.label_poly_x.setText(
-                dclab.dfn.feature_name2label[plot["axis x"]])
+                dclab.dfn.get_feature_label(plot["axis x"]))
             self.label_poly_y.setText(
-                dclab.dfn.feature_name2label[plot["axis y"]])
+                dclab.dfn.get_feature_label(plot["axis y"]))
             self.show_statistics()
 
     @show_wait_cursor
@@ -589,8 +589,8 @@ class QuickView(QtWidgets.QWidget):
         else:
             # only use computed features (speed)
             fcands = ds.features_loaded
-            feats = [f for f in fcands if f in dclab.dfn.scalar_feature_names]
-            lf = sorted([(dclab.dfn.feature_name2label[f], f) for f in feats])
+            feats = [f for f in fcands if f in ds.features_scalar]
+            lf = sorted([(dclab.dfn.get_feature_label(f), f) for f in feats])
             keys = []
             vals = []
             for lii, fii in lf:
@@ -632,8 +632,9 @@ class QuickView(QtWidgets.QWidget):
             plot["axis x"] = "area_um"
         if plot["axis y"] is None:
             plot["axis y"] = "deform"
-        # check whether axes exist in ds and change them if necessary
-        ds_features = self.rtdc_ds.features
+        # check whether axes exist in ds and change them to defaults
+        # if necessary
+        ds_features = self.rtdc_ds.features_scalar
         if plot["axis x"] not in ds_features:
             for feat in dclab.dfn.scalar_feature_names:
                 if feat in ds_features:
@@ -674,11 +675,10 @@ class QuickView(QtWidgets.QWidget):
 
         This is used e.g. when emodulus becomes available
         """
-        feats_scalar = dclab.dfn.scalar_feature_names
         if self.rtdc_ds is not None:
             # axes combobox choices
-            ds_feats = [f for f in self.rtdc_ds.features if f in feats_scalar]
-            ds_labels = [dclab.dfn.feature_name2label[f] for f in ds_feats]
+            ds_feats = self.rtdc_ds.features_scalar
+            ds_labels = [dclab.dfn.get_feature_label(f) for f in ds_feats]
             ds_fl = sorted(zip(ds_labels, ds_feats))
             for cb in [self.comboBox_x, self.comboBox_y]:
                 fcur = cb.currentData()

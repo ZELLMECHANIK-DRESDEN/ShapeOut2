@@ -116,8 +116,8 @@ class QuickViewScatterWidget(SimplePlotWidget):
         # set data
         self.setData(x, y, brush=brush)
         # set axes labels (replace with user-defined flourescence names)
-        left = dclab.dfn.feature_name2label[self.yax]
-        bottom = dclab.dfn.feature_name2label[self.xax]
+        left = dclab.dfn.get_feature_label(self.yax)
+        bottom = dclab.dfn.get_feature_label(self.xax)
         for key in self.slot.fl_name_dict:
             if key in left:
                 left = left.replace(key, self.slot.fl_name_dict[key])

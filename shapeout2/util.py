@@ -54,7 +54,7 @@ def get_valid_filename(value):
         "[": "(",
         "]": ")",
         "µ": "u",
-        }
+    }
 
     for ch in value:
         if ch in valid:

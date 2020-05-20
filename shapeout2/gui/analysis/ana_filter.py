@@ -93,8 +93,15 @@ class FilterPanel(QtWidgets.QWidget):
 
     def _init_box_filters(self):
         self._box_range_controls = {}
-        feats = dclab.dfn.scalar_feature_names
-        labs = [dclab.dfn.feature_name2label[f] for f in feats]
+        if self.pipeline is not None:
+            # Do not sort here, because we will have to sort anyway
+            # if there is no pipeline.
+            feats, labs = self.pipeline.get_features(scalar=True,
+                                                     ret_labels=True)
+        else:
+            feats = dclab.dfn.scalar_feature_names
+            labs = [dclab.dfn.feature_name2label[f] for f in feats]
+
         self.verticalLayout_box.setAlignment(QtCore.Qt.AlignTop)
 
         for lab, feat in sorted(zip(labs, feats)):

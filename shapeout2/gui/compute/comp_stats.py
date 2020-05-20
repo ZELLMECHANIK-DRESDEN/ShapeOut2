@@ -193,6 +193,6 @@ class ComputeStatistics(QtWidgets.QDialog):
 
         self.listWidget_features.clear()
         for feat in self.features:
-            wid = QtWidgets.QListWidgetItem(dclab.dfn.feature_name2label[feat])
+            wid = QtWidgets.QListWidgetItem(dclab.dfn.get_feature_label(feat))
             wid.setCheckState(0)
             self.listWidget_features.addItem(wid)

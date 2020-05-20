@@ -523,7 +523,7 @@ class PlotPanel(QtWidgets.QWidget):
                     label_sort=True,
                     plot_id=self.current_plot.identifier)
                 for feat in feats_srt:
-                    cb.addItem(dclab.dfn.feature_name2label[feat], feat)
+                    cb.addItem(dclab.dfn.get_feature_label(feat), feat)
                 if curfeat is not None:
                     # write back current selection
                     curidx = feats_srt.index(curfeat)

@@ -66,6 +66,8 @@ STATE_OPTIONS = {
     },
     "general": {
         "auto range": bool,
+        # This is not entirely correct, because `ml_score_???`
+        # should also work.
         "axis x": dclab.dfn.scalar_feature_names,
         "axis y": dclab.dfn.scalar_feature_names,
         "isoelastics": bool,
@@ -81,6 +83,8 @@ STATE_OPTIONS = {
         "downsampling": bool,
         "downsampling value": int,
         "enabled":  bool,
+        # This is not entirely correct, because `ml_score_???`
+        # should also work.
         "hue feature": dclab.dfn.scalar_feature_names,
         "hue max": float,
         "hue min": float,

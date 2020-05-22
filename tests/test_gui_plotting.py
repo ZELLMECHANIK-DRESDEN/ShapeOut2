@@ -3,6 +3,7 @@ import pathlib
 import tempfile
 
 import dclab
+import h5py
 import numpy as np
 from PyQt5 import QtCore
 import pytest
@@ -152,6 +153,43 @@ def test_hue_feature_not_computed_if_not_selected(qtbot):
     # now check whether "bright_avg" has been computed
     assert "bright_avg" in ds.features
     assert "bright_avg" not in ds.features_loaded
+
+    try:
+        pathlib.Path(tmp).unlink()
+    except OSError:
+        pass
+
+
+def test_plot_ml_score(qtbot):
+    tmp = tempfile.mktemp(".rtdc", prefix="example_ml_score_")
+    with dclab.new_dataset(datapath / "calibration_beads_47.rtdc") as ds:
+        ds.export.hdf5(tmp, features=["area_um", "pos_x", "pos_y", "image",
+                                      "mask", "deform"])
+        lends = len(ds)
+    # add ml_score features
+    with h5py.File(tmp, "a") as h5:
+        h5["/events/ml_score_ds9"] = np.linspace(0, 1, lends)
+        h5["/events/ml_score_voy"] = np.linspace(1, 0, lends)
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+    # add dataset
+    slot_id = mw.add_dataslot([tmp])[0]
+    # add plot
+    plot_id = mw.add_plot()
+    # and activate it
+    pw = mw.block_matrix.get_widget(filt_plot_id=plot_id, slot_id=slot_id)
+    qtbot.mouseClick(pw, QtCore.Qt.LeftButton)
+    # get the dataset
+    ds = mw.pipeline.get_dataset(slot_index=0)
+    # sanity check
+    assert "ml_class" in ds
+
+    # Now set the x axis to Voyager
+    pv = mw.widget_ana_view.widget_plot
+    idvoy = pv.comboBox_axis_x.findData("ml_score_voy")
+    assert idvoy >= 0
+    pv.comboBox_axis_x.setCurrentIndex(idvoy)
+    qtbot.mouseClick(pv.pushButton_apply, QtCore.Qt.LeftButton)
 
     try:
         pathlib.Path(tmp).unlink()

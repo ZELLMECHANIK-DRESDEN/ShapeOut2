@@ -1,3 +1,6 @@
+2.2.0
+ - setup: bump dclab from 0.26.2 to 0.27.0 (support for machine
+   learning features)
 2.1.6
  - fix: export file names were allowed to have invalid characters
  - fix: Quick View showed filtered events that were not plotted

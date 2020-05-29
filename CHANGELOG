@@ -1,5 +1,5 @@
 2.2.0
- - setup: bump dclab from 0.26.2 to 0.27.0 (support for machine
+ - setup: bump dclab from 0.26.2 to 0.27.5 (support for machine
    learning features)
  - fix: modify the GUI to enable box filtering for ml_score_???
    features

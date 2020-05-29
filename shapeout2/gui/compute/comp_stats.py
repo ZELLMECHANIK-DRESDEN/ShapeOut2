@@ -8,8 +8,6 @@ import dclab
 from PyQt5 import uic, QtCore, QtWidgets
 
 from ..widgets import show_wait_cursor
-
-from ...pipeline import Pipeline
 from ..._version import version
 
 STAT_METHODS = sorted(dclab.statistics.Statistics.available_methods.keys())

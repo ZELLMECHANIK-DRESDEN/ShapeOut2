@@ -708,7 +708,7 @@
      <item>
       <widget class="QGroupBox" name="groupBox_contour">
        <property name="title">
-        <string>Contour plot</string>
+        <string>Contour density plot</string>
        </property>
        <property name="checkable">
         <bool>true</bool>

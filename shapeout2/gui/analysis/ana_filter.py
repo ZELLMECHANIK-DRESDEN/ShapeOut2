@@ -27,7 +27,9 @@ class FilterPanel(QtWidgets.QWidget):
         # current Shape-Out 2 pipeline
         self._pipeline = None
         self.setUpdatesEnabled(False)
-        self._init_box_filters()
+        #: contains the range widgets for the box filters
+        self._box_range_controls = {}
+        self._populate_box_filters()
         self._polygon_checkboxes = {}
         self.update_polygon_filters()
         self.pushButton_duplicate.clicked.connect(self.on_duplicate_filter)
@@ -91,14 +93,20 @@ class FilterPanel(QtWidgets.QWidget):
             else:
                 self._polygon_checkboxes[key].setChecked(False)
 
-    def _init_box_filters(self):
-        self._box_range_controls = {}
+    def _populate_box_filters(self):
+        """Dynamically update available pipeline box filters
+
+        This method can be called multiple times. If called multiple
+        times, additional features that were not there before
+        (e.g. `ml_score_???`) are added.
+        """
         if self.pipeline is not None:
             # Do not sort here, because we will have to sort anyway
             # if there is no pipeline.
             feats, labs = self.pipeline.get_features(scalar=True,
                                                      ret_labels=True)
         else:
+            # This does not include the `ml_score_???` features.
             feats = dclab.dfn.scalar_feature_names
             labs = [dclab.dfn.feature_name2label[f] for f in feats]
 
@@ -106,16 +114,22 @@ class FilterPanel(QtWidgets.QWidget):
 
         for lab, feat in sorted(zip(labs, feats)):
             integer = True if feat in idiom.INTEGER_FEATURES else False
-            rc = RangeControl(
-                self,
-                checkbox=False,  # checkbox is used in on_moreless
-                integer=integer,
-                label=lab,
-                data=feat)
-            rc.checkBox.setChecked(False)
-            rc.setVisible(False)
-            self.verticalLayout_box.addWidget(rc)
-            self._box_range_controls[feat] = rc
+            if feat not in self._box_range_controls:
+                # Create the control
+                rc = RangeControl(
+                    self,
+                    checkbox=False,  # checkbox is used in on_moreless
+                    integer=integer,
+                    label=lab,
+                    data=feat)
+                rc.checkBox.setChecked(False)
+                rc.setVisible(False)
+                # Insert the control at the correct position (label-sorted)
+                rcf = list(self._box_range_controls.keys())
+                rcl = [dclab.dfn.get_feature_label(ft) for ft in rcf]
+                index = sorted(rcl + [lab]).index(lab) + 1  # +1 b/c new list
+                self.verticalLayout_box.insertWidget(index, rc)
+                self._box_range_controls[feat] = rc
 
     @property
     def active_box_features(self):
@@ -180,11 +194,14 @@ class FilterPanel(QtWidgets.QWidget):
 
     def on_moreless(self):
         """User wants to choose box filters"""
-        features = self.pipeline.get_features(scalar=True,
-                                              label_sort=True,
-                                              union=True)
         if not self._box_edit_view:
-            # Show all filters to the user
+            # get available features to show
+            features = self.pipeline.get_features(scalar=True,
+                                                  label_sort=True,
+                                                  union=True)
+            # create missing range controls if applicable (e.g. ml_score_???)
+            self._populate_box_filters()
+            # Show all filters shared by all datasets to the user
             for feat, rc in self._box_range_controls.items():
                 if feat in features:
                     rc.setVisible(True)

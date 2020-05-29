@@ -333,7 +333,9 @@ class Pipeline(object):
             features = [it[1] for it in lf]
             labs = [it[0] for it in lf]
         else:
-            features = sorted(features)
+            fl = sorted(zip(features, labs))
+            features = [it[0] for it in fl]
+            labs = [it[1] for it in fl]
         if ret_labels:
             return features, labs
         else:

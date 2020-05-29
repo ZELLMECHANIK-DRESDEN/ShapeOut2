@@ -1,6 +1,8 @@
 2.2.0
  - setup: bump dclab from 0.26.2 to 0.27.0 (support for machine
    learning features)
+ - fix: modify the GUI to enable box filtering for ml_score_???
+   features
 2.1.6
  - fix: export file names were allowed to have invalid characters
  - fix: Quick View showed filtered events that were not plotted

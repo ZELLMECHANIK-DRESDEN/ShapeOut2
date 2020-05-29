@@ -185,11 +185,15 @@ class ComputeStatistics(QtWidgets.QDialog):
                                                        union=True,
                                                        label_sort=True)
         else:
-            # This is just a cheap way of getting a label-sorted list
-            # of all scalar features.
-            empty_pipeline = Pipeline()
-            self.features = empty_pipeline.get_features(scalar=True,
-                                                        label_sort=True)
+            # We want to compute statistics from a folder
+            # TODO:
+            # - Add ml_score_??? features
+
+            # label-sorted features
+            features = dclab.dfn.scalar_feature_names
+            labs = [dclab.dfn.get_feature_label(f) for f in features]
+            lf = sorted(zip(labs, features))
+            self.features = [it[1] for it in lf]
 
         self.listWidget_features.clear()
         for feat in self.features:

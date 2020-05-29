@@ -57,8 +57,7 @@ class PlotPanel(QtWidgets.QWidget):
         self.widget_range_y.range_changed.connect(self.on_range_changed)
 
     def __getstate__(self):
-        feats_srt = self.pipeline.get_features(
-            scalar=True, label_sort=True, plot_id=self.current_plot.identifier)
+        feats_srt = self.get_features()
 
         rx = self.widget_range_x.__getstate__()
         ry = self.widget_range_y.__getstate__()
@@ -130,8 +129,7 @@ class PlotPanel(QtWidgets.QWidget):
     def __setstate__(self, state):
         if self.current_plot.identifier != state["identifier"]:
             raise ValueError("Plot identifier mismatch!")
-        feats_srt = self.pipeline.get_features(
-            scalar=True, label_sort=True, plot_id=self.current_plot.identifier)
+        feats_srt = self.get_features()
         toblock = [
             self.comboBox_axis_x,
             self.comboBox_axis_y,
@@ -397,6 +395,18 @@ class PlotPanel(QtWidgets.QWidget):
             ids = []
         return ids
 
+    def get_features(self):
+        """Wrapper around pipeline with default features if empty"""
+        feats_srt = self.pipeline.get_features(
+            scalar=True, label_sort=True, plot_id=self.current_plot.identifier)
+        if len(feats_srt) == 0:
+            # fallback (nothing in the pipeline)
+            features = dclab.dfn.scalar_feature_names
+            labs = [dclab.dfn.get_feature_label(f) for f in features]
+            lf = sorted(zip(labs, features))
+            feats_srt = [it[1] for it in lf]
+        return feats_srt
+
     def on_axis_changed(self):
         gen = self.__getstate__()["general"]
         if self.sender() == self.comboBox_axis_x:
@@ -518,10 +528,7 @@ class PlotPanel(QtWidgets.QWidget):
                     curfeat = None
                 # repopulate
                 cb.clear()
-                feats_srt = self.pipeline.get_features(
-                    scalar=True,
-                    label_sort=True,
-                    plot_id=self.current_plot.identifier)
+                feats_srt = self.get_features()
                 for feat in feats_srt:
                     cb.addItem(dclab.dfn.get_feature_label(feat), feat)
                 if curfeat is not None:

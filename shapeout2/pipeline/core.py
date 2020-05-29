@@ -303,6 +303,11 @@ class Pipeline(object):
             are used.
         ret_labels: bool
             If True, return the labels as well
+
+        Notes
+        -----
+        This function returns an empty list if there are no features
+        available.
         """
         if union:
             features = set()
@@ -325,8 +330,9 @@ class Pipeline(object):
                         features = ds_features
                     else:
                         features &= ds_features
-            else:
-                features = dclab.dfn.scalar_feature_names
+        if features is None:
+            # This means that the pipeline is empty
+            features = []
         labs = [dclab.dfn.get_feature_label(f) for f in features]
         if label_sort:
             lf = sorted(zip(labs, features))

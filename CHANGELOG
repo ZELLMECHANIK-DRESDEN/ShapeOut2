@@ -3,6 +3,9 @@
    learning features)
  - fix: modify the GUI to enable box filtering for ml_score_???
    features
+ - ref: pipeline.get_features now only returns features that are
+   available (previously all features were returned when no
+   datasets were in the pipeline)
 2.1.6
  - fix: export file names were allowed to have invalid characters
  - fix: Quick View showed filtered events that were not plotted

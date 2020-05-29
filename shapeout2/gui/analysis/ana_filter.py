@@ -100,15 +100,7 @@ class FilterPanel(QtWidgets.QWidget):
         times, additional features that were not there before
         (e.g. `ml_score_???`) are added.
         """
-        if self.pipeline is not None:
-            # Do not sort here, because we will have to sort anyway
-            # if there is no pipeline.
-            feats, labs = self.pipeline.get_features(scalar=True,
-                                                     ret_labels=True)
-        else:
-            # This does not include the `ml_score_???` features.
-            feats = dclab.dfn.scalar_feature_names
-            labs = [dclab.dfn.feature_name2label[f] for f in feats]
+        feats, labs = self.get_features_labels()
 
         self.verticalLayout_box.setAlignment(QtCore.Qt.AlignTop)
 
@@ -172,6 +164,22 @@ class FilterPanel(QtWidgets.QWidget):
     def pipeline(self):
         return self._pipeline
 
+    def get_features_labels(self):
+        """Wrapper around pipeline with default features if empty"""
+        if self.pipeline is not None and self.pipeline.num_slots != 0:
+            feats, labs = self.pipeline.get_features(scalar=True,
+                                                     label_sort=True,
+                                                     ret_labels=True,
+                                                     union=True)
+        else:
+            # fallback (nothing in the pipeline or no pipeline)
+            features = dclab.dfn.scalar_feature_names
+            labs = [dclab.dfn.get_feature_label(f) for f in features]
+            lf = sorted(zip(labs, features))
+            feats = [it[1] for it in lf]
+            labs = [it[0] for it in lf]
+        return feats, labs
+
     def on_duplicate_filter(self):
         # determine the new filter state
         filt_state = self.__getstate__()
@@ -196,9 +204,7 @@ class FilterPanel(QtWidgets.QWidget):
         """User wants to choose box filters"""
         if not self._box_edit_view:
             # get available features to show
-            features = self.pipeline.get_features(scalar=True,
-                                                  label_sort=True,
-                                                  union=True)
+            features, _ = self.get_features_labels()
             # create missing range controls if applicable (e.g. ml_score_???)
             self._populate_box_filters()
             # Show all filters shared by all datasets to the user

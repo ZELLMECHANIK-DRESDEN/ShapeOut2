@@ -24,6 +24,34 @@ def run_around_tests():
     session.clear_session()
 
 
+def test_empty_plot_with_one_plot_per_dataset_issue_41(qtbot):
+    """
+    Setting "one plot per dataset" for an empty plot resulted in
+    zero-division error when determining col/row numbers
+    """
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+
+    # add a dataslot
+    path = datapath / "calibration_beads_47.rtdc"
+    mw.add_dataslot(paths=[path])
+
+    # add a plot
+    plot_id = mw.add_plot()
+
+    # activate analysis view
+    pe = mw.block_matrix.get_widget(filt_plot_id=plot_id)
+    qtbot.mouseClick(pe.toolButton_modify, QtCore.Qt.LeftButton)
+
+    pv = mw.widget_ana_view.widget_plot
+
+    # Change to "each" and apply
+    idx = pv.comboBox_division.findData("each")
+    pv.comboBox_division.setCurrentIndex(idx)
+    # Lead to zero-division error in "get_plot_col_row_count"
+    qtbot.mouseClick(pv.pushButton_apply, QtCore.Qt.LeftButton)
+
+
 def test_handle_axis_selection_empty_plot(qtbot):
     """User did not add a dataset to a plot and starts changing plot params"""
     mw = ShapeOut2()

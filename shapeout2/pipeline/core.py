@@ -458,7 +458,7 @@ class Pipeline(object):
         # additional plots
         div = pstate["layout"]["division"]
         if div == "each":
-            num_plots = num_scat
+            num_plots = max(1, num_scat)
         elif div == "merge":
             num_plots = 1
         elif div == "multiscatter+contour":

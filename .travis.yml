@@ -35,6 +35,7 @@ script:
 - coverage report -m
 - flake8 shapeout2
 - flake8 tests
+# build
 - python setup.py sdist bdist_wheel
 - pip install pyinstaller==3.6
 - bash ./.travis/${TRAVIS_OS_NAME}_build_app.sh Shape-Out $TRAVIS_TAG

@@ -36,7 +36,7 @@
          <string>&amp;Analysis View</string>
         </property>
         <property name="icon">
-         <iconset theme="applications-development"/>
+         <iconset theme="tools-wizard"/>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -61,7 +61,7 @@
          <string>Load &amp;Dataset</string>
         </property>
         <property name="icon">
-         <iconset theme="applications-science"/>
+         <iconset theme="office-chart-ring"/>
         </property>
         <property name="toolButtonStyle">
          <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -129,7 +129,7 @@
          <string>Block &amp;Matrix</string>
         </property>
         <property name="icon">
-         <iconset theme="user-home"/>
+         <iconset theme="show-grid"/>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -157,7 +157,7 @@
          <string>&amp;Quick View</string>
         </property>
         <property name="icon">
-         <iconset theme="input-gaming"/>
+         <iconset theme="office-chart-scatter"/>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -176,7 +176,7 @@
          <string>New Filte&amp;r</string>
         </property>
         <property name="icon">
-         <iconset theme="applications-accessories"/>
+         <iconset theme="view-filter"/>
         </property>
         <property name="toolButtonStyle">
          <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -189,7 +189,7 @@
          <string>New &amp;Plot</string>
         </property>
         <property name="icon">
-         <iconset theme="applications-graphics"/>
+         <iconset theme="draw-watercolor"/>
         </property>
         <property name="toolButtonStyle">
          <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -322,7 +322,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionLoadDataset">
    <property name="icon">
-    <iconset theme="applications-science"/>
+    <iconset theme="office-chart-ring"/>
    </property>
    <property name="text">
     <string>Load &amp;Dataset</string>
@@ -333,7 +333,8 @@
   </action>
   <action name="actionOpenSession">
    <property name="icon">
-    <iconset theme="document-open"/>
+    <iconset theme="document-open">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Open Session</string>
@@ -344,7 +345,8 @@
   </action>
   <action name="actionSaveSession">
    <property name="icon">
-    <iconset theme="document-save"/>
+    <iconset theme="document-save">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Save Session</string>
@@ -363,7 +365,8 @@
   </action>
   <action name="actionClearSession">
    <property name="icon">
-    <iconset theme="edit-clear"/>
+    <iconset theme="edit-clear">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Clear Session</string>
@@ -379,7 +382,8 @@
   </action>
   <action name="actionQuit">
    <property name="icon">
-    <iconset theme="application-exit"/>
+    <iconset theme="application-exit">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Quit</string>
@@ -387,7 +391,7 @@
   </action>
   <action name="actionDocumentation">
    <property name="icon">
-    <iconset theme="help-contents"/>
+    <iconset theme="globe"/>
    </property>
    <property name="text">
     <string>&amp;Documentation</string>
@@ -395,7 +399,7 @@
   </action>
   <action name="actionSoftware">
    <property name="icon">
-    <iconset theme="applications-other"/>
+    <iconset theme="code-context"/>
    </property>
    <property name="text">
     <string>&amp;Software</string>
@@ -403,7 +407,7 @@
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset theme="help-about"/>
+    <iconset theme="documentinfo"/>
    </property>
    <property name="text">
     <string>&amp;About</string>
@@ -424,7 +428,7 @@
   </action>
   <action name="actionExportPlot">
    <property name="icon">
-    <iconset theme="applications-graphics"/>
+    <iconset theme="draw-watercolor"/>
    </property>
    <property name="text">
     <string>&amp;Plot...</string>
@@ -432,7 +436,7 @@
   </action>
   <action name="actionExportData">
    <property name="icon">
-    <iconset theme="applications-science"/>
+    <iconset theme="office-chart-ring"/>
    </property>
    <property name="text">
     <string>&amp;Data...</string>
@@ -440,7 +444,7 @@
   </action>
   <action name="actionExportFilter">
    <property name="icon">
-    <iconset theme="applications-accessories"/>
+    <iconset theme="view-filter"/>
    </property>
    <property name="text">
     <string>&amp;Filter...</string>
@@ -448,7 +452,7 @@
   </action>
   <action name="actionImportFilter">
    <property name="icon">
-    <iconset theme="applications-accessories"/>
+    <iconset theme="view-filter"/>
    </property>
    <property name="text">
     <string>Filter</string>
@@ -466,7 +470,7 @@
   </action>
   <action name="actionComputeStatistics">
    <property name="icon">
-    <iconset theme="applications-office"/>
+    <iconset theme="view-statistics"/>
    </property>
    <property name="text">
     <string>Statistics</string>
@@ -475,9 +479,6 @@
   <action name="actionDeveloperMode">
    <property name="checkable">
     <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset theme="system-run"/>
    </property>
    <property name="text">
     <string>Developer Mode</string>
@@ -490,16 +491,13 @@
    <property name="checked">
     <bool>true</bool>
    </property>
-   <property name="icon">
-    <iconset theme="system-software-update"/>
-   </property>
    <property name="text">
     <string>Check for updates on startup</string>
    </property>
   </action>
   <action name="actionLoadDCOR">
    <property name="icon">
-    <iconset theme="applications-internet"/>
+    <iconset theme="folder-cloud"/>
    </property>
    <property name="text">
     <string>Load DCOR data</string>

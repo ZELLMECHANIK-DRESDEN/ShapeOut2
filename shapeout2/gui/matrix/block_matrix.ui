@@ -76,6 +76,9 @@
          <property name="text">
           <string>+</string>
          </property>
+         <property name="icon">
+          <iconset theme="view-filter"/>
+         </property>
         </widget>
        </item>
        <item row="0" column="3">
@@ -107,6 +110,9 @@
          </property>
          <property name="text">
           <string>+</string>
+         </property>
+         <property name="icon">
+          <iconset theme="draw-watercolor"/>
          </property>
         </widget>
        </item>
@@ -159,6 +165,9 @@
          </property>
          <property name="text">
           <string>+</string>
+         </property>
+         <property name="icon">
+          <iconset theme="office-chart-ring"/>
          </property>
          <property name="autoRaise">
           <bool>false</bool>

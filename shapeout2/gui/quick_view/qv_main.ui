@@ -14,7 +14,7 @@
    <string>Form</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="input-gaming"/>
+   <iconset theme="office-chart-scatter"/>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
@@ -102,11 +102,11 @@
          <string>Plot</string>
         </property>
         <property name="text">
-         <string/>
+         <string>S</string>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>../../img/axes.svg</normaloff>../../img/axes.svg</iconset>
+         <iconset theme="gtk-preferences">
+          <normaloff>.</normaloff>.</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -128,11 +128,11 @@
          <string>Event</string>
         </property>
         <property name="text">
-         <string/>
+         <string>E</string>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>../../img/eye.svg</normaloff>../../img/eye.svg</iconset>
+         <iconset theme="visibility">
+          <normaloff>.</normaloff>.</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -148,11 +148,11 @@
       <item>
        <widget class="QToolButton" name="toolButton_poly">
         <property name="text">
-         <string>...</string>
+         <string>P</string>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>../../img/poly.svg</normaloff>../../img/poly.svg</iconset>
+         <iconset theme="path-mode-polyline">
+          <normaloff>.</normaloff>.</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>

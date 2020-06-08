@@ -26,6 +26,9 @@ def main(splash=True):
     from PyQt5 import QtCore, QtGui
     from .gui import ShapeOut2
 
+    # Set Icon Theme Search Path
+    QtGui.QIcon.setThemeSearchPaths([os.path.join(imdir, "icon-theme")])
+
     # Set Application Icon
     icon_path = os.path.join(imdir, "icon.png")
     app.setWindowIcon(QtGui.QIcon(icon_path))

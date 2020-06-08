@@ -1,0 +1,13 @@
+[Icon Theme]
+Name=ShapeOutMix
+Comment=Mix of themes for Shape-Out 2
+
+Directories=breeze/places/16,breeze/actions/16
+
+[breeze/places/16]
+Size=16
+Type=Fixed
+
+[breeze/actions/16]
+Size=16
+Type=Fixed

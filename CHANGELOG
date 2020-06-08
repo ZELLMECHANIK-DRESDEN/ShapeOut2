@@ -1,3 +1,5 @@
+2.2.2
+ - enh: add pretty tool icons from KDE breeze theme
 2.2.1
  - fix: zero-division error when setting "one plot per dataset"
    for an empty plot (#41)

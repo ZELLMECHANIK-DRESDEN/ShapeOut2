@@ -35,8 +35,14 @@
         <property name="text">
          <string>&amp;Analysis View</string>
         </property>
+        <property name="icon">
+         <iconset theme="applications-development"/>
+        </property>
         <property name="checkable">
          <bool>true</bool>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
         </property>
         <property name="autoRaise">
          <bool>true</bool>
@@ -53,6 +59,12 @@
         </property>
         <property name="text">
          <string>Load &amp;Dataset</string>
+        </property>
+        <property name="icon">
+         <iconset theme="applications-science"/>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
         </property>
        </widget>
       </item>
@@ -116,11 +128,17 @@
         <property name="text">
          <string>Block &amp;Matrix</string>
         </property>
+        <property name="icon">
+         <iconset theme="user-home"/>
+        </property>
         <property name="checkable">
          <bool>true</bool>
         </property>
         <property name="checked">
          <bool>true</bool>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
         </property>
         <property name="autoRaise">
          <bool>true</bool>
@@ -138,8 +156,14 @@
         <property name="text">
          <string>&amp;Quick View</string>
         </property>
+        <property name="icon">
+         <iconset theme="input-gaming"/>
+        </property>
         <property name="checkable">
          <bool>true</bool>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
         </property>
         <property name="autoRaise">
          <bool>true</bool>
@@ -151,12 +175,24 @@
         <property name="text">
          <string>New Filte&amp;r</string>
         </property>
+        <property name="icon">
+         <iconset theme="applications-accessories"/>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        </property>
        </widget>
       </item>
       <item row="0" column="2">
        <widget class="QToolButton" name="toolButton_new_plot">
         <property name="text">
          <string>New &amp;Plot</string>
+        </property>
+        <property name="icon">
+         <iconset theme="applications-graphics"/>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
         </property>
        </widget>
       </item>
@@ -285,6 +321,9 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionLoadDataset">
+   <property name="icon">
+    <iconset theme="applications-science"/>
+   </property>
    <property name="text">
     <string>Load &amp;Dataset</string>
    </property>
@@ -293,6 +332,9 @@
    </property>
   </action>
   <action name="actionOpenSession">
+   <property name="icon">
+    <iconset theme="document-open"/>
+   </property>
    <property name="text">
     <string>&amp;Open Session</string>
    </property>
@@ -301,6 +343,9 @@
    </property>
   </action>
   <action name="actionSaveSession">
+   <property name="icon">
+    <iconset theme="document-save"/>
+   </property>
    <property name="text">
     <string>&amp;Save Session</string>
    </property>
@@ -317,6 +362,9 @@
    </property>
   </action>
   <action name="actionClearSession">
+   <property name="icon">
+    <iconset theme="edit-clear"/>
+   </property>
    <property name="text">
     <string>&amp;Clear Session</string>
    </property>
@@ -330,21 +378,33 @@
    </property>
   </action>
   <action name="actionQuit">
+   <property name="icon">
+    <iconset theme="application-exit"/>
+   </property>
    <property name="text">
     <string>&amp;Quit</string>
    </property>
   </action>
   <action name="actionDocumentation">
+   <property name="icon">
+    <iconset theme="help-contents"/>
+   </property>
    <property name="text">
     <string>&amp;Documentation</string>
    </property>
   </action>
   <action name="actionSoftware">
+   <property name="icon">
+    <iconset theme="applications-other"/>
+   </property>
    <property name="text">
     <string>&amp;Software</string>
    </property>
   </action>
   <action name="actionAbout">
+   <property name="icon">
+    <iconset theme="help-about"/>
+   </property>
    <property name="text">
     <string>&amp;About</string>
    </property>
@@ -363,21 +423,33 @@
    </property>
   </action>
   <action name="actionExportPlot">
+   <property name="icon">
+    <iconset theme="applications-graphics"/>
+   </property>
    <property name="text">
     <string>&amp;Plot...</string>
    </property>
   </action>
   <action name="actionExportData">
+   <property name="icon">
+    <iconset theme="applications-science"/>
+   </property>
    <property name="text">
     <string>&amp;Data...</string>
    </property>
   </action>
   <action name="actionExportFilter">
+   <property name="icon">
+    <iconset theme="applications-accessories"/>
+   </property>
    <property name="text">
     <string>&amp;Filter...</string>
    </property>
   </action>
   <action name="actionImportFilter">
+   <property name="icon">
+    <iconset theme="applications-accessories"/>
+   </property>
    <property name="text">
     <string>Filter</string>
    </property>
@@ -393,6 +465,9 @@
    </property>
   </action>
   <action name="actionComputeStatistics">
+   <property name="icon">
+    <iconset theme="applications-office"/>
+   </property>
    <property name="text">
     <string>Statistics</string>
    </property>
@@ -400,6 +475,9 @@
   <action name="actionDeveloperMode">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset theme="system-run"/>
    </property>
    <property name="text">
     <string>Developer Mode</string>
@@ -412,11 +490,17 @@
    <property name="checked">
     <bool>true</bool>
    </property>
+   <property name="icon">
+    <iconset theme="system-software-update"/>
+   </property>
    <property name="text">
     <string>Check for updates on startup</string>
    </property>
   </action>
   <action name="actionLoadDCOR">
+   <property name="icon">
+    <iconset theme="applications-internet"/>
+   </property>
    <property name="text">
     <string>Load DCOR data</string>
    </property>

@@ -19,6 +19,9 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="windowIcon">
+   <iconset theme="applications-development"/>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
@@ -26,6 +29,9 @@
       <number>2</number>
      </property>
      <widget class="QWidget" name="tab_meta">
+      <attribute name="icon">
+       <iconset theme="dialog-info"/>
+      </attribute>
       <attribute name="title">
        <string>Meta</string>
       </attribute>
@@ -58,6 +64,9 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tab_slot">
+      <attribute name="icon">
+       <iconset theme="applications-science"/>
+      </attribute>
       <attribute name="title">
        <string>Dataset</string>
       </attribute>
@@ -80,6 +89,9 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tab_filter">
+      <attribute name="icon">
+       <iconset theme="applications-accessories"/>
+      </attribute>
       <attribute name="title">
        <string>Filter</string>
       </attribute>
@@ -105,6 +117,9 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tab_plot">
+      <attribute name="icon">
+       <iconset theme="applications-graphics"/>
+      </attribute>
       <attribute name="title">
        <string>Plot</string>
       </attribute>

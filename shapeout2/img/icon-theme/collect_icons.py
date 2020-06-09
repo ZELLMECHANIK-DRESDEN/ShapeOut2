@@ -10,22 +10,31 @@ that `icon_root` is correct.
 import pathlib
 import shutil
 
-# Which resolutions to collect
-resolutions = ["16"]
-
 # The key identifies the theme; each list contains icon names
 icons = {
     "breeze": [
         "application-exit",
         "code-context",
+        "dialog-cancel",
+        "dialog-close",
+        "dialog-error",
+        "dialog-information",
+        "dialog-messages",
+        "dialog-ok",
+        "dialog-ok-apply",
+        "dialog-question",
+        "dialog-warning",
         "documentinfo",
         "document-open",
+        "document-open-folder",
         "document-save",
         "draw-watercolor",
         "edit-clear",
+        "folder",
         "folder-cloud",
         "globe",
         "gtk-preferences",
+        "messagebox_warning",
         "office-chart-ring",
         "office-chart-scatter",
         "show-grid",
@@ -55,28 +64,22 @@ Type=Fixed
 icon_root = pathlib.Path("/usr/share/icons")
 
 
-def find_icon(name, res, theme):
+def find_icons(name, theme):
     cands = sorted((icon_root / theme).rglob("{}.svg".format(name)))
     cands += sorted((icon_root / theme).rglob("{}.png".format(name)))
-    rescands = []
-    for c in cands:
-        if c.parent.name == res or str(c.parent).count("/"+res+"x"+res):
-            rescands.append(c)
-    if not rescands:
-        rescands = cands
-        if not cands:
-            raise ValueError(
-                "Could not find {} / {} / {}".format(theme, res, name))
-    return rescands[0]
+    return cands
 
 
 if __name__ == "__main__":
     directories = []
     here = pathlib.Path(__file__).parent
-    for res in resolutions:
-        for theme in icons:
-            for name in icons[theme]:
-                ipath = find_icon(name, res, theme)
+    for theme in icons:
+        for name in icons[theme]:
+            ipaths = find_icons(name, theme)
+            if not ipaths:
+                print("Could not find {} {}".format(theme, name))
+                continue
+            for ipath in ipaths:
                 relp = ipath.parent.relative_to(icon_root)
                 dest = here / relp
                 directories.append(str(relp))
@@ -87,4 +90,9 @@ if __name__ == "__main__":
         directories = list(set(directories))
         fd.write(index.format(directories=",".join(directories)))
         for dd in directories:
+            for res in ["16", "22", "24", "32", "64", "128"]:
+                if res in str(dd):
+                    break
+            else:
+                raise ValueError("No resolution for {}!".format(dd))
             fd.write(index_item.format(directory=dd, res=res))

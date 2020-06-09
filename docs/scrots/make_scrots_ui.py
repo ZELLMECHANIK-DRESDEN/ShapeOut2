@@ -92,7 +92,7 @@ QApplication.processEvents()
 mw.widget_quick_view.grab().save("_ui_qv_poly.png")
 
 # block matrix
-mw.block_matrix.setFixedSize(425, 350)
+mw.block_matrix.setFixedSize(435, 360)
 mw.block_matrix.repaint()
 QApplication.processEvents()
 mw.block_matrix.scrollArea_block.grab().save("_ui_block_matrix.png")

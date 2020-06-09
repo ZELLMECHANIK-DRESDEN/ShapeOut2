@@ -1,3 +1,4 @@
+import os
 import pathlib
 import pkg_resources
 import signal
@@ -11,7 +12,7 @@ import h5py
 import numpy
 import scipy
 
-from PyQt5 import uic, QtCore, QtWidgets
+from PyQt5 import uic, QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
 
 from . import analysis
@@ -37,6 +38,13 @@ pg.setConfigOption("background", "w")
 pg.setConfigOption("foreground", "k")
 pg.setConfigOption("antialias", True)
 pg.setConfigOption("imageAxisOrder", "row-major")
+
+
+# set Qt icon theme search path
+QtGui.QIcon.setThemeSearchPaths([
+    os.path.join(pkg_resources.resource_filename("shapeout2", "img"),
+                 "icon-theme")])
+QtGui.QIcon.setThemeName(".")
 
 
 class ShapeOut2(QtWidgets.QMainWindow):
@@ -631,6 +639,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         for lib in libs:
             sw_text += "- {} {}\n".format(lib.__name__, lib.__version__)
         sw_text += "- PyQt5 {}\n".format(QtCore.QT_VERSION_STR)
+        sw_text += "\n Breeze icon theme by the KDE Community (LGPL)."
         if hasattr(sys, 'frozen'):
             sw_text += "\nThis executable has been created using PyInstaller."
         QtWidgets.QMessageBox.information(self,
@@ -786,6 +795,7 @@ def excepthook(etype, value, trace):
     exception = "".join([vinfo]+tmp)
 
     errorbox = QtWidgets.QMessageBox()
+    errorbox.setIcon(QtWidgets.QMessageBox.Critical)
     errorbox.addButton(QtWidgets.QPushButton('Close'),
                        QtWidgets.QMessageBox.YesRole)
     errorbox.addButton(QtWidgets.QPushButton(

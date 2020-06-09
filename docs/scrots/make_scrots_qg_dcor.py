@@ -16,9 +16,11 @@ mw.settings.set_bool("developer mode", False)
 # show the dialog
 dlg = dcor.DCORLoader(mw)
 dlg.lineEdit_api_key.setText("")
-dlg.lineEdit_search.setText("reference data")
+dlg.lineEdit_search.setText("sorting")
 dlg.on_search()
-dlg.repaint()
+# force redraw of scrollbars
+dlg.listWidget.scrollToBottom()
+dlg.listWidget.scrollToTop()
 QApplication.processEvents()
 QApplication.processEvents()
 dlg.grab().save("_qg_dcor_dlg.png")

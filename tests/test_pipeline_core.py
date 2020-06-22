@@ -1,4 +1,6 @@
+import copy
 import pathlib
+import tempfile
 
 import dclab
 import numpy as np
@@ -38,6 +40,38 @@ def test_apply_filter_ray():
         if dclab.dfn.scalar_feature_exists(feat):
             assert np.allclose(ds_ref[feat], ds_ext[feat]), feat
     assert np.all(ds_ref.filter.all == ds_ext.filter.all)
+
+
+def test_get_min_max_inf():
+    # generate fake dataset
+    path = pathlib.Path(__file__).parent / "data" / "calibration_beads_47.rtdc"
+    with dclab.new_dataset(path) as ds:
+        config = copy.deepcopy(ds.config)
+
+    tmp = tempfile.mktemp(".rtdc", prefix="example_filter_inf_")
+    ds2 = dclab.new_dataset({"deform": np.linspace(0, .01, 100),
+                             "area_um": np.linspace(20, 200, 100),
+                             "area_ratio": np.linspace(1, 1.1, 100)
+                             })
+    ds2.config.update(config)
+    ds2["area_ratio"][0] = np.inf
+    ds2["area_ratio"][1] = np.nan
+    ds2.export.hdf5(tmp, features=["area_um", "deform", "area_ratio"])
+
+    # initiate the pipeline
+    pl = pipeline.Pipeline()
+    pl.add_slot(path=tmp)
+    pl.add_filter()
+
+    # get the current min/max values
+    amin, amax = pl.get_min_max("area_ratio")
+    assert amin == ds2["area_ratio"][2]
+    assert amax == 1.1
+
+    try:
+        pathlib.Path(tmp).unlink()
+    except BaseException:
+        pass
 
 
 def test_get_min_max_plot():

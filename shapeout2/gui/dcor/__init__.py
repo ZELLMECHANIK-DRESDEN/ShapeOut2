@@ -92,7 +92,7 @@ class DCORLoader(QtWidgets.QDialog):
         if "version" not in req.json() or req.json()["version"] != 3:
             raise ValueError("Invalid response: {}".format(req.json()))
 
-        # perform search (limit to 20 results)
+        # perform search
         if self.comboBox_search.currentIndex() == 1:
             stype = "dataset"
         else:

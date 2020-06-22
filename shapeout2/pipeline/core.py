@@ -384,8 +384,11 @@ class Pipeline(object):
         for ds in dslist:
             if np.sum(ds.filter.all):
                 if feat in ds:
-                    vmin = np.nanmin(ds[feat][ds.filter.all])
-                    vmax = np.nanmax(ds[feat][ds.filter.all])
+                    fdata = ds[feat][ds.filter.all]
+                    invalid = np.logical_or(np.isnan(fdata), np.isinf(fdata))
+                    vdata = fdata[~invalid]
+                    vmin = np.min(vdata)
+                    vmax = np.max(vdata)
                     fmin = np.min([fmin, vmin])
                     fmax = np.max([fmax, vmax])
                 else:

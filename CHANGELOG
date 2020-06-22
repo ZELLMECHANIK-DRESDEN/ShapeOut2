@@ -1,4 +1,5 @@
 2.2.2
+ - fix: correct box filter ranges when feature contains inf values
  - enh: add pretty tool icons from KDE breeze theme
 2.2.1
  - fix: zero-division error when setting "one plot per dataset"

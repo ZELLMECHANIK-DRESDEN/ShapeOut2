@@ -61,7 +61,7 @@ Testing
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/ShapeOut2.svg
    :target: https://pypi.python.org/pypi/ShapeOut2
 .. |Tests Status Linux| image:: https://img.shields.io/travis/ZELLMECHANIK-DRESDEN/ShapeOut2.svg?label=tests_linux
-   :target: https://travis-ci.org/ZELLMECHANIK-DRESDEN/ShapeOut2
+   :target: https://travis-ci.com/ZELLMECHANIK-DRESDEN/ShapeOut2
 .. |Tests Status Win| image:: https://img.shields.io/appveyor/ci/paulmueller/ShapeOut2/master.svg?label=tests_win
    :target: https://ci.appveyor.com/project/paulmueller/ShapeOut2
 .. |Coverage Status| image:: https://img.shields.io/codecov/c/github/ZELLMECHANIK-DRESDEN/ShapeOut2/master.svg

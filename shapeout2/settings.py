@@ -102,7 +102,7 @@ class SettingsFile(object):
 
     def get_string_list(self, key):
         """Returns list of strings"""
-        self._get_value("string_list", key)
+        return self._get_value("string_list", key)
 
     def load(self):
         """Loads the settings file returning a dictionary"""

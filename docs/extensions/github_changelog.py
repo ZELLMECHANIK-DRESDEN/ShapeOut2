@@ -13,6 +13,11 @@ and hash) and a link is inserted
  https://github.com/RI-imaging/{PROJECT}/issues/{XY}
 
 where PROJECT ist the `project` variable defined in conf.py.
+
+Changelog
+---------
+0.2 (2020-07-22)
+ - escape underscores
 """
 import io
 import re
@@ -46,6 +51,7 @@ class IncludeDirective(Directive):
         rst = []
         for line in text:
             line = line.strip("\n")
+            line = line.replace("_", "\_")
             if line.startswith("  ") and line.strip().startswith("-"):
                 # list in list:
                 rst.append("")
@@ -72,4 +78,4 @@ class IncludeDirective(Directive):
 def setup(app):
     app.add_config_value('github_project', "user/project", 'html')
     app.add_directive('include_changelog', IncludeDirective)
-    return {'version': '0.1'}   # identifies the version of our extension
+    return {'version': '0.2'}   # identifies the version of our extension

@@ -109,8 +109,8 @@ to match the object sizes. Larger object sizes require wider channels
 if meaningful values for the Young's modulus are to be computed.
 
 
-In the following, additional visualizations for commonly used channel sizes
-and flow rates are shown:
+In the following, additional visualizations for other commonly used channel
+sizes and flow rates are shown:
 
 .. figure:: figures/qg_youngs_modulus_15um.png
     :target: _images/qg_youngs_modulus_15um.png

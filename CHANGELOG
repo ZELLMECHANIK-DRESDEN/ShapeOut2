@@ -1,3 +1,6 @@
+2.2.3
+ - docs: update visualization of Young's modulus look-up tables
+   using new figure script from dclab
 2.2.2
  - fix: correct box filter ranges when feature contains inf values
  - enh: add pretty tool icons from KDE breeze theme

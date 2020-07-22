@@ -85,15 +85,15 @@ have a *nan*-valued (not a number) Young's modulus. Note that as a result,
 these events will be excluded from all plots when *remove invalid events*
 is checked in the *Filter* configuration tab.
 
-.. figure:: figures/qg_youngs_modulus_15um.png
-    :target: images/qg_youngs_modulus_15um.png
+.. figure:: figures/qg_youngs_modulus_20um.png
+    :target: images/qg_youngs_modulus_20um.png
 
     Visualizations of the support and the values of the look-up table (LUT)
     used for determining the Young's modulus from deformation and
     cell area. The values of the Young's moduli in the regions
     shown depend on the channel size, the flow rate, the temperature,
     and the viscosity of the medium :cite:`Mietke2015`.
-    Here, they are computed for a 15 µm wide channel at 24°C with an
+    Here, they are computed for a 20 µm wide channel at 23°C with an
     effective pixel size of 0.34 µm. The data are corrected for pixelation
     effects according to :cite:`Herold2017`.
 
@@ -112,8 +112,8 @@ if meaningful values for the Young's modulus are to be computed.
 In the following, additional visualizations for commonly used channel sizes
 and flow rates are shown:
 
-.. figure:: figures/qg_youngs_modulus_20um.png
-    :target: _images/qg_youngs_modulus_20um.png
+.. figure:: figures/qg_youngs_modulus_15um.png
+    :target: _images/qg_youngs_modulus_15um.png
 
 .. figure:: figures/qg_youngs_modulus_30um.png
     :target: _images/qg_youngs_modulus_30um.png

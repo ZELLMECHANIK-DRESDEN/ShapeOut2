@@ -51,7 +51,7 @@ class IncludeDirective(Directive):
         rst = []
         for line in text:
             line = line.strip("\n")
-            line = line.replace("_", "\_")
+            line = line.replace(r"_", r"\_")
             if line.startswith("  ") and line.strip().startswith("-"):
                 # list in list:
                 rst.append("")

@@ -61,10 +61,17 @@ class ShapeOut2(QtWidgets.QMainWindow):
         application will print the version after initialization
         and exit.
         """
+        print("s01")
+        sys.stdout.flush()
         QtWidgets.QMainWindow.__init__(self)
+        print("s02")
+        sys.stdout.flush()
+
         path_ui = pkg_resources.resource_filename("shapeout2.gui", "main.ui")
+        print("s03")
+        sys.stdout.flush()
         uic.loadUi(path_ui, self)
-        print("s1")
+        print("s04")
         sys.stdout.flush()
 
         # update check

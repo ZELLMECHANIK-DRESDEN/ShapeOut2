@@ -1,4 +1,6 @@
 2.2.3
+ - fix: improve plot matrix column/row visualization and show flow
+   rate (#45)
  - docs: update visualization of Young's modulus look-up tables
    using new figure script from dclab
 2.2.2

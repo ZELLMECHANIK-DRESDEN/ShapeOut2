@@ -40,6 +40,7 @@ test_script:
   - 'python -c "import shapeout2; print(shapeout2.__version__)"'
   - "pip install coverage"
   - "pip install codecov"
+  - "python -m shapeout2 --version"
   - "pip install pytest pytest-qt"
   - "py.test -vvvv tests/test_gui_basic.py"  # tests don't run?
   - "coverage run --source=shapeout2 ./setup.py test"

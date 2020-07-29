@@ -41,8 +41,7 @@ pg.setConfigOption("imageAxisOrder", "row-major")
 
 # set Qt icon theme search path
 QtGui.QIcon.setThemeSearchPaths([
-    os.path.join(pkg_resources.resource_filename("shapeout2", "img"),
-                 "icon-theme")])
+    pkg_resources.resource_filename("shapeout2.img", "icon-theme")])
 QtGui.QIcon.setThemeName(".")
 
 

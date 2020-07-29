@@ -1,3 +1,5 @@
+import sys
+
 from shapeout2 import settings
 
 
@@ -6,3 +8,4 @@ def pytest_configure(config):
     # disable update checking
     settings.SettingsFile().set_bool("check update", False)
     settings.SettingsFile().set_bool("check pgversion", False)
+    sys.excepthook = None

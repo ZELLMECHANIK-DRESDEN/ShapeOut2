@@ -1,6 +1,5 @@
 """Test of data set functionalities"""
 import pathlib
-import sys
 
 from PyQt5 import QtCore
 
@@ -13,7 +12,6 @@ import pytest
 def run_around_tests():
     # Code that will run before your test, for example:
     session.clear_session()
-    sys.excepthook = None
     # A test function will be run at this point
     yield
     # Code that will run after your test, for example:

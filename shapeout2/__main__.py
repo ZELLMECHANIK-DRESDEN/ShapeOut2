@@ -15,7 +15,7 @@ def main(splash=True):
 
     sys.stdout.flush()
     print("0")
-    if False:#splash:
+    if splash:
         from PyQt5.QtWidgets import QSplashScreen
         from PyQt5.QtGui import QPixmap
         splash_path = os.path.join(imdir, "splash.png")

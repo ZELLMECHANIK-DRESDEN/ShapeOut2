@@ -8,6 +8,8 @@ def main(splash=True):
     # import before creating application
     import pyqtgraph  # noqa: F401
 
+    raise ValueError("Line 71")
+    
     app = QApplication(sys.argv)
     imdir = pkg_resources.resource_filename("shapeout2", "img")
 

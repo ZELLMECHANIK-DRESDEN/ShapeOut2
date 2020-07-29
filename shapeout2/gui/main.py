@@ -68,7 +68,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # open a session with private data.
         api_key = self.settings.get_string("dcor api key")
         dclab.rtdc_dataset.fmt_dcor.APIHandler.add_api_key(api_key)
-        raise ValueError("Line 71")
         #: Analysis pipeline
         self.pipeline = pipeline.Pipeline()
         # GUI

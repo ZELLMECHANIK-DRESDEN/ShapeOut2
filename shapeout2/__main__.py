@@ -4,13 +4,17 @@ def main(splash=True):
     import sys
     import time
 
+    print("-2")
     from PyQt5.QtWidgets import QApplication
     # import before creating application
     import pyqtgraph  # noqa: F401
 
+    print("-1")
     app = QApplication(sys.argv)
     imdir = pkg_resources.resource_filename("shapeout2", "img")
 
+    sys.stdout.flush()
+    print("0")
     if False:#splash:
         from PyQt5.QtWidgets import QSplashScreen
         from PyQt5.QtGui import QPixmap
@@ -24,10 +28,13 @@ def main(splash=True):
         app.processEvents()
 
     print("1")
+    sys.stdout.flush()
     from PyQt5 import QtCore, QtGui
     print("2")
+    sys.stdout.flush()
     from .gui import ShapeOut2
     print("3")
+    sys.stdout.flush()
     # Set Application Icon
     icon_path = os.path.join(imdir, "icon.png")
     app.setWindowIcon(QtGui.QIcon(icon_path))

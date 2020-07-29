@@ -17,16 +17,19 @@ from PyQt5 import uic, QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
 
 print("a")
+sys.stdout.flush()
 from . import analysis
 from . import compute
 from . import dcor
 from . import export
 print("b")
+sys.stdout.flush()
 from . import pipeline_plot
 from . import quick_view
 from . import update
 from . import widgets
 print("c")
+sys.stdout.flush()
 from .. import pipeline
 from .. import session
 from .. import settings
@@ -34,6 +37,7 @@ from .. import settings
 
 from .._version import version as __version__
 print("d")
+sys.stdout.flush()
 
 # global plotting configuration parameters
 pg.setConfigOption("background", "w")

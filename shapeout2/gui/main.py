@@ -810,4 +810,4 @@ def excepthook(etype, value, trace):
 # Make Ctr+C close the app
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 # Display exception hook in separate dialog instead of crashing
-#sys.excepthook = excepthook
+sys.excepthook = excepthook

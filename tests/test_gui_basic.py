@@ -26,7 +26,7 @@ def test_simple(qtbot):
     main_window.close()
 
 
-def test_matrix_slots(qtbot):
+def ttest_matrix_slots(qtbot):
     mw = ShapeOut2()
     qtbot.addWidget(mw)
 

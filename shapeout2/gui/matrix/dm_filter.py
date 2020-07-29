@@ -36,6 +36,7 @@ class MatrixFilter(QtWidgets.QWidget):
         font = self.label.font()
         font.setPointSize(font.pointSize()-2)
         self.label.setFont(font)
+        self.toolButton_modify.setFont(font)
 
         if state is None:
             filt = pipeline.Filter._instances[identifier]

@@ -35,6 +35,8 @@ icons = {
         "globe",
         "gtk-preferences",
         "messagebox_warning",
+        "object-columns",
+        "object-rows",
         "office-chart-ring",
         "office-chart-scatter",
         "show-grid",
@@ -43,6 +45,7 @@ icons = {
         "view-statistics",
         "visibility",
         "path-mode-polyline",
+        "preferences-activities",
     ],
 }
 
@@ -87,7 +90,7 @@ if __name__ == "__main__":
                 shutil.copy(ipath, dest)
 
     with (here / "index.theme").open("w") as fd:
-        directories = list(set(directories))
+        directories = sorted(set(directories))
         fd.write(index.format(directories=",".join(directories)))
         for dd in directories:
             for res in ["16", "22", "24", "32", "64", "128"]:

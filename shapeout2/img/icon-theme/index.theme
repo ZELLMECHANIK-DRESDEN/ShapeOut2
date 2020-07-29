@@ -2,26 +2,38 @@
 Name=ShapeOutMix
 Comment=Mix of themes for Shape-Out 2
 
-Directories=breeze/places/64,breeze/places/16,breeze/status/64,breeze/actions/24,breeze/actions/22,breeze/status/16,breeze/status/22,breeze/actions/32,breeze/status/24,breeze/places/22,breeze/actions/16,breeze/places/32
+Directories=breeze/actions/16,breeze/actions/22,breeze/actions/24,breeze/actions/32,breeze/places/16,breeze/places/22,breeze/places/32,breeze/places/64,breeze/status/16,breeze/status/22,breeze/status/24,breeze/status/64
 
-[breeze/places/64]
-Size=64
-Type=Fixed
-
-[breeze/places/16]
+[breeze/actions/16]
 Size=16
 Type=Fixed
 
-[breeze/status/64]
-Size=64
+[breeze/actions/22]
+Size=22
 Type=Fixed
 
 [breeze/actions/24]
 Size=24
 Type=Fixed
 
-[breeze/actions/22]
+[breeze/actions/32]
+Size=32
+Type=Fixed
+
+[breeze/places/16]
+Size=16
+Type=Fixed
+
+[breeze/places/22]
 Size=22
+Type=Fixed
+
+[breeze/places/32]
+Size=32
+Type=Fixed
+
+[breeze/places/64]
+Size=64
 Type=Fixed
 
 [breeze/status/16]
@@ -32,22 +44,10 @@ Type=Fixed
 Size=22
 Type=Fixed
 
-[breeze/actions/32]
-Size=32
-Type=Fixed
-
 [breeze/status/24]
 Size=24
 Type=Fixed
 
-[breeze/places/22]
-Size=22
-Type=Fixed
-
-[breeze/actions/16]
-Size=16
-Type=Fixed
-
-[breeze/places/32]
-Size=32
+[breeze/status/64]
+Size=64
 Type=Fixed

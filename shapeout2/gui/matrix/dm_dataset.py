@@ -1,6 +1,6 @@
 import pkg_resources
 
-from PyQt5 import uic, QtWidgets, QtCore
+from PyQt5 import uic, Qt, QtWidgets, QtCore
 
 from ... import meta_tool
 from ... import pipeline
@@ -43,6 +43,8 @@ class MatrixDataset(QtWidgets.QWidget):
         font = self.label.font()
         font.setPointSize(font.pointSize()-2)
         self.label.setFont(font)
+        self.label_flowrate.setFont(font)
+        self.toolButton_modify.setFont(font)
 
         if state is None:
             slot = pipeline.Dataslot._instances[identifier]
@@ -100,3 +102,22 @@ class MatrixDataset(QtWidgets.QWidget):
             slot = pipeline.Dataslot._instances[self.identifier]
             name = slot.name
             self.set_label_string(name)
+            # Set region image
+            region = meta_tool.get_info(self.path,
+                                        section="setup",
+                                        key="chip region")
+            path_region_image = pkg_resources.resource_filename(
+                "shapeout2.img", "region_{}.svg".format(region))
+            pixmap = Qt.QPixmap(path_region_image)
+            self.label_region.setPixmap(pixmap)
+            self.label_region.setToolTip(region)
+            if region == "channel":
+                # Set flow rate
+                flow_rate = meta_tool.get_info(self.path,
+                                               section="setup",
+                                               key="flow rate")
+                self.label_flowrate.setText("{:.4g}".format(flow_rate))
+                self.label_flowrate.setToolTip("{:.4g} µL/s".format(flow_rate))
+            else:
+                self.label_flowrate.setText(region[:3])
+                self.label_flowrate.setToolTip(region)

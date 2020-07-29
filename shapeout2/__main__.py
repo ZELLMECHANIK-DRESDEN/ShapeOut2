@@ -23,10 +23,9 @@ def main(splash=True):
         time.sleep(.07)
         app.processEvents()
 
-    raise ValueError("Line 36")
-
     from PyQt5 import QtCore, QtGui
     from .gui import ShapeOut2
+    raise ValueError("Line 28")
 
     # Set Application Icon
     icon_path = os.path.join(imdir, "icon.png")

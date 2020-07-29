@@ -15,35 +15,36 @@ import scipy
 from PyQt5 import uic, QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
 
+print("a")
 from . import analysis
 from . import compute
 from . import dcor
 from . import export
+print("b")
 from . import pipeline_plot
 from . import quick_view
 from . import update
 from . import widgets
-
+print("c")
 from .. import pipeline
 from .. import session
 from .. import settings
 
 
 from .._version import version as __version__
-
+print("d")
 
 # global plotting configuration parameters
 pg.setConfigOption("background", "w")
 pg.setConfigOption("foreground", "k")
 pg.setConfigOption("antialias", True)
 pg.setConfigOption("imageAxisOrder", "row-major")
-
-
+print("e")
 # set Qt icon theme search path
 QtGui.QIcon.setThemeSearchPaths([
     pkg_resources.resource_filename("shapeout2.img", "icon-theme")])
 QtGui.QIcon.setThemeName(".")
-
+print("f")
 
 class ShapeOut2(QtWidgets.QMainWindow):
     plots_changed = QtCore.pyqtSignal()

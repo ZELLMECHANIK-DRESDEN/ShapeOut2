@@ -5,13 +5,14 @@ import signal
 import sys
 import traceback
 import webbrowser
-
+print("-c")
 import appdirs
 import dclab
 import h5py
+print("-b")
 import numpy
 import scipy
-
+print("-a")
 from PyQt5 import uic, QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
 

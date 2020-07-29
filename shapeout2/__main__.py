@@ -23,9 +23,11 @@ def main(splash=True):
         time.sleep(.07)
         app.processEvents()
 
+    print("1")
     from PyQt5 import QtCore, QtGui
+    print("2")
     from .gui import ShapeOut2
-
+    print("3")
     # Set Application Icon
     icon_path = os.path.join(imdir, "icon.png")
     app.setWindowIcon(QtGui.QIcon(icon_path))

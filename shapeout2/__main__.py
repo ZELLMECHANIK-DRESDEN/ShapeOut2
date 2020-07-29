@@ -23,6 +23,8 @@ def main(splash=True):
         time.sleep(.07)
         app.processEvents()
 
+    raise ValueError("Line 36")
+
     from PyQt5 import QtCore, QtGui
     from .gui import ShapeOut2
 
@@ -32,7 +34,6 @@ def main(splash=True):
 
     # Use dots as decimal separators
     QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
-    raise ValueError("Line 35")
 
     window = ShapeOut2()
     window.show()

@@ -5,51 +5,46 @@ import signal
 import sys
 import traceback
 import webbrowser
-print("-c")
+
 import appdirs
 import dclab
 import h5py
-print("-b")
 import numpy
 import scipy
-print("-a")
+
 from PyQt5 import uic, QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
 
-print("a")
-sys.stdout.flush()
 from . import analysis
 from . import compute
 from . import dcor
 from . import export
-print("b")
-sys.stdout.flush()
 from . import pipeline_plot
 from . import quick_view
 from . import update
 from . import widgets
-print("c")
-sys.stdout.flush()
+
 from .. import pipeline
 from .. import session
 from .. import settings
 
 
 from .._version import version as __version__
-print("d")
-sys.stdout.flush()
+
 
 # global plotting configuration parameters
 pg.setConfigOption("background", "w")
 pg.setConfigOption("foreground", "k")
 pg.setConfigOption("antialias", True)
 pg.setConfigOption("imageAxisOrder", "row-major")
-print("e")
+
+
 # set Qt icon theme search path
 QtGui.QIcon.setThemeSearchPaths([
-    pkg_resources.resource_filename("shapeout2.img", "icon-theme")])
+    os.path.join(pkg_resources.resource_filename("shapeout2", "img"),
+                 "icon-theme")])
 QtGui.QIcon.setThemeName(".")
-print("f")
+
 
 class ShapeOut2(QtWidgets.QMainWindow):
     plots_changed = QtCore.pyqtSignal()
@@ -61,19 +56,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         application will print the version after initialization
         and exit.
         """
-        print("s01")
-        sys.stdout.flush()
         QtWidgets.QMainWindow.__init__(self)
-        print("s02")
-        sys.stdout.flush()
-
         path_ui = pkg_resources.resource_filename("shapeout2.gui", "main.ui")
-        print("s03")
-        sys.stdout.flush()
         uic.loadUi(path_ui, self)
-        print("s04")
-        sys.stdout.flush()
-
         # update check
         self._update_thread = None
         self._update_worker = None
@@ -94,9 +79,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.actionOpenSession.triggered.connect(self.on_action_open)
         self.actionQuit.triggered.connect(self.on_action_quit)
         self.actionSaveSession.triggered.connect(self.on_action_save)
-        print("s2")
-        sys.stdout.flush()
-
         # Help menu
         self.actionDocumentation.triggered.connect(self.on_action_docs)
         self.actionSoftware.triggered.connect(self.on_action_software)
@@ -170,9 +152,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.on_quickview_refresh)  # might be an active filter (#26)
         self.widget_quick_view.polygon_filter_modified.connect(
             self.plots_changed)  # might be an active filter (#26)
-        print("s4")
-        sys.stdout.flush()
-
         # This is important, because if meta data such as emodulus recipe
         # is changed, the QuickView must be updated as well.
         self.plots_changed.connect(self.widget_quick_view.plot)

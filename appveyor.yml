@@ -41,7 +41,7 @@ test_script:
   - "pip install coverage"
   - "pip install codecov"
   - "pip install pytest pytest-qt"
-  - "py.test -vvvv tests/test_gui-basic.py"  # tests don't run?
+  - "py.test -vvvv tests/test_gui_basic.py"  # tests don't run?
   - "coverage run --source=shapeout2 ./setup.py test"
   - "coverage report -m"
   # Allow codecov to fail

@@ -8,8 +8,6 @@ def main(splash=True):
     # import before creating application
     import pyqtgraph  # noqa: F401
 
-    raise ValueError("Line 71")
-    
     app = QApplication(sys.argv)
     imdir = pkg_resources.resource_filename("shapeout2", "img")
 
@@ -34,6 +32,7 @@ def main(splash=True):
 
     # Use dots as decimal separators
     QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
+    raise ValueError("Line 35")
 
     window = ShapeOut2()
     window.show()

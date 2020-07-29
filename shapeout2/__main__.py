@@ -11,7 +11,7 @@ def main(splash=True):
     app = QApplication(sys.argv)
     imdir = pkg_resources.resource_filename("shapeout2", "img")
 
-    if splash:
+    if False:#splash:
         from PyQt5.QtWidgets import QSplashScreen
         from PyQt5.QtGui import QPixmap
         splash_path = os.path.join(imdir, "splash.png")

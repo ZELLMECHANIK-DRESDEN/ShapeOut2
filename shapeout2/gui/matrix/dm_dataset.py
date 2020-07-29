@@ -102,22 +102,23 @@ class MatrixDataset(QtWidgets.QWidget):
             slot = pipeline.Dataslot._instances[self.identifier]
             name = slot.name
             self.set_label_string(name)
-            # Set region image
-            region = meta_tool.get_info(self.path,
-                                        section="setup",
-                                        key="chip region")
-            path_region_image = pkg_resources.resource_filename(
-                "shapeout2.img", "region_{}.svg".format(region))
-            pixmap = Qt.QPixmap(path_region_image)
-            self.label_region.setPixmap(pixmap)
-            self.label_region.setToolTip(region)
-            if region == "channel":
-                # Set flow rate
-                flow_rate = meta_tool.get_info(self.path,
-                                               section="setup",
-                                               key="flow rate")
-                self.label_flowrate.setText("{:.4g}".format(flow_rate))
-                self.label_flowrate.setToolTip("{:.4g} µL/s".format(flow_rate))
-            else:
-                self.label_flowrate.setText(region[:3])
-                self.label_flowrate.setToolTip(region)
+            if False:
+                # Set region image
+                region = meta_tool.get_info(self.path,
+                                            section="setup",
+                                            key="chip region")
+                path_region_image = pkg_resources.resource_filename(
+                    "shapeout2.img", "region_{}.svg".format(region))
+                pixmap = Qt.QPixmap(path_region_image)
+                self.label_region.setPixmap(pixmap)
+                self.label_region.setToolTip(region)
+                if region == "channel":
+                    # Set flow rate
+                    flow_rate = meta_tool.get_info(self.path,
+                                                   section="setup",
+                                                   key="flow rate")
+                    self.label_flowrate.setText("{:.4g}".format(flow_rate))
+                    self.label_flowrate.setToolTip("{:.4g} µL/s".format(flow_rate))
+                else:
+                    self.label_flowrate.setText(region[:3])
+                    self.label_flowrate.setToolTip(region)

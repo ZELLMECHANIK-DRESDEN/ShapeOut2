@@ -38,11 +38,18 @@ def main(splash=True):
     # Set Application Icon
     icon_path = os.path.join(imdir, "icon.png")
     app.setWindowIcon(QtGui.QIcon(icon_path))
+    print("4")
+    sys.stdout.flush()
 
     # Use dots as decimal separators
     QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
 
+    print("5")
+    sys.stdout.flush()
+
     window = ShapeOut2()
+    print("6")
+    sys.stdout.flush()
     window.show()
     window.raise_()
 

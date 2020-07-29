@@ -64,6 +64,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self)
         path_ui = pkg_resources.resource_filename("shapeout2.gui", "main.ui")
         uic.loadUi(path_ui, self)
+        print("s1")
+        sys.stdout.flush()
+
         # update check
         self._update_thread = None
         self._update_worker = None
@@ -84,6 +87,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.actionOpenSession.triggered.connect(self.on_action_open)
         self.actionQuit.triggered.connect(self.on_action_quit)
         self.actionSaveSession.triggered.connect(self.on_action_save)
+        print("s2")
+        sys.stdout.flush()
+
         # Help menu
         self.actionDocumentation.triggered.connect(self.on_action_docs)
         self.actionSoftware.triggered.connect(self.on_action_software)
@@ -157,6 +163,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.on_quickview_refresh)  # might be an active filter (#26)
         self.widget_quick_view.polygon_filter_modified.connect(
             self.plots_changed)  # might be an active filter (#26)
+        print("s4")
+        sys.stdout.flush()
+
         # This is important, because if meta data such as emodulus recipe
         # is changed, the QuickView must be updated as well.
         self.plots_changed.connect(self.widget_quick_view.plot)

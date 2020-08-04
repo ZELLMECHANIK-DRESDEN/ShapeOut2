@@ -4,6 +4,7 @@ from . import util
 
 def get_contour_data(rtdc_ds, xax, yax, xacc, yacc, xscale, yscale,
                      kde_type="histogram", kde_kwargs={}):
+    rtdc_ds.apply_filter()
     cfg = rtdc_ds.config
     tohash = [
         rtdc_ds.identifier, rtdc_ds.filter.all,
@@ -31,6 +32,7 @@ def get_contour_data(rtdc_ds, xax, yax, xacc, yacc, xscale, yscale,
 
 def get_scatter_data(rtdc_ds, downsample, xax, yax, xscale, yscale,
                      kde_type="histogram", kde_kwargs={}):
+    rtdc_ds.apply_filter()
     cfg = rtdc_ds.config
     tohash = [
         rtdc_ds.identifier, rtdc_ds.filter.all, downsample,

@@ -1,10 +1,14 @@
 2.2.3
+ - fix: update Quick View plot when values for the Young's modulus
+   computation are changed (#44)
  - fix: use fixed point size in Block Matrix
  - enh: improve plot matrix column/row visualization and show flow
    rate (#45)
  - docs: update visualization of Young's modulus look-up tables
    using new figure script from dclab
  - build: bump Python to 3.8 for Windows builds
+ - setup: bump dclab from 0.27.5 to 0.27.11 (improvement of hierarchy
+   child handling)
 2.2.2
  - fix: correct box filter ranges when feature contains inf values
  - enh: add pretty tool icons from KDE breeze theme

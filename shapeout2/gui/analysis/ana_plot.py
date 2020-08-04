@@ -180,7 +180,7 @@ class PlotPanel(QtWidgets.QWidget):
         color_index = COLORMAPS.index(sca["colormap"])
         self.comboBox_colormap.setCurrentIndex(color_index)
         self.checkBox_event_count.setChecked(sca["show event count"])
-        self.spinBox_alpha.setValue(sca["marker alpha"]*100)
+        self.spinBox_alpha.setValue(int(sca["marker alpha"]*100))
         if sca["marker hue"] == "feature":
             self._set_range_feat_state(sca["hue feature"], sca["hue min"],
                                        sca["hue max"])

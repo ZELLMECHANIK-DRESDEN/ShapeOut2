@@ -61,20 +61,23 @@ class ColorBarWidget(pg.GraphicsWidget):
         maxwidth = 0.0
         for tick, tick_label in zip(ticks, tick_labels):
             y_ = (1.0 - (tick - smn)/spp) * h
-            p.drawLine(w, y_, w+5.0, y_)
+            p.drawLine(w, int(y_), int(w+5.0), int(y_))
             br = p.boundingRect(
                 0, 0, 0, 0, pg.QtCore.Qt.AlignRight, tick_label)
             if br.x() < mintx:
                 mintx = br.x()
             if br.width() > maxwidth:
                 maxwidth = br.width()
-            p.drawText(br.x() + 10.0 + w + br.width(),
-                       y_ + br.height() / 4.0, tick_label)
+            p.drawText(int(br.x() + 10.0 + w + br.width()),
+                       int(y_ + br.height() / 4.0),
+                       tick_label)
 
         # draw label
         br = p.boundingRect(0, 0, 0, 0, pg.QtCore.Qt.AlignBottom, label)
         p.rotate(90)
-        p.drawText(h/2 - br.width()/2, -w-maxwidth-15, label)
+        p.drawText(int(h/2 - br.width()/2),
+                   int(-w-maxwidth-15),
+                   label)
 
         # done
         p.end()

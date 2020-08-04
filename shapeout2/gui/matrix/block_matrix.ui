@@ -10,6 +10,11 @@
     <height>464</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <pointsize>9</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -77,7 +82,8 @@
           <string>+</string>
          </property>
          <property name="icon">
-          <iconset theme="view-filter"/>
+          <iconset theme="view-filter">
+           <normaloff>.</normaloff>.</iconset>
          </property>
         </widget>
        </item>
@@ -112,7 +118,8 @@
           <string>+</string>
          </property>
          <property name="icon">
-          <iconset theme="draw-watercolor"/>
+          <iconset theme="draw-watercolor">
+           <normaloff>.</normaloff>.</iconset>
          </property>
         </widget>
        </item>
@@ -167,7 +174,8 @@
           <string>+</string>
          </property>
          <property name="icon">
-          <iconset theme="office-chart-ring"/>
+          <iconset theme="office-chart-ring">
+           <normaloff>.</normaloff>.</iconset>
          </property>
          <property name="autoRaise">
           <bool>false</bool>

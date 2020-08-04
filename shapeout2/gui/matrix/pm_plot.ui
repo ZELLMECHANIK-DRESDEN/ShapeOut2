@@ -25,6 +25,11 @@
     <height>120</height>
    </size>
   </property>
+  <property name="font">
+   <font>
+    <pointsize>9</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -103,6 +108,11 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Name</string>
         </property>
@@ -119,6 +129,11 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
         <property name="toolTip">
          <string>Modify this plot in Analysis View</string>
         </property>
@@ -126,7 +141,8 @@
          <string>edit</string>
         </property>
         <property name="icon">
-         <iconset theme="tools-wizard"/>
+         <iconset theme="tools-wizard">
+          <normaloff>.</normaloff>.</iconset>
         </property>
         <property name="toolButtonStyle">
          <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -165,7 +181,8 @@
            <string>c</string>
           </property>
           <property name="icon">
-           <iconset theme="object-columns"/>
+           <iconset theme="object-columns">
+            <normaloff>.</normaloff>.</iconset>
           </property>
           <property name="autoRaise">
            <bool>true</bool>
@@ -203,7 +220,8 @@
            <string>...</string>
           </property>
           <property name="icon">
-           <iconset theme="preferences-activities"/>
+           <iconset theme="preferences-activities">
+            <normaloff>.</normaloff>.</iconset>
           </property>
           <property name="popupMode">
            <enum>QToolButton::InstantPopup</enum>

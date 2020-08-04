@@ -17,19 +17,19 @@ class MatrixElement(dm_element.MatrixElement):
             tooltip = "Incompatible plot settings"
         elif self.active and self.enabled:
             color = "#86E7C1"  # turquois
-            label = "used"
+            label = "active"
             tooltip = "Click to deactivate"
         elif self.active and not self.enabled:
             color = "#C9DAD7"  # gray-turquois
-            label = "unused\n(disabled)"
+            label = "active\n(unused)"
             tooltip = "Click to deactivate"
         elif not self.active and self.enabled:
             color = "#EFEFEF"  # light gray
-            label = "unused"
+            label = "inactive"
             tooltip = "Click to activate"
         else:
             color = "#DCDCDC"  # gray
-            label = "used\n(disabled)"
+            label = "inactive\n(unused)"
             tooltip = "Click to activate"
 
         self.setStyleSheet("background-color:{}".format(color))

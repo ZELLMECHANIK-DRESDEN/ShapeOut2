@@ -39,13 +39,6 @@ class MatrixDataset(QtWidgets.QWidget):
         # modify slot button
         self.toolButton_modify.clicked.connect(self.on_modify)
 
-        # reduce font size of name
-        font = self.label.font()
-        font.setPointSize(font.pointSize()-2)
-        self.label.setFont(font)
-        self.label_flowrate.setFont(font)
-        self.toolButton_modify.setFont(font)
-
         if state is None:
             slot = pipeline.Dataslot._instances[identifier]
             self.identifier = identifier

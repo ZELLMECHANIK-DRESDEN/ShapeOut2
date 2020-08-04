@@ -26,12 +26,6 @@ class MatrixPlot(QtWidgets.QWidget):
         self.toolButton_toggle.clicked.connect(self.active_toggled.emit)
         self.toolButton_modify.clicked.connect(self.on_modify)
 
-        # reduce font size of name
-        font = self.label.font()
-        font.setPointSize(font.pointSize()-2)
-        self.label.setFont(font)
-        self.toolButton_modify.setFont(font)
-
         if state is None:
             plot = pipeline.Plot._instances[identifier]
             self.identifier = identifier

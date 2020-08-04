@@ -125,7 +125,7 @@ pipeline. Each row represents a dataset (purple). The columns represent
 either filters (yellow) or plots (blue) of your pipeline.
 
 You can perform dataset operations in the purple rectangular area
-at the beginning of each row: To modify a dataset, click on the *modify*
+at the beginning of each row: To modify a dataset, click on the *edit*
 button. You can duplicate, insert anew (unmodified), or remove datasets
 using the dropdown menu. You can also exclude a dataset from an analysis
 via the check box.
@@ -165,7 +165,7 @@ Analysis View
 The analysis view is separated into four tabs (see screenshots below).
 
 - The **Meta** tab displays all metadata of the selected dataset that
-  is stored in the original .rtdc file.
+  are stored in the original .rtdc file.
 - The **Dataset** tab allows to
   specify additional metadata, such as unique colors used for plotting and
   additional metadata for computing the Young's modulus or correcting
@@ -204,8 +204,8 @@ The analysis view is separated into four tabs (see screenshots below).
 Quick View
 ----------
 The Quick View is meant for dataset exploration. It consists of a scatter plot
-on the left and a set of tool panels that are accessible via the corresponding
-tool buttons on the right.
+on the left (left click for panning and right-click for zooming) and a set of
+tool panels that are accessible via the corresponding tool buttons on the right.
 
 
 Use the **Plot** panel to define all plot parameters. It also displays
@@ -217,7 +217,7 @@ common statistics of the two features plotted.
 
 The **Event** panel displays all parameters of an individual event. You can
 select single events by clicking in the scatter plot or by scrolling through
-*Index* spin control. If available, the event image is shown alongside the
+the *Index* spin control. If available, the event image is shown alongside the
 fluorescence trace of the event. All features of the event are listed in a
 separate tab.
 

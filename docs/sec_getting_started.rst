@@ -7,8 +7,7 @@ Installation
 Shape-Out 2 can be installed via multiple channels.
 
 1. **Windows installer:** Download the latest version for your architecture
-   (e.g. ``Shape-Out_X.Y.Z_win_64bit_setup.exe`` for 64bit Windows) from the
-   official
+   (i.e. ``Shape-Out_X.Y.Z_win_64bit_setup.exe``) from the official
    `release page <https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/releases/latest>`__. 
 
 2. **macOS:** Download the latest version

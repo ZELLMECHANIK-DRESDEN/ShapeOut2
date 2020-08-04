@@ -8,31 +8,31 @@ import numpy as np
 
 def hashobj(obj):
     """Compute md5 hex-hash of a Python object"""
-    return hashlib.md5(obj2str(obj)).hexdigest()
+    return hashlib.md5(obj2bytes(obj)).hexdigest()
 
 
-def obj2str(obj):
+def obj2bytes(obj):
     """String representation of an object for hashing"""
     if isinstance(obj, str):
         return obj.encode("utf-8")
     elif isinstance(obj, pathlib.Path):
-        return obj2str(str(obj))
+        return obj2bytes(str(obj))
     elif isinstance(obj, (bool, numbers.Number)):
         return str(obj).encode("utf-8")
     elif obj is None:
         return b"none"
     elif isinstance(obj, np.ndarray):
-        return obj.tostring()
+        return obj.tobytes()
     elif isinstance(obj, tuple):
-        return obj2str(list(obj))
+        return obj2bytes(list(obj))
     elif isinstance(obj, list):
-        return b"".join(obj2str(o) for o in obj)
+        return b"".join(obj2bytes(o) for o in obj)
     elif isinstance(obj, dict):
-        return obj2str(sorted(obj.items()))
+        return obj2bytes(sorted(obj.items()))
     elif hasattr(obj, "identifier"):
-        return obj2str(obj.identifier)
+        return obj2bytes(obj.identifier)
     elif isinstance(obj, h5py.Dataset):
-        return obj2str(obj[0])
+        return obj2bytes(obj[0])
     else:
         raise ValueError("No rule to convert object '{}' to string.".
                          format(obj.__class__))

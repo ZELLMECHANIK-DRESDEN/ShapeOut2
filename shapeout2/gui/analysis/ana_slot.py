@@ -95,7 +95,7 @@ class SlotPanel(QtWidgets.QWidget):
         self.doubleSpinBox_ct32.setValue(crosstalk["crosstalk fl32"])
         # emodulus
         # this has to be done first, because self.comboBox_medium
-        # triggers on_medium which triggers on_temperature
+        # triggers on_ui_changed
         self._init_emodulus_temp_choices()
         emodulus = state["emodulus"]
         self.groupBox_emod.setVisible(emodulus["emodulus enabled"])
@@ -152,10 +152,10 @@ class SlotPanel(QtWidgets.QWidget):
                 name = choice
             self.comboBox_medium.addItem(name, choice)
         self.comboBox_medium.addItem("not defined", "undefined")
-        self.comboBox_medium.currentIndexChanged.connect(self.on_medium)
+        self.comboBox_medium.currentIndexChanged.connect(self.on_ui_changed)
         self._init_emodulus_temp_choices()
-        self.comboBox_temp.currentIndexChanged.connect(self.on_temperature)
-        self.doubleSpinBox_temp.valueChanged.connect(self.on_temperature)
+        self.comboBox_temp.currentIndexChanged.connect(self.on_ui_changed)
+        self.doubleSpinBox_temp.valueChanged.connect(self.on_ui_changed)
 
     def _init_emodulus_temp_choices(self):
         """populate the temperature comboBox with all available entries
@@ -217,6 +217,7 @@ class SlotPanel(QtWidgets.QWidget):
         else:
             return None
 
+    @QtCore.pyqtSlot()
     def on_anew_slot(self):
         slot_state = self.__getstate__()
         new_slot = Dataslot(slot_state["path"])
@@ -225,6 +226,7 @@ class SlotPanel(QtWidgets.QWidget):
         state = self.pipeline.__getstate__()
         self.pipeline_changed.emit(state)
 
+    @QtCore.pyqtSlot()
     def on_duplicate_slot(self):
         # determine the new filter state
         slot_state = self.__getstate__()
@@ -239,57 +241,57 @@ class SlotPanel(QtWidgets.QWidget):
         state = self.pipeline.__getstate__()
         self.pipeline_changed.emit(state)
 
+    @QtCore.pyqtSlot()
     def on_remove_slot(self):
         slot_state = self.__getstate__()
         self.pipeline.remove_slot(slot_state["identifier"])
         state = self.pipeline.__getstate__()
         self.pipeline_changed.emit(state)
 
-    def on_medium(self):
-        """Called if the user chose a different medium"""
+    @QtCore.pyqtSlot()
+    def on_ui_changed(self):
+        """Called when the user modifies the medium or temperature options"""
         medium = self.comboBox_medium.currentData()
+        tselec = self.comboBox_temp.currentData()
         if medium == "undefined":
-            self.doubleSpinBox_temp.setValue(np.nan)
-            self.doubleSpinBox_temp.setEnabled(False)
             self.comboBox_temp.setEnabled(False)
+            self.doubleSpinBox_temp.setEnabled(False)
+            self.doubleSpinBox_temp.setValue(np.nan)
+            self.doubleSpinBox_visc.setValue(np.nan)
             self.doubleSpinBox_visc.setEnabled(False)
             self.doubleSpinBox_visc.setStyleSheet("border-width: 2px")
         elif medium == "other":
-            self.doubleSpinBox_temp.setValue(np.nan)
-            self.doubleSpinBox_temp.setEnabled(False)
             self.comboBox_temp.setEnabled(False)
+            self.doubleSpinBox_temp.setEnabled(False)
+            self.doubleSpinBox_temp.setValue(np.nan)
             self.doubleSpinBox_visc.setEnabled(True)
             self.doubleSpinBox_visc.setReadOnly(False)
             self.doubleSpinBox_visc.setStyleSheet("border-width: 2px")
-        else:
-            self.doubleSpinBox_temp.setEnabled(True)
+        else:  # A known medium
             self.comboBox_temp.setEnabled(True)
             self.doubleSpinBox_visc.setEnabled(True)
             self.doubleSpinBox_visc.setReadOnly(True)
-            self.on_temperature()
-
-    def on_temperature(self):
-        """Called on temperature selections (comboBox, doubleSpinBox)"""
-        medium = self.comboBox_medium.currentData()
-        tselec = self.comboBox_temp.currentData()
-        if tselec in ["manual", "config"]:
             if tselec == "manual":
                 temperature = self.doubleSpinBox_temp.value()
-                self.doubleSpinBox_temp.setReadOnly(False)
                 self.doubleSpinBox_temp.setEnabled(True)
+                self.doubleSpinBox_temp.setReadOnly(False)
             elif tselec == "config":
                 # get temperature from dataset
                 ds = self.get_dataset()
                 temperature = ds.config["setup"]["temperature"]
-                self.doubleSpinBox_temp.setReadOnly(True)
                 self.doubleSpinBox_temp.setEnabled(True)
+                self.doubleSpinBox_temp.setReadOnly(True)
                 self.doubleSpinBox_temp.setValue(temperature)
             elif tselec == "feature":
                 temperature = np.nan
                 self.doubleSpinBox_temp.setEnabled(False)
                 self.doubleSpinBox_temp.setValue(temperature)
+            else:
+                assert tselec is None, "We should still be in init"
+                return
             # For user convenience, also show the viscosity
-            if medium in dclab.features.emodulus.viscosity.KNOWN_MEDIA:
+            if (medium in dclab.features.emodulus.viscosity.KNOWN_MEDIA
+                    and not np.isnan(temperature)):
                 # compute viscosity
                 state = self.__getstate__()
                 cfg = meta_tool.get_rtdc_config(state["path"])
@@ -309,14 +311,15 @@ class SlotPanel(QtWidgets.QWidget):
                             break
                     else:
                         vstyle = "border-width: 2px"
-                self.doubleSpinBox_visc.setStyleSheet(vstyle)
-                self.doubleSpinBox_visc.setValue(visc)
                 self.doubleSpinBox_visc.setEnabled(True)
-        else:  # feature
-            self.doubleSpinBox_temp.setValue(np.nan)
-            self.doubleSpinBox_temp.setEnabled(False)
-            self.doubleSpinBox_visc.setValue(np.nan)
-            self.doubleSpinBox_visc.setEnabled(False)
+                self.doubleSpinBox_visc.setReadOnly(True)
+                self.doubleSpinBox_visc.setValue(visc)
+                self.doubleSpinBox_visc.setStyleSheet(vstyle)
+            else:
+                self.doubleSpinBox_visc.setEnabled(False)
+                self.doubleSpinBox_visc.setReadOnly(True)
+                self.doubleSpinBox_visc.setValue(np.nan)
+                self.doubleSpinBox_visc.setStyleSheet("border-width: 2px")
 
     def set_pipeline(self, pipeline):
         self._pipeline = pipeline
@@ -350,11 +353,9 @@ class SlotPanel(QtWidgets.QWidget):
                 self.comboBox_medium.setCurrentIndex(idx)
                 self.comboBox_medium.setEnabled(False)  # prevent modification
                 # compute viscosity if possible
-                self.on_medium()
-                self.on_temperature()
             else:
                 self.comboBox_medium.setEnabled(True)
-                self.on_medium()
+            self.on_ui_changed()
         else:
             self.setEnabled(False)
 

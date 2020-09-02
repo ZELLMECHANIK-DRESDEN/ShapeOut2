@@ -21,7 +21,10 @@ def make_dataset(medium="CellCarrier", temp=22.5, temp_range=[22, 23],
     ds.export.hdf5(tmp, features=["deform", "area_um", "bright_avg"])
     with h5py.File(tmp, mode="a") as h5:
         h5["events/temp"] = np.linspace(temp_range[0], temp_range[1], len(ds))
-        h5.attrs["setup:medium"] = medium
+        if medium is None:
+            h5.attrs.pop("setup:medium")
+        else:
+            h5.attrs["setup:medium"] = medium
         h5.attrs["setup:temperature"] = temp
         h5.attrs["setup:chip region"] = chip_region
     return pathlib.Path(tmp)
@@ -90,6 +93,21 @@ def test_simple(qtbot):
         path.unlink()
     except BaseException:
         pass
+
+
+def test_other_medium_viscosity_editable_issue_49(qtbot):
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+    # add fake measurement
+    path1 = make_dataset(medium=None, chip_region="channel")
+    mw.add_dataslot(paths=[path1])
+    wsl = mw.widget_ana_view.widget_slot
+    ds = mw.pipeline.slots[0].get_dataset()
+    assert "medium" not in ds.config["setup"], "sanity check (medium removed)"
+    oidx = wsl.comboBox_medium.findData("other")
+    wsl.comboBox_medium.setCurrentIndex(oidx)
+    assert not wsl.doubleSpinBox_visc.isReadOnly(), "Should be editable"
+    assert wsl.doubleSpinBox_visc.isEnabled(), "Should be editable"
 
 
 def test_switch_and_update(qtbot):

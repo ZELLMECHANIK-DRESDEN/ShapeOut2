@@ -1,7 +1,7 @@
 2.2.4
  - fix: UI slot issues (probably a racing condition) in the
    analysis view; editing the viscosity for "other" medium not
-   possible on frozen Windows and macOS application (#49) 
+   possible on frozen Windows and macOS application (#49)
 2.2.3
  - fix: update Quick View plot when values for the Young's modulus
    computation are changed (#44)

@@ -112,7 +112,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.init_quick_view()
         self.init_analysis_view()
         self.mdiArea.cascadeSubWindows()
-        self.showMaximized()
         # DCOR Dialog
         self.actionLoadDCOR.triggered.connect(self.on_action_dcor)
         # BLOCK MATRIX (wraps DataMatrix and PlotMatrix)

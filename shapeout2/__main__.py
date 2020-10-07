@@ -34,11 +34,13 @@ def main(splash=True):
     QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
 
     window = ShapeOut2()
-    window.show()
-    window.raise_()
 
     if splash:
         splash.finish(window)
+
+    window.show()
+    window.raise_()
+    window.activateWindow()
 
     sys.exit(app.exec_())
 

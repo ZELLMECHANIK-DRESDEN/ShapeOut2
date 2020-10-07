@@ -38,12 +38,6 @@ def main(splash=True):
     if splash:
         splash.finish(window)
 
-    window.show()
-    window.raise_()
-    window.activateWindow()
-    window.showMaximized()
-    window.setWindowState(QtCore.Qt.WindowState.WindowActive)
-
     sys.exit(app.exec_())
 
 

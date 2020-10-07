@@ -166,6 +166,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
             QtWidgets.QApplication.processEvents()
             sys.exit(0)
         self.show()
+        self.raise_()
+        self.activateWindow()
+        self.showMaximized()
+        self.setWindowState(QtCore.Qt.WindowState.WindowActive)
 
     def _check_pg_version(self):
         """Tells the user if the pyqtgraph version is not correct"""

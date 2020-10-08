@@ -1,3 +1,6 @@
+2.2.5
+ - setup: correct installation directory on Windows
+ - setup: bump dclab from 0.27.11 to 0.29.0
 2.2.4
  - fix: UI slot issues (probably a racing condition) in the
    analysis view; editing the viscosity for "other" medium not

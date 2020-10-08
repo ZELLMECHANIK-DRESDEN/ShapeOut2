@@ -5,8 +5,8 @@
 #define MyAppNameSimple "Shape-Out"
 #define MyzmAppName "Shape-Out 2"
 #define MyAppVersion "0.1.0"
-#define MyAppPublisher "ZELLMECHANIK DRESDEN"
-#define MyAppURL "http://zellmechanik.com"
+#define MyAppPublisher "Zellmechanik-Dresden"
+#define MyAppURL "https://zellmechanik.com"
 #define MyAppPlatform "win32"
 #define MyAppExeName "ShapeOut2.exe"
 
@@ -22,8 +22,9 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={localappdata}\{#MyAppName}
+DefaultDirName={localappdata}\{#MyAppPublisher}\{#MyAppName}
 DisableDirPage=yes
+UsePreviousAppDir=false
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 OutputBaseFilename={#MyAppNameSimple}_{#MyAppVersion}_{#MyAppPlatform}_setup

@@ -3,7 +3,7 @@ import pkg_resources
 import warnings
 
 import dclab
-from dclab.rtdc_dataset.check import VALID_CHOICES
+from dclab.features.emodulus.viscosity import KNOWN_MEDIA
 import numpy as np
 from PyQt5 import uic, QtCore, QtWidgets
 
@@ -145,7 +145,7 @@ class SlotPanel(QtWidgets.QWidget):
 
     def _init_emodulus(self):
         self.comboBox_medium.clear()
-        for choice in VALID_CHOICES["setup"]["medium"]:
+        for choice in KNOWN_MEDIA + ["other"]:
             if choice == "CellCarrierB":
                 name = "CellCarrier B"  # [sic]
             else:

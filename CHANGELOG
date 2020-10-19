@@ -1,3 +1,6 @@
+2.2.6
+ - docs: update bibliography
+ - bump dclab from 0.29.0 to 0.29.1
 2.2.5
  - setup: correct installation directory on Windows
  - setup: bump dclab from 0.27.11 to 0.29.0

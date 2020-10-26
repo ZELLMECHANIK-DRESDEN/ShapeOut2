@@ -56,10 +56,10 @@ class Dataslot(object):
                 "emodulus medium": "undefined",
                 # https://dclab.readthedocs.io/en/latest/sec_av_emodulus.html
                 # possible values are:
-                # - feature: scenario A
-                # - config: scenario C (temperature taken from config)
-                # - manual: scenario C (temperature entered manually)
-                # -> secnario B is when "emodulus medium" is "other".
+                # - "feature": scenario A
+                # - None: secnario B ("emodulus medium" is "other" or user-def)
+                # - "config": scenario C (temperature taken from config)
+                # - "manual": scenario C (temperature entered manually)
                 "emodulus scenario": "manual",
                 "emodulus temperature": np.nan,
                 "emodulus viscosity": np.nan,

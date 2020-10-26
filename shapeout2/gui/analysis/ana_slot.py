@@ -31,8 +31,13 @@ class SlotPanel(QtWidgets.QWidget):
         self.pushButton_apply.clicked.connect(self.write_slot)
         self.pushButton_reset.clicked.connect(self.update_content)
         self.comboBox_slots.currentIndexChanged.connect(self.update_content)
+        self.comboBox_medium.currentIndexChanged.connect(self.on_ui_changed)
+        self.comboBox_temp.currentIndexChanged.connect(self.on_ui_changed)
+        self.doubleSpinBox_temp.valueChanged.connect(self.on_ui_changed)
         # init
-        self._init_emodulus()
+        self._update_emodulus_medium_choices()
+        self._update_emodulus_temp_choices()
+
         self.update_content()
 
     def __getstate__(self):
@@ -41,10 +46,15 @@ class SlotPanel(QtWidgets.QWidget):
             emod_temp = self.doubleSpinBox_temp.value()
         else:
             emod_temp = np.nan
-        if self.comboBox_medium.currentData() == "other":
-            emod_visc = self.doubleSpinBox_visc.value()
-        else:
-            emod_visc = np.nan
+        if self.comboBox_medium.currentData() in KNOWN_MEDIA:
+            emod_visc = np.nan  # viscosity computed from LUT
+            scenario = self.comboBox_temp.currentData()
+        elif self.comboBox_medium.currentData() == "unknown":
+            emod_visc = np.nan  # viscosity not defined
+            scenario = None
+        else:  # "other", user-defined medium
+            emod_visc = self.doubleSpinBox_visc.value()  # user input
+            scenario = None
         state = {
             "identifier": slot_state["identifier"],
             "name": self.lineEdit_name.text(),
@@ -66,8 +76,10 @@ class SlotPanel(QtWidgets.QWidget):
             "emodulus": {
                 "emodulus enabled": slot_state["emodulus"]["emodulus enabled"],
                 "emodulus model": "elastic sphere",
+                # It is ok if we have user-defined strings here, because
+                # only media in KNOWN_MEDIA are passed to dclab in the end.
                 "emodulus medium": self.comboBox_medium.currentData(),
-                "emodulus scenario": self.comboBox_temp.currentData(),
+                "emodulus scenario": scenario,
                 "emodulus temperature": emod_temp,
                 "emodulus viscosity": emod_visc,
             }
@@ -94,19 +106,28 @@ class SlotPanel(QtWidgets.QWidget):
         self.doubleSpinBox_ct31.setValue(crosstalk["crosstalk fl31"])
         self.doubleSpinBox_ct32.setValue(crosstalk["crosstalk fl32"])
         # emodulus
-        # this has to be done first, because self.comboBox_medium
-        # triggers on_ui_changed
-        self._init_emodulus_temp_choices()
+        # updating the medium/temperature choices has to be done first,
+        # because self.comboBox_medium triggers the function on_ui_changed.
+        self._update_emodulus_medium_choices()
+        self._update_emodulus_temp_choices()
         emodulus = state["emodulus"]
         self.groupBox_emod.setVisible(emodulus["emodulus enabled"])
         idx_med = self.comboBox_medium.findData(emodulus["emodulus medium"])
+        if idx_med == -1:  # empty medium string
+            idx_med = self.comboBox_medium.findData("other")
         self.comboBox_medium.setCurrentIndex(idx_med)
+        cfg = meta_tool.get_rtdc_config(state["path"])
+        if "medium" in cfg["setup"] and cfg["setup"]["medium"] in KNOWN_MEDIA:
+            self.comboBox_medium.setEnabled(False)  # prevent modification
+        else:
+            self.comboBox_medium.setEnabled(True)  # user-defined
         # https://dclab.readthedocs.io/en/latest/sec_av_emodulus.html
         scenario = emodulus.get("emodulus scenario", "manual")
-        idx_scen = self.comboBox_temp.findData(scenario)
-        self.comboBox_temp.blockSignals(True)
-        self.comboBox_temp.setCurrentIndex(idx_scen)
-        self.comboBox_temp.blockSignals(False)
+        if scenario:
+            idx_scen = self.comboBox_temp.findData(scenario)
+            self.comboBox_temp.blockSignals(True)
+            self.comboBox_temp.setCurrentIndex(idx_scen)
+            self.comboBox_temp.blockSignals(False)
         # This has to be done after setting the scenario
         # (otherwise it might be overridden in the frontend)
         self.doubleSpinBox_temp.setValue(emodulus["emodulus temperature"])
@@ -143,22 +164,30 @@ class SlotPanel(QtWidgets.QWidget):
         self.groupBox_fl_labels.setVisible(hasfl1 | hasfl2 | hasfl3)
         self.groupBox_fl_cross.setVisible(hasfl1 | hasfl2 | hasfl3)
 
-    def _init_emodulus(self):
+    def _update_emodulus_medium_choices(self):
+        """update currently available medium choices for YM
+
+        Signals are blocked.
+        """
+        self.comboBox_medium.blockSignals(True)
         self.comboBox_medium.clear()
-        for choice in KNOWN_MEDIA + ["other"]:
+        ds = self.get_dataset()
+        choices = KNOWN_MEDIA + ["other"]
+        if ds and "setup" in ds.config and "medium" in ds.config["setup"]:
+            medium = ds.config["setup"]["medium"]
+            if medium not in choices and medium.strip():
+                choices.append(medium)
+        for choice in choices:
             if choice == "CellCarrierB":
                 name = "CellCarrier B"  # [sic]
             else:
                 name = choice
             self.comboBox_medium.addItem(name, choice)
         self.comboBox_medium.addItem("not defined", "undefined")
-        self.comboBox_medium.currentIndexChanged.connect(self.on_ui_changed)
-        self._init_emodulus_temp_choices()
-        self.comboBox_temp.currentIndexChanged.connect(self.on_ui_changed)
-        self.doubleSpinBox_temp.valueChanged.connect(self.on_ui_changed)
+        self.comboBox_medium.blockSignals(False)
 
-    def _init_emodulus_temp_choices(self):
-        """populate the temperature comboBox with all available entries
+    def _update_emodulus_temp_choices(self):
+        """pupdate temperature choices for YM
 
         The previous selection is preserved. Signals are blocked.
         """
@@ -253,21 +282,7 @@ class SlotPanel(QtWidgets.QWidget):
         """Called when the user modifies the medium or temperature options"""
         medium = self.comboBox_medium.currentData()
         tselec = self.comboBox_temp.currentData()
-        if medium == "undefined":
-            self.comboBox_temp.setEnabled(False)
-            self.doubleSpinBox_temp.setEnabled(False)
-            self.doubleSpinBox_temp.setValue(np.nan)
-            self.doubleSpinBox_visc.setValue(np.nan)
-            self.doubleSpinBox_visc.setEnabled(False)
-            self.doubleSpinBox_visc.setStyleSheet("border-width: 2px")
-        elif medium == "other":
-            self.comboBox_temp.setEnabled(False)
-            self.doubleSpinBox_temp.setEnabled(False)
-            self.doubleSpinBox_temp.setValue(np.nan)
-            self.doubleSpinBox_visc.setEnabled(True)
-            self.doubleSpinBox_visc.setReadOnly(False)
-            self.doubleSpinBox_visc.setStyleSheet("border-width: 2px")
-        else:  # A known medium
+        if medium in KNOWN_MEDIA:  # medium registered with dclab
             self.comboBox_temp.setEnabled(True)
             self.doubleSpinBox_visc.setEnabled(True)
             self.doubleSpinBox_visc.setReadOnly(True)
@@ -320,6 +335,20 @@ class SlotPanel(QtWidgets.QWidget):
                 self.doubleSpinBox_visc.setReadOnly(True)
                 self.doubleSpinBox_visc.setValue(np.nan)
                 self.doubleSpinBox_visc.setStyleSheet("border-width: 2px")
+        elif medium == "undefined":
+            self.comboBox_temp.setEnabled(False)
+            self.doubleSpinBox_temp.setEnabled(False)
+            self.doubleSpinBox_temp.setValue(np.nan)
+            self.doubleSpinBox_visc.setValue(np.nan)
+            self.doubleSpinBox_visc.setEnabled(False)
+            self.doubleSpinBox_visc.setStyleSheet("border-width: 2px")
+        else:  # "other" or user-defined
+            self.comboBox_temp.setEnabled(False)
+            self.doubleSpinBox_temp.setEnabled(False)
+            self.doubleSpinBox_temp.setValue(np.nan)
+            self.doubleSpinBox_visc.setEnabled(True)
+            self.doubleSpinBox_visc.setReadOnly(False)
+            self.doubleSpinBox_visc.setStyleSheet("border-width: 2px")
 
     def set_pipeline(self, pipeline):
         self._pipeline = pipeline
@@ -343,18 +372,6 @@ class SlotPanel(QtWidgets.QWidget):
             # populate content
             slot_state = self.pipeline.slots[slot_index].__getstate__()
             self.__setstate__(slot_state)
-            # determine whether we already have a medium defined
-            cfg = meta_tool.get_rtdc_config(slot_state["path"])
-            if "medium" in cfg["setup"]:
-                medium = cfg["setup"]["medium"]
-                idx = self.comboBox_medium.findData(medium)
-                if idx < 0:
-                    raise ValueError("Invalid medium: {}".format(medium))
-                self.comboBox_medium.setCurrentIndex(idx)
-                self.comboBox_medium.setEnabled(False)  # prevent modification
-                # compute viscosity if possible
-            else:
-                self.comboBox_medium.setEnabled(True)
             self.on_ui_changed()
         else:
             self.setEnabled(False)

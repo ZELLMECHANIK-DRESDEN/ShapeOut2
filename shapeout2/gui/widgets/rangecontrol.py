@@ -4,6 +4,16 @@ import numpy as np
 from PyQt5 import uic, QtCore, QtWidgets
 
 
+#: Precision for these features (``data``) should not go below this value.
+#: (Precision is set automatically based on data range)
+SPIN_CONTROL_PRECISION = {
+    "area_ratio": 3,
+    "aspect": 3,
+    "bright_avg": 1,
+    "bright_sd": 3,
+}
+
+
 class RangeControl(QtWidgets.QWidget):
     #: Emitted when the range changed
     range_changed = QtCore.pyqtSignal(float, float)
@@ -198,7 +208,17 @@ class RangeControl(QtWidgets.QWidget):
         self.map_spin_values_to_range_slider()
 
     def setSpinLimits(self, vmin, vmax):
-        """Only sets spin control limits"""
+        """Sets spin control limits and precision
+
+        Notes
+        -----
+        The precision is set automatically from the min/max
+        peak-to-peak size. If this precision is not high
+        enough for a specific application, you can set the
+        ``data`` attribute upon initialization and add the
+        precision (in decimals) to :const:`SPIN_CONTROL_PRECISION`
+        via ``SPIN_CONTROL_PRECISION[data] = precision``.
+        """
         # min/max
         self.doubleSpinBox_min.setMinimum(vmin)
         self.doubleSpinBox_max.setMinimum(vmin)
@@ -214,6 +234,8 @@ class RangeControl(QtWidgets.QWidget):
                 dec = int(np.ceil(np.log10(1/np.abs(vmax-vmin)))) + 5
                 if dec <= 0:
                     dec = 1
+            if self.data in SPIN_CONTROL_PRECISION:
+                dec = max(dec, SPIN_CONTROL_PRECISION[self.data])
             self.doubleSpinBox_min.setDecimals(dec)
             self.doubleSpinBox_max.setDecimals(dec)
             self.doubleSpinBox_min.setSingleStep(10**-dec)

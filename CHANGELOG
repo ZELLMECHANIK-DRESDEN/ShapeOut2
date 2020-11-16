@@ -1,5 +1,6 @@
 2.2.6
  - fix: support user-defined media introduced in dclab 0.29.1 (#53)
+ - fix: porosity box filter precision at lower limit (#58)
  - docs: update bibliography
  - bump dclab from 0.29.0 to 0.29.1
 2.2.5

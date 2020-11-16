@@ -465,12 +465,16 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.mdiArea.addSubWindow(sub)
 
     def on_action_about(self):
+        gh = "ZELLMECHANIK-DRESDEN/ShapeOut2"
+        rtd = "shapeout2.readthedocs.io"
         about_text = "Shape-Out 2 is the successor of Shape-Out, " \
             + "a graphical user interface for the analysis and " \
-            + "visualization of RT-DC data sets.\n\n" \
-            + "Author: Paul Müller\n" \
-            + "Code: https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2\n" \
-            + "Documentation: https://shapeout2.readthedocs.io"
+            + "visualization of RT-DC data sets.<br><br>" \
+            + "Author: Paul Müller<br>" \
+            + "GitHub: " \
+            + "<a href='https://github.com/{gh}'>{gh}</a><br>".format(gh=gh) \
+            + "Documentation: " \
+            + "<a href='https://{rtd}'>{rtd}</a><br>".format(rtd=rtd)
         QtWidgets.QMessageBox.about(self,
                                     "Shape-Out {}".format(__version__),
                                     about_text)

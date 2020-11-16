@@ -101,9 +101,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # Compute menu
         self.actionComputeStatistics.triggered.connect(
             self.on_action_compute_statistics)
-        # Initially hide buttons
-        self.pushButton_preset_load.hide()
-        self.pushButton_preset_save.hide()
         # Subwindows
         self.subwindows = {}
         # Subwindows for plots

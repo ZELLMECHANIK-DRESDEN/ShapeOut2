@@ -34,6 +34,7 @@ icons = {
         "folder-cloud",
         "globe",
         "gtk-preferences",
+        "list-add",
         "messagebox_warning",
         "object-columns",
         "object-rows",

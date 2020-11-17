@@ -1,9 +1,10 @@
 import pkg_resources
 import requests
 import urllib.parse
+import webbrowser
 
 import dclab
-from PyQt5 import uic, QtCore, QtWidgets
+from PyQt5 import uic, QtCore, QtGui, QtWidgets
 
 from ..widgets import show_wait_cursor
 
@@ -28,60 +29,22 @@ class DCORLoader(QtWidgets.QDialog):
         self.buttonBox.buttons()[0].setDefault(False)
         self.lineEdit_search.setFocus()
 
-    @show_wait_cursor
-    @QtCore.pyqtSlot(int)
-    def done(self, r):
-        if r:
-            for ii in range(self.listWidget.count()):
-                item = self.listWidget.item(ii)
-                if item.isSelected():
-                    self.main_ui.add_dataslot(
-                        paths=[self.search_results[ii][0]], is_dcor=True)
-        super(DCORLoader, self).done(r)
+        # signals
+        btn_close = self.buttonBox.button(QtGui.QDialogButtonBox.Close)
+        btn_close.clicked.connect(self.on_close)
+        btn_close.setToolTip("Close this window.")
+        btn_open = self.buttonBox.button(QtGui.QDialogButtonBox.Apply)
+        btn_open.clicked.connect(self.on_open)
+        btn_open.setToolTip("Add selected resources to current session.")
+        btn_open.setText("Add to session")
+        plusicon = QtGui.QIcon.fromTheme("list-add")
+        btn_open.setIcon(plusicon)
+        btn_help = self.buttonBox.button(QtGui.QDialogButtonBox.Help)
+        btn_help.clicked.connect(self.on_help)
+        btn_help.setToolTip("View DCOR Quick Guide online.")
 
-    @show_wait_cursor
-    @QtCore.pyqtSlot()
-    def on_search(self):
-        server = self.settings.value("dcor/servers", ["dcor.mpl.mpg.de"])[0]
-        api_key = self.settings.value("dcor/api key", "")
-        use_ssl = bool(int(self.settings.value("dcor/use ssl", 1)))
-        # Add this API Key to the known API Keys (dclab)
-        dclab.rtdc_dataset.fmt_dcor.APIHandler.add_api_key(api_key)
-
-        # ready API
-        http = "https" if use_ssl else "http"
-        base = "{}://{}/api/3".format(http, server)
-        if api_key:
-            api_headers = {"Authorization": api_key}
-        else:
-            api_headers = {}
-
-        # check API availability
-        req = requests.get(base, headers=api_headers)
-        if not req.ok:
-            msg = QtWidgets.QMessageBox()
-            msg.setIcon(QtWidgets.QMessageBox.Warning)
-            msg.setText("Failed to connect to server '{}'! ".format(server)
-                        + "Reason: {}".format(req.reason))
-            msg.setWindowTitle("Connection failed")
-            msg.exec_()
-            return
-        if "version" not in req.json() or req.json()["version"] != 3:
-            raise ValueError("Invalid response: {}".format(req.json()))
-
-        # perform search
-        if self.comboBox_search.currentIndex() == 1:
-            stype = "dataset"
-        else:
-            stype = "free"
-        search_string = urllib.parse.quote(self.lineEdit_search.text())
-        res = self.perform_search(search_string, stype, base, api_headers)
-        self.listWidget.clear()
-        for r in res:
-            self.listWidget.addItem(r[1])
-        self.search_results = res
-
-    def perform_search(self, string, search_type, api_base, api_headers):
+    @staticmethod
+    def perform_search(string, search_type, api_base, api_headers):
         """Perform search
 
         Parameters
@@ -157,3 +120,66 @@ class DCORLoader(QtWidgets.QDialog):
             msg.setWindowTitle("Dataset validation")
             msg.exec_()
         return res_list
+
+    @QtCore.pyqtSlot()
+    def on_close(self):
+        """close window"""
+        self.close()
+
+    @show_wait_cursor
+    @QtCore.pyqtSlot()
+    def on_open(self):
+        """Add selected resources to the current session"""
+        for ii in range(self.listWidget.count()):
+            item = self.listWidget.item(ii)
+            if item.isSelected():
+                self.main_ui.add_dataslot(
+                    paths=[self.search_results[ii][0]], is_dcor=True)
+
+    @QtCore.pyqtSlot()
+    def on_help(self):
+        """Show Shape-Out 2 docs"""
+        webbrowser.open(
+            "https://shapeout2.readthedocs.io/en/stable/sec_qg_dcor.html")
+
+    @show_wait_cursor
+    @QtCore.pyqtSlot()
+    def on_search(self):
+        server = self.settings.value("dcor/servers", ["dcor.mpl.mpg.de"])[0]
+        api_key = self.settings.value("dcor/api key", "")
+        use_ssl = bool(int(self.settings.value("dcor/use ssl", 1)))
+        # Add this API Key to the known API Keys (dclab)
+        dclab.rtdc_dataset.fmt_dcor.APIHandler.add_api_key(api_key)
+
+        # ready API
+        http = "https" if use_ssl else "http"
+        base = "{}://{}/api/3".format(http, server)
+        if api_key:
+            api_headers = {"Authorization": api_key}
+        else:
+            api_headers = {}
+
+        # check API availability
+        req = requests.get(base, headers=api_headers)
+        if not req.ok:
+            msg = QtWidgets.QMessageBox()
+            msg.setIcon(QtWidgets.QMessageBox.Warning)
+            msg.setText("Failed to connect to server '{}'! ".format(server)
+                        + "Reason: {}".format(req.reason))
+            msg.setWindowTitle("Connection failed")
+            msg.exec_()
+            return
+        if "version" not in req.json() or req.json()["version"] != 3:
+            raise ValueError("Invalid response: {}".format(req.json()))
+
+        # perform search
+        if self.comboBox_search.currentIndex() == 1:
+            stype = "dataset"
+        else:
+            stype = "free"
+        search_string = urllib.parse.quote(self.lineEdit_search.text())
+        res = self.perform_search(search_string, stype, base, api_headers)
+        self.listWidget.clear()
+        for r in res:
+            self.listWidget.addItem(r[1])
+        self.search_results = res

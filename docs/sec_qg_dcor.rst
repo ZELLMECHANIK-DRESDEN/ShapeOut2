@@ -23,9 +23,11 @@ In the *File* menu, choose *Load DCOR data*. A dialog
 
 .. note::
 
-    If you need to access private data, you have to enter your
-    personal API Key. You can find your personal API Key in your
-    user pofile page after logging in at https://dcor.mpl.mpg.de.
+    If you need to access private data, you have to specify your
+    personal API key in the preferences dialog (via the *Edit* menu).
+    There, you can also specify which server you wish to connect to.
+    You can find your personal API Key in your user pofile page after
+    you logged in (e.g. at https://dcor.mpl.mpg.de).
 
 You can choose between a free text search (dataset and resource names,
 tags, etc.) and an identifier search (dataset and resource identifiers).

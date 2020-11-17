@@ -15,6 +15,8 @@ app = QApplication(sys.argv)
 QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
 
 mw = ShapeOut2()
+mw.settings.setValue("general/check for updates", 0)
+mw.settings.setValue("advanced/check pyqtgraph version", 0)
 
 # create a fake dataset
 ds = dclab.new_dataset("Figure3_Blood_Initial.rtdc")

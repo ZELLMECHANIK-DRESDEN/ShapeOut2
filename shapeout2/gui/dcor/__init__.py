@@ -24,6 +24,8 @@ class DCORLoader(QtWidgets.QDialog):
 
         # tool button
         self.pushButton_search.clicked.connect(self.on_search)
+        searchicon = QtGui.QIcon.fromTheme("search")
+        self.pushButton_search.setIcon(searchicon)
         self.pushButton_search.setDefault(True)
         self.buttonBox.buttons()[1].setDefault(False)
         self.buttonBox.buttons()[0].setDefault(False)
@@ -32,16 +34,20 @@ class DCORLoader(QtWidgets.QDialog):
         # signals
         btn_close = self.buttonBox.button(QtGui.QDialogButtonBox.Close)
         btn_close.clicked.connect(self.on_close)
-        btn_close.setToolTip("Close this window.")
+        btn_close.setToolTip("Close this window")
+        closeicon = QtGui.QIcon.fromTheme("dialog-close")
+        btn_close.setIcon(closeicon)
         btn_open = self.buttonBox.button(QtGui.QDialogButtonBox.Apply)
         btn_open.clicked.connect(self.on_open)
-        btn_open.setToolTip("Add selected resources to current session.")
+        btn_open.setToolTip("Add selected resources to current session")
         btn_open.setText("Add to session")
         plusicon = QtGui.QIcon.fromTheme("list-add")
         btn_open.setIcon(plusicon)
         btn_help = self.buttonBox.button(QtGui.QDialogButtonBox.Help)
         btn_help.clicked.connect(self.on_help)
-        btn_help.setToolTip("View DCOR Quick Guide online.")
+        btn_help.setToolTip("View DCOR Quick Guide online")
+        helpicon = QtGui.QIcon.fromTheme("documentinfo")
+        btn_help.setIcon(helpicon)
 
     @staticmethod
     def perform_search(string, search_type, api_base, api_headers):

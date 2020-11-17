@@ -11,6 +11,8 @@ app = QApplication(sys.argv)
 QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
 
 mw = ShapeOut2()
+mw.settings.setValue("general/check for updates", 0)
+mw.settings.setValue("advanced/check pyqtgraph version", 0)
 
 # build up a session
 mw.add_dataslot(paths=["Figure3_Blood_Initial.rtdc"])

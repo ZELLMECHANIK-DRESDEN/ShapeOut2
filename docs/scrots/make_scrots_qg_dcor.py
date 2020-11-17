@@ -11,11 +11,11 @@ app = QApplication(sys.argv)
 QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
 
 mw = ShapeOut2()
-mw.settings.set_bool("developer mode", False)
+mw.settings.setValue("general/check for updates", 0)
+mw.settings.setValue("advanced/check pyqtgraph version", 0)
 
 # show the dialog
 dlg = dcor.DCORLoader(mw)
-dlg.lineEdit_api_key.setText("")
 dlg.lineEdit_search.setText("sorting")
 dlg.on_search()
 # force redraw of scrollbars

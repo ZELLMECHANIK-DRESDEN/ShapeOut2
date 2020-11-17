@@ -40,6 +40,7 @@ icons = {
         "object-rows",
         "office-chart-ring",
         "office-chart-scatter",
+        "search",
         "show-grid",
         "tools-wizard",
         "view-filter",

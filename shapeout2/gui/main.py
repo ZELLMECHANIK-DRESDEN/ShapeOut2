@@ -19,6 +19,7 @@ from . import compute
 from . import dcor
 from . import export
 from . import pipeline_plot
+from . import preferences
 from . import quick_view
 from . import update
 from . import widgets
@@ -82,22 +83,17 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # Disable native menu bar (e.g. on Mac)
         self.menubar.setNativeMenuBar(False)
         # File menu
+        self.actionLoadDataset.triggered.connect(self.add_dataslot)
+        self.actionLoadDCOR.triggered.connect(self.on_action_dcor)
         self.actionClearSession.triggered.connect(self.on_action_clear)
         self.actionOpenSession.triggered.connect(self.on_action_open)
         self.actionQuit.triggered.connect(self.on_action_quit)
         self.actionSaveSession.triggered.connect(self.on_action_save)
+        # Edit menu
+        self.actionPreferences.triggered.connect(self.on_action_preferences)
         # Help menu
         self.actionDocumentation.triggered.connect(self.on_action_docs)
         self.actionSoftware.triggered.connect(self.on_action_software)
-        # developer mode
-        self.actionDeveloperMode.setChecked(
-            int(self.settings.value("advanced/developer mode", 0)))
-        self.actionDeveloperMode.triggered.connect(self.on_action_develop)
-        # check for updates
-        do_update = int(self.settings.value("general/check for updates", 1))
-        self.actionCheckUpdate.setChecked(do_update)
-        self.actionCheckUpdate.triggered.connect(self.on_action_check_update)
-        self.on_action_check_update(do_update)  # check for updates if True
         self.actionAbout.triggered.connect(self.on_action_about)
         # Export menu
         self.actionExportData.triggered.connect(self.on_action_export_data)
@@ -116,14 +112,14 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.init_quick_view()
         self.init_analysis_view()
         self.mdiArea.cascadeSubWindows()
-        # DCOR Dialog
-        self.actionLoadDCOR.triggered.connect(self.on_action_dcor)
+        # check for updates
+        do_update = int(self.settings.value("general/check for updates", 1))
+        self.on_action_check_update(do_update)  # check for updates if True
         # BLOCK MATRIX (wraps DataMatrix and PlotMatrix)
         # BlockMatrix appearance
         self.toolButton_dm.clicked.connect(self.on_data_matrix)
         self.splitter.splitterMoved.connect(self.on_splitter)
         # BlockMatrix Actions
-        self.actionLoadDataset.triggered.connect(self.add_dataslot)
         self.actionNewFilter.triggered.connect(self.add_filter)
         self.actionNewPlot.triggered.connect(self.add_plot)
         self.block_matrix.toolButton_load_dataset.clicked.connect(
@@ -531,15 +527,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
         dlg = compute.ComputeStatistics(self, pipeline=self.pipeline)
         dlg.exec()
 
-    @QtCore.pyqtSlot(bool)
-    def on_action_develop(self, b):
-        self.settings.setValue("advanced/developer mode", int(b))
-        msg = QtWidgets.QMessageBox()
-        msg.setIcon(QtWidgets.QMessageBox.Information)
-        msg.setText("Please restart Shape-Out for the changes to take effect.")
-        msg.setWindowTitle("Restart Shape-Out")
-        msg.exec_()
-
     @QtCore.pyqtSlot()
     def on_action_clear(self, assume_yes=False):
         if assume_yes:
@@ -619,6 +606,11 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 else:
                     break
             self.reload_pipeline()
+
+    def on_action_preferences(self):
+        """Show the DCOR import dialog"""
+        dlg = preferences.Preferences(self)
+        dlg.exec()
 
     def on_action_quit(self):
         """Determine what happens when the user wants to quit"""

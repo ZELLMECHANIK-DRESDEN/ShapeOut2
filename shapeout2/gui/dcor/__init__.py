@@ -21,25 +21,12 @@ class DCORLoader(QtWidgets.QDialog):
         # Update UI
         self.settings = QtCore.QSettings()
 
-        # hide SSL checkbox
-        if not int(self.settings.value("acvanced/developer mode", 0)):
-            self.checkBox_ssl.hide()
-        self._init_combobox()
-        self.lineEdit_api_key.setText(self.settings.value("dcor/api key", ""))
-
         # tool button
         self.pushButton_search.clicked.connect(self.on_search)
         self.pushButton_search.setDefault(True)
         self.buttonBox.buttons()[1].setDefault(False)
         self.buttonBox.buttons()[0].setDefault(False)
         self.lineEdit_search.setFocus()
-
-    def _init_combobox(self):
-        # update server list
-        servs = self.settings.value("dcor/servers", [])
-        self.comboBox_server.clear()
-        self.comboBox_server.addItems(servs)
-        self.comboBox_server.setCurrentIndex(0)
 
     @show_wait_cursor
     @QtCore.pyqtSlot(int)
@@ -55,35 +42,26 @@ class DCORLoader(QtWidgets.QDialog):
     @show_wait_cursor
     @QtCore.pyqtSlot()
     def on_search(self):
-        # update server list
-        servs = self.settings.value("dcor/servers", [])
-        serv = self.comboBox_server.currentText()
-        if serv.count("://"):
-            serv = serv.split("://")[1]
-        if serv in servs:
-            # make this server the first choice
-            servs.remove(serv)
-        servs = [serv] + servs
-        api_key = self.lineEdit_api_key.text().strip()
+        server = self.settings.value("dcor/servers", ["dcor.mpl.mpg.de"])[0]
+        api_key = self.settings.value("dcor/api key", "")
+        use_ssl = bool(int(self.settings.value("dcor/use ssl", 1)))
         # Add this API Key to the known API Keys (dclab)
         dclab.rtdc_dataset.fmt_dcor.APIHandler.add_api_key(api_key)
 
-        # save config
-        self.settings.setValue("dcor/api key", api_key)
-        self.settings.setValue("dcor/servers", servs)
-        self._init_combobox()
-
         # ready API
-        http = "https" if self.checkBox_ssl.isChecked() else "http"
-        base = "{}://{}/api/3".format(http, serv)
-        api_headers = {"Authorization": api_key}
+        http = "https" if use_ssl else "http"
+        base = "{}://{}/api/3".format(http, server)
+        if api_key:
+            api_headers = {"Authorization": api_key}
+        else:
+            api_headers = {}
 
         # check API availability
         req = requests.get(base, headers=api_headers)
         if not req.ok:
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Warning)
-            msg.setText("Failed to connect to DCOR server '{}'! ".format(serv)
+            msg.setText("Failed to connect to server '{}'! ".format(server)
                         + "Reason: {}".format(req.reason))
             msg.setWindowTitle("Connection failed")
             msg.exec_()

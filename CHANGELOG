@@ -1,4 +1,5 @@
-2.2.7
+2.3.0
+ - enh: added preferences dialog
  - ref: migrate settings to QSettings
  - setup: remove appdirs dependency, because we let QSettings
    determine where to store settings

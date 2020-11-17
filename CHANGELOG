@@ -1,3 +1,5 @@
+2.2.7
+ - ref: migrate settings to QSettings
 2.2.6
  - fix: support user-defined media introduced in dclab 0.29.1 (#53)
  - fix: porosity box filter precision at lower limit (#58)

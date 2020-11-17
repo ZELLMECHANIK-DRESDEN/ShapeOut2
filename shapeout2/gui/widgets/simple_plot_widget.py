@@ -2,8 +2,6 @@ from PyQt5 import QtCore, QtWidgets
 import pyqtgraph as pg
 from pyqtgraph import exporters
 
-from ...settings import SettingsFile
-
 
 class SimplePlotItem(pg.PlotItem):
     """Custom class for data visualization in Shape-Out
@@ -97,8 +95,8 @@ class SimpleViewBox(pg.ViewBox):
         super(SimpleViewBox, self).__init__(*args, **kwargs)
         #: allowed right-click menu options with new name
         self.right_click_actions = {}
-        settings = SettingsFile()
-        if settings.get_bool("developer mode"):
+        settings = QtCore.QSettings()
+        if int(settings.value("developer mode", 0)):
             # Enable advanced export in developer mode
             self.right_click_actions["Export..."] = "Advanced Export"
 

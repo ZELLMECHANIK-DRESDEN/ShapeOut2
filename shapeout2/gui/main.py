@@ -6,7 +6,6 @@ import sys
 import traceback
 import webbrowser
 
-import appdirs
 import dclab
 import h5py
 import numpy
@@ -637,8 +636,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             session.save_session(path, self.pipeline)
 
     def on_action_software(self):
-        libs = [appdirs,
-                dclab,
+        libs = [dclab,
                 h5py,
                 numpy,
                 pg,

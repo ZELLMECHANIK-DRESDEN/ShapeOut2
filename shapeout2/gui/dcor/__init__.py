@@ -22,10 +22,10 @@ class DCORLoader(QtWidgets.QDialog):
         self.settings = QtCore.QSettings()
 
         # hide SSL checkbox
-        if not int(self.settings.value("developer mode", 0)):
+        if not int(self.settings.value("acvanced/developer mode", 0)):
             self.checkBox_ssl.hide()
         self._init_combobox()
-        self.lineEdit_api_key.setText(self.settings.value("dcor api key", ""))
+        self.lineEdit_api_key.setText(self.settings.value("dcor/api key", ""))
 
         # tool button
         self.pushButton_search.clicked.connect(self.on_search)
@@ -36,7 +36,7 @@ class DCORLoader(QtWidgets.QDialog):
 
     def _init_combobox(self):
         # update server list
-        servs = self.settings.value("dcor servers", [])
+        servs = self.settings.value("dcor/servers", [])
         self.comboBox_server.clear()
         self.comboBox_server.addItems(servs)
         self.comboBox_server.setCurrentIndex(0)
@@ -56,7 +56,7 @@ class DCORLoader(QtWidgets.QDialog):
     @QtCore.pyqtSlot()
     def on_search(self):
         # update server list
-        servs = self.settings.value("dcor servers", [])
+        servs = self.settings.value("dcor/servers", [])
         serv = self.comboBox_server.currentText()
         if serv.count("://"):
             serv = serv.split("://")[1]
@@ -69,8 +69,8 @@ class DCORLoader(QtWidgets.QDialog):
         dclab.rtdc_dataset.fmt_dcor.APIHandler.add_api_key(api_key)
 
         # save config
-        self.settings.setValue("dcor api key", api_key)
-        self.settings.setValue("dcor servers", servs)
+        self.settings.setValue("dcor/api key", api_key)
+        self.settings.setValue("dcor/servers", servs)
         self._init_combobox()
 
         # ready API
@@ -115,6 +115,8 @@ class DCORLoader(QtWidgets.QDialog):
             or "dataset": resource/package name/id
         api_base: str
             Everything up until "https://server.example.org/api/3"
+        api_headers: dict
+            Headers for the request
         """
         if search_type == "free":
             url = api_base + "/action/package_search?q={}".format(string)

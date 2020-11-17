@@ -67,14 +67,14 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # of strings (comma-separated) work nicely though.
         QtCore.QCoreApplication.setOrganizationName("Zellmechanik-Dresden")
         QtCore.QCoreApplication.setOrganizationDomain("zellmechanik.com")
-        QtCore.QCoreApplication.setApplicationName("Shape-Out 2")
+        QtCore.QCoreApplication.setApplicationName("shapeout2")
         QtCore.QSettings.setDefaultFormat(QtCore.QSettings.IniFormat)
         #: Shape-Out settings
         self.settings = QtCore.QSettings()
         self.settings.setIniCodec("utf-8")
         # Register user-defined DCOR API Key in case the user wants to
         # open a session with private data.
-        api_key = self.settings.value("dcor api key", "")
+        api_key = self.settings.value("dcor/api key", "")
         dclab.rtdc_dataset.fmt_dcor.APIHandler.add_api_key(api_key)
         #: Analysis pipeline
         self.pipeline = pipeline.Pipeline()
@@ -92,10 +92,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.actionSoftware.triggered.connect(self.on_action_software)
         # developer mode
         self.actionDeveloperMode.setChecked(
-            int(self.settings.value("developer mode", 0)))
+            int(self.settings.value("advanced/developer mode", 0)))
         self.actionDeveloperMode.triggered.connect(self.on_action_develop)
         # check for updates
-        do_update = int(self.settings.value("check update", 1))
+        do_update = int(self.settings.value("general/check for updates", 1))
         self.actionCheckUpdate.setChecked(do_update)
         self.actionCheckUpdate.triggered.connect(self.on_action_check_update)
         self.on_action_check_update(do_update)  # check for updates if True
@@ -178,7 +178,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     def _check_pg_version(self):
         """Tells the user if the pyqtgraph version is not correct"""
-        if (int(self.settings.value("check pgversion", 1))
+        if (int(self.settings.value("advanced/check pyqtgraph version", 1))
                 and pg.__version__ != "0.11.0.dev0+g1c63ae5"):
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Warning)
@@ -356,7 +356,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             fnames, _ = QtWidgets.QFileDialog.getOpenFileNames(
                 parent=self,
                 caption="Select an RT-DC measurement",
-                directory=self.settings.value("path rtdc import dataset", ""),
+                directory=self.settings.value("paths/add dataset", ""),
                 filter="RT-DC Files (*.rtdc)")
         else:
             fnames = paths
@@ -372,7 +372,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 path = fn
             else:
                 path = pathlib.Path(fn)
-                self.settings.setValue("rtdc import dataset", str(path.parent))
+                self.settings.setValue("paths/add dataset", str(path.parent))
             # add a filter if we don't have one already
             if self.pipeline.num_filters == 0:
                 self.add_filter()
@@ -485,7 +485,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(bool)
     def on_action_check_update(self, b):
-        self.settings.setValue("check update", int(b))
+        self.settings.setValue("general/check for updates", int(b))
         if b and self._update_thread is None:
             self._update_thread = QtCore.QThread()
             self._update_worker = update.UpdateWorker()
@@ -534,7 +534,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(bool)
     def on_action_develop(self, b):
-        self.settings.setValue("developer mode", int(b))
+        self.settings.setValue("advanced/developer mode", int(b))
         msg = QtWidgets.QMessageBox()
         msg.setIcon(QtWidgets.QMessageBox.Information)
         msg.setText("Please restart Shape-Out for the changes to take effect.")

@@ -96,7 +96,7 @@ class SimpleViewBox(pg.ViewBox):
         #: allowed right-click menu options with new name
         self.right_click_actions = {}
         settings = QtCore.QSettings()
-        if int(settings.value("developer mode", 0)):
+        if int(settings.value("advanced/developer mode", 0)):
             # Enable advanced export in developer mode
             self.right_click_actions["Export..."] = "Advanced Export"
 

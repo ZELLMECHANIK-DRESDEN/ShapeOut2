@@ -10,6 +10,6 @@ def pytest_configure(config):
     QtCore.QSettings.setDefaultFormat(QtCore.QSettings.IniFormat)
     settings = QtCore.QSettings()
     settings.setIniCodec("utf-8")
-    settings.setValue("general/check for updates", 0)
+    settings.setValue("check for updates", 0)
     settings.setValue("advanced/check pyqtgraph version", 0)
     settings.sync()

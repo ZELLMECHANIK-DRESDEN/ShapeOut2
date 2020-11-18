@@ -23,7 +23,7 @@ class Preferences(QtWidgets.QDialog):
             ["dcor/api key", self.dcor_api_key, ""],
             ["dcor/servers", self.dcor_servers, ["dcor.mpl.mpg.de"]],
             ["dcor/use ssl", self.dcor_use_ssl, 1],
-            ["general/check for updates", self.general_check_for_updates, 1],
+            ["check for updates", self.general_check_for_updates, 1],
         ]
         self.reload()
 

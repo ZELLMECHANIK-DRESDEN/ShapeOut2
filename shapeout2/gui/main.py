@@ -163,7 +163,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # check pyqtgraph version
         self._check_pg_version()
         # check for updates
-        do_update = int(self.settings.value("general/check for updates", 1))
+        do_update = int(self.settings.value("check for updates", 1))
         self.on_action_check_update(do_update)
         # finalize
         self.show()
@@ -481,7 +481,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(bool)
     def on_action_check_update(self, b):
-        self.settings.setValue("general/check for updates", int(b))
+        self.settings.setValue("check for updates", int(b))
         if b and self._update_thread is None:
             self._update_thread = QtCore.QThread()
             self._update_worker = update.UpdateWorker()

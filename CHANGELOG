@@ -1,5 +1,6 @@
 2.3.0
  - enh: added preferences dialog
+ - enh: improved user experience for searching DCOR data
  - ref: migrate settings to QSettings
  - setup: remove appdirs dependency, because we let QSettings
    determine where to store settings

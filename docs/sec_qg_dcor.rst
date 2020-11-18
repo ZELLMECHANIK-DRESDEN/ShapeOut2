@@ -33,4 +33,4 @@ You can choose between a free text search (dataset and resource names,
 tags, etc.) and an identifier search (dataset and resource identifiers).
 After clicking the *Search* button, you may select the resources you
 wish to load into your sesssion in the list view below. Then, click
-*Open* to load the data.
+*Add to session* to load the data.

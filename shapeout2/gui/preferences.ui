@@ -119,11 +119,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_r">
-      <attribute name="title">
-       <string>R/lme4</string>
-      </attribute>
-     </widget>
      <widget class="QWidget" name="tab_advanced">
       <attribute name="title">
        <string>Advanced</string>

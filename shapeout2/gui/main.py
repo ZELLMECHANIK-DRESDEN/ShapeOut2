@@ -112,9 +112,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.init_quick_view()
         self.init_analysis_view()
         self.mdiArea.cascadeSubWindows()
-        # check for updates
-        do_update = int(self.settings.value("general/check for updates", 1))
-        self.on_action_check_update(do_update)  # check for updates if True
         # BLOCK MATRIX (wraps DataMatrix and PlotMatrix)
         # BlockMatrix appearance
         self.toolButton_dm.clicked.connect(self.on_data_matrix)
@@ -158,13 +155,17 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.plot_changed.connect(self.adopt_plot)
         # slot signals
         self.widget_ana_view.slot_changed.connect(self.adopt_slot)
-        # check pyqtgraph version
-        self._check_pg_version()
         # if "--version" was specified, print the version and exit
         if "--version" in sys.argv:
             print(__version__)
             QtWidgets.QApplication.processEvents()
             sys.exit(0)
+        # check pyqtgraph version
+        self._check_pg_version()
+        # check for updates
+        do_update = int(self.settings.value("general/check for updates", 1))
+        self.on_action_check_update(do_update)
+        # finalize
         self.show()
         self.raise_()
         self.activateWindow()

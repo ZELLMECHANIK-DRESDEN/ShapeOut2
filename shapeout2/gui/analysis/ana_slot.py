@@ -164,6 +164,62 @@ class SlotPanel(QtWidgets.QWidget):
         self.groupBox_fl_labels.setVisible(hasfl1 | hasfl2 | hasfl3)
         self.groupBox_fl_cross.setVisible(hasfl1 | hasfl2 | hasfl3)
 
+    @staticmethod
+    def get_dataset_choices_medium(ds):
+        """Return the choices for the medium selection
+
+        Parameters
+        ----------
+        ds: RTDCBase
+            Dataset
+
+        Returns
+        -------
+        choices: list
+            List of [title, identifier]
+        """
+        if ds:
+            medium = ds.config.get("setup", {}).get("medium", "").strip()
+            if not medium:  # empty medium string
+                medium = "other"
+        else:
+            medium = "undefined"
+        if medium in KNOWN_MEDIA:
+            valid_media = [medium]
+        else:
+            valid_media = KNOWN_MEDIA + ["other", "undefined"]
+        choices = []
+        for vm in valid_media:
+            if vm == "CellCarrierB":
+                name = "CellCarrier B"  # [sic]
+            else:
+                name = vm
+            choices.append([name, medium])
+        return choices
+
+    @staticmethod
+    def get_dataset_choices_temperature(ds):
+        """Return the choices for the temperature selection
+
+        Parameters
+        ----------
+        ds: RTDCBase
+            Dataset
+
+        Returns
+        -------
+        choices: list
+            List of [title, identifier]
+        """
+        choices = []
+        if ds is not None:
+            if "temp" in ds:
+                choices.append(["From feature", "feature"])
+            if "temperature" in ds.config["setup"]:
+                choices.append(["From meta data", "config"])
+        choices.append(["Manual", "manual"])
+        return choices
+
     def _update_emodulus_medium_choices(self):
         """update currently available medium choices for YM
 
@@ -172,18 +228,9 @@ class SlotPanel(QtWidgets.QWidget):
         self.comboBox_medium.blockSignals(True)
         self.comboBox_medium.clear()
         ds = self.get_dataset()
-        choices = KNOWN_MEDIA + ["other"]
-        if ds and "setup" in ds.config and "medium" in ds.config["setup"]:
-            medium = ds.config["setup"]["medium"]
-            if medium not in choices and medium.strip():
-                choices.append(medium)
-        for choice in choices:
-            if choice == "CellCarrierB":
-                name = "CellCarrier B"  # [sic]
-            else:
-                name = choice
-            self.comboBox_medium.addItem(name, choice)
-        self.comboBox_medium.addItem("not defined", "undefined")
+        choices = self.get_dataset_choices_medium(ds)
+        for name, data in choices:
+            self.comboBox_medium.addItem(name, data)
         self.comboBox_medium.blockSignals(False)
 
     def _update_emodulus_temp_choices(self):
@@ -195,12 +242,9 @@ class SlotPanel(QtWidgets.QWidget):
         cursel = self.comboBox_temp.currentData()
         self.comboBox_temp.clear()
         ds = self.get_dataset()
-        if ds is not None:
-            if "temp" in ds:
-                self.comboBox_temp.addItem("From feature", "feature")
-            if "temperature" in ds.config["setup"]:
-                self.comboBox_temp.addItem("From meta data", "config")
-        self.comboBox_temp.addItem("Manual", "manual")
+        choices = self.get_dataset_choices_temperature(ds)
+        for name, data in choices:
+            self.comboBox_temp.addItem(name, data)
         idx = self.comboBox_temp.findData(cursel)
         self.comboBox_temp.setCurrentIndex(idx)
         self.comboBox_temp.blockSignals(False)

@@ -1,6 +1,7 @@
 import copy
 
 import dclab
+from dclab.features.emodulus.viscosity import KNOWN_MEDIA
 import numpy as np
 
 from .. import meta_tool
@@ -147,21 +148,30 @@ class Dataslot(object):
             if key in dataset.config["calculation"]:
                 dataset.config["calculation"].pop(key)
 
-        calc = self.config["emodulus"]
-        # it is safe to set the model
-        model = calc["emodulus model"]
+        model = self.config["emodulus"]["emodulus model"]
+        medium = self.config["emodulus"]["emodulus medium"]
+        visc = self.config["emodulus"]["emodulus viscosity"]
+        scenario = self.config["emodulus"]["emodulus scenario"]
+        if scenario == "config":
+            # Force the temperature from the dataset metadata
+            # (this is a failsafe, the user/developer might not have set it)
+            temp = dataset.config["setup"]["temperature"]
+        elif scenario == "manual":
+            # Only here do we actually need the temperature stored
+            temp = self.config["emodulus"]["emodulus temperature"]
+        else:
+            # Temperature is not used in these scenarios.
+            temp = np.nan
+
         dataset.config["calculation"]["emodulus model"] = model
         # known media
-        medium = calc["emodulus medium"]
         if medium in dclab.features.emodulus.viscosity.KNOWN_MEDIA:
             dataset.config["calculation"]["emodulus medium"] = medium
         # temperature
-        temp = calc["emodulus temperature"]
         if not np.isnan(temp):
             dataset.config["calculation"]["emodulus temperature"] = temp
         # viscosity
-        visc = calc["emodulus viscosity"]
-        if not np.isnan(visc):
+        if medium not in KNOWN_MEDIA and not np.isnan(visc):
             dataset.config["calculation"]["emodulus viscosity"] = visc
 
     def get_dataset(self):

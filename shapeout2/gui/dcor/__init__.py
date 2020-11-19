@@ -145,7 +145,7 @@ class DCORLoader(QtWidgets.QDialog):
                 search_id=this_search_id,
                 api_base_url=api_base_url,
                 api_headers=api_headers,
-                )
+            )
         except BaseException:
             results = []
             failed = []

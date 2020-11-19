@@ -237,7 +237,7 @@
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>&amp;Edit</string>
     </property>
     <addaction name="actionPreferences"/>
    </widget>
@@ -260,18 +260,25 @@
    </widget>
    <widget class="QMenu" name="menuImport">
     <property name="title">
-     <string>Import</string>
+     <string>&amp;Import</string>
     </property>
     <addaction name="actionImportFilter"/>
    </widget>
    <widget class="QMenu" name="menuCompute">
     <property name="title">
-     <string>Compute</string>
+     <string>&amp;Compute</string>
     </property>
     <addaction name="actionComputeStatistics"/>
    </widget>
+   <widget class="QMenu" name="menuBulk_Action">
+    <property name="title">
+     <string>&amp;Bulk Action</string>
+    </property>
+    <addaction name="actionComputeEmodulus"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuBulk_Action"/>
    <addaction name="menuCompute"/>
    <addaction name="menuExport"/>
    <addaction name="menuImport"/>
@@ -284,7 +291,7 @@
      <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Load &amp;Dataset...</string>
+    <string>&amp;Load Dataset...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
@@ -392,7 +399,7 @@
      <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Filter...</string>
+    <string>&amp;Filter...</string>
    </property>
   </action>
   <action name="actionNewPlot">
@@ -411,7 +418,7 @@
      <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Statistics...</string>
+    <string>&amp;Statistics...</string>
    </property>
   </action>
   <action name="actionLoadDCOR">
@@ -420,7 +427,7 @@
      <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>Load DCOR data...</string>
+    <string>Load &amp;DCOR data...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
@@ -431,7 +438,15 @@
     <iconset theme="gtk-preferences"/>
    </property>
    <property name="text">
-    <string>Preferences...</string>
+    <string>&amp;Preferences...</string>
+   </property>
+  </action>
+  <action name="actionComputeEmodulus">
+   <property name="icon">
+    <iconset theme="emodulus"/>
+   </property>
+   <property name="text">
+    <string>&amp;Young's modulus...</string>
    </property>
   </action>
  </widget>

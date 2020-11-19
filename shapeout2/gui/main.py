@@ -91,19 +91,21 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.actionSaveSession.triggered.connect(self.on_action_save)
         # Edit menu
         self.actionPreferences.triggered.connect(self.on_action_preferences)
-        # Help menu
-        self.actionDocumentation.triggered.connect(self.on_action_docs)
-        self.actionSoftware.triggered.connect(self.on_action_software)
-        self.actionAbout.triggered.connect(self.on_action_about)
+        # Compute menu
+        self.actionComputeStatistics.triggered.connect(
+            self.on_action_compute_statistics)
+        self.actionComputeEmodulus.triggered.connect(
+            self.on_action_compute_emodulus)
         # Export menu
         self.actionExportData.triggered.connect(self.on_action_export_data)
         self.actionExportFilter.triggered.connect(self.on_action_export_filter)
         self.actionExportPlot.triggered.connect(self.on_action_export_plot)
         # Import menu
         self.actionImportFilter.triggered.connect(self.on_action_import_filter)
-        # Compute menu
-        self.actionComputeStatistics.triggered.connect(
-            self.on_action_compute_statistics)
+        # Help menu
+        self.actionDocumentation.triggered.connect(self.on_action_docs)
+        self.actionSoftware.triggered.connect(self.on_action_software)
+        self.actionAbout.triggered.connect(self.on_action_about)
         # Subwindows
         self.subwindows = {}
         # Subwindows for plots
@@ -526,6 +528,11 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     def on_action_compute_statistics(self):
         dlg = compute.ComputeStatistics(self, pipeline=self.pipeline)
+        dlg.exec()
+
+    def on_action_compute_emodulus(self):
+        dlg = compute.ComputeEmodulus(self, pipeline=self.pipeline)
+        dlg.pipeline_changed.connect(self.adopt_pipeline)
         dlg.exec()
 
     @QtCore.pyqtSlot()

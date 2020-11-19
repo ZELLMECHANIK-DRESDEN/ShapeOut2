@@ -427,6 +427,9 @@
    </property>
   </action>
   <action name="actionPreferences">
+   <property name="icon">
+    <iconset theme="gtk-preferences"/>
+   </property>
    <property name="text">
     <string>Preferences...</string>
    </property>

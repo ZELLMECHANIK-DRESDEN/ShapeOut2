@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Compute and export statistics</string>
   </property>
+  <property name="windowIcon">
+   <iconset theme="view-statistics"/>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="label">

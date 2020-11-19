@@ -11,7 +11,10 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Filter export</string>
+  </property>
+  <property name="windowIcon">
+   <iconset theme="view-filter"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

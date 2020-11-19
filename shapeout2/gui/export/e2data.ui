@@ -11,7 +11,10 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Data export</string>
+  </property>
+  <property name="windowIcon">
+   <iconset theme="office-chart-ring"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

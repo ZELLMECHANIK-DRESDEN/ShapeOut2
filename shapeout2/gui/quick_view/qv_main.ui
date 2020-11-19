@@ -14,7 +14,8 @@
    <string>Form</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="office-chart-scatter"/>
+   <iconset theme="office-chart-scatter">
+    <normaloff>.</normaloff>.</iconset>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>

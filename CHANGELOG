@@ -1,6 +1,6 @@
 2.4.0
  - feat: allow to set Young's modulus parameters for all
-   open datasets via the "Bulk Action" menu
+   open datasets via the "Bulk Action" menu (#60)
  - fix: force temperature for Young's modulus computation
    to the value stored in the dataset for the "config"
    scenario

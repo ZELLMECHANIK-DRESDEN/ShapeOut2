@@ -15,6 +15,7 @@ from PyQt5 import uic, QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
 
 from . import analysis
+from . import bulk
 from . import compute
 from . import dcor
 from . import export
@@ -531,7 +532,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         dlg.exec()
 
     def on_action_compute_emodulus(self):
-        dlg = compute.ComputeEmodulus(self, pipeline=self.pipeline)
+        dlg = bulk.BulkActionEmodulus(self, pipeline=self.pipeline)
         dlg.pipeline_changed.connect(self.adopt_pipeline)
         dlg.exec()
 

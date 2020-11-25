@@ -4,18 +4,18 @@ from dclab.features.emodulus.viscosity import KNOWN_MEDIA
 
 from PyQt5 import uic, QtCore, QtGui, QtWidgets
 
-from ..analysis.ana_slot import SlotPanel
-from ..widgets import show_wait_cursor
+from shapeout2.gui.analysis.ana_slot import SlotPanel
+from shapeout2.gui.widgets import show_wait_cursor
 
 
-class ComputeEmodulus(QtWidgets.QDialog):
+class BulkActionEmodulus(QtWidgets.QDialog):
     #: Emitted when the pipeline is to be changed
     pipeline_changed = QtCore.pyqtSignal(dict)
 
     def __init__(self, parent, pipeline, *args, **kwargs):
         QtWidgets.QWidget.__init__(self, parent, *args, **kwargs)
         path_ui = pkg_resources.resource_filename(
-            "shapeout2.gui.compute", "comp_emodulus.ui")
+            "shapeout2.gui.bulk", "bulk_emodulus.ui")
         uic.loadUi(path_ui, self)
         # main
         self.parent = self.parent

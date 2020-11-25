@@ -85,9 +85,9 @@ class BulkActionEmodulus(QtWidgets.QDialog):
         """Set the given emodulus properties for all datasets"""
         medium = self.comboBox_medium.currentData()
         if self.comboBox_temp.isEnabled():
-            temp = self.comboBox_temp.currentData()
+            scen = self.comboBox_temp.currentData()
         else:
-            temp = None
+            scen = None
         if self.doubleSpinBox_temp.isEnabled():
             tempval = self.doubleSpinBox_temp.value()
         else:
@@ -105,26 +105,23 @@ class BulkActionEmodulus(QtWidgets.QDialog):
 
             # Use the internal sanity checks to determine whether
             # or not we can set the medium or temperature scenarios.
-            choices_medium = SlotPanel.get_dataset_choices_medium(ds)
-            choices_temp = SlotPanel.get_dataset_choices_temperature(ds)
-            if medium in [m[1] for m in choices_medium]:
+            valid_media = SlotPanel.get_dataset_choices_medium(ds)
+            valid_scenarios = SlotPanel.get_dataset_choices_temperature(ds)
+            if medium in [m[1] for m in valid_media]:
                 state = slot.__getstate__()
                 state["emodulus"]["emodulus medium"] = medium
-                slot.__setstate__(state)
-
                 # Set the viscosity here, because unknown media are
                 # available.
                 if viscval is not None:
                     state["emodulus"]["emodulus viscosity"] = viscval
+                slot.__setstate__(state)
 
-            if temp in [t[1] for t in choices_temp]:  # temp is not None
+            if scen in [s[1] for s in valid_scenarios]:  # scen is not None
                 state = slot.__getstate__()
-                state["emodulus"]["emodulus scenario"] = temp
+                state["emodulus"]["emodulus scenario"] = scen
                 if tempval is not None:
                     state["emodulus"]["emodulus temperature"] = tempval
                 slot.__setstate__(state)
-
-            print(state["emodulus"])
 
     def update_ui(self):
         """Update all relevant parts of the main user interface"""

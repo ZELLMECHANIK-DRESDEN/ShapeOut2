@@ -272,7 +272,7 @@
    </widget>
    <widget class="QMenu" name="menuBulk_Action">
     <property name="title">
-     <string>&amp;Bulk Action</string>
+     <string>&amp;Bulk action</string>
     </property>
     <addaction name="actionComputeEmodulus"/>
    </widget>
@@ -435,7 +435,8 @@
   </action>
   <action name="actionPreferences">
    <property name="icon">
-    <iconset theme="gtk-preferences"/>
+    <iconset theme="gtk-preferences">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Preferences...</string>
@@ -443,7 +444,8 @@
   </action>
   <action name="actionComputeEmodulus">
    <property name="icon">
-    <iconset theme="emodulus"/>
+    <iconset theme="emodulus">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Young's modulus...</string>

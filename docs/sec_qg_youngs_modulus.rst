@@ -10,11 +10,12 @@ fully elastic spheres according to Mokbel et al. :cite:`Mokbel2017`.
 
 .. note::
 
-    For reservoir data, the Young's modulus cannot be computed and the
+    For reservoir data, the Young's modulus cannot be computed. The
     corresponding options are hidden.
 
-Usage
------
+
+Parameter settings
+------------------
 
 .. _qg_emodulus_config:
 .. figure:: scrots/qg_emodulus_config.png
@@ -73,6 +74,20 @@ shear-thinning :cite:`Herold2017`).
 
 Click *Apply* for any changes to take effect. The Young's modulus is then
 available for the selected dataset.
+
+
+
+Bulk actions
+------------
+The *Bulk action* menu has an entry for Young's modulus computation.
+In the associated dialog you can set the corresponding parameters
+for all datasets of the current session. Note that the options
+in this dialog do not necessarily reflect the options available for the
+individual datasets. Only valid options are adopted. For instance,
+you will not be able to change the medium for a dataset if a medium is
+already given in its meta data. To verify the options set, you can always
+check the current setting via the *Analysis View* (see above).
+
 
 
 Validity

@@ -1,6 +1,6 @@
 import pkg_resources
 
-from PyQt5 import uic, QtCore, QtGui, QtWidgets
+from PyQt5 import uic, QtCore, QtWidgets
 
 
 class Preferences(QtWidgets.QDialog):
@@ -28,14 +28,12 @@ class Preferences(QtWidgets.QDialog):
         self.reload()
 
         # signals
-        btn_apply = self.buttonBox.button(QtGui.QDialogButtonBox.Apply)
+        btn_apply = self.buttonBox.button(QtWidgets.QDialogButtonBox.Apply)
         btn_apply.clicked.connect(self.on_apply)
-        btn_ok = self.buttonBox.button(QtGui.QDialogButtonBox.Ok)
-        btn_ok.clicked.connect(self.on_ok)
-        btn_cancel = self.buttonBox.button(QtGui.QDialogButtonBox.Cancel)
-        btn_cancel.clicked.connect(self.on_cancel)
+        btn_ok = self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok)
+        btn_ok.clicked.connect(self.on_apply)
         btn_restore = self.buttonBox.button(
-            QtGui.QDialogButtonBox.RestoreDefaults)
+            QtWidgets.QDialogButtonBox.RestoreDefaults)
         btn_restore.clicked.connect(self.on_restore)
 
     def reload(self):
@@ -78,15 +76,6 @@ class Preferences(QtWidgets.QDialog):
 
         # reload UI to give visual feedback
         self.reload()
-
-    @QtCore.pyqtSlot()
-    def on_cancel(self):
-        self.close()
-
-    @QtCore.pyqtSlot()
-    def on_ok(self):
-        self.on_apply()
-        self.on_cancel()
 
     @QtCore.pyqtSlot()
     def on_restore(self):

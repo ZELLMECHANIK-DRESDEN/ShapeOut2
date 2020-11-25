@@ -2,7 +2,7 @@ import pkg_resources
 
 from dclab.features.emodulus.viscosity import KNOWN_MEDIA
 
-from PyQt5 import uic, QtCore, QtGui, QtWidgets
+from PyQt5 import uic, QtCore, QtWidgets
 
 from shapeout2.gui.analysis.ana_slot import SlotPanel
 from shapeout2.gui.widgets import show_wait_cursor
@@ -45,14 +45,8 @@ class BulkActionEmodulus(QtWidgets.QDialog):
         self.comboBox_temp.setCurrentIndex(self.comboBox_temp.count()-1)
 
         # buttons
-        btn_ok = self.buttonBox.button(QtGui.QDialogButtonBox.Ok)
+        btn_ok = self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok)
         btn_ok.clicked.connect(self.on_ok)
-        btn_cancel = self.buttonBox.button(QtGui.QDialogButtonBox.Cancel)
-        btn_cancel.clicked.connect(self.on_cancel)
-
-    @QtCore.pyqtSlot()
-    def on_cancel(self):
-        self.close()
 
     @QtCore.pyqtSlot()
     def on_ok(self):

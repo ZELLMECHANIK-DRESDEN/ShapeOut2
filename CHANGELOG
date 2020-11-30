@@ -1,3 +1,7 @@
+2.4.1
+ - fix: strip white-space characters from line edits in the
+   preferences to avoid line breaks introduced in the API key
+   via copy-paste
 2.4.0
  - feat: allow to set Young's modulus parameters for all
    open datasets via the "Bulk action" menu (#60)

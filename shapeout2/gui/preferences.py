@@ -62,7 +62,7 @@ class Preferences(QtWidgets.QDialog):
             if isinstance(widget, QtWidgets.QCheckBox):
                 value = int(widget.isChecked())
             elif isinstance(widget, QtWidgets.QLineEdit):
-                value = widget.text()
+                value = widget.text().strip()
             elif widget is self.dcor_servers:
                 curtext = self.dcor_servers.currentText()
                 items = self.settings.value(key, default)

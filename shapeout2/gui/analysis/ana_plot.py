@@ -175,7 +175,10 @@ class PlotPanel(QtWidgets.QWidget):
         hue_index = self.comboBox_marker_hue.findData(sca["marker hue"])
         self.comboBox_marker_hue.setCurrentIndex(hue_index)
         self.doubleSpinBox_marker_size.setValue(sca["marker size"])
-        feat_index = feats_srt.index(sca["hue feature"])
+        if sca["hue feature"] in feats_srt:
+            feat_index = feats_srt.index(sca["hue feature"])
+        else:
+            feat_index = 0  # feature not available in datasets
         self.comboBox_marker_feature.setCurrentIndex(feat_index)
         color_index = COLORMAPS.index(sca["colormap"])
         self.comboBox_colormap.setCurrentIndex(color_index)
@@ -520,15 +523,19 @@ class PlotPanel(QtWidgets.QWidget):
             for cb in [self.comboBox_axis_x,
                        self.comboBox_axis_y,
                        self.comboBox_marker_feature]:
+                # get the features currently available
+                feats_srt = self.get_features()
                 cb.blockSignals(True)
+                # remember previous selection if possible
                 if cb.count:
                     # remember current selection
                     curfeat = cb.currentData()
+                    if curfeat not in feats_srt:
+                        curfeat = None
                 else:
                     curfeat = None
                 # repopulate
                 cb.clear()
-                feats_srt = self.get_features()
                 for feat in feats_srt:
                     cb.addItem(dclab.dfn.get_feature_label(feat), feat)
                 if curfeat is not None:

@@ -68,8 +68,3 @@ def test_filter_min_max_inf(qtbot):
     # only approximate (b/c they were converted on the range scale)
     assert np.allclose(rcstate["start"], ds2["area_ratio"][2], rtol=1e-4)
     assert np.allclose(rcstate["end"], 1.1, rtol=1e-4)
-
-    try:
-        pathlib.Path(tmp).unlink()
-    except BaseException:
-        pass

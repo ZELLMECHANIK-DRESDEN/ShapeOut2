@@ -239,6 +239,8 @@
     <property name="title">
      <string>&amp;Edit</string>
     </property>
+    <addaction name="actionChangeDatasetOrder"/>
+    <addaction name="separator"/>
     <addaction name="actionPreferences"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
@@ -449,6 +451,14 @@
    </property>
    <property name="text">
     <string>&amp;Young's modulus...</string>
+   </property>
+  </action>
+  <action name="actionChangeDatasetOrder">
+   <property name="icon">
+    <iconset theme="object-order-lower"/>
+   </property>
+   <property name="text">
+    <string>&amp;Change dataset order</string>
    </property>
   </action>
  </widget>

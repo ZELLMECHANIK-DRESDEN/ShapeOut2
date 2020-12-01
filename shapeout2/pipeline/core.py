@@ -522,6 +522,24 @@ class Pipeline(object):
         if slot_id in self.element_states:
             self.element_states.pop(slot_id)
 
+    def reorder_slots(self, indices):
+        """Change the order of data slots
+
+        Parameters
+        ----------
+        indices: list of ints
+            New sequence of slots, i.e. the new slots
+            will be `self.slots[indices]`.
+        """
+        # sanity checks
+        if sorted(indices) != list(range(len(self.slots))):
+            raise ValueError("Cannot reorder slots with inconclusive "
+                             "ordering sequence '{}'!".format(indices))
+        new_slots = []
+        for idx in indices:
+            new_slots.append(self.slots[idx])
+        self.slots = new_slots
+
     def reset(self):
         """Reset the pipeline"""
         #: Filters are instances of :class:`shapeout2.pipeline.Filter`

@@ -47,23 +47,54 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_anew">
+      <widget class="QToolButton" name="toolButton_reorder">
+       <property name="toolTip">
+        <string>Reorder</string>
+       </property>
+       <property name="text">
+        <string>Reorder</string>
+       </property>
+       <property name="icon">
+        <iconset theme="object-order-lower"/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButton_anew">
+       <property name="toolTip">
+        <string>Insert anew</string>
+       </property>
        <property name="text">
         <string>Insert anew</string>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_duplicate">
-       <property name="text">
-        <string>Duplicate</string>
+       <property name="icon">
+        <iconset theme="special_paste"/>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_remove">
+      <widget class="QToolButton" name="toolButton_duplicate">
+       <property name="toolTip">
+        <string>Duplicate</string>
+       </property>
+       <property name="text">
+        <string>Duplicate</string>
+       </property>
+       <property name="icon">
+        <iconset theme="edit-paste"/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButton_remove">
+       <property name="toolTip">
+        <string>Remove</string>
+       </property>
        <property name="text">
         <string>Remove</string>
+       </property>
+       <property name="icon">
+        <iconset theme="remove"/>
        </property>
       </widget>
      </item>

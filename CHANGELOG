@@ -1,3 +1,6 @@
+2.4.2
+ - fix: allow to reorder the dataset list (#46)
+ - enh: iconify buttons at top of Analysis View
 2.4.1
  - fix: strip white-space characters from line edits in the
    preferences to avoid line breaks introduced in the API key

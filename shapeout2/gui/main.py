@@ -91,6 +91,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.actionQuit.triggered.connect(self.on_action_quit)
         self.actionSaveSession.triggered.connect(self.on_action_save)
         # Edit menu
+        self.actionChangeDatasetOrder.triggered.connect(
+            self.on_action_change_dataset_order)
         self.actionPreferences.triggered.connect(self.on_action_preferences)
         # Compute menu
         self.actionComputeStatistics.triggered.connect(
@@ -481,6 +483,12 @@ class ShapeOut2(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.about(self,
                                     "Shape-Out {}".format(__version__),
                                     about_text)
+
+    def on_action_change_dataset_order(self):
+        """Show dialog for changing dataset order"""
+        dlg = analysis.DlgSlotReorder(self.pipeline, self)
+        dlg.pipeline_changed.connect(self.adopt_pipeline)
+        dlg.exec()
 
     @QtCore.pyqtSlot(bool)
     def on_action_check_update(self, b):

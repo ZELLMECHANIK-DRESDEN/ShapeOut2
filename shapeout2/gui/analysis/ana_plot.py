@@ -38,8 +38,8 @@ class PlotPanel(QtWidgets.QWidget):
         self.comboBox_division.setCurrentIndex(2)
 
         # signals
-        self.pushButton_duplicate.clicked.connect(self.on_plot_duplicated)
-        self.pushButton_remove.clicked.connect(self.on_plot_removed)
+        self.toolButton_duplicate.clicked.connect(self.on_plot_duplicated)
+        self.toolButton_remove.clicked.connect(self.on_plot_removed)
         self.pushButton_reset.clicked.connect(self.update_content)
         self.pushButton_apply.clicked.connect(self.write_plot)
         self.comboBox_plots.currentIndexChanged.connect(self.update_content)

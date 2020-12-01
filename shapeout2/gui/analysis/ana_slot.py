@@ -10,6 +10,8 @@ from PyQt5 import uic, QtCore, QtWidgets
 from ... import meta_tool
 from ...pipeline import Dataslot
 
+from .dlg_slot_reorder import DlgSlotReorder
+
 
 class SlotPanel(QtWidgets.QWidget):
     #: Emitted when a shapeout2.pipeline.Dataslot is to be changed
@@ -25,9 +27,10 @@ class SlotPanel(QtWidgets.QWidget):
         # current Shape-Out 2 pipeline
         self._pipeline = None
         # signals
-        self.pushButton_anew.clicked.connect(self.on_anew_slot)
-        self.pushButton_duplicate.clicked.connect(self.on_duplicate_slot)
-        self.pushButton_remove.clicked.connect(self.on_remove_slot)
+        self.toolButton_reorder.clicked.connect(self.on_reorder_slots)
+        self.toolButton_anew.clicked.connect(self.on_anew_slot)
+        self.toolButton_duplicate.clicked.connect(self.on_duplicate_slot)
+        self.toolButton_remove.clicked.connect(self.on_remove_slot)
         self.pushButton_apply.clicked.connect(self.write_slot)
         self.pushButton_reset.clicked.connect(self.update_content)
         self.comboBox_slots.currentIndexChanged.connect(self.update_content)
@@ -320,6 +323,13 @@ class SlotPanel(QtWidgets.QWidget):
         self.pipeline.remove_slot(slot_state["identifier"])
         state = self.pipeline.__getstate__()
         self.pipeline_changed.emit(state)
+
+    @QtCore.pyqtSlot()
+    def on_reorder_slots(self):
+        """Open dialog for reordering slots"""
+        dlg = DlgSlotReorder(self.pipeline, self)
+        dlg.pipeline_changed.connect(self.pipeline_changed)
+        dlg.exec()
 
     @QtCore.pyqtSlot()
     def on_ui_changed(self):

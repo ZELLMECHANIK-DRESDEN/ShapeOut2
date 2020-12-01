@@ -32,8 +32,8 @@ class FilterPanel(QtWidgets.QWidget):
         self._populate_box_filters()
         self._polygon_checkboxes = {}
         self.update_polygon_filters()
-        self.pushButton_duplicate.clicked.connect(self.on_duplicate_filter)
-        self.pushButton_remove.clicked.connect(self.on_remove_filter)
+        self.toolButton_duplicate.clicked.connect(self.on_duplicate_filter)
+        self.toolButton_remove.clicked.connect(self.on_remove_filter)
         self.pushButton_apply.clicked.connect(self.write_filter)
         self.pushButton_reset.clicked.connect(self.update_content)
         self.comboBox_filters.currentIndexChanged.connect(self.update_content)

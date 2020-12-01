@@ -1,4 +1,7 @@
 2.4.2
+ - fix: a regression introduced during refactoring in 2.4.0
+   made it impossible to select the temperature for known
+   media
  - fix: allow to reorder the dataset list (#46)
  - enh: iconify buttons at top of Analysis View
 2.4.1

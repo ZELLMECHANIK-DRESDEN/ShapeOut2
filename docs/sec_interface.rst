@@ -103,8 +103,8 @@ bar at the top, the Block Matrix on the left, and the Workspace on the right
 Menu bar and tool bar
 ---------------------
 The menu bar is used for session management (File menu)
-and makes additional functionalities available, such as data statistics,
-data export, plot export, or filter import/export.
+and makes additional functionalities available, such as batch
+processing, data statistics, data export, plot export, or filter import/export.
 The tool bar contains shortcuts for adding new datasets,
 filters, or plots (left part) and allows to hide/show the
 :ref:`sec_block_matrix` as well as the :ref:`sec_quick_view` and
@@ -123,6 +123,8 @@ Block Matrix
 The Block Matrix gives an overview of the current analysis
 pipeline. Each row represents a dataset (purple). The columns represent
 either filters (yellow) or plots (blue) of your pipeline.
+You can change the order of datasets via the *Edit|Change dataset order*
+menu bar entry.
 
 You can perform dataset operations in the purple rectangular area
 at the beginning of each row: To modify a dataset, click on the *edit*

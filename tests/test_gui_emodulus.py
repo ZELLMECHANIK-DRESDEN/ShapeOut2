@@ -11,11 +11,13 @@ from shapeout2.gui.main import ShapeOut2
 from shapeout2 import session
 import pytest
 
+datapath = pathlib.Path(__file__).parent / "data"
+
 
 def make_dataset(medium="CellCarrier", temp=22.5, temp_range=[22, 23],
                  chip_region="channel"):
     # create a fake dataset
-    path = pathlib.Path(__file__).parent / "data" / "calibration_beads_47.rtdc"
+    path = datapath / "calibration_beads_47.rtdc"
     ds = dclab.new_dataset(path)
     tmp = tempfile.mktemp(".rtdc", prefix="example_")
     ds.export.hdf5(tmp, features=["deform", "area_um", "bright_avg"])
@@ -38,6 +40,35 @@ def run_around_tests():
     yield
     # Code that will run after your test, for example:
     session.clear_session()
+
+
+def test_allow_to_set_manual_temperature_for_known_medium(qtbot):
+    """Fixes regression introduced in 2.4.0"""
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+    # add fake measurement
+    path1 = make_dataset(medium=None, temp=23.5)
+    mw.add_dataslot(paths=[path1])
+    wsl = mw.widget_ana_view.widget_slot
+
+    # 1. test whether we can actually select things in comboBox_temp
+    ccidx = wsl.comboBox_medium.findData("CellCarrier")
+    wsl.comboBox_medium.setCurrentIndex(ccidx)
+    assert wsl.comboBox_temp.isEnabled()
+
+    # 2. test whether we can select manual
+    manidx = wsl.comboBox_temp.findData("manual")
+    wsl.comboBox_temp.setCurrentIndex(manidx)
+    assert wsl.doubleSpinBox_temp.isEnabled()
+    assert not wsl.doubleSpinBox_temp.isReadOnly()
+
+    # 3. test whether we can select config and the the temperature
+    # should be 23.5
+    conidx = wsl.comboBox_temp.findData("config")
+    wsl.comboBox_temp.setCurrentIndex(conidx)
+    assert wsl.doubleSpinBox_temp.isEnabled()
+    assert wsl.doubleSpinBox_temp.isReadOnly()
+    assert wsl.doubleSpinBox_temp.value() == 23.5
 
 
 def test_empty_medium_string_should_offer_user_edit(qtbot):

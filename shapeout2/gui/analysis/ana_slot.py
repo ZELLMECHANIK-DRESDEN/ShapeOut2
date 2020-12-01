@@ -190,14 +190,14 @@ class SlotPanel(QtWidgets.QWidget):
         if medium in KNOWN_MEDIA:
             valid_media = [medium]
         else:
-            valid_media = KNOWN_MEDIA + ["other", "undefined"]
+            valid_media = KNOWN_MEDIA + [medium, "other", "undefined"]
         choices = []
         for vm in valid_media:
             if vm == "CellCarrierB":
                 name = "CellCarrier B"  # [sic]
             else:
                 name = vm
-            choices.append([name, medium])
+            choices.append([name, vm])
         return choices
 
     @staticmethod

@@ -1,3 +1,5 @@
+2.4.3
+ - enh: improve UI (tooltips, icons)
 2.4.2
  - fix: a regression introduced during refactoring in 2.4.0
    made it impossible to select the temperature for known

@@ -49,52 +49,56 @@
      <item>
       <widget class="QToolButton" name="toolButton_reorder">
        <property name="toolTip">
-        <string>Reorder</string>
+        <string>Reorder datasets</string>
        </property>
        <property name="text">
         <string>Reorder</string>
        </property>
        <property name="icon">
-        <iconset theme="object-order-lower"/>
+        <iconset theme="object-order-lower">
+         <normaloff>.</normaloff>.</iconset>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QToolButton" name="toolButton_anew">
        <property name="toolTip">
-        <string>Insert anew</string>
+        <string>Duplicate this dataset without custom settings</string>
        </property>
        <property name="text">
         <string>Insert anew</string>
        </property>
        <property name="icon">
-        <iconset theme="special_paste"/>
+        <iconset theme="special_paste">
+         <normaloff>.</normaloff>.</iconset>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QToolButton" name="toolButton_duplicate">
        <property name="toolTip">
-        <string>Duplicate</string>
+        <string>Duplicate this dataset</string>
        </property>
        <property name="text">
         <string>Duplicate</string>
        </property>
        <property name="icon">
-        <iconset theme="edit-paste"/>
+        <iconset theme="edit-paste">
+         <normaloff>.</normaloff>.</iconset>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QToolButton" name="toolButton_remove">
        <property name="toolTip">
-        <string>Remove</string>
+        <string>Remove this dataset</string>
        </property>
        <property name="text">
         <string>Remove</string>
        </property>
        <property name="icon">
-        <iconset theme="remove"/>
+        <iconset theme="remove">
+         <normaloff>.</normaloff>.</iconset>
        </property>
       </widget>
      </item>

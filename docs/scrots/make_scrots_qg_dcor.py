@@ -1,5 +1,6 @@
 """Screenshots for quick guide dcor"""
 import sys
+import time
 
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication
@@ -13,11 +14,18 @@ QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
 mw = ShapeOut2()
 mw.settings.setValue("check for updates", 0)
 mw.settings.setValue("advanced/check pyqtgraph version", 0)
+mw.settings.remove("dcor/api key")
 
 # show the dialog
 dlg = dcor.DCORLoader(mw)
 dlg.lineEdit_search.setText("sorting")
 dlg.on_search()
+# Now the dialog searches in another thread. Wait a little
+# and only then take a screenshot.
+for _ in range(5):
+    time.sleep(.5)
+    if dlg.listWidget.count() < 5:
+        continue
 # force redraw of scrollbars
 dlg.listWidget.scrollToBottom()
 dlg.listWidget.scrollToTop()

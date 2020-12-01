@@ -425,7 +425,7 @@
   </action>
   <action name="actionLoadDCOR">
    <property name="icon">
-    <iconset theme="folder-cloud">
+    <iconset theme="dcor">
      <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
@@ -455,7 +455,8 @@
   </action>
   <action name="actionChangeDatasetOrder">
    <property name="icon">
-    <iconset theme="object-order-lower"/>
+    <iconset theme="object-order-lower">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>&amp;Change dataset order</string>

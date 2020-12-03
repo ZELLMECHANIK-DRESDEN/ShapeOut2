@@ -25,11 +25,9 @@ install:
   - python --version
   # Upgrade pip
   - appveyor-retry python -m pip install --upgrade pip
-  # Pin version of scipy (1.5 did not work with PyInstaller 3.6)
-  - appveyor-retry pip install "scipy<1.5.0"
   # Pin version of numpy (1.19.4 did not work
   # https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/64)
-  - appveyor-retry pip install "numpy<1.19.3"
+  - appveyor-retry pip install "numpy!=1.19.4"
   # Install shapeout2 and its dependencies
   - appveyor-retry pip install -e .
   - appveyor-retry pip install git+git://github.com/ZELLMECHANIK-DRESDEN/dclab.git
@@ -55,7 +53,7 @@ after_test:
   - python setup.py sdist
   - ps: "ls dist"
   # Install pyinstaller (includes dependency for pywin32)
-  - appveyor-retry pip install pyinstaller==3.6
+  - appveyor-retry pip install pyinstaller==4.1
   # Run pyinstaller
   - pyinstaller -y --log-level=WARN .appveyor\\shapeout2.spec
   # Run the binary (the most simple test)

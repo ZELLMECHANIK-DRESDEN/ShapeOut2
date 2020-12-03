@@ -1,5 +1,8 @@
 2.4.3
  - enh: improve UI (tooltips, icons)
+ - build: Windows build won't start due to breaking change in
+   Windows ucrtbase.dll (#64)
+ - build: Migrate Windows build to PyInstaller 4.1
 2.4.2
  - fix: a regression introduced during refactoring in 2.4.0
    made it impossible to select the temperature for known

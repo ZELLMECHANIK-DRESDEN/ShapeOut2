@@ -459,7 +459,7 @@
      <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>&amp;Change dataset order</string>
+    <string>&amp;Change dataset order...</string>
    </property>
   </action>
  </widget>

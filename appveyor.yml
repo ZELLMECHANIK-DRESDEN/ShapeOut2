@@ -12,7 +12,7 @@ environment:
     - PYTHON: "C:\\Python38-x64"
 
 init:
-  - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
+  - ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%
 
 install:
   # Install InnoSetup and add to path
@@ -20,46 +20,49 @@ install:
   # Prepend newly installed Python to the PATH of this build (this cannot be
   # done from inside the powershell script as it would require to restart
   # the parent CMD process).
-  - "set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
   # Check that we have the expected version and architecture for Python
-  - "python --version"
+  - python --version
   # Upgrade pip
-  - "appveyor-retry python -m pip install --upgrade pip"
+  - appveyor-retry python -m pip install --upgrade pip
   # Pin version of scipy (1.5 did not work with PyInstaller 3.6)
   - appveyor-retry pip install "scipy<1.5.0"
+  # Pin version of numpy (1.19.4 did not work
+  # https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/64)
+  - appveyor-retry pip install "numpy<1.19.3"
   # Install shapeout2 and its dependencies
-  - "appveyor-retry pip install -e ."
-  - "appveyor-retry pip install git+git://github.com/ZELLMECHANIK-DRESDEN/dclab.git"
-  - "appveyor-retry pip install git+git://github.com/ZELLMECHANIK-DRESDEN/pyqtgraph.git"
+  - appveyor-retry pip install -e .
+  - appveyor-retry pip install git+git://github.com/ZELLMECHANIK-DRESDEN/dclab.git
+  - appveyor-retry pip install git+git://github.com/ZELLMECHANIK-DRESDEN/pyqtgraph.git
   # Show the installed packages
-  - "pip freeze"
+  - pip freeze
 
 build: off
 
 test_script:
-  - 'python -c "import shapeout2; print(shapeout2.__version__)"'
-  - "pip install coverage"
-  - "pip install codecov"
-  - "coverage run --source=shapeout2 ./setup.py test"
-  - "coverage report -m"
+  - python -c "import shapeout2; print(shapeout2.__version__)"
+  - pip install coverage
+  - pip install codecov
+  - coverage run --source=shapeout2 ./setup.py test
+  - coverage report -m
   # Allow codecov to fail
-  - "codecov || exit 0"
+  - codecov || exit 0
 
 after_test:
-  - "appveyor-retry pip install twine wheel"
+  - appveyor-retry pip install twine wheel
   # If tests are successful, create a whl package for the project.
-  - "python setup.py bdist_wheel"
-  - "python setup.py sdist"
+  - python setup.py bdist_wheel
+  - python setup.py sdist
   - ps: "ls dist"
   # Install pyinstaller (includes dependency for pywin32)
-  - "appveyor-retry pip install pyinstaller==3.6"
+  - appveyor-retry pip install pyinstaller==3.6
   # Run pyinstaller
-  - "pyinstaller -y --log-level=WARN .appveyor\\shapeout2.spec"
+  - pyinstaller -y --log-level=WARN .appveyor\\shapeout2.spec
   # Run the binary (the most simple test)
-  - "dist\\ShapeOut2\\ShapeOut2.exe --version"
+  - dist\\ShapeOut2\\ShapeOut2.exe --version
   # Create InnoSetup installers
   # Generate iss file
-  - "python .appveyor\\make_iss.py"
+  - python .appveyor\\make_iss.py
   # Set InnoSetup path here, because Cython complained about it.
   - set PATH=%PATH%;"C:\\Program Files (x86)\\Inno Setup 5"
   - iscc /Q .appveyor\\shapeout2.iss

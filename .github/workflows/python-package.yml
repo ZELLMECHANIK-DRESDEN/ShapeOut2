@@ -29,6 +29,8 @@ jobs:
         pip install "scipy<1.5.0"
         # install our own version of pyqtgraph
         pip install git+git://github.com/ZELLMECHANIK-DRESDEN/pyqtgraph.git
+        # install dependencies
+        pip install -e .
         # show installed packages
         pip freeze
     - name: Test with pytest

@@ -273,16 +273,7 @@ class FilterPanel(QtWidgets.QWidget):
     def update_box_ranges(self):
         """Update the box plot filter ranges
 
-        Parameters
-        ----------
-        show_features: None or list of str
-            The features to show. Features in this list will become
-            visible, all other features will be hidden.
-            If set to `None`, no changes are performed.
-        mmdict: dict
-            The min/max dictionary for updating the limits.
-            Each key is a feature name; each item is a tuple
-            of min/max values for that feature.
+        Feature information is taken from the current pipeline.
         """
         if self.pipeline is not None and self.pipeline.num_slots:
             # compute min/max values

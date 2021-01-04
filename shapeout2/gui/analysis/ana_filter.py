@@ -137,7 +137,7 @@ class FilterPanel(QtWidgets.QWidget):
         """List of box-filtered features that are active"""
         act = []
         for feat, item in self._box_range_controls.items():
-            if item.is_active:
+            if item.is_active():
                 act.append(feat)
         return act
 

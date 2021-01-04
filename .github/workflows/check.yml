@@ -18,7 +18,7 @@ jobs:
         python-version: ['3.7', '3.8', '3.9']
         os: [macos-latest, ubuntu-latest]
     env:
-      QT_DEBUG_PLUGINS=1
+      QT_DEBUG_PLUGINS: 1
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}

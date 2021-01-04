@@ -144,6 +144,9 @@ class RangeControl(QtWidgets.QWidget):
         self.doubleSpinBox_max.blockSignals(False)
         return vmin, vmax
 
+    def is_active(self):
+        return self.checkBox.isChecked()
+
     def on_range(self):
         self.map_range_slider_to_spin_values()
         self.range_changed.emit(self.doubleSpinBox_min.value(),
@@ -157,6 +160,9 @@ class RangeControl(QtWidgets.QWidget):
     def reset_range(self):
         self.doubleSpinBox_min.setValue(self.minimum)
         self.doubleSpinBox_max.setValue(self.maximum)
+
+    def setActive(self, b=True):
+        self.checkBox.setChecked(b)
 
     def setCheckable(self, b=True):
         self.checkBox.setVisible(b)

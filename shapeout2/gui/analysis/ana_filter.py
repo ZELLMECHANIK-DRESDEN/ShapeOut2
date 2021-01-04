@@ -12,6 +12,14 @@ from .. import idiom
 
 
 class FilterPanel(QtWidgets.QWidget):
+    """Filter panel widget
+
+    The filtering panel visualizes the properties of a
+    :class:`shapeout2.pipeline.filter.Filter` instance,
+    i.e. box filters, list of polygon filters, filter
+    name, etc. Their `__getstate__` and `__setstate__`
+    functions are compatible.
+    """
     #: Emitted when a shapeout2.pipeline.Filter is to be changed
     filter_changed = QtCore.pyqtSignal(dict)
     #: Emitted when the pipeline is to be changed
@@ -82,6 +90,7 @@ class FilterPanel(QtWidgets.QWidget):
                 rc.show()
                 rc.__setstate__(box[feat])
             else:
+                rc.setActive(False)  # uncheck range control (#67)
                 rc.hide()
                 rc.reset_range()
 
@@ -114,7 +123,7 @@ class FilterPanel(QtWidgets.QWidget):
                     integer=integer,
                     label=lab,
                     data=feat)
-                rc.checkBox.setChecked(False)
+                rc.setActive(False)
                 rc.setVisible(False)
                 # Insert the control at the correct position (label-sorted)
                 rcf = list(self._box_range_controls.keys())
@@ -128,7 +137,7 @@ class FilterPanel(QtWidgets.QWidget):
         """List of box-filtered features that are active"""
         act = []
         for feat, item in self._box_range_controls.items():
-            if item.__getstate__()["active"]:
+            if item.is_active:
                 act.append(feat)
         return act
 
@@ -221,7 +230,7 @@ class FilterPanel(QtWidgets.QWidget):
         else:
             # Hide all filters that are not active
             for _, rc in self._box_range_controls.items():
-                if not rc.__getstate__()["active"]:
+                if not rc.is_active():
                     rc.setVisible(False)
                 rc.checkBox.setVisible(False)
                 rc.doubleSpinBox_min.setEnabled(True)

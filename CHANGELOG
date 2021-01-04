@@ -1,4 +1,5 @@
 2.4.4
+ - fix: box filters selections bled to other filters (#67)
  - build: do not use development version of dclab
 2.4.3
  - enh: improve UI (tooltips, icons)

@@ -1,18 +1,21 @@
-name: Tests, Coverage, Linting
+name: Checks
 
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  schedule:
+  - cron: "0 0 1 * *"
 
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8']
+        python-version: ['3.7', '3.8']
+        os: [macos-latest, ubuntu-latest]
 
     steps:
     - uses: actions/checkout@v2
@@ -20,27 +23,25 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+    - name: Install dependencies (Linux)
+      run: sudo apt-get install x11-utils libxkbcommon-x11-0
+      if: matrix.os == 'ubuntu-latest'
+    - name: Install Python dependencies
       run: |
         # prerequisites
         python -m pip install --upgrade pip wheel
         python -m pip install codecov coverage flake8 pytest
-        # pin version of scipy (issues with PyInstaller)
-        pip install "scipy<1.5.0"
-        # install our own version of pyqtgraph
-        pip install git+git://github.com/ZELLMECHANIK-DRESDEN/pyqtgraph.git
         # install dependencies
         pip install -e .
         # show installed packages
         pip freeze
     - name: Test with pytest
       run: |
-        python setup.py test
+        coverage run --source=shapeout2 setup.py test
     - name: Lint with flake8
       run: |
         flake8 .
-    - name: Code coverage
+    - name: Submit code coverage
       run: |
-        coverage run --source=shapeout2 pytest
         coverage report -m
         codecov

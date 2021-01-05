@@ -60,6 +60,8 @@ extensions = ['sphinx.ext.autodoc',
               'github_changelog',
               'rtd_pdf',
               ]
+# specify bibtex files (required for sphinxcontrib.bibtex>=2.0)
+bibtex_bibfiles = ['shapeout.bib']
 
 # enable enumeration of figures
 numfig = True

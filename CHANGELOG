@@ -1,3 +1,5 @@
+2.4.15
+ - ci: fix rtd build
 2.4.14
  - maintenance release
 2.4.13

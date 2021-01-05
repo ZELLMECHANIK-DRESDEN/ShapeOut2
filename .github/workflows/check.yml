@@ -37,7 +37,9 @@ jobs:
         # show installed packages
         pip freeze
     - name: Start application and print version
-      run: QT_DEBUG_PLUGINS=1 python -m shapeout2 --version
+      run: |
+        echo $DISPPLAY
+        DISPLAY=:99 QT_DEBUG_PLUGINS=1 python -m shapeout2 --version
     - name: Test with pytest
       run: |
          coverage run --source=shapeout2 setup.py test

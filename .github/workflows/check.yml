@@ -22,10 +22,10 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Specific setup (Linux)
-      run: sudo apt-get install -y xvfb libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xinput0 libxcb-xfixes0
       if: runner.os == 'Linux'
-      env:
-        RUNNER: 'xvfb-run --auto-servernum'
+      run: |
+      sudo apt-get install -y xvfb libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xinput0 libxcb-xfixes0
+      /usr/bin/Xvfb :99 -screen 0 1280x1024x24 &
     - name: Install Python dependencies
       run: |
         # prerequisites
@@ -36,10 +36,10 @@ jobs:
         # show installed packages
         pip freeze
     - name: Start application and print version
-      run: QT_DEBUG_PLUGINS=1 $RUNNER python -m shapeout2 --version
+      run: QT_DEBUG_PLUGINS=1 python -m shapeout2 --version
     - name: Test with pytest
       run: |
-         $RUNNER coverage run --source=shapeout2 setup.py test
+         coverage run --source=shapeout2 setup.py test
     - name: Lint with flake8
       run: |
         flake8 .

@@ -57,4 +57,6 @@ jobs:
       if: runner.os == 'macOS'
       working-directory: ./build-recipes
       run: |
+        # pyinstaller is missing a hook for latest scipy
+        pip install scipy<1.15
         bash ./macos_build_app.sh Shape-Out $(git describe --tags)

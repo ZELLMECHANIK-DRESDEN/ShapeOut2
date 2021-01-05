@@ -11,7 +11,7 @@ if not exists(join(cdir, "shapeout2")):
 	warnings.warn("Cannot find 'shapeout2'! Please run pyinstaller "+
                   "from git root folder.")
 
-pyinstdir = os.path.realpath(cdir+"/.build-recipes/")
+pyinstdir = os.path.realpath(cdir+"/build-recipes/")
 script = os.path.join(pyinstdir, "Shape-Out.py")
 
 # Icon

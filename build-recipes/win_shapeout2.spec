@@ -11,9 +11,8 @@ if not exists(join(cdir, "shapeout2")):
 	warnings.warn("Cannot find 'shapeout2'! Please run pyinstaller "+
                   "from git root folder.")
 
-name = "ShapeOut2"
 pyinstdir = os.path.realpath(cdir+"/.build-recipes/")
-script = os.path.join(pyinstdir, name+".py")
+script = os.path.join(pyinstdir, "Shape-Out.py")
 
 # Icon
 icofile = os.path.join(pyinstdir,"ShapeOut2.ico")
@@ -30,7 +29,7 @@ exe = EXE(pyz,
           a.scripts,
           options,
           exclude_binaries=True,
-          name=name+".exe",
+          name="ShapeOut2.exe",
           debug=False,
           strip=False,
           upx=False,

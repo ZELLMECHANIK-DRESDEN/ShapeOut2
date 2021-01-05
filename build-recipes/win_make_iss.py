@@ -15,7 +15,7 @@ sys.path.insert(0, pdir)
 version = shapeout2.__version__
 
 # read dummy
-with io.open(op.join(cdir, "shapeout2.iss_dummy"), 'r') as dummy:
+with io.open(op.join(cdir, "win_shapeout2.iss_dummy"), 'r') as dummy:
     iss = dummy.readlines()
 
 # replace keywords
@@ -28,5 +28,5 @@ for i in range(len(iss)):
             platform.architecture()[0])
 
 # write iss
-with io.open(op.join(cdir, "shapeout2.iss"), 'w') as issfile:
+with io.open(op.join(cdir, "win_shapeout2.iss"), 'w') as issfile:
     issfile.writelines(iss)

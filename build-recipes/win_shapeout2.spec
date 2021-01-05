@@ -12,7 +12,7 @@ if not exists(join(cdir, "shapeout2")):
                   "from git root folder.")
 
 name = "ShapeOut2"
-pyinstdir = os.path.realpath(cdir+"/.appveyor/")
+pyinstdir = os.path.realpath(cdir+"/.build-recipes/")
 script = os.path.join(pyinstdir, name+".py")
 
 # Icon

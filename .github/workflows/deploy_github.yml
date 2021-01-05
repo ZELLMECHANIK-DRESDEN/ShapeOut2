@@ -25,7 +25,7 @@ jobs:
     - name: Build app
       working-directory: ./build-recipes
       run: |
-        bash ./macos_build_app.sh Shape-Out ${{ github.event.release.tag_name }}
+        bash ./macos_build_app.sh Shape-Out ${{ env.RELEASE_VERSION }}
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1

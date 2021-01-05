@@ -9,6 +9,8 @@ jobs:
   build:
     name: Create Release
     runs-on: macos-latest
+    env:
+      TAG: $(git describe --tags)
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -23,17 +25,17 @@ jobs:
     - name: Build app
       working-directory: ./build-recipes
       run: |
-        bash ./macos_build_app.sh Shape-Out $(git describe --tags)
+        bash ./macos_build_app.sh Shape-Out ${TAG}
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Shape-Out ${{ github.ref }}
+        tag_name: ${TAG}
+        release_name: Shape-Out ${TAG}
         body: |
-          ![](https://img.shields.io/github/downloads/ZELLMECHANIK-DRESDEN/ShapeOut2/${{ github.ref }}/total.svg)
+          ![](https://img.shields.io/github/downloads/ZELLMECHANIK-DRESDEN/ShapeOut2/${TAG}/total.svg)
 
           See https://shapeout2.readthedocs.io/en/stable/sec_changelog.html for
           a list of changes made in this release.
@@ -46,8 +48,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-        asset_path: ./dist_app/Shape-Out_${{ github.ref }}.dmg
-        asset_name: Shape-Out_${{ github.ref }}.dmg
+        asset_path: ./dist_app/Shape-Out_${TAG}.dmg
+        asset_name: Shape-Out_${TAG}.dmg
         asset_content_type: application/zip
     - name: Upload Release Asset PGK
       id: upload-release-asset-pkg
@@ -56,6 +58,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-        asset_path: ./dist_app/Shape-Out_${{ github.ref }}.pkg
-        asset_name: Shape-Out_${{ github.ref }}.pkg
+        asset_path: ./dist_app/Shape-Out_${TAG}.pkg
+        asset_name: Shape-Out_${TAG}.pkg
         asset_content_type: application/zip

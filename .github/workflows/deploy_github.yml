@@ -1,0 +1,37 @@
+name: Deploy to GitHub Releases
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools wheel twine
+        pip install -e .
+    - name: Build app
+      run: |
+        bash ./macos_build_app.sh Shape-Out $(git describe --tags)
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Shape-Out ${{ github.ref }}
+        body: |
+          ![](https://img.shields.io/github/downloads/ZELLMECHANIK-DRESDEN/ShapeOut2/${{ github.ref }/total.svg)
+        draft: true
+        prerelease: false

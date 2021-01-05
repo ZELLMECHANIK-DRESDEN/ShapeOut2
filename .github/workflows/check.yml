@@ -53,10 +53,8 @@ jobs:
       run: |
         coverage report -m
         codecov
-    - name: Creat app and check if it runs (macOS)
+    - name: Create app and check if it runs (macOS)
       if: runner.os == 'macOS'
       working-directory: ./build-recipes
       run: |
-        # pyinstaller is missing a hook for latest scipy
-        pip install scipy<1.15
         bash ./macos_build_app.sh Shape-Out $(git describe --tags)

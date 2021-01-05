@@ -34,7 +34,7 @@ TMP="./dist_app/pack.temp.dmg"
 rm -rf ./build
 rm -rf ./dist_app
 
-pip install pyinstaller
+pip install -r macos_build_requirements.txt
 
 pyinstaller -w -y --distpath="./dist_app" --exclude-module tkinter --additional-hooks-dir="." $SCRIPT
 

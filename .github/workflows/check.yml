@@ -35,6 +35,8 @@ jobs:
         pip install -e .
         # show installed packages
         pip freeze
+    - name: Start application and print version
+      run: python -m shapeout2 --version
     - name: Test with pytest
       run: |
         coverage run --source=shapeout2 setup.py test

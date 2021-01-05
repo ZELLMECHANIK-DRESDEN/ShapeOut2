@@ -25,17 +25,17 @@ jobs:
     - name: Build app
       working-directory: ./build-recipes
       run: |
-        bash ./macos_build_app.sh Shape-Out ${TAG}
+        bash ./macos_build_app.sh Shape-Out ${{ github.event.release.tag_name }}
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
-        tag_name: ${TAG}
-        release_name: Shape-Out ${TAG}
+        tag_name: ${{ github.event.release.tag_name }}
+        release_name: Shape-Out ${{ github.event.release.tag_name }}
         body: |
-          ![](https://img.shields.io/github/downloads/ZELLMECHANIK-DRESDEN/ShapeOut2/${TAG}/total.svg)
+          ![](https://img.shields.io/github/downloads/ZELLMECHANIK-DRESDEN/ShapeOut2/${{ github.event.release.tag_name }}/total.svg)
 
           See https://shapeout2.readthedocs.io/en/stable/sec_changelog.html for
           a list of changes made in this release.
@@ -48,8 +48,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-        asset_path: ./dist_app/Shape-Out_${TAG}.dmg
-        asset_name: Shape-Out_${TAG}.dmg
+        asset_path: ./dist_app/Shape-Out_${{ github.event.release.tag_name }}.dmg
+        asset_name: Shape-Out_${{ github.event.release.tag_name }}.dmg
         asset_content_type: application/zip
     - name: Upload Release Asset PGK
       id: upload-release-asset-pkg
@@ -58,6 +58,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-        asset_path: ./dist_app/Shape-Out_${TAG}.pkg
-        asset_name: Shape-Out_${TAG}.pkg
+        asset_path: ./dist_app/Shape-Out_${{ github.event.release.tag_name }}.pkg
+        asset_name: Shape-Out_${{ github.event.release.tag_name }}.pkg
         asset_content_type: application/zip

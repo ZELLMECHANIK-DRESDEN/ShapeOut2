@@ -28,7 +28,6 @@ jobs:
       sudo apt-get update -y
       sudo apt-get install -y libdbus-1-3 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xinput0 libxcb-xfixes0
       sudo apt-get install -y xvfb
-      /usr/bin/Xvfb :99 -screen 0 1280x1024x24 &
       if: matrix.os == 'ubuntu-20.04'
     - name: Install Python dependencies
       run: |
@@ -40,10 +39,10 @@ jobs:
         # show installed packages
         pip freeze
     - name: Start application and print version
-      run: python -m shapeout2 --version
+      run: xvfb-run --auto-servernum python -m shapeout2 --version
     - name: Test with pytest
       run: |
-        coverage run --source=shapeout2 setup.py test
+        xvfb-run --auto-servernum coverage run --source=shapeout2 setup.py test
     - name: Lint with flake8
       run: |
         flake8 .

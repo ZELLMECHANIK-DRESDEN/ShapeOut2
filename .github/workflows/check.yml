@@ -15,17 +15,17 @@ jobs:
       matrix:
         python-version: ['3.7', '3.8', '3.9']
         os: [macos-latest, ubuntu-20.04]
-    env:
-      QT_DEBUG_PLUGINS: 1
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies (Linux)
-      run: sudo apt-get install -y libdbus-1-3 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xinput0 libxcb-xfixes0 xvfb
-      if: matrix.os == 'ubuntu-20.04'
+    - name: Specific setup (Linux)
+      run: sudo apt-get install -y xvfb
+      if: runner.os == 'Linux'
+      env:
+        - RUNNER: 'xvfb-run --auto-servernum'
     - name: Install Python dependencies
       run: |
         # prerequisites
@@ -36,10 +36,10 @@ jobs:
         # show installed packages
         pip freeze
     - name: Start application and print version
-      run: xvfb-run --auto-servernum python -m shapeout2 --version
+      run: QT_DEBUG_PLUGINS=1 $RUNNER python -m shapeout2 --version
     - name: Test with pytest
       run: |
-        xvfb-run --auto-servernum coverage run --source=shapeout2 setup.py test
+         $RUNNER coverage run --source=shapeout2 setup.py test
     - name: Lint with flake8
       run: |
         flake8 .

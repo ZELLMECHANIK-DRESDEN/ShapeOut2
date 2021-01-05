@@ -32,7 +32,7 @@ jobs:
         tag_name: ${{ github.ref }}
         release_name: Shape-Out ${{ github.ref }}
         body: |
-          ![](https://img.shields.io/github/downloads/ZELLMECHANIK-DRESDEN/ShapeOut2/${{ github.ref }/total.svg)
+          ![](https://img.shields.io/github/downloads/ZELLMECHANIK-DRESDEN/ShapeOut2/${{ github.ref }}/total.svg)
 
           See https://shapeout2.readthedocs.io/en/stable/sec_changelog.html for
           a list of changes made in this release.
@@ -45,8 +45,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-        asset_path: ./dist_app/Shape-Out_${{ github.ref }.dmg
-        asset_name: Shape-Out_${{ github.ref }.dmg
+        asset_path: ./dist_app/Shape-Out_${{ github.ref }}.dmg
+        asset_name: Shape-Out_${{ github.ref }}.dmg
         asset_content_type: application/zip
     - name: Upload Release Asset PGK
       id: upload-release-asset
@@ -55,6 +55,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-        asset_path: ./dist_app/Shape-Out_${{ github.ref }.pkg
-        asset_name: Shape-Out_${{ github.ref }.pkg
+        asset_path: ./dist_app/Shape-Out_${{ github.ref }}.pkg
+        asset_name: Shape-Out_${{ github.ref }}.pkg
         asset_content_type: application/zip

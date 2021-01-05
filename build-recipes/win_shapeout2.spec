@@ -42,4 +42,4 @@ coll = COLLECT(exe,
                a.datas,
                strip=False,
                upx=False,
-               name=name)
+               name="ShapeOut2")

@@ -1,6 +1,7 @@
 2.4.4
  - fix: box filters selections bled to other filters (#67)
  - build: do not use development version of dclab
+ - ci: move to GitHub Actions
 2.4.3
  - enh: improve UI (tooltips, icons)
  - build: Windows build won't start due to breaking change in

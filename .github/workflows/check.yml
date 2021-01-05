@@ -25,7 +25,7 @@ jobs:
       run: sudo apt-get install -y xvfb
       if: runner.os == 'Linux'
       env:
-        - RUNNER: 'xvfb-run --auto-servernum'
+        RUNNER: 'xvfb-run --auto-servernum'
     - name: Install Python dependencies
       run: |
         # prerequisites

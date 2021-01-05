@@ -60,9 +60,9 @@ Testing
 .. |ShapeOut2| image:: https://raw.github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/master/docs/logo/shapeout2_h50.png
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/ShapeOut2.svg
    :target: https://pypi.python.org/pypi/ShapeOut2
-.. |Tests Status Linux| image:: https://img.shields.io/travis/ZELLMECHANIK-DRESDEN/ShapeOut2.svg?label=tests_linux
-   :target: https://travis-ci.com/ZELLMECHANIK-DRESDEN/ShapeOut2
-.. |Tests Status Win| image:: https://img.shields.io/appveyor/ci/paulmueller/ShapeOut2/master.svg?label=tests_win
+.. |Build Status Unix| image:: https://img.shields.io/github/workflow/status/ZELLMECHANIK-DRESDEN/ShapeOut2/Checks
+   :target: https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/actions?query=workflow%3AChecks
+.. |Build Status Win| image:: https://img.shields.io/appveyor/ci/paulmueller/ShapeOut2/master.svg?label=build_win
    :target: https://ci.appveyor.com/project/paulmueller/ShapeOut2
 .. |Coverage Status| image:: https://img.shields.io/codecov/c/github/ZELLMECHANIK-DRESDEN/ShapeOut2/master.svg
    :target: https://codecov.io/gh/ZELLMECHANIK-DRESDEN/ShapeOut2

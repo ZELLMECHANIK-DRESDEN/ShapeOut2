@@ -1,7 +1,7 @@
 |ShapeOut2|
 ===========
 
-|PyPI Version| |Tests Status Linux| |Tests Status Win| |Coverage Status| |Docs Status|
+|PyPI Version| |Build Status Unix| |Build Status Win| |Coverage Status| |Docs Status|
 
 
 **Shape-Out 2** is the successor of

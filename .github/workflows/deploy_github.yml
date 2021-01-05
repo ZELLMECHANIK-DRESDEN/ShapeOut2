@@ -39,7 +39,7 @@ jobs:
         draft: true
         prerelease: false
     - name: Upload Release Asset DMG
-      id: upload-release-asset
+      id: upload-release-asset-dmg
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -49,7 +49,7 @@ jobs:
         asset_name: Shape-Out_${{ github.ref }}.dmg
         asset_content_type: application/zip
     - name: Upload Release Asset PGK
-      id: upload-release-asset
+      id: upload-release-asset-pkg
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -28,6 +28,8 @@ install:
   # Pin version of numpy (1.19.4 did not work
   # https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/64)
   - appveyor-retry pip install "numpy<1.19.4"
+  # Pin scipy to an older version, b/c it does not work with pyinstaller
+  - appveyor-retry pip install "scipy<1.5"
   # Install shapeout2 and its dependencies
   - appveyor-retry pip install -e .
   - appveyor-retry pip install git+git://github.com/ZELLMECHANIK-DRESDEN/pyqtgraph.git

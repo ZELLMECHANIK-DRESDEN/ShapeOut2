@@ -16,6 +16,7 @@ jobs:
         python-version: ['3.7', '3.8', '3.9']
         os: [macos-latest, ubuntu-20.04]
     env:
+      # Display must be available globally for linux to know where xvfb is
       DISPLAY: :0
 
     steps:

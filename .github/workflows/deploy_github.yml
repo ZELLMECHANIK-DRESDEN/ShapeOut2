@@ -21,6 +21,7 @@ jobs:
         pip install setuptools wheel twine
         pip install -e .
     - name: Build app
+      working-directory: ./build-recipes
       run: |
         bash ./macos_build_app.sh Shape-Out $(git describe --tags)
     - name: Create Release

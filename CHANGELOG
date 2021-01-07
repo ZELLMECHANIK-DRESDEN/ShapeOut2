@@ -1,5 +1,6 @@
 2.4.15
  - ci: fix rtd build
+ - fix: typo in infobox in analysis view (#69)
 2.4.14
  - maintenance release
 2.4.13

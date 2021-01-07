@@ -60,7 +60,7 @@
      <item>
       <widget class="QToolButton" name="toolButton_remove">
        <property name="toolTip">
-        <string>Remove this filter</string>
+        <string>Remove this plot</string>
        </property>
        <property name="text">
         <string>Remove</string>

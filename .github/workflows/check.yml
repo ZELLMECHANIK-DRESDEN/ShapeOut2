@@ -57,4 +57,4 @@ jobs:
       if: runner.os == 'macOS'
       working-directory: ./build-recipes
       run: |
-        bash ./macos_build_app.sh Shape-Out $(git describe --tags)
+        bash ./macos_build_app.sh ShapeOut2 $(git describe --tags)

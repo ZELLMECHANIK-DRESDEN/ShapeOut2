@@ -3,7 +3,7 @@ from os.path import exists
 import warnings
 
 
-NAME = "ShapeOut"
+NAME = "ShapeOut2"
 
 if not exists("./{}Launcher.py".format(NAME)):
     warnings.warn("Cannot find {}Launcher.py'! ".format(NAME) +

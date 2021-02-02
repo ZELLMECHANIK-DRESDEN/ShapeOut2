@@ -2,7 +2,7 @@
 from os.path import exists
 import warnings
 
-from pyjibe._version import version
+from shapeout2._version import version
 
 NAME = "ShapeOut2"
 

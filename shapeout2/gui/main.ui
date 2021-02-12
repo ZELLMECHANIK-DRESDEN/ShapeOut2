@@ -271,6 +271,7 @@
      <string>&amp;Compute</string>
     </property>
     <addaction name="actionComputeStatistics"/>
+    <addaction name="actionComputeSignificance"/>
    </widget>
    <widget class="QMenu" name="menuBulk_Action">
     <property name="title">
@@ -420,7 +421,7 @@
      <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>&amp;Statistics...</string>
+    <string>Statistical &amp;data...</string>
    </property>
   </action>
   <action name="actionLoadDCOR">
@@ -460,6 +461,14 @@
    </property>
    <property name="text">
     <string>&amp;Change dataset order...</string>
+   </property>
+  </action>
+  <action name="actionComputeSignificance">
+   <property name="icon">
+    <iconset theme="statistical_significance"/>
+   </property>
+   <property name="text">
+    <string>Statistical &amp;significance...</string>
    </property>
   </action>
  </widget>

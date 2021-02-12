@@ -114,8 +114,7 @@ class Dataslot(object):
 
     @staticmethod
     def get_slot(slot_id):
-        """Get the slot with the given identifier.
-        """
+        """Get the slot with the given identifier"""
         return Dataslot._instances[slot_id]
 
     @staticmethod

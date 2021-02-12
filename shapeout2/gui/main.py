@@ -94,11 +94,14 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.actionChangeDatasetOrder.triggered.connect(
             self.on_action_change_dataset_order)
         self.actionPreferences.triggered.connect(self.on_action_preferences)
+        # Bulk action menu
+        self.actionComputeEmodulus.triggered.connect(
+            self.on_action_compute_emodulus)
         # Compute menu
         self.actionComputeStatistics.triggered.connect(
             self.on_action_compute_statistics)
-        self.actionComputeEmodulus.triggered.connect(
-            self.on_action_compute_emodulus)
+        self.actionComputeSignificance.triggered.connect(
+            self.on_action_compute_significance)
         # Export menu
         self.actionExportData.triggered.connect(self.on_action_export_data)
         self.actionExportFilter.triggered.connect(self.on_action_export_filter)
@@ -535,13 +538,17 @@ class ShapeOut2(QtWidgets.QMainWindow):
         msg.setText(text)
         msg.exec_()
 
-    def on_action_compute_statistics(self):
-        dlg = compute.ComputeStatistics(self, pipeline=self.pipeline)
-        dlg.exec()
-
     def on_action_compute_emodulus(self):
         dlg = bulk.BulkActionEmodulus(self, pipeline=self.pipeline)
         dlg.pipeline_changed.connect(self.adopt_pipeline)
+        dlg.exec()
+
+    def on_action_compute_significance(self):
+        dlg = compute.ComputeSignificance(self, pipeline=self.pipeline)
+        dlg.exec()
+
+    def on_action_compute_statistics(self):
+        dlg = compute.ComputeStatistics(self, pipeline=self.pipeline)
         dlg.exec()
 
     @QtCore.pyqtSlot()

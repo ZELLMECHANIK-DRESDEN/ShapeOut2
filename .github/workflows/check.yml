@@ -66,5 +66,5 @@ jobs:
       run: |
         # Uninstall rpy2, because it does not work on frozen macOS:
         # https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/73
-        pip uninstall rpy2
+        pip uninstall -y rpy2
         bash ./macos_build_app.sh ShapeOut2 $(python -m shapeout2 --version)

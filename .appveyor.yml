@@ -17,6 +17,7 @@ init:
 install:
   # Install InnoSetup and add to path
   - appveyor-retry choco install -y InnoSetup
+  - appveyor-retry choco install -y wget --version 1.20
   # install R with lme4
   - wget -q https://cran.r-project.org/bin/windows/base/old/3.2.5/R-3.2.5-win.exe
   - R-3.2.5-win.exe /silent

@@ -65,14 +65,24 @@ class ComputeSignificance(QtWidgets.QDialog):
             return "glmer+loglink"
 
     @QtCore.pyqtSlot()
-    def on_lme4(self):
-        """Run lme4 analysis"""
+    def on_lme4(self, ret_dlg=False):
+        """Run lme4 analysis
+
+        Parameters
+        ----------
+        ret_dlg: bool
+            If set to True, then the dialog is returned without
+            `_exec`uting it (used for testing).
+        """
         rlme4 = lme4.Rlme4(model=self.model, feature=self.feature)
         for wds in self.datasets:
             wds.add_to_rlme4(self.pipeline, rlme4)
         result = rlme4.fit()
         dlg = Rlme4ResultsDialog(self, result)
-        dlg.exec_()
+        if ret_dlg:
+            return dlg
+        else:
+            dlg.exec_()
 
     @QtCore.pyqtSlot()
     def on_close(self):

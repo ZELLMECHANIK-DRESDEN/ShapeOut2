@@ -22,10 +22,10 @@ install:
   - wget -q https://cran.r-project.org/bin/windows/base/old/3.6.3/R-3.6.3-win.exe
   - R-3.6.3-win.exe /silent
   # Installing an older version of R did neither work so:
-  #- choco install -dfvy -version 3.2.5 -source 'http://cran.at.r-project.org/bin/windows/base/old/3.2.5/;http://cran.at.r-project.org/bin/windows/base/old/;c:\projects\shapeout' r.project
+  #- choco install -dfvy -version 3.6.3 -source 'http://cran.at.r-project.org/bin/windows/base/old/3.6.3/;http://cran.at.r-project.org/bin/windows/base/old/;c:\projects\shapeout' r.project
   # nor so:
-  #- choco install -y -version 3.2.5 r.project
-  - set PATH=%PATH%;"C:\\Program Files\\R\\R-3.2.5\\bin\\i386"
+  #- choco install -y -version 3.6.3 r.project
+  - set PATH=%PATH%;"C:\\Program Files\\R\\R-3.6.3\\bin\\i386"
   - R -e "install.packages('lme4', repos='http://cran.r-project.org')"
   # Prepend newly installed Python to the PATH of this build (this cannot be
   # done from inside the powershell script as it would require to restart

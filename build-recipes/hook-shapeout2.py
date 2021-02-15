@@ -14,4 +14,8 @@ from PyInstaller.utils.hooks import collect_data_files
 datas = collect_data_files("shapeout2", include_py_files=True)
 datas += collect_data_files("shapeout2", subdir="img")
 
-hiddenimports = ["rpy2"]
+hiddenimports = ["rpy2",
+                 "rpy2.robjects",
+                 "rpy2.robjects.packages",
+                 "rpy2.situation",
+                 ]

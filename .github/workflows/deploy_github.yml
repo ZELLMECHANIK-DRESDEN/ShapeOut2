@@ -24,6 +24,9 @@ jobs:
         # install our patched version of pyqtgraph
         pip install git+git://github.com/ZELLMECHANIK-DRESDEN/pyqtgraph.git
         pip install -e .
+        # Uninstall rpy2, because it does not work on frozen macOS:
+        # https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/73
+        pip uninstall rpy2
     - name: Build app
       working-directory: ./build-recipes
       run: |

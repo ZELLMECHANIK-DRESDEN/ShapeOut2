@@ -46,6 +46,9 @@ jobs:
       run: |
         QT_DEBUG_PLUGINS=1 python -m shapeout2 --version
     - name: Test with pytest
+      env:
+        # github token required for testing update.py
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
          coverage run --source=shapeout2 setup.py test
     - name: Lint with flake8

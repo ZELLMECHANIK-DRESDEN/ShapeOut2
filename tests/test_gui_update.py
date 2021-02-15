@@ -1,6 +1,5 @@
 import os
 import socket
-import urllib
 
 import pytest
 from shapeout2.gui import update
@@ -12,9 +11,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         NET_AVAILABLE = True
     except socket.gaierror:
         # no internet
-        NET_AVAILABLE = False
-    except urllib.error.HTTPError:
-        # rate limit exceeded
         NET_AVAILABLE = False
 
 

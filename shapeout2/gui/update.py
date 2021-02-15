@@ -1,9 +1,10 @@
 from distutils.version import LooseVersion, StrictVersion
 import json
+import os
 import struct
 import sys
 import traceback
-from urllib import request
+import urllib
 
 from PyQt5 import QtCore
 
@@ -36,14 +37,19 @@ def check_for_update(version, ghrepo):
 
 def check_release(ghrepo="user/repo", version=None, timeout=20):
     """Check GitHub repository for latest release"""
-    u = "https://api.github.com/repos/{}/releases/latest".format(ghrepo)
+    url = "https://api.github.com/repos/{}/releases/latest".format(ghrepo)
+    if "GITHUB_TOKEN" in os.environ:
+        hdr = {'authorization': os.environ["GITHUB_TOKEN"]}
+    else:
+        hdr = {}
     web = "https://github.com/{}/releases".format(ghrepo)
     errors = None  # error messages (str)
     update = False  # whether or not an update is available
     binary = None  # download link to binary file
     new_version = None  # string identifying new version
     try:
-        data = request.urlopen(u, timeout=timeout).read()
+        req = urllib.request.Request(url, headers=hdr)
+        data = urllib.request.urlopen(req, timeout=timeout).read()
     except BaseException:
         errors = traceback.format_exc()
     else:

@@ -8,6 +8,26 @@ Directories=shapeout2,breeze/actions/16,breeze/actions/22,breeze/actions/24,bree
 Size=16
 Type=Fixed
 
+[shapeout2]
+Size=22
+Type=Fixed
+
+[shapeout2]
+Size=24
+Type=Fixed
+
+[shapeout2]
+Size=32
+Type=Fixed
+
+[shapeout2]
+Size=64
+Type=Fixed
+
+[shapeout2]
+Size=128
+Type=Fixed
+
 [breeze/actions/16]
 Size=16
 Type=Fixed

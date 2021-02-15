@@ -101,6 +101,11 @@ if __name__ == "__main__":
             ["shapeout2"] + directories)))
         # Shape-Out icons
         fd.write(index_item.format(directory="shapeout2", res="16"))
+        fd.write(index_item.format(directory="shapeout2", res="22"))
+        fd.write(index_item.format(directory="shapeout2", res="24"))
+        fd.write(index_item.format(directory="shapeout2", res="32"))
+        fd.write(index_item.format(directory="shapeout2", res="64"))
+        fd.write(index_item.format(directory="shapeout2", res="128"))
         # theme icons
         for dd in directories:
             for res in ["16", "22", "24", "32", "64", "128"]:

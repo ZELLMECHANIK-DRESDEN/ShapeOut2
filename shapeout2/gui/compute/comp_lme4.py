@@ -7,6 +7,8 @@ from PyQt5 import uic, QtCore, QtGui, QtWidgets
 from .comp_lme4_dataset import LME4Dataset
 from .comp_lme4_results import Rlme4ResultsDialog
 
+from ..widgets import ShowWaitCursor
+
 
 class ComputeSignificance(QtWidgets.QDialog):
     def __init__(self, parent, pipeline, *args, **kwargs):
@@ -74,10 +76,13 @@ class ComputeSignificance(QtWidgets.QDialog):
             If set to True, then the dialog is returned without
             `_exec`uting it (used for testing).
         """
-        rlme4 = lme4.Rlme4(model=self.model, feature=self.feature)
-        for wds in self.datasets:
-            wds.add_to_rlme4(self.pipeline, rlme4)
-        result = rlme4.fit()
+        self.setEnabled(False)
+        with ShowWaitCursor():
+            rlme4 = lme4.Rlme4(model=self.model, feature=self.feature)
+            for wds in self.datasets:
+                wds.add_to_rlme4(self.pipeline, rlme4)
+            result = rlme4.fit()
+            self.setEnabled(True)
         dlg = Rlme4ResultsDialog(self, result)
         if ret_dlg:
             return dlg

@@ -1,5 +1,6 @@
 import os
 import socket
+import urllib
 
 import pytest
 from shapeout2.gui import update
@@ -10,7 +11,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect(("www.python.org", 80))
         NET_AVAILABLE = True
     except socket.gaierror:
+        # no internet
         NET_AVAILABLE = False
+    except urllib.error.HTTPError:
+        # rate limit exceeded
+        NET_AVAILABLE = False
+
 
 
 @pytest.mark.xfail(os.getenv("APPVEYOR") in ["true", "True"],

@@ -42,6 +42,8 @@ jobs:
         pip install -e .
         # show installed packages
         pip freeze
+        # show information for rpy2
+        python -m rpy2.situation
     - name: Start application and print version
       run: |
         QT_DEBUG_PLUGINS=1 python -m shapeout2 --version

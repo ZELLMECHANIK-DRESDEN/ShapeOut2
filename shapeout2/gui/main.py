@@ -7,6 +7,7 @@ import traceback
 import webbrowser
 
 import dclab
+from dclab.lme4.rlibs import rpy2, MockRPackage
 import h5py
 import numpy
 import scipy
@@ -658,6 +659,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 pg,
                 scipy,
                 ]
+        if not isinstance(rpy2, MockRPackage):
+            libs.append(rpy2)
+
         sw_text = "Shape-Out {}\n\n".format(__version__)
         sw_text += "Python {}\n\n".format(sys.version)
         sw_text += "Modules:\n"

@@ -130,6 +130,37 @@
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
         <layout class="QGridLayout" name="gridLayout_2">
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="lme4_rpath"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>lme4 package</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <widget class="QPushButton" name="pushButton_lme4_install">
+           <property name="text">
+            <string>Install...</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="label_lme4_installed">
+           <property name="text">
+            <string>installed / not installed</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QPushButton" name="pushButton_lme4_search">
+           <property name="text">
+            <string>Search manually...</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="0">
           <widget class="QLabel" name="label">
            <property name="text">
@@ -137,34 +168,10 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="2">
-          <widget class="QToolButton" name="toolButton_lme4_search">
-           <property name="text">
-            <string>Search manually...</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="lme4_rpath"/>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>lme4 package</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="1">
-          <widget class="QLabel" name="label_lme4_installed">
+          <widget class="QLabel" name="label_r_version">
            <property name="text">
-            <string>installed / not installed</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QToolButton" name="toolButton_lme4_install">
-           <property name="text">
-            <string>Install...</string>
+            <string>R version</string>
            </property>
           </widget>
          </item>

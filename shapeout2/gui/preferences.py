@@ -1,3 +1,4 @@
+import pathlib
 import pkg_resources
 import platform
 
@@ -47,8 +48,8 @@ class Preferences(QtWidgets.QDialog):
             QtWidgets.QDialogButtonBox.RestoreDefaults)
         btn_restore.clicked.connect(self.on_restore)
         # lme4 buttons
-        self.toolButton_lme4_install.clicked.connect(self.on_lme4_install)
-        self.toolButton_lme4_search.clicked.connect(self.on_lme4_search_r)
+        self.pushButton_lme4_install.clicked.connect(self.on_lme4_install)
+        self.pushButton_lme4_search.clicked.connect(self.on_lme4_search_r)
 
     def reload(self):
         """Read configuration or set default parameters"""
@@ -74,14 +75,22 @@ class Preferences(QtWidgets.QDialog):
     @show_wait_cursor
     def reload_lme4(self, install=False):
         """Reload information about lme4, optionally installing it"""
+        # set the binary
+        binary = self.lme4_rpath.text()
+        if pathlib.Path(binary).is_file():
+            rsetup.set_r_path(binary)
+        # check lme4 package status
         if not rsetup.has_r():
-            status = "unknown"
-        elif rsetup.has_lme4():
-            status = "installed"
+            r_version = "unknown"
+            lme4_st = "unknown"
         else:
-            status = "not installed"
+            r_version = rsetup.get_r_version()
+            if rsetup.has_lme4():
+                lme4_st = "installed"
+            else:
+                lme4_st = "not installed"
 
-        if install and status == "not installed":
+        if install and lme4_st == "not installed":
             self.setEnabled(False)
             rsetup.install_lme4()
             self.setEnabled(True)
@@ -89,8 +98,9 @@ class Preferences(QtWidgets.QDialog):
             self.reload_lme4(install=False)
         else:
             # update user interface
-            self.toolButton_lme4_install.setVisible(status == "not installed")
-            self.label_lme4_installed.setText(status)
+            self.pushButton_lme4_install.setVisible(lme4_st == "not installed")
+            self.label_r_version.setText(r_version)
+            self.label_lme4_installed.setText(lme4_st)
 
     @QtCore.pyqtSlot()
     def on_apply(self):

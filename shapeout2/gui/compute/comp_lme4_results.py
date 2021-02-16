@@ -55,6 +55,8 @@ class Rlme4ResultsDialog(QtWidgets.QDialog):
         summary = [ll for ll in summary if not ll[:11] in excludelines]
 
         self.summary = summary
+        font = QtGui.QFont("Courier")
+        self.plainTextEdit.setFont(font)
         self.plainTextEdit.setPlainText("\n".join(summary))
 
         # button signals

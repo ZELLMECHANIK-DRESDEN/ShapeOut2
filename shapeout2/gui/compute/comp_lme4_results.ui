@@ -195,11 +195,6 @@ font-weight:600}</string>
    </item>
    <item>
     <widget class="QPlainTextEdit" name="plainTextEdit">
-     <property name="font">
-      <font>
-       <family>Monospace</family>
-      </font>
-     </property>
      <property name="readOnly">
       <bool>true</bool>
      </property>

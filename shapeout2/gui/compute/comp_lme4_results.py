@@ -1,6 +1,7 @@
 import pathlib
 import pkg_resources
 
+import dclab
 from PyQt5 import uic, QtCore, QtGui, QtWidgets
 
 
@@ -15,7 +16,7 @@ class Rlme4ResultsDialog(QtWidgets.QDialog):
 
         # parameters
         self.label_model.setText(res["model"])
-        self.label_feature.setText(res["feature"])
+        self.label_feature.setText(dclab.dfn.get_feature_label(res["feature"]))
         if res["is differential"]:
             self.label_differential.setText("Yes")
         else:

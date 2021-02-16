@@ -11,10 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Compute and export statistics</string>
+   <string>Compute and export statistical data</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="view-statistics"/>
+   <iconset theme="view-statistics">
+    <normaloff>.</normaloff>.</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

@@ -77,12 +77,19 @@ class ComputeSignificance(QtWidgets.QDialog):
             `_exec`uting it (used for testing).
         """
         self.setEnabled(False)
+        # set R HOME from settings
+        settings = QtCore.QSettings()
+        settings.setIniCodec("utf-8")
+        r_path = settings.value("lme4/r path", "")
+        if r_path:
+            lme4.set_r_path(r_path)
+        # compute LMM
         with ShowWaitCursor():
             rlme4 = lme4.Rlme4(model=self.model, feature=self.feature)
             for wds in self.datasets:
                 wds.add_to_rlme4(self.pipeline, rlme4)
             result = rlme4.fit()
-            self.setEnabled(True)
+        self.setEnabled(True)
         dlg = Rlme4ResultsDialog(self, result)
         if ret_dlg:
             return dlg

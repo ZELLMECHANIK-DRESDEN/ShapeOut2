@@ -69,7 +69,7 @@ def test_manual_basic(qtbot):
         ds = slot.get_dataset()
         assert "emodulus" in ds
         assert ds.config["setup"]["medium"] == "CellCarrierB"
-        assert ds.config["calculation"]["emodulus model"] == "elastic sphere"
+        assert ds.config["calculation"]["emodulus lut"] == "LE-2D-FEM-19"
         assert ds.config["calculation"]["emodulus medium"] == "CellCarrierB"
         assert ds.config["calculation"]["emodulus temperature"] == 29.5
         assert "emodulus viscosity" not in ds.config["calculation"]
@@ -98,7 +98,7 @@ def test_manual_wrong_medium(qtbot):
         ds = slot.get_dataset()
         assert "emodulus" in ds
         assert ds.config["setup"]["medium"] == "CellCarrierB"
-        assert ds.config["calculation"]["emodulus model"] == "elastic sphere"
+        assert ds.config["calculation"]["emodulus lut"] == "LE-2D-FEM-19"
         assert ds.config["calculation"]["emodulus medium"] == "CellCarrierB"
         assert ds.config["calculation"]["emodulus temperature"] == 29.5
         assert "emodulus viscosity" not in ds.config["calculation"]
@@ -122,7 +122,7 @@ def test_temperature_feature(qtbot):
         ds = slot.get_dataset()
         assert "emodulus" in ds
         assert ds.config["setup"]["medium"] == "CellCarrier"
-        assert ds.config["calculation"]["emodulus model"] == "elastic sphere"
+        assert ds.config["calculation"]["emodulus lut"] == "LE-2D-FEM-19"
         assert ds.config["calculation"]["emodulus medium"] == "CellCarrier"
         assert "emodulus temperature" not in ds.config["calculation"]
         assert "emodulus viscosity" not in ds.config["calculation"]
@@ -147,7 +147,7 @@ def test_viscosity(qtbot):
         ds = slot.get_dataset()
         assert "emodulus" in ds
         assert ds.config["setup"]["medium"] == "other"
-        assert ds.config["calculation"]["emodulus model"] == "elastic sphere"
+        assert ds.config["calculation"]["emodulus lut"] == "LE-2D-FEM-19"
         assert "emodulus medium" not in ds.config["calculation"]
         assert "emodulus temperature" not in ds.config["calculation"]
         assert ds.config["calculation"]["emodulus viscosity"] == 1.0
@@ -174,7 +174,7 @@ def test_wrong_medium_viscosity(qtbot):
         ds = slot.get_dataset()
         assert "emodulus" not in ds, "because medium is fixed"
         assert ds.config["setup"]["medium"] == "CellCarrierB"
-        assert ds.config["calculation"]["emodulus model"] == "elastic sphere"
+        assert ds.config["calculation"]["emodulus lut"] == "LE-2D-FEM-19"
         assert ds.config["calculation"]["emodulus medium"] == "CellCarrierB"
         assert "emodulus temperature" not in ds.config["calculation"]
         assert "emodulus viscosity" not in ds.config["calculation"]

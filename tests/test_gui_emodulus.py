@@ -117,7 +117,7 @@ def test_simple(qtbot):
         # https://dclab.readthedocs.io/en/latest/sec_av_emodulus.html
         ds.config["calculation"]["emodulus medium"] = \
             ds.config["setup"]["medium"]
-        ds.config["calculation"]["emodulus model"] = "elastic sphere"
+        ds.config["calculation"]["emodulus lut"] = "LE-2D-FEM-19"
         emodA = np.array(ds["emodulus"], copy=True)
         ds.config["calculation"]["emodulus temperature"] = \
             ds.config["setup"]["temperature"]

@@ -35,9 +35,23 @@ class PathlibJSONDecoder(json.JSONDecoder):
         super(PathlibJSONDecoder, self).__init__(object_hook=self.object_hook,
                                                  *args, **kwargs)
 
+    @staticmethod
+    def compat_2_5_1(obj):
+        """New standard for emodulus computation keyword arguments
+
+        This compatibility hook was introduced in Shape-Out 2.5.1
+        and is used to convert [calculation]: "emodulus model" which
+        was deprecated in dclab 0.32.0 to [calculation]: "emodulus lut".
+        """
+        if ("emodulus model" in obj
+                and obj["emodulus model"] == "elastic sphere"):
+            obj.pop("emodulus model")
+            obj["emodulus lut"] = "LE-2D-FEM-19"
+
     def object_hook(self, obj):
         if "__type__" in obj and obj["__type__"] == "path":
             return pathlib.Path(obj["__data__"])
+        self.compat_2_5_1(obj)
         return obj
 
 

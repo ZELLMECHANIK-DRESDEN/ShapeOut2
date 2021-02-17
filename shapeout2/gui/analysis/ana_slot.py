@@ -78,7 +78,7 @@ class SlotPanel(QtWidgets.QWidget):
             },
             "emodulus": {
                 "emodulus enabled": slot_state["emodulus"]["emodulus enabled"],
-                "emodulus model": "elastic sphere",
+                "emodulus lut": "LE-2D-FEM-19",
                 # It is ok if we have user-defined strings here, because
                 # only media in KNOWN_MEDIA are passed to dclab in the end.
                 "emodulus medium": self.comboBox_medium.currentData(),

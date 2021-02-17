@@ -84,6 +84,17 @@ def make_pipeline(nslots=2, nfilters=3, nplots=1, paths=None):
     return pl
 
 
+def test_2_5_1_replace_emodulus_model():
+    """In Shape-Out 2.5.1 we replace "emodulus model" with "emodulus lut"."""
+    spath = pathlib.Path(__file__).parent / "data" / "version_2_1_0_basic.so2"
+    pl = session.open_session(spath)
+    sc = pl.slots[0].config
+    assert "emodulus" in sc
+    assert "emodulus model" not in sc["emodulus"]
+    assert "emodulus lut" in sc["emodulus"]
+    assert sc["emodulus"]["emodulus lut"] == "LE-2D-FEM-19"
+
+
 def test_2_1_1_new_key_emodulus_enabled():
     """In Shape-Out 2.1.1 we introduces the "emodulus enabled" key
 

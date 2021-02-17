@@ -53,7 +53,7 @@ class Dataslot(object):
             "emodulus": {
                 # emodulus
                 "emodulus enabled": is_channel,  # False for reservoir
-                "emodulus model": "elastic sphere",
+                "emodulus lut": "LE-2D-FEM-19",
                 "emodulus medium": "undefined",
                 # https://dclab.readthedocs.io/en/latest/sec_av_emodulus.html
                 # possible values are:
@@ -147,7 +147,7 @@ class Dataslot(object):
             if key in dataset.config["calculation"]:
                 dataset.config["calculation"].pop(key)
 
-        model = self.config["emodulus"]["emodulus model"]
+        lut = self.config["emodulus"]["emodulus lut"]
         medium = self.config["emodulus"]["emodulus medium"]
         visc = self.config["emodulus"]["emodulus viscosity"]
         scenario = self.config["emodulus"]["emodulus scenario"]
@@ -162,7 +162,7 @@ class Dataslot(object):
             # Temperature is not used in these scenarios.
             temp = np.nan
 
-        dataset.config["calculation"]["emodulus model"] = model
+        dataset.config["calculation"]["emodulus lut"] = lut
         # known media
         if medium in dclab.features.emodulus.viscosity.KNOWN_MEDIA:
             dataset.config["calculation"]["emodulus medium"] = medium

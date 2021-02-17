@@ -415,7 +415,7 @@ def add_isoelastics(plot_item, axis_x, axis_y, channel_width, pixel_size):
     # in Shape-Out 1.
     try:
         iso = isodef.get(
-            method="numerical",
+            lut_identifier="LE-2D-FEM-19",
             channel_width=channel_width,
             flow_rate=None,
             viscosity=None,

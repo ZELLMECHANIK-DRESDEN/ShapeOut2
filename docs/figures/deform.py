@@ -3,12 +3,12 @@ import matplotlib.pylab as plt
 
 
 # dataset
-ds = dclab.new_dataset("deform/M1_data.tdms")
+ds = dclab.new_dataset("unknown_dataset.rtdc")
 # kernel density estimate
 kde = ds.get_kde_scatter(xax="area_um", yax="deform")
 # isoelasticity lines
 isodef = dclab.isoelastics.get_default()
-iso = isodef.get_with_rtdcbase(method="numerical",
+iso = isodef.get_with_rtdcbase(lut_identifier="LE-2D-FEM-19",
                                col1="area_um",
                                col2="deform",
                                dataset=ds)

@@ -29,11 +29,11 @@ class Rlme4ResultsDialog(QtWidgets.QDialog):
         else:
             self.label_yes.hide()
             self.label_no.show()
-        self.lineEdit_pvalue.setText("{:f}".format(res["anova p-value"]))
+        self.lineEdit_pvalue.setText("{:.7g}".format(res["anova p-value"]))
         self.lineEdit_intercept.setText(
-            "{:f}".format(res["fixed effects intercept"]))
+            "{:.7g}".format(res["fixed effects intercept"]))
         self.lineEdit_treatment.setText(
-            "{:f}".format(res["fixed effects treatment"]))
+            "{:.7g}".format(res["fixed effects treatment"]))
 
         # summary text
         summary = []

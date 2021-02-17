@@ -91,6 +91,9 @@
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="3" column="0">
          <widget class="QLabel" name="label_3">
+          <property name="toolTip">
+           <string>The effect size of the parameter chosen between the mean of all controls and the mean of all treatments</string>
+          </property>
           <property name="text">
            <string>Fixed effect treatment</string>
           </property>
@@ -98,6 +101,9 @@
         </item>
         <item row="2" column="1">
          <widget class="QLineEdit" name="lineEdit_intercept">
+          <property name="toolTip">
+           <string>The mean of the parameter chosen for all controls</string>
+          </property>
           <property name="text">
            <string>nan</string>
           </property>
@@ -108,6 +114,9 @@
         </item>
         <item row="3" column="1">
          <widget class="QLineEdit" name="lineEdit_treatment">
+          <property name="toolTip">
+           <string>The effect size of the parameter chosen between the mean of all controls and the mean of all treatments</string>
+          </property>
           <property name="text">
            <string>nan</string>
           </property>
@@ -118,6 +127,9 @@
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_2">
+          <property name="toolTip">
+           <string>The p-value of the ANOVA test</string>
+          </property>
           <property name="text">
            <string>Anova p-value</string>
           </property>
@@ -125,6 +137,9 @@
         </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_4">
+          <property name="toolTip">
+           <string>The mean of the parameter chosen for all controls</string>
+          </property>
           <property name="text">
            <string>Fixed effect intercept</string>
           </property>
@@ -180,6 +195,9 @@ font-weight:600}</string>
         </item>
         <item row="1" column="1">
          <widget class="QLineEdit" name="lineEdit_pvalue">
+          <property name="toolTip">
+           <string>The p-value of the ANOVA test</string>
+          </property>
           <property name="text">
            <string>nan</string>
           </property>

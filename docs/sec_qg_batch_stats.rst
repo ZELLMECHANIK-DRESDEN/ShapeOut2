@@ -1,8 +1,8 @@
 .. _sec_qg_batch_stats:
 
-==================
-Compute statistics
-==================
+=======================
+Export statistical data
+=======================
 
 The :ref:`Quick View window <sec_quick_view>` quantifies the statistics for
 the features shown there. If you need access to statistics for more features of

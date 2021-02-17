@@ -2,6 +2,7 @@ import pathlib
 import pkg_resources
 
 import dclab
+import numpy as np
 from PyQt5 import uic, QtCore, QtGui, QtWidgets
 
 
@@ -29,11 +30,11 @@ class Rlme4ResultsDialog(QtWidgets.QDialog):
         else:
             self.label_yes.hide()
             self.label_no.show()
-        self.lineEdit_pvalue.setText("{:.7g}".format(res["anova p-value"]))
+        self.lineEdit_pvalue.setText(format_float(res["anova p-value"]))
         self.lineEdit_intercept.setText(
-            "{:.7g}".format(res["fixed effects intercept"]))
+            format_float(res["fixed effects intercept"]))
         self.lineEdit_treatment.setText(
-            "{:.7g}".format(res["fixed effects treatment"]))
+            format_float(res["fixed effects treatment"]))
 
         # summary text
         summary = []
@@ -100,3 +101,10 @@ class Rlme4ResultsDialog(QtWidgets.QDialog):
             if path.suffix != ".txt":
                 path = path.with_name(path.name + ".txt")
             path.write_text("\r\n".join(self.summary))
+
+
+def format_float(value):
+    return np.format_float_positional(value,
+                                      precision=5,
+                                      fractional=False,
+                                      trim="0")

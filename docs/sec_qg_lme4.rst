@@ -8,6 +8,13 @@ significance (p-value) when comparing two measurement groups. The analysis
 uses linear mixed effects models (LMM) as described in :cite:`Herbig2018`
 and yields results identical to those obtained with Shape-Out 1.
 
+.. warning::
+    Unfortunately, LMM analysis currently does not work with the .app or
+    .pkg bundle on macOS. This problem is tracked in `issue #73
+    <https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/73>`_.
+    If you are using macOS and you would like to use LMM analysis, you have to
+    install Shape-Out 2 as a Python package (see :ref:`sec_installation`).
+
 The LMM analysis is performed using the lme4 R package
 and is based on the :ref:`implementation in dclab <dclab:sec_av_lme4>`
 (please read for more information on the options available) which uses

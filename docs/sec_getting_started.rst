@@ -2,6 +2,8 @@
 Getting started
 ===============
 
+.. _sec_installation:
+
 Installation
 ============
 Shape-Out 2 can be installed via multiple channels.
@@ -19,9 +21,9 @@ Shape-Out 2 can be installed via multiple channels.
 
    .. code:: bash
 
-       pip install shapeout2
+       python3 -m pip install shapeout2
 
-   To start Shape-Out, simply run ``python -m shapeout2``
+   To start Shape-Out, simply run ``python3 -m shapeout2``
    or ``shapeout2`` in a command shell. 
 
 

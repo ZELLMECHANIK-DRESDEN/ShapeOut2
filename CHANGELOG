@@ -1,3 +1,6 @@
+2.5.1
+ - build: bump dclab from 0.29.1 to 0.32.4 (this should have happened
+   in the 2.5.0 release which introduced R-lme4 analysis)
 2.5.0
  - feat: implement linear-mixed effects models with R/lme4 (#55)
  - ci: overhauled build process

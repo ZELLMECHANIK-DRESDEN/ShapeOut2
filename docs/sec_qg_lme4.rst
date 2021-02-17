@@ -33,6 +33,11 @@ five datasets:
 - MG63_pure_16uls_rep2_20150422.rtdc  (MG-63 repetition 2)
 - MG63_pure_16uls_rep3_20150422.rtdc  (MG-63 repetition 3)
 
+.. note:: The data sets are ordered according to run index. In an ideal case,
+    the run index would resemble the repetition of an experiment. Here,
+    however, the run index is only an internal lab book reference.
+
+
 In this example, we treat SSC as our "treatment" and MG-63 as our "control".
 These are just group names that remind us that we are comparing one type of
 sample against another type.
@@ -79,3 +84,31 @@ Deformation. We repeat the analysis with Area (0.0002183) and Young's
 modulus (0.0002777). The p-values indicate that MG-63 (mean elastic
 modulus 1.26 kPa) cells are softer than SSCs (mean elastic modulus 1.54 kPa)
 :cite:`Herbig2018`.
+
+
+LMM analysis of differential deformation
+----------------------------------------
+To check whether the deformation we see is not just an inherent deformation
+(visible in the reservoir data), we would like to perform a differential feature
+analysis.
+
+Please load :download:`this session <../tests/data/version_2_5_0_dcor_lme4_diff.so2>`
+into Shape-Out (via *File | Open Session*). The experimental data are accessed
+from DCOR, so you will need a working internet connection. The session contains
+ten datasets (reservoir measurements in addition to the measurements above).
+
+As in the example above, go to *Compute | Statistical significance* and
+set the groups and repetitions.
+
+.. image:: scrots/qg_lme4_diff_init.png
+    :target: _images/qg_lme4_diff_init.png
+
+The results of the LMM analysis for differential deformation are:
+
+.. image:: scrots/qg_lme4_diff_results.png
+    :target: _images/qg_lme4_diff_results.png
+
+The p-value for the differential deformation is magnitudes lower than the
+p-value for the (non-differential) deformation in the previous example.
+This indicates that there is a non-negligible initial deformation of the
+cells in the reservoir.

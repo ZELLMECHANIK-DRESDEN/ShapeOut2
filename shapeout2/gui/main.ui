@@ -465,7 +465,8 @@
   </action>
   <action name="actionComputeSignificance">
    <property name="icon">
-    <iconset theme="statistical_significance"/>
+    <iconset theme="statistical_significance">
+     <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
     <string>Statistical &amp;significance...</string>

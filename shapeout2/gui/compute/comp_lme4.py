@@ -16,6 +16,7 @@ class ComputeSignificance(QtWidgets.QDialog):
         path_ui = pkg_resources.resource_filename(
             "shapeout2.gui.compute", "comp_lme4.ui")
         uic.loadUi(path_ui, self)
+
         # set pipeline
         self.pipeline = pipeline
 

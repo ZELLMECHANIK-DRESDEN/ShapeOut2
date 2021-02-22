@@ -253,8 +253,7 @@ class PipelinePlotItem(SimplePlotItem):
         win.nextRow()
         win.addLabel(labelx, col=1)
         # Update the UI (do it twice, otherwise the tick labels overlap)
-        QtWidgets.QApplication.processEvents()
-        QtWidgets.QApplication.processEvents()
+        QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 300)
         win.hide()
         # perform actual export
         suffix = file[-3:]

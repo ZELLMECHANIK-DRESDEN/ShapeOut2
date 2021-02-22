@@ -39,7 +39,7 @@ class SimplePlotItem(pg.PlotItem):
         # bring axes to front
         # (This screws up event selection in QuickView)
         for kax in self.axes:
-            self.axes[kax]["item"].setZValue(200)
+            self.axes[kax]["item"].setZValue(900)
 
     def on_export(self, suffix):
         """Export subplots as original figures (with axes labels, etc)"""

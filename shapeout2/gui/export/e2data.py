@@ -64,7 +64,7 @@ class ExportData(QtWidgets.QDialog):
         prog.setMinimumDuration(0)
         time.sleep(0.01)
         prog.setValue(0)
-        QtWidgets.QApplication.processEvents()
+        QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 300)
         for slot_index in range(len(self.pipeline.slots)):
             slot = self.pipeline.slots[slot_index]
             if slot.slot_used:  # only export slots "used" (#15)
@@ -92,7 +92,8 @@ class ExportData(QtWidgets.QDialog):
             if prog.wasCanceled():
                 break
             prog.setValue(slot_index + 1)
-            QtWidgets.QApplication.processEvents()
+            QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents,
+                                                 300)
         prog.setValue(pend)
 
     def on_browse(self):

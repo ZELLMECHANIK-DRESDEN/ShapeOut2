@@ -149,10 +149,10 @@ class PlotMatrix(QtWidgets.QWidget):
             width1 = self.glo.itemAt(0).widget().width()
             width = (width1 + 2)*ncols - 2
             height = self.data_matrix.sizeHint().height()
-            QtWidgets.QApplication.processEvents()
             self.setMinimumSize(width, height)
             self.setFixedSize(width, height)
-            QtWidgets.QApplication.processEvents()
+            QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents,
+                                                 300)
             self.setMinimumSize(width, height)
             self.setFixedSize(width, height)
 

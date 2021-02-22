@@ -93,7 +93,8 @@ class ComputeStatistics(QtWidgets.QDialog):
                 if prog.wasCanceled():
                     break
                 prog.setValue(slot_index + 1)
-                QtWidgets.QApplication.processEvents()
+                QtWidgets.QApplication.processEvents(
+                    QtCore.QEventLoop.AllEvents, 300)
         else:
             # from path
             inpath = pathlib.Path(self.path)
@@ -114,7 +115,8 @@ class ComputeStatistics(QtWidgets.QDialog):
                 v = ["{}".format(pp), title] + v
                 values.append(v)
                 prog.setValue(ii + 1)
-                QtWidgets.QApplication.processEvents()
+                QtWidgets.QApplication.processEvents(
+                    QtCore.QEventLoop.AllEvents, 300)
         # Output path
         opath, _ = QtWidgets.QFileDialog.getSaveFileName(
             self, 'Save statistics', '', 'tab-separated values (*.tsv)')

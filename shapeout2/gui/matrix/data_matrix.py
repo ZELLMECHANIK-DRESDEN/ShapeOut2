@@ -238,10 +238,10 @@ class DataMatrix(QtWidgets.QWidget):
         return mf
 
     def adjust_size(self):
-        QtWidgets.QApplication.processEvents()
+        QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 300)
         self.setMinimumSize(self.sizeHint())
         self.setFixedSize(self.sizeHint())
-        QtWidgets.QApplication.processEvents()
+        QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 300)
         self.setMinimumSize(self.sizeHint())
         self.setFixedSize(self.sizeHint())
 

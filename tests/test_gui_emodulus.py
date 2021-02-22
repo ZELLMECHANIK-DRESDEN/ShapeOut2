@@ -182,7 +182,7 @@ def test_switch_and_update_chip_region(qtbot):
     wsl.doubleSpinBox_temp.setValue(20.0)
     assert wsl.doubleSpinBox_temp.value() == 20
     qtbot.mouseClick(wsl.pushButton_apply, QtCore.Qt.LeftButton)
-    QtWidgets.QApplication.processEvents()
+    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 300)
     # check whether that worked
     assert wsl.get_dataset(
     ).config["calculation"]["emodulus temperature"] == 20
@@ -225,7 +225,7 @@ def test_switch_and_update_medium(qtbot):
     wsl.doubleSpinBox_temp.setValue(20.0)
     assert wsl.doubleSpinBox_temp.value() == 20
     qtbot.mouseClick(wsl.pushButton_apply, QtCore.Qt.LeftButton)
-    QtWidgets.QApplication.processEvents()
+    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 300)
     # check whether that worked
     assert wsl.get_dataset(
     ).config["calculation"]["emodulus temperature"] == 20

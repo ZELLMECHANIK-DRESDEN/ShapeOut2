@@ -54,12 +54,12 @@ feat_id = dlg.comboBox_feat.findData("deform")
 dlg.comboBox_feat.setCurrentIndex(feat_id)
 
 dlg.show()
-QApplication.processEvents()
+QApplication.processEvents(QtCore.QEventLoop.AllEvents, 300)
 dlg.grab().save("_qg_lme4_diff_init.png")
 
 dlgr = dlg.on_lme4(ret_dlg=True)
 dlgr.show()
-QApplication.processEvents()
+QApplication.processEvents(QtCore.QEventLoop.AllEvents, 300)
 dlgr.grab().save("_qg_lme4_diff_results.png")
 
 mw.close()

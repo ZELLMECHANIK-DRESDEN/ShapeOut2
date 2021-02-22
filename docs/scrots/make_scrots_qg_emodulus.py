@@ -40,25 +40,25 @@ wsl.groupBox_emod.setFixedSize(350, wsl.groupBox_emod.sizeHint().height())
 wsl.comboBox_medium.setCurrentIndex(
     wsl.comboBox_medium.findData("CellCarrier"))
 wsl.comboBox_temp.setCurrentIndex(wsl.comboBox_temp.findData("config"))
-QApplication.processEvents()
+app.processEvents(QtCore.QEventLoop.AllEvents, 300)
 wsl.groupBox_emod.grab().save("_qg_emodulus_config.png")
 
 wsl.comboBox_medium.setCurrentIndex(
     wsl.comboBox_medium.findData("CellCarrier"))
 wsl.comboBox_temp.setCurrentIndex(wsl.comboBox_temp.findData("feature"))
-QApplication.processEvents()
+app.processEvents(QtCore.QEventLoop.AllEvents, 300)
 wsl.groupBox_emod.grab().save("_qg_emodulus_feature.png")
 
 wsl.comboBox_medium.setCurrentIndex(
     wsl.comboBox_medium.findData("CellCarrier"))
 wsl.comboBox_temp.setCurrentIndex(wsl.comboBox_temp.findData("manual"))
 wsl.doubleSpinBox_temp.setValue(31)
-QApplication.processEvents()
+app.processEvents(QtCore.QEventLoop.AllEvents, 300)
 wsl.groupBox_emod.grab().save("_qg_emodulus_badtemp.png")
 
 wsl.comboBox_medium.setCurrentIndex(wsl.comboBox_medium.findData("other"))
 wsl.doubleSpinBox_visc.setValue(3.14)
-QApplication.processEvents()
+app.processEvents(QtCore.QEventLoop.AllEvents, 300)
 wsl.groupBox_emod.grab().save("_qg_emodulus_other.png")
 
 mw.close()

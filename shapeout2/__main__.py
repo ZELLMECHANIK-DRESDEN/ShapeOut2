@@ -2,9 +2,9 @@ def main(splash=True):
     import os
     import pkg_resources
     import sys
-    import time
 
     from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtCore import QEventLoop
     # import before creating application
     import pyqtgraph  # noqa: F401
 
@@ -20,8 +20,7 @@ def main(splash=True):
         splash.setMask(splash_pix.mask())
         splash.show()
         # make sure Qt really displays the splash screen
-        time.sleep(.07)
-        app.processEvents()
+        app.processEvents(QEventLoop.AllEvents, 300)
 
     from PyQt5 import QtCore, QtGui
     from .gui import ShapeOut2

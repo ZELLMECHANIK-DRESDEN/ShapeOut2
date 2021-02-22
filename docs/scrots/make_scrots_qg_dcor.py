@@ -29,6 +29,5 @@ for _ in range(5):
 # force redraw of scrollbars
 dlg.listWidget.scrollToBottom()
 dlg.listWidget.scrollToTop()
-QApplication.processEvents()
-QApplication.processEvents()
+app.processEvents(QtCore.QEventLoop.AllEvents, 300)
 dlg.grab().save("_qg_dcor_dlg.png")

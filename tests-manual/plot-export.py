@@ -33,6 +33,20 @@ with mock.patch("PyQt5.QtWidgets.QFileDialog.getSaveFileName") as gsfn:
     dlg.export_plots()
 
 
+# scatter-long-title-export
+with mock.patch("PyQt5.QtWidgets.QFileDialog.getSaveFileName") as gsfn:
+    gsfn.return_value = \
+        (str(here / "plot-export_scatter-long-title-export-png_actual.png"),
+         ".png")
+    # create export dialog manually
+    dlg = export.ExportPlot(mw, pipeline=mw.pipeline)
+    # select a single plot to export
+    plot_id = mw.pipeline.plot_ids[1]
+    plot_index = dlg.comboBox_plot.findData(plot_id)
+    dlg.comboBox_plot.setCurrentIndex(plot_index)
+    dlg.export_plots()
+
+
 # scatter-and-contour-export-svg
 with mock.patch("PyQt5.QtWidgets.QFileDialog.getSaveFileName") as gsfn:
     gsfn.return_value = \
@@ -43,6 +57,35 @@ with mock.patch("PyQt5.QtWidgets.QFileDialog.getSaveFileName") as gsfn:
     dlg.comboBox_fmt.setCurrentIndex(1)
     # select a single plot to export
     plot_id = mw.pipeline.plot_ids[0]
+    plot_index = dlg.comboBox_plot.findData(plot_id)
+    dlg.comboBox_plot.setCurrentIndex(plot_index)
+    dlg.export_plots()
+
+
+# log-large-points-export-png
+with mock.patch("PyQt5.QtWidgets.QFileDialog.getSaveFileName") as gsfn:
+    gsfn.return_value = \
+        (str(here / "plot-export_log-large-points-export-png_actual.png"),
+         ".png")
+    # create export dialog manually
+    dlg = export.ExportPlot(mw, pipeline=mw.pipeline)
+    # select a single plot to export
+    plot_id = mw.pipeline.plot_ids[2]
+    plot_index = dlg.comboBox_plot.findData(plot_id)
+    dlg.comboBox_plot.setCurrentIndex(plot_index)
+    dlg.export_plots()
+
+
+# log-large-points-export-svg
+with mock.patch("PyQt5.QtWidgets.QFileDialog.getSaveFileName") as gsfn:
+    gsfn.return_value = \
+        (str(here / "plot-export_log-large-points-export-svg_actual.svg"),
+         ".svg")
+    # create export dialog manually
+    dlg = export.ExportPlot(mw, pipeline=mw.pipeline)
+    dlg.comboBox_fmt.setCurrentIndex(1)
+    # select a single plot to export
+    plot_id = mw.pipeline.plot_ids[2]
     plot_index = dlg.comboBox_plot.findData(plot_id)
     dlg.comboBox_plot.setCurrentIndex(plot_index)
     dlg.export_plots()

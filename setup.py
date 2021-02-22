@@ -34,7 +34,7 @@ setup(
                       "scipy>=0.13.0"],
     python_requires='>=3.6, <4',
     setup_requires=['pytest-runner'],
-    tests_require=["pytest", "pytest-qt"],
+    tests_require=["pytest", "pytest-qt", "imageio"],
     entry_points={"gui_scripts": ['shapeout2 = shapeout2.__main__:main']},
     keywords=["RT-DC", "deformability", "cytometry", "zellmechanik"],
     classifiers=['Operating System :: OS Independent',

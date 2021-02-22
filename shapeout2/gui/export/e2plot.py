@@ -44,6 +44,13 @@ class ExportPlot(QtWidgets.QDialog):
     @show_wait_cursor
     @QtCore.pyqtSlot()
     def export_plots(self):
+        """Export the plots according to the current selection
+
+        Returns
+        -------
+        exported_plots: dict
+            dictionary plot identifier: pathlib.Path
+        """
         # show dialog
         fmt = self.comboBox_fmt.currentData()
         # keys are plot identifiers, values are paths
@@ -62,6 +69,8 @@ class ExportPlot(QtWidgets.QDialog):
                 self, 'Plot export file name', '',
                 self.comboBox_fmt.currentText())
             if pp:
+                if not pp.endswith(fmt):
+                    pp += "." + fmt
                 fnames[self.comboBox_plot.currentData()] = pathlib.Path(pp)
 
         # get PipelinePlot instance
@@ -73,9 +82,9 @@ class ExportPlot(QtWidgets.QDialog):
                 exp.params["width"] = int(exp.params["width"] / 72 * dpi)
                 exp.params["antialias"] = self.checkBox_aa.isChecked()
             pout = str(fnames[plot_id])
-            if not pout.endswith(fmt):
-                pout += "."+fmt
             exp.export(pout)
+
+        return fnames
 
     def on_format(self):
         if self.comboBox_fmt.currentData() == "png":

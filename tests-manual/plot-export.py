@@ -19,10 +19,10 @@ mw = ShapeOut2()
 # load session
 mw.on_action_open(here / "plot-export.so2")
 
-# scatter-and-contour-export
+# scatter-and-contour-export-png
 with mock.patch("PyQt5.QtWidgets.QFileDialog.getSaveFileName") as gsfn:
     gsfn.return_value = \
-        (str(here / "plot-export_scatter-and-contour-export_actual.png"),
+        (str(here / "plot-export_scatter-and-contour-export-png_actual.png"),
          ".png")
     # create export dialog manually
     dlg = export.ExportPlot(mw, pipeline=mw.pipeline)
@@ -31,3 +31,33 @@ with mock.patch("PyQt5.QtWidgets.QFileDialog.getSaveFileName") as gsfn:
     plot_index = dlg.comboBox_plot.findData(plot_id)
     dlg.comboBox_plot.setCurrentIndex(plot_index)
     dlg.export_plots()
+
+
+# scatter-and-contour-export-svg
+with mock.patch("PyQt5.QtWidgets.QFileDialog.getSaveFileName") as gsfn:
+    gsfn.return_value = \
+        (str(here / "plot-export_scatter-and-contour-export-svg_actual.svg"),
+         ".svg")
+    # create export dialog manually
+    dlg = export.ExportPlot(mw, pipeline=mw.pipeline)
+    dlg.comboBox_fmt.setCurrentIndex(1)
+    # select a single plot to export
+    plot_id = mw.pipeline.plot_ids[0]
+    plot_index = dlg.comboBox_plot.findData(plot_id)
+    dlg.comboBox_plot.setCurrentIndex(plot_index)
+    dlg.export_plots()
+
+
+# scatter-and-contour-subplot-export-png
+plot1 = mw.subwindows_plots["Plot_1"].widget()
+plot1_subplot1 = plot1.plot_items[0]
+plot1_subplot2 = plot1.plot_items[1]
+plot1_subplot1.perform_export(str(
+    here / "plot-export_scatter-and-contour-subplot1-export-png_actual.png"))
+plot1_subplot2.perform_export(str(
+    here / "plot-export_scatter-and-contour-subplot2-export-png_actual.png"))
+# scatter-and-contour-subplot-export-svg
+plot1_subplot1.perform_export(str(
+    here / "plot-export_scatter-and-contour-subplot1-export-svg_actual.svg"))
+plot1_subplot2.perform_export(str(
+    here / "plot-export_scatter-and-contour-subplot2-export-svg_actual.svg"))

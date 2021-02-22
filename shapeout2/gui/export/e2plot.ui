@@ -14,7 +14,8 @@
    <string>Plot export</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="draw-watercolor"/>
+   <iconset theme="draw-watercolor">
+    <normaloff>.</normaloff>.</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -57,12 +58,12 @@
        </property>
        <item>
         <property name="text">
-         <string>vector graphics (*.svg)</string>
+         <string>rendered image (*.png)</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>rendered image (*.png)</string>
+         <string>vector graphics (*.svg)</string>
         </property>
        </item>
       </widget>

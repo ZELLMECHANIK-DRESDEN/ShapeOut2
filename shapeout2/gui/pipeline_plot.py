@@ -51,6 +51,8 @@ class PipelinePlot(QtWidgets.QWidget):
         # used to avoid unnecessary plotting
         self._plot_data_hash = "unset"
 
+        #: Contains the PipelinePlotItmes
+        self.plot_items = []
         self.pipeline = pipeline
         self.identifier = plot_id
         self.update_content()
@@ -118,9 +120,12 @@ class PipelinePlot(QtWidgets.QWidget):
         self.plot_layout.addLabel(labely, angle=-90)
         linner = self.plot_layout.addLayout()
 
+        self.plot_items.clear()
+
         # limits in case of scatter plot and feature hue
         if lay["division"] == "merge":
             pp = PipelinePlotItem(parent=linner)
+            self.plot_items.append(pp)
             linner.addItem(item=pp,
                            row=None,
                            col=None,
@@ -131,6 +136,7 @@ class PipelinePlot(QtWidgets.QWidget):
             colcount = 0
             for ds, sl in zip(dslist, slot_states):
                 pp = PipelinePlotItem(parent=linner)
+                self.plot_items.append(pp)
                 linner.addItem(item=pp,
                                row=None,
                                col=None,
@@ -147,6 +153,7 @@ class PipelinePlot(QtWidgets.QWidget):
             plot_state_scatter["contour"]["enabled"] = False
             for ds, sl in zip(dslist, slot_states):
                 pp = PipelinePlotItem(parent=linner)
+                self.plot_items.append(pp)
                 linner.addItem(item=pp,
                                row=None,
                                col=None,
@@ -160,6 +167,7 @@ class PipelinePlot(QtWidgets.QWidget):
             plot_state_contour = copy.deepcopy(plot_state)
             plot_state_contour["scatter"]["enabled"] = False
             pp = PipelinePlotItem(parent=linner)
+            self.plot_items.append(pp)
             linner.addItem(item=pp,
                            row=None,
                            col=None,

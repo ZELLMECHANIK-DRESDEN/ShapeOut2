@@ -188,17 +188,16 @@ class ShapeOut2(QtWidgets.QMainWindow):
     def _check_pg_version(self):
         """Tells the user if the pyqtgraph version is not correct"""
         if (int(self.settings.value("advanced/check pyqtgraph version", 1))
-                and pg.__version__ != "0.11.0.dev0+g1c63ae5"):
+                and pg.__version__ != "0.11.1"):
             msg = QtWidgets.QMessageBox()
             msg.setIcon(QtWidgets.QMessageBox.Warning)
             msg.setText("You are using an unexpected version of pyqtgraph. "
-                        + "Plot export may not work correctly!")
+                        + "Plotting may not work correctly!")
             msg.setWindowTitle("pyqtgraph version mismatch")
             msg.setDetailedText(
                 "If you have installed Shape-Out using pip, please "
-                + "install our pyqtgraph fork using: \n\n"
-                + "pip install "
-                + "git+git://github.com/ZELLMECHANIK-DRESDEN/pyqtgraph.git"
+                + "install pyqtgraph 0.11.1: \n\n"
+                + "pip install pyqtgraph==0.11.1"
             )
             msg.exec_()
 

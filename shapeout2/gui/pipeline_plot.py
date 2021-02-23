@@ -44,7 +44,7 @@ class PipelinePlot(QtWidgets.QWidget):
     instances = {}
 
     def __init__(self, parent, pipeline, plot_id, *args, **kwargs):
-        QtWidgets.QWidget.__init__(self, parent=parent, *args, **kwargs)
+        super(PipelinePlot, self).__init__(parent=parent, *args, **kwargs)
         path_ui = pkg_resources.resource_filename(
             "shapeout2.gui", "pipeline_plot.ui")
         uic.loadUi(path_ui, self)

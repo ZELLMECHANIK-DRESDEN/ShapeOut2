@@ -218,16 +218,18 @@ class QuickViewViewBox(SimpleViewBox):
 
 
 class RTDCScatterPlot(pg.ScatterPlotItem):
-    def __init__(self, size=3, pen=pg.mkPen(color=(0, 0, 0, 0)),
-                 brush=pg.mkBrush("k"),
-                 *args, **kwargs):
+    def __init__(self, size=3, pen=None, brush=None, *args, **kwargs):
+        if pen is None:
+            pen = pg.mkPen(color=(0, 0, 0, 0))
+        if brush is None:
+            brush = pg.mkBrush("k")
         super(RTDCScatterPlot, self).__init__(size=size,
                                               pen=pen,
                                               brush=brush,
                                               symbol="s",
                                               *args,
                                               **kwargs)
-        self.setData(x=range(10), y=range(10))
+        self.setData(x=range(10), y=range(10), brush=brush)
 
     def pointAt(self, pos):
         """Unlike `ScatterPlotItem.pointsAt`, return the closest point"""
@@ -249,7 +251,7 @@ class RTDCScatterPlot(pg.ScatterPlotItem):
         pos = self.mapFromView(view_pos)
         pt = self.pointAt(pos)
         self.ptClicked = pt
-        self.sigClicked.emit(self, self.ptClicked)
+        self.sigClicked.emit(self, self.ptClicked, None)
 
     def mouseClickEvent(self, ev):
         """Override that does not handle events"""

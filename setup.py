@@ -29,7 +29,7 @@ setup(
                       "h5py>=2.8.0",
                       "numpy>=1.9.0",
                       "pyqt5",
-                      "pyqtgraph>=0.10.0",
+                      "pyqtgraph==0.11.1",
                       "requests",
                       "scipy>=0.13.0"],
     python_requires='>=3.6, <4',

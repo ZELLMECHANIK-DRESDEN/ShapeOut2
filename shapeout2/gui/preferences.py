@@ -2,10 +2,13 @@ import pathlib
 import pkg_resources
 import platform
 
+from dclab.lme4.rlibs import rpy2, MockRPackage
 from dclab.lme4 import rsetup
 from PyQt5 import uic, QtCore, QtWidgets
 
 from .widgets import show_wait_cursor
+
+RPY2_AVAILABLE = not isinstance(rpy2, MockRPackage)
 
 
 class Preferences(QtWidgets.QDialog):
@@ -21,10 +24,13 @@ class Preferences(QtWidgets.QDialog):
         self.parent = parent
 
         # Get default R path
-        if rsetup.has_r():
+        if RPY2_AVAILABLE and rsetup.has_r():
             rdefault = rsetup.get_r_path()
         else:
             rdefault = ""
+
+        # disable R settings
+        self.tab_r.setEnabled(RPY2_AVAILABLE)
 
         #: configuration keys, corresponding widgets, and defaults
         self.config_pairs = [
@@ -66,7 +72,8 @@ class Preferences(QtWidgets.QDialog):
             else:
                 raise NotImplementedError("No rule for '{}'".format(key))
 
-        self.reload_lme4()
+        if RPY2_AVAILABLE:
+            self.reload_lme4()
 
         # peculiarities of developer mode
         devmode = bool(int(self.settings.value("advanced/developer mode", 0)))

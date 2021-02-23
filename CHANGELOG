@@ -1,4 +1,6 @@
 2.5.1
+ - fix: preferences dialog did not open in macOS App bundle (#76)
+ - enh: disable R settings in preferences dialog if rpy2 is missing
  - build: bump dclab from 0.29.1 to 0.32.4 (this should have happened
    in the 2.5.0 release which introduced R-lme4 analysis)
  - build: bump pyqtgraph to commit c1900 (post 0.11.1)

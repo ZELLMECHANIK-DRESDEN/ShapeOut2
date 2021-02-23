@@ -1,3 +1,5 @@
+2.5.2
+ - build: add pyinstaller hook for pyqtgraph
 2.5.1
  - fix: preferences dialog did not open in macOS App bundle (#76)
  - enh: disable R settings in preferences dialog if rpy2 is missing

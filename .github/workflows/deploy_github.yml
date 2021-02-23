@@ -22,6 +22,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install setuptools wheel twine
         # install our patched version of pyqtgraph
+        pip install git+git://github.com/ZELLMECHANIK-DRESDEN/pyqtgraph.git@master-c1900
         pip install -e .
         # Uninstall rpy2, because it does not work on frozen macOS:
         # https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/73

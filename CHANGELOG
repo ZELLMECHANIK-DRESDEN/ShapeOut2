@@ -1,3 +1,5 @@
+2.5.3
+ - fix: workaround for different plot widths due to title label (#33)
 2.5.2
  - build: add pyinstaller hook for pyqtgraph
 2.5.1

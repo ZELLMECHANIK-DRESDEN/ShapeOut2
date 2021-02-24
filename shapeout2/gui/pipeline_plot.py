@@ -326,30 +326,100 @@ class PipelinePlotItem(SimplePlotItem):
         if plot_state["layout"]["label plots"]:
             if len(dslist) == 1 and plot_state["scatter"]["enabled"]:
                 # only one scatter plot
-                # set title
                 ss = slot_states[0]
-                thtmls = "<span style='color:{}'>{}</span>"
-                title = thtmls.format(ss["color"], ss["name"])
-                self.setTitle(title)
+                self.setTitle("")  # fake title
+                add_label(text=ss["name"],
+                          anchor_parent=self.titleLabel.item,
+                          color=ss["color"],
+                          text_halign="center",
+                          text_valign="top",
+                          dx=4
+                          )
+
                 if plot_state["scatter"]["show event count"]:
-                    # set event count
-                    chtml = "<span style='font-size:{}pt'>".format(
-                        # default font size - 1
-                        QtGui.QFont().pointSize() - 1) + "{} events</span>"
-                    label = QtWidgets.QGraphicsTextItem(
-                        "",
-                        # This is kind of hackish: set the parent to the right
-                        # axis so that it is always drawn there.
-                        parent=self.axes["right"]["item"])
-                    label.setHtml(chtml.format(len(sct[0].data)))
-                    # move the label to the left by its width
-                    label.setPos(-label.boundingRect().width()+2, -5)
+                    if True:
+                        add_label(text="{} events".format(len(sct[0].data)),
+                                  anchor_parent=self.axes["right"]["item"],
+                                  font_size_diff=-1,
+                                  text_halign="right",
+                                  text_valign="top",
+                                  dx=2,
+                                  dy=-5,
+                                  )
 
             elif (plot_state["contour"]["enabled"]
                     and not plot_state["scatter"]["enabled"]):
                 # only a contour plot
-                # set title
-                self.setTitle("Contours")
+                self.setTitle("")  # fake title
+                add_label(text="Contours",
+                          anchor_parent=self.titleLabel.item,
+                          text_halign="center",
+                          text_valign="top",
+                          dx=4,
+                          )
+
+
+def add_label(text, anchor_parent, text_halign="center", text_valign="center",
+              font_size_diff=0, color=None, dx=0, dy=0):
+    """Add a graphics label anchored to another item
+
+    This is a hackish workaround that was made more elaborate
+    due to https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/33.
+
+    Parameters
+    ----------
+    text: str
+        Label text (no HTML!)
+    anchor_parent: QGraphicsItem
+        Anything in the plot (e.g. axis items or other labels) that can
+        be anchored to. This object will be the parent of the label.
+    text_halign: str
+        Horizontal text alignment relative to anchor point
+        ("left", "center", "right")
+    text_valign: str
+        Vertical text alignment relative to anchor point
+        ("left", "center", "right")
+    font_size_diff: int
+        Change font size of text relative to `QtGui.QFont().pointSize()`
+        (is added via css)
+    color: str
+        Color of the text (is added via css)
+    dx: float
+        Manual horizontal positioning
+    dy: float
+        Manual vertical positioning
+    """
+    assert text_halign in ["left", "center", "right"]
+    assert text_valign in ["top", "center", "bottom"]
+    font_size = QtGui.QFont().pointSize() + font_size_diff
+    css = "font-size:{}pt;".format(font_size)
+    if color is not None:
+        css += "color:{};".format(color)
+    html = "<span style='{}'>{}</span>".format(css, text)
+    label = QtWidgets.QGraphicsTextItem(
+                        "",
+                        # This is kind of hackish: set the parent to the right
+                        # axis so that it is always drawn there.
+                        parent=anchor_parent)
+    label.setHtml(html)
+
+    # move label
+    width = label.boundingRect().width()
+    height = label.boundingRect().height()
+    if text_halign == "center":
+        x = -width / 2
+    elif text_halign == "left":
+        x = 0
+    else:  # "right"
+        x = -width
+
+    if text_valign == "center":
+        y = -height / 2
+    elif text_valign == "top":
+        y = 0
+    else:  # "bottom"
+        y = -height/2
+    label.setPos(x + dx, y + dy)
 
 
 def add_contour(plot_item, plot_state, rtdc_ds, slot_state, legend=None):

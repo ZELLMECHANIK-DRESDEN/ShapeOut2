@@ -3,8 +3,8 @@ from setuptools import setup, find_packages
 import sys
 
 
-author = u"Paul Müller"
-authors = [author]
+maintainer = u"Paul Müller"
+maintainer_email = "dev@craban.de"
 description = 'User interface for real-time deformability cytometry (RT-DC)'
 name = 'shapeout2'
 year = "2019"
@@ -14,8 +14,8 @@ from _version import version  # noqa: E402
 
 setup(
     name=name,
-    author=author,
-    author_email='dev@craban.de',
+    maintainer=maintainer,
+    maintainer_email=maintainer_email,
     url='https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2',
     version=version,
     packages=find_packages(),

@@ -8,6 +8,8 @@ from PyQt5 import QtCore
 TMPDIR = tempfile.mkdtemp(prefix=time.strftime(
     "shapeout2_test_%H.%M_"))
 
+pytest_plugins = ["pytest-qt"]
+
 
 def pytest_configure(config):
     """This is ran before all tests"""

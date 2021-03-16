@@ -54,8 +54,9 @@ Testing
 ::
 
     pip install -e .
-    python setup.py test
-    
+    pip install -r tests/requirements.txt
+    pytest tests
+
 
 .. |ShapeOut2| image:: https://raw.github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/master/docs/logo/shapeout2_h50.png
 .. |PyPI Version| image:: https://img.shields.io/pypi/v/ShapeOut2.svg

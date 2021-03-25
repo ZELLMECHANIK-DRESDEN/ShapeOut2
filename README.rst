@@ -67,5 +67,5 @@ Testing
    :target: https://ci.appveyor.com/project/paulmueller/ShapeOut2
 .. |Coverage Status| image:: https://img.shields.io/codecov/c/github/ZELLMECHANIK-DRESDEN/ShapeOut2/master.svg
    :target: https://codecov.io/gh/ZELLMECHANIK-DRESDEN/ShapeOut2
-.. |Docs Status| image:: https://readthedocs.org/projects/ShapeOut2/badge/?version=latest
+.. |Docs Status| image:: https://img.shields.io/readthedocs/shapeout2
    :target: https://readthedocs.org/projects/shapeout2/builds/

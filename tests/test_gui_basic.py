@@ -1,4 +1,3 @@
-"""Test of data set functionalities"""
 import pathlib
 
 from PyQt5 import QtCore

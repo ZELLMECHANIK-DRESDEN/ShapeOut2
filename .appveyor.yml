@@ -38,7 +38,6 @@ install:
   # install build requirements (pinned versions of some packages)
   - python -m pip install -r build-recipes\\win_build_requirements.txt
   # Install shapeout2 and its dependencies
-  - appveyor-retry pip install git+git://github.com/ZELLMECHANIK-DRESDEN/pyqtgraph.git@master-c1900
   - appveyor-retry pip install -e .
   # Show the installed packages
   - pip freeze

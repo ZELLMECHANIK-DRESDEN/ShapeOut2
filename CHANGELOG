@@ -1,6 +1,7 @@
 2.6.2
  - setup: migrate to pyqtgraph 0.12.0
  - setup: bump dclab from 0.33.1 to 0.33.3
+ - docs: fix rtd build
 2.6.1
  - setup: remove deprecated setup.py test
  - setup: bump dclab to 0.33.1 (filters were ignored when exporting

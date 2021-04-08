@@ -33,4 +33,3 @@ datas = collect_data_files("pyqtgraph",
 # Tested with pyqtgraph master branch (commit c1900aa).
 hiddenimports = collect_submodules(
     "pyqtgraph", filter=lambda name: "Template" in name)
-

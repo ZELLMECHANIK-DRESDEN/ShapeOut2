@@ -1,4 +1,3 @@
-import dclab
 import numpy as np
 from PyQt5 import QtCore
 import pyqtgraph as pg
@@ -116,16 +115,10 @@ class QuickViewScatterWidget(SimplePlotWidget):
         # set data
         self.setData(x, y, brush=brush)
         # set axes labels (replace with user-defined flourescence names)
-        left = dclab.dfn.get_feature_label(self.yax)
-        bottom = dclab.dfn.get_feature_label(self.xax)
-        for key in self.slot.fl_name_dict:
-            if key in left:
-                left = left.replace(key, self.slot.fl_name_dict[key])
-                break
-        for key in self.slot.fl_name_dict:
-            if key in bottom:
-                bottom = bottom.replace(key, self.slot.fl_name_dict[key])
-                break
+        left = pipeline_plot.get_axis_label_from_feature(
+            self.yax, slot_state=self.slot.__getstate__())
+        bottom = pipeline_plot.get_axis_label_from_feature(
+            self.xax, slot_state=self.slot.__getstate__())
         self.plotItem.setLabels(left=left, bottom=bottom)
 
         # Force updating the plot item size, otherwise axes labels

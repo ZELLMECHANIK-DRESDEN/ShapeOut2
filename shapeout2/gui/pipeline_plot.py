@@ -1,4 +1,5 @@
 import copy
+import html
 import pkg_resources
 import warnings
 
@@ -114,7 +115,9 @@ class PipelinePlot(QtWidgets.QWidget):
 
         # font size for plot title (default size + 2)
         size = "{}pt".format(QtGui.QFont().pointSize() + 2)
-        self.plot_layout.addLabel(lay["name"], colspan=3, size=size)
+        self.plot_layout.addLabel(html.escape(lay["name"]),
+                                  colspan=3,
+                                  size=size)
         self.plot_layout.nextRow()
 
         self.plot_layout.addLabel(labely, angle=-90)
@@ -328,7 +331,7 @@ class PipelinePlotItem(SimplePlotItem):
                 # only one scatter plot
                 ss = slot_states[0]
                 self.setTitle("")  # fake title
-                add_label(text=ss["name"],
+                add_label(text=html.escape(ss["name"]),
                           anchor_parent=self.titleLabel.item,
                           color=ss["color"],
                           text_halign="center",
@@ -586,21 +589,29 @@ def add_scatter(plot_item, plot_state, rtdc_ds, slot_state):
 
 def get_axes_labels(plot_state, slot_states):
     gen = plot_state["general"]
-    labelx = dclab.dfn.get_feature_label(gen["axis x"])
-    labely = dclab.dfn.get_feature_label(gen["axis y"])
-    # replace FL-? with user-defined names
-    fl_names = slot_states[0]["fl names"]
-    if labelx.count("FL"):
-        for key in fl_names:
-            if key in labelx:
-                labelx = labelx.replace(key, fl_names[key])
-                break
-    if labely.count("FL"):
-        for key in fl_names:
-            if key in labely:
-                labely = labely.replace(key, fl_names[key])
-                break
+    # Use slot_states[0] because we only have one x-axis label
+    labelx = get_axis_label_from_feature(gen["axis x"], slot_states[0])
+    labely = get_axis_label_from_feature(gen["axis y"], slot_states[0])
     return labelx, labely
+
+
+def get_axis_label_from_feature(feat, slot_state=None):
+    """Return the axis label for plotting given a feature name
+
+    - replace the fluorescence names with user-defined strings
+      from `slot_state["fl names"]` if `slot_state` is given
+    - html-escape all characters
+    """
+    label = dclab.dfn.get_feature_label(feat)
+    # replace FL-? with user-defined names
+    if slot_state is not None and "fl names" in slot_state:
+        fl_names = slot_state["fl names"]
+        if label.count("FL") and feat.startswith("fl"):
+            for key in fl_names:
+                if key in label:
+                    label = label.replace(key, fl_names[key])
+                    break
+    return html.escape(label)
 
 
 def set_viewbox(plot, range_x, range_y, scale_x="linear", scale_y="linear",

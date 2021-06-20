@@ -41,9 +41,6 @@ class ColorBarWidget(pg.GraphicsWidget):
         stops, colors = pcmap.getStops('float')
         smn, spp = stops.min(), stops.ptp()
         stops = (stops - stops.min())/stops.ptp()
-        ticks = np.r_[0.0:1.0:5j, 1.0] * spp + smn
-        tick_labels = ["%0.2g" % (t,) for t in np.linspace(vmin, vmax, 5)]
-
         # setup picture
         self.pic = pg.QtGui.QPicture()
         p = pg.QtGui.QPainter(self.pic)
@@ -57,6 +54,8 @@ class ColorBarWidget(pg.GraphicsWidget):
         p.drawRect(pg.QtCore.QRectF(0, 0, w, h))
 
         # draw ticks & tick labels
+        ticks = np.linspace(0.0, 1.0, 5, endpoint=True) * spp + smn
+        tick_labels = ["%0.2g" % (t,) for t in np.linspace(vmin, vmax, 5)]
         mintx = 0.0
         maxwidth = 0.0
         for tick, tick_label in zip(ticks, tick_labels):
@@ -85,9 +84,11 @@ class ColorBarWidget(pg.GraphicsWidget):
         # set minimum sizes (how do you get the actual bounding rect?)
         br = self.pic.boundingRect()
         self.setMinimumWidth(br.width() + maxwidth + 20)
+        self.setFixedWidth(br.width() + maxwidth + 20)
         self.setMinimumHeight(h)
+        self.setFixedHeight(h)
 
-        # alognment with other Shape-Out plots (kind of a workaround)
+        # alignment with other Shape-Out plots (kind of a workaround)
         self.translate(0, 40)
 
     def paint(self, p, *args):

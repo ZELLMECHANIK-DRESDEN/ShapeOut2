@@ -45,7 +45,6 @@ class ShapeOutColorBarItem(pg.ColorBarItem):
         for key in ['left', 'top', 'bottom']:
             axis = self.getAxis(key)
             axis.setTicks([])
-            axis.translate(-5, 0)
         self.axis.setWidth(45)
 
         # set correct size and position

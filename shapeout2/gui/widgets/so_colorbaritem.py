@@ -2,7 +2,6 @@ from distutils.version import LooseVersion
 import pathlib
 import warnings
 
-from PyQt5 import QtGui
 import pyqtgraph as pg
 
 

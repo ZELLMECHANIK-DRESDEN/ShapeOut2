@@ -16,13 +16,14 @@ else:
     # freezing (e.g. during tests).
     axis_item_path = pathlib.Path(pg.graphicsItems.AxisItem.__file__)
     if axis_item_path.suffix == ".py" and axis_item_path.exists():
-        lines = axis_item_path.read_text().split("\n")
+        lines = axis_item_path.read_text(encoding="utf-8").split("\n")
         for ii, line in enumerate(lines):
             if (line.count("resolves some damn pixel ambiguity")
                     and not line.strip().startswith("#")):
                 lines[ii] = "# " + line
                 try:
-                    axis_item_path.write_text("\n".join(lines))
+                    axis_item_path.write_text("\n".join(lines),
+                                              encoding="utf-8")
                 except BaseException:
                     warnings.warn("Could not patch AxisItem for ColorBarItem!")
 

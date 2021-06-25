@@ -53,7 +53,7 @@ class PipelinePlot(QtWidgets.QWidget):
         # used to avoid unnecessary plotting
         self._plot_data_hash = "unset"
 
-        #: Contains the PipelinePlotItmes
+        #: Contains the PipelinePlotItems
         self.plot_items = []
         self.pipeline = pipeline
         self.identifier = plot_id
@@ -123,6 +123,7 @@ class PipelinePlot(QtWidgets.QWidget):
 
         self.plot_layout.addLabel(labely, angle=-90)
         linner = self.plot_layout.addLayout()
+        linner.setContentsMargins(0, 0, 0, 0)  # reallocate some space
 
         self.plot_items.clear()
 
@@ -204,6 +205,7 @@ class PipelinePlot(QtWidgets.QWidget):
             # add colorbar
             cmap = pg.ColorMap(*zip(*Gradients[sca["colormap"]]["ticks"]))
             colorbar = ShapeOutColorBarItem(
+                yoffset=31,  # this is heuristic
                 height=min(300, lay["size y"] // 2),
                 cmap=cmap,
                 interactive=False,
@@ -222,6 +224,7 @@ class PipelinePlot(QtWidgets.QWidget):
         size_hint = self.parent().sizeHint()
         parent.setMinimumSize(size_hint)
         parent.setMaximumSize(size_hint)
+        self.plot_layout.updateGeometry()
 
 
 class PipelinePlotItem(SimplePlotItem):

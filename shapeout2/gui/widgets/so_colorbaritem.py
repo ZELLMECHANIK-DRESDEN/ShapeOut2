@@ -2,6 +2,7 @@ from distutils.version import LooseVersion
 import pathlib
 import warnings
 
+from PyQt5 import QtGui
 import pyqtgraph as pg
 
 
@@ -29,13 +30,15 @@ else:
 
 
 class ShapeOutColorBarItem(pg.ColorBarItem):
-    def __init__(self, height, *args, **kwargs):
+    def __init__(self, yoffset, height, label, *args, **kwargs):
         """pg.ColorBarItem modified for Shape-Out
 
         - Workaround for https://github.com/pyqtgraph/pyqtgraph/issues/1720
           which is not in pyqtgraph 0.12.1
         - Added option to define height
         - translate the colorbar so that it is aligned with the plot
+        - show the label on the right-hand axis
+        - increase the contents margins
         """
         # workaround for pyqtgraph 0.12.1, which does not yet include
         # https://github.com/pyqtgraph/pyqtgraph/issues/1720
@@ -46,8 +49,13 @@ class ShapeOutColorBarItem(pg.ColorBarItem):
         for key in ['left', 'top', 'bottom']:
             axis = self.getAxis(key)
             axis.setTicks([])
-        self.axis.setWidth(45)
+
+        # show label on right side
+        self.axis.setLabel(label)
+
+        # increase contents margins
+        self.layout.setContentsMargins(7, 0, 7, 0)
 
         # set correct size and position
         self.setFixedHeight(height)
-        self.translate(0, 40)
+        self.translate(0, yoffset)

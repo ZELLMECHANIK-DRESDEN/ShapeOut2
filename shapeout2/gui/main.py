@@ -30,7 +30,6 @@ from . import widgets
 from .. import pipeline
 from .. import session
 
-
 from .._version import version as __version__
 
 

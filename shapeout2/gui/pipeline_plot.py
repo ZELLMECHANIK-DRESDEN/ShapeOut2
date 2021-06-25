@@ -14,8 +14,9 @@ from pyqtgraph.graphicsItems.GradientEditorItem import Gradients
 
 from .. import plot_cache
 from .. import util
+from .widgets import ShapeOutColorBarItem
 
-from .widgets import ColorBarWidget, SimplePlotItem
+from .widgets import SimplePlotItem
 
 
 # Register custom colormaps
@@ -182,8 +183,7 @@ class PipelinePlot(QtWidgets.QWidget):
         colorbar_kwds = {}
 
         if sca["marker hue"] == "kde":
-            colorbar_kwds["vmin"] = 0
-            colorbar_kwds["vmax"] = 1
+            colorbar_kwds["values"] = (0, 1)
             colorbar_kwds["label"] = "density [a.u.]"
         elif sca["marker hue"] == "feature":
             feat = sca["hue feature"]
@@ -196,18 +196,18 @@ class PipelinePlot(QtWidgets.QWidget):
                         break
             colorbar_kwds["label"] = label
             if label.endswith("[a.u.]"):
-                colorbar_kwds["vmin"] = 0
-                colorbar_kwds["vmax"] = 1
+                colorbar_kwds["values"] = (0, 1)
             else:
-                colorbar_kwds["vmin"] = sca["hue min"]
-                colorbar_kwds["vmax"] = sca["hue max"]
+                colorbar_kwds["values"] = (sca["hue min"], sca["hue max"])
 
         if colorbar_kwds:
             # add colorbar
-            colorbar = ColorBarWidget(
-                cmap=sca["colormap"],
+            cmap = pg.ColorMap(*zip(*Gradients[sca["colormap"]]["ticks"]))
+            colorbar = ShapeOutColorBarItem(
+                height=min(300, lay["size y"] // 2),
+                cmap=cmap,
+                interactive=False,
                 width=15,
-                height=min(300, lay["size y"]//2),
                 **colorbar_kwds
             )
             self.plot_layout.addItem(colorbar)

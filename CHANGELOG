@@ -3,7 +3,8 @@
    (removed the responsible code, because there are now more regular
    releases of pyqtgraph)
  - enh: allow passing session files, datasets, and filters via the
-   command line (partly #88)
+   command line (#88)
+ - enh: associate the .so2 file format with Shape-Out on Windows (#88)
  - ref: avoid pyqtgraph DeprecationWarning due to `translate`
 2.6.5
  - fix: migrate to pg.ColorBarItem (with some manual patches from

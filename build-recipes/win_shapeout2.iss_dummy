@@ -34,6 +34,13 @@ SolidCompression=yes
 ChangesAssociations=yes
 PrivilegesRequired=lowest
 
+[Registry]
+Root: HKA; Subkey: "Software\Classes\.so2\OpenWithProgids"; ValueType: string; ValueName: "ShapeOut2Session.so2"; ValueData: ""; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\ShapeOut2Session.so2"; ValueType: string; ValueName: ""; ValueData: "Shape-Out 2 session"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\ShapeOut2Session.so2\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#MyAppExeName},0"
+Root: HKA; Subkey: "Software\Classes\ShapeOut2Session.so2\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
+Root: HKA; Subkey: "Software\Classes\Applications\{#MyAppExeName}\SupportedTypes"; ValueType: string; ValueName: ".so2"; ValueData: ""
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "german"; MessagesFile: "compiler:Languages\German.isl"

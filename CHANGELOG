@@ -1,3 +1,8 @@
+2.6.6
+ - fix: false alarms about wrong pyqtgraph version on startup
+   (removed the responsible code, because there are now more regular
+   releases of pyqtgraph)
+ - ref: avoid pyqtgraph DeprecationWarning due to `translate`
 2.6.5
  - fix: migrate to pg.ColorBarItem (with some manual patches from
    upstream) to resolve issues with SVG export (#87)

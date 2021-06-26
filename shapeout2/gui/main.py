@@ -172,8 +172,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents,
                                                  300)
             sys.exit(0)
-        # check pyqtgraph version
-        self._check_pg_version()
+
         # check for updates
         do_update = int(self.settings.value("check for updates", 1))
         self.on_action_check_update(do_update)
@@ -183,24 +182,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.activateWindow()
         self.showMaximized()
         self.setWindowState(QtCore.Qt.WindowState.WindowActive)
-
-    def _check_pg_version(self):
-        """Tells the user when the pyqtgraph version is not correct"""
-        if (int(self.settings.value("advanced/check pyqtgraph version", 1))
-                and pg.__version__ != "0.12.0"):
-            msg = QtWidgets.QMessageBox()
-            msg.setIcon(QtWidgets.QMessageBox.Warning)
-            msg.setText("You are using an unexpected version of pyqtgraph. "
-                        + "Plotting may not work correctly!")
-            msg.setWindowTitle("pyqtgraph version mismatch")
-            msg.setDetailedText(
-                "If you have installed Shape-Out using pip, please "
-                + "install our pyqtgraph fork via: \n\n"
-                + "pip install pyqtgraph==0.12.0"
-                # "pip install git+git://github.com/ZELLMECHANIK-DRESDEN/"
-                # "pyqtgraph.git@master-c1900"
-            )
-            msg.exec_()
 
     @widgets.show_wait_cursor
     @QtCore.pyqtSlot(dict)

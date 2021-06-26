@@ -57,4 +57,7 @@ class ShapeOutColorBarItem(pg.ColorBarItem):
 
         # set correct size and position
         self.setFixedHeight(height)
-        self.translate(0, yoffset)
+
+        tr = self.transform()
+        tr.translate(0, yoffset)
+        self.setTransform(tr)

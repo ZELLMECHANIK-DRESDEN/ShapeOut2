@@ -32,7 +32,7 @@ def main(splash=True):
     # Use dots as decimal separators
     QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
 
-    window = ShapeOut2()
+    window = ShapeOut2(*app.arguments()[1:])
 
     if splash:
         splash.finish(window)

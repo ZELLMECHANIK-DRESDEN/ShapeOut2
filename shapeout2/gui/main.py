@@ -50,7 +50,7 @@ QtGui.QIcon.setThemeName(".")
 class ShapeOut2(QtWidgets.QMainWindow):
     plots_changed = QtCore.pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, *arguments):
         """Initialize Shape-Out 2
 
         If you pass the "--version" command line argument, the
@@ -167,11 +167,25 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # slot signals
         self.widget_ana_view.slot_changed.connect(self.adopt_slot)
         # if "--version" was specified, print the version and exit
-        if "--version" in sys.argv:
+        if "--version" in arguments:
             print(__version__)
             QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents,
                                                  300)
             sys.exit(0)
+        else:
+            # deal with any other arguments that might have been passed
+            for arg in arguments:
+                apath = pathlib.Path(arg)
+                if apath.exists():
+                    if apath.suffix == ".so2":
+                        # load a session
+                        self.on_action_open(path=apath)
+                    elif apath.suffix == ".rtdc":
+                        # add a dataslot
+                        self.add_dataslot(paths=[apath])
+                    elif apath.suffix in [".sof", ".poly"]:
+                        # add a filter
+                        self.on_action_import_filter(path=apath)
 
         # check for updates
         do_update = int(self.settings.value("check for updates", 1))
@@ -335,7 +349,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
         Parameters
         ----------
-        paths: list of str or None
+        paths: list of str or list of pathlib.Path
             If specified, no file dialog is displayed and the files
             specified are loaded. Can also be DCOR URL.
         is_dcor: bool
@@ -458,6 +472,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         sub.hide()
         self.mdiArea.addSubWindow(sub)
 
+    @QtCore.pyqtSlot()
     def on_action_about(self):
         gh = "ZELLMECHANIK-DRESDEN/ShapeOut2"
         rtd = "shapeout2.readthedocs.io"
@@ -473,6 +488,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                                     "Shape-Out {}".format(__version__),
                                     about_text)
 
+    @QtCore.pyqtSlot()
     def on_action_change_dataset_order(self):
         """Show dialog for changing dataset order"""
         dlg = analysis.DlgSlotReorder(self.pipeline, self)
@@ -524,11 +540,13 @@ class ShapeOut2(QtWidgets.QMainWindow):
         msg.setText(text)
         msg.exec_()
 
+    @QtCore.pyqtSlot()
     def on_action_compute_emodulus(self):
         dlg = bulk.BulkActionEmodulus(self, pipeline=self.pipeline)
         dlg.pipeline_changed.connect(self.adopt_pipeline)
         dlg.exec()
 
+    @QtCore.pyqtSlot()
     def on_action_compute_significance(self):
         # check that R is available
         if rsetup.has_r():
@@ -541,6 +559,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 + "to the PATH variable or define it manually in the "
                 + "Shape-Out preferences.")
 
+    @QtCore.pyqtSlot()
     def on_action_compute_statistics(self):
         dlg = compute.ComputeStatistics(self, pipeline=self.pipeline)
         dlg.exec()
@@ -560,30 +579,44 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.reload_pipeline()
         return yes
 
+    @QtCore.pyqtSlot()
     def on_action_dcor(self):
         """Show the DCOR import dialog"""
         dlg = dcor.DCORLoader(self)
         dlg.exec()
 
+    @QtCore.pyqtSlot()
     def on_action_docs(self):
         webbrowser.open("https://shapeout2.readthedocs.io")
 
+    @QtCore.pyqtSlot()
     def on_action_export_data(self):
         dlg = export.ExportData(self, pipeline=self.pipeline)
         if dlg.path is not None:  # user pressed cancel
             dlg.exec()
 
+    @QtCore.pyqtSlot()
     def on_action_export_filter(self):
         dlg = export.ExportFilter(self, pipeline=self.pipeline)
         dlg.exec()
 
+    @QtCore.pyqtSlot()
     def on_action_export_plot(self):
         dlg = export.ExportPlot(self, pipeline=self.pipeline)
         dlg.exec()
 
-    def on_action_import_filter(self):
-        path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, 'Select Filter', '', 'Filters formats (*.poly *.sof)')
+    @QtCore.pyqtSlot()
+    def on_action_import_filter(self, path=None):
+        """Import a filter from a .sof or .poly file
+
+        Parameters
+        ----------
+        path: str or pathlib.Path
+            path to the filter to impoert
+        """
+        if path is None:
+            path, _ = QtWidgets.QFileDialog.getOpenFileName(
+                self, 'Select Filter', '', 'Filters formats (*.poly *.sof)')
         if path:
             session.import_filters(path, self.pipeline)
             # update UI
@@ -591,6 +624,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_action_open(self, path=None):
+        """Open a Shape-Out 2 session"""
         if self.pipeline.slots or self.pipeline.filters:
             if not self.on_action_clear():
                 return
@@ -625,11 +659,13 @@ class ShapeOut2(QtWidgets.QMainWindow):
                     break
             self.reload_pipeline()
 
+    @QtCore.pyqtSlot()
     def on_action_preferences(self):
         """Show the DCOR import dialog"""
         dlg = preferences.Preferences(self)
         dlg.exec()
 
+    @QtCore.pyqtSlot()
     def on_action_quit(self):
         """Determine what happens when the user wants to quit"""
         if self.pipeline.slots or self.pipeline.filters:
@@ -637,6 +673,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 return
         QtCore.QCoreApplication.quit()
 
+    @QtCore.pyqtSlot()
     def on_action_save(self):
         path, _ = QtWidgets.QFileDialog.getSaveFileName(
             self, 'Save session', '', 'Shape-Out 2 session (*.so2)')
@@ -645,6 +682,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 path += ".so2"
             session.save_session(path, self.pipeline)
 
+    @QtCore.pyqtSlot()
     def on_action_software(self):
         libs = [dclab,
                 h5py,
@@ -681,6 +719,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.mdiArea.update()
         self.block_matrix.update()
 
+    @QtCore.pyqtSlot()
     def on_new_polygon_filter(self):
         if not self.pipeline.slots:
             msg = QtWidgets.QMessageBox()

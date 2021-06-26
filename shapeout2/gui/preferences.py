@@ -35,8 +35,6 @@ class Preferences(QtWidgets.QDialog):
         #: configuration keys, corresponding widgets, and defaults
         self.config_pairs = [
             ["advanced/developer mode", self.advanced_developer_mode, 0],
-            ["advanced/check pyqtgraph version",
-             self.advanced_check_pyqtgraph_version, 1],
             ["check for updates", self.general_check_for_updates, 1],
             ["dcor/api key", self.dcor_api_key, ""],
             ["dcor/servers", self.dcor_servers, ["dcor.mpl.mpg.de"]],

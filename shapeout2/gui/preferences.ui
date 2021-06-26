@@ -205,13 +205,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="advanced_check_pyqtgraph_version">
-         <property name="text">
-          <string>Check pyqtgraph version on startup</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

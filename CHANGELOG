@@ -5,6 +5,7 @@
  - enh: allow passing session files, datasets, and filters via the
    command line (#88)
  - enh: associate the .so2 file format with Shape-Out on Windows (#88)
+ - build: migrate to Inno Setup 6
  - ref: avoid pyqtgraph DeprecationWarning due to `translate`
 2.6.5
  - fix: migrate to pg.ColorBarItem (with some manual patches from

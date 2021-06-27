@@ -16,7 +16,7 @@ init:
 
 install:
   # Install InnoSetup and add to path
-  - appveyor-retry choco install -y InnoSetup
+  - appveyor-retry choco install -y innosetup --version=6.2.0
   - iscc /?
   - appveyor-retry choco install -y wget --version 1.20
   # install R with lme4

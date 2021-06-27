@@ -20,7 +20,7 @@ install:
   # Set InnoSetup path here, because otherwise version 5 is used for some reason
   #- set PATH="C:\\Program Files (x86)\\Inno Setup 6",%PATH%
   #- iscc
-  - C:\\Program Files (x86)\\Inno Setup 6\\ICC.exe
+  - 'C:\\Program Files (x86)\\Inno Setup 6\\ICC.exe'
   - appveyor-retry choco install -y wget --version 1.20
   # install R with lme4
   - wget -q https://cran.r-project.org/bin/windows/base/old/3.6.3/R-3.6.3-win.exe
@@ -73,7 +73,7 @@ after_test:
   # Create InnoSetup installers
   # Generate iss file
   - python win_make_iss.py
-  - C:\\Program Files (x86)\\Inno Setup 6\\ICC.exe /Q win_shapeout2.iss
+  - 'C:\\Program Files (x86)\\Inno Setup 6\\ICC.exe' /Q win_shapeout2.iss
 
 artifacts:
   # InnoSetup files

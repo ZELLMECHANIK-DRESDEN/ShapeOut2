@@ -1,3 +1,6 @@
+2.6.7
+ - setup: bump dclab from 0.34.2 to 0.34.3 (set R_HOME)
+ - build: bumpy rpy2 from 3.4.2 to 3.5.0
 2.6.6
  - fix: false alarms about wrong pyqtgraph version on startup
    (removed the responsible code, because there are now more regular

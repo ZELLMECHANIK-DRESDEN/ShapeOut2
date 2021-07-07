@@ -43,3 +43,17 @@ Help menu) and notifies the user when a new version is available.
    .. code:: bash
 
        pip install --upgrade shapeout2
+
+
+How to cite
+===========
+If you use Shape-Out in a scientific publication, please cite it with:
+
+.. pull-quote::
+
+   Paul Müller and others (2019), Shape-Out version 2.X.X: Graphical user
+   interface for analysis and visualization of RT-DC data sets [Software].
+   Available at https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2.
+
+If the journal does not accept ``and others``, you can fill in the missing
+names from the `credits file <https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/blob/master/CREDITS>`_.

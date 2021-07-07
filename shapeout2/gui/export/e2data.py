@@ -75,20 +75,36 @@ class ExportData(QtWidgets.QDialog):
                 # remove bad characters from file name
                 fn = get_valid_filename(fn)
                 path = out / fn
+                # check features
+                fmiss = [ff for ff in features if ff not in ds.features]
+                if fmiss:
+                    lmiss = [dclab.dfn.get_feature_label(ff) for ff in fmiss]
+                    QtWidgets.QMessageBox.warning(
+                        self,
+                        "Features missing!",
+                        (f"Dataslot {slot_index} does not have these features:"
+                         + "\n"
+                         + "".join([f"\n- {fl}" for fl in lmiss])
+                         + "\n\n"
+                         + f"They are not exported to .{self.file_format}!")
+                    )
                 if self.file_format == "rtdc":
-                    ds.export.hdf5(path=path,
-                                   features=features,
-                                   override=True)
+                    ds.export.hdf5(
+                        path=path,
+                        features=[ff for ff in features if ff in ds.features],
+                        override=True)
                 elif self.file_format == "fcs":
-                    ds.export.fcs(path=path,
-                                  features=features,
-                                  meta_data={"Shape-Out version": version},
-                                  override=True)
+                    ds.export.fcs(
+                        path=path,
+                        features=[ff for ff in features if ff in ds.features],
+                        meta_data={"Shape-Out version": version},
+                        override=True)
                 else:
-                    ds.export.tsv(path=path,
-                                  features=features,
-                                  meta_data={"Shape-Out version": version},
-                                  override=True)
+                    ds.export.tsv(
+                        path=path,
+                        features=[ff for ff in features if ff in ds.features],
+                        meta_data={"Shape-Out version": version},
+                        override=True)
             if prog.wasCanceled():
                 break
             prog.setValue(slot_index + 1)

@@ -15,9 +15,9 @@ from ._version import version
 
 
 class DataFileNotFoundError(BaseException):
-    def __init__(self, missing_paths, *args, **kwargs):
+    def __init__(self, missing_paths, *args):
         self.missing_paths = missing_paths
-        super(DataFileNotFoundError, self).__init__(*args, **kwargs)
+        super(DataFileNotFoundError, self).__init__(*args)
 
 
 class PathlibJSONEncoder(json.JSONEncoder):
@@ -84,7 +84,7 @@ def import_filters(path, pipeline, strict=False):
 
     Parameters
     ----------
-    path: pathlib.Path or str
+    path: pathlib.Path or str or io.IOBase
         Path to the filter file
     pipeline: shapeout2.pipeline.Pipeline
         Analysis pipeline to import filters to
@@ -292,7 +292,7 @@ def find_file(original_path, search_paths, partial_hash, size_read):
     return path
 
 
-def open_session(path, pipeline=None, search_paths=[]):
+def open_session(path, pipeline=None, search_paths=None):
     """Load a session (optionally overriding an existing pipeline)
 
     Parameters
@@ -305,6 +305,8 @@ def open_session(path, pipeline=None, search_paths=[]):
         Paths to search for missing measurements; entries may be
         directories or .rtdc files
     """
+    if search_paths is None:
+        search_paths = []
     path = pathlib.Path(path)
     if pipeline is None:
         pipeline = Pipeline()

@@ -43,7 +43,9 @@ class QuickViewScatterWidget(SimplePlotWidget):
         # let view box update self.poly_line_roi
         self._view_box.add_poly_vertex.connect(self.add_poly_vertex)
 
-    def activate_poly_mode(self, points=[]):
+    def activate_poly_mode(self, points=None):
+        if points is None:
+            points = []
         if self.poly_line_roi is None:
             self.poly_line_roi = pg.PolyLineROI([], closed=True)
             self.poly_line_roi.setPen("k")

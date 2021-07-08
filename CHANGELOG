@@ -1,5 +1,6 @@
 2.6.7
  - fix: correctly handle missing features on data export (#80)
+ - ref: cleanup (default arguments and PyQt5 object references)
  - setup: bump dclab from 0.34.2 to 0.34.3 (set R_HOME)
  - build: bumpy rpy2 from 3.4.2 to 3.4.5
  - build: bumpy pyqtgraph from 0.12.1 to 0.12.2 and remove

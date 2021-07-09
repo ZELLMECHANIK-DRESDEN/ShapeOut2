@@ -161,7 +161,9 @@ The inertia ratio is the ratio of the second order
 `central moments
 <https://en.wikipedia.org/wiki/Image_moment#Central_moments>`_ along
 x and y computed for the event contour. Thus, the inertia ratio is a measure
-of deformation. In comparison to deformation, the inertia ratio has a low
+of deformation. In contrast to deformation (which is computed from the
+contour), inertia ratio is based on the integral over the cell area and thus
+less prone to noise. In comparison to deformation, the inertia ratio has a low
 correlation to porosity.
 Shape-Out also allows to compute the principal inertia ratio which is the
 maximal inertia ratio that can be obtained by rotating the contour. Thus,

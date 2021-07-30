@@ -37,9 +37,6 @@
          <height>300</height>
         </size>
        </property>
-       <property name="styleSheet">
-        <string notr="true">background-color:#FFFFFF</string>
-       </property>
       </widget>
      </item>
      <item>
@@ -567,7 +564,7 @@
                    </size>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true"/>
+                   <string notr="true">background-color:transparent</string>
                   </property>
                  </widget>
                 </item>

@@ -34,7 +34,7 @@ from .._version import version as __version__
 
 
 # global plotting configuration parameters
-pg.setConfigOption("background", "w")
+pg.setConfigOption("background", None)
 pg.setConfigOption("foreground", "k")
 pg.setConfigOption("antialias", True)
 pg.setConfigOption("imageAxisOrder", "row-major")

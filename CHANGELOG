@@ -1,3 +1,5 @@
+2.6.8
+ - fix: adapt color scheme to work in dark mode (#92)
 2.6.7
  - fix: correctly handle missing features on data export (#80)
  - ref: cleanup (default arguments and PyQt5 object references)

@@ -32,8 +32,8 @@ class MatrixElement(dm_element.MatrixElement):
             label = "inactive\n(unused)"
             tooltip = "Click to activate"
 
-        self.setStyleSheet("background-color:{}".format(color))
-        self.label.setStyleSheet("background-color:{}".format(color))
         self.label.setText(label)
         self.setToolTip(tooltip)
         self.label.setToolTip(tooltip)
+        self.setStyleSheet(
+            "background-color:{};color:black".format(color))

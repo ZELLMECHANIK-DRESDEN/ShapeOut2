@@ -103,8 +103,8 @@ class MatrixElement(QtWidgets.QWidget):
             else:
                 tooltip += "\nShift+Click for Quick View"
 
-        self.setStyleSheet("background-color:{}".format(color))
-        self.label.setStyleSheet("background-color:{}".format(color))
         self.label.setText(label)
         self.setToolTip(tooltip)
         self.label.setToolTip(tooltip)
+        self.setStyleSheet(
+            "background-color:{};color:black".format(color))

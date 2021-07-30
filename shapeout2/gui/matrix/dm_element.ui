@@ -43,7 +43,7 @@
    <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color:#EFEFEF</string>
+   <string notr="true">background-color:#EFEFEF; color:black</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">

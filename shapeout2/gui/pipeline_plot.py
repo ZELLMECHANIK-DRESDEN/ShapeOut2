@@ -109,6 +109,9 @@ class PipelinePlot(QtWidgets.QWidget):
         # clear widget
         self.plot_layout.clear()
 
+        # set background to white
+        self.plot_layout.setBackground("w")
+
         if not slot_states:
             return
 
@@ -238,6 +241,8 @@ class PipelinePlotItem(SimplePlotItem):
         self.axes_to_front()
         # Keep track of all elements (for redraw)
         self._plot_elements = []
+        # Set background to white (for plot export)
+        self.vb.setBackgroundColor("w")
 
     def perform_export(self, file):
         """Performs export in new layout with axes labels set
@@ -347,6 +352,7 @@ class PipelinePlotItem(SimplePlotItem):
                         add_label(text="{} events".format(len(sct[0].data)),
                                   anchor_parent=self.axes["right"]["item"],
                                   font_size_diff=-1,
+                                  color="black",
                                   text_halign="right",
                                   text_valign="top",
                                   dx=2,
@@ -358,6 +364,7 @@ class PipelinePlotItem(SimplePlotItem):
                 # only a contour plot
                 self.setTitle("")  # fake title
                 add_label(text="Contours",
+                          color="black",
                           anchor_parent=self.titleLabel.item,
                           text_halign="center",
                           text_valign="top",

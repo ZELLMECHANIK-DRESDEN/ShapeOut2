@@ -394,14 +394,10 @@ class DataMatrix(QtWidgets.QWidget):
             slot = pipeline.Dataslot(path=dw_state["path"])
             new_id = slot.identifier
             if option == "duplicate":
-                orig_state = copy.deepcopy(state["slots"][slot_index])
                 # use original state
-                new_state = orig_state
+                new_state = copy.deepcopy(state["slots"][slot_index])
+                # only set the new identifier (issue #96)
                 new_state["identifier"] = new_id
-                new_state["name"] = slot.name
-                new_state["color"] = slot.color
-                # also set element states
-                # state["elements"][new_id] = state["elements"][slot_id]
             else:  # insert_anew
                 new_state = slot.__getstate__()
             slot.__setstate__(new_state)

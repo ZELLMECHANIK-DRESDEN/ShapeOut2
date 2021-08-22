@@ -439,15 +439,22 @@ class ShapeOut2(QtWidgets.QMainWindow):
     def dropEvent(self, e):
         """Add dropped files to view"""
         urls = e.mimeData().urls()
-        pathlist = []
-        for ff in urls:
-            pp = pathlib.Path(ff.toLocalFile())
-            if pp.is_dir():
-                pathlist += list(pp.rglob("*.rtdc"))
-            elif pp.suffix == ".rtdc":
-                pathlist.append(pp)
-        if pathlist:
-            self.add_dataslot(paths=sorted(pathlist))
+        if urls:
+            pathlist = []
+            is_dcor = bool(urls[0].host())
+            for ff in urls:
+                if is_dcor:
+                    # DCOR data
+                    pathlist.append(ff.toString())
+                else:
+                    pp = pathlib.Path(ff.toLocalFile())
+                    if pp.is_dir():
+                        pathlist += list(pp.rglob("*.rtdc"))
+                    elif pp.suffix == ".rtdc":
+                        pathlist.append(pp)
+                    pathlist = sorted(pathlist)
+            if pathlist:
+                self.add_dataslot(paths=pathlist, is_dcor=is_dcor)
 
     def init_analysis_view(self):
         sub = widgets.MDISubWindowWOButtons(self)

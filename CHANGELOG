@@ -1,3 +1,6 @@
+2.7.1
+ - setup: bump dclab from 0.34.3 to 0.35.0
+ - tests: change test data to avoid warnings in dclab 0.35.0
 2.7.0
  - feat: accept DCOR drag events from DCOR-Aid data browser
 2.6.9

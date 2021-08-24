@@ -260,11 +260,11 @@ class DataMatrix(QtWidgets.QWidget):
         self._reset_layout()
 
     def dragEnterEvent(self, event):
-        print("drag enter event on data matrix")
+        # drag enter event on data matrix
         event.ignore()
 
     def dropEvent(self, event):
-        print("drag drop event on data matrix")
+        # drag drop event on data matrix
         event.ignore()
 
     def fill_elements(self):

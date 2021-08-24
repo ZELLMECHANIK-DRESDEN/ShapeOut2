@@ -239,7 +239,9 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # update BlockMatrix
         if self.sender() != self.block_matrix:
             # Update BlockMatrix
+            self.setUpdatesEnabled(False)
             self.block_matrix.adopt_pipeline(pipeline_state)
+            self.setUpdatesEnabled(True)
         # trigger redraw
         self.block_matrix.update()
         # Invalidate block matrix elements that do not make sense due to
@@ -371,7 +373,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
         slot_ids = []
         # Create Dataslot instance and update block matrix
-        updates_enabled = self.updatesEnabled()
         self.setUpdatesEnabled(False)
         for fn in fnames:
             if is_dcor:

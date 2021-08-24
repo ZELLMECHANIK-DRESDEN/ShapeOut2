@@ -75,7 +75,6 @@ class DataMatrix(QtWidgets.QWidget):
     def __setstate__(self, state):
         # remember current QuickView identifiers
         qv_slot_id, qv_filt_id = self.get_quickview_ids()
-        self.setUpdatesEnabled(False)
         self.blockSignals(True)
         self.clear()
         # dataset states
@@ -114,8 +113,6 @@ class DataMatrix(QtWidgets.QWidget):
         else:
             MatrixElement._quick_view_instance = meqv
             self.update_content()
-        self.blockSignals(False)
-        self.setUpdatesEnabled(True)
 
     def _reset_layout(self):
         if self.glo is not None:
@@ -128,6 +125,7 @@ class DataMatrix(QtWidgets.QWidget):
             self.old_layout.deleteLater()
         # add new layout
         self.glo = QtWidgets.QGridLayout()
+        self.glo.setAlignment(QtCore.Qt.AlignTop)
         self.glo.setSpacing(2)
         self.glo.setContentsMargins(0, 0, 0, 0)
         # add dummy corner element
@@ -206,7 +204,6 @@ class DataMatrix(QtWidgets.QWidget):
 
     def add_dataset(self, slot_id=None, state=None):
         """Add a dataset to the DataMatrix"""
-        self.setUpdatesEnabled(False)
         md = MatrixDataset(identifier=slot_id, state=state)
         self.glo.addWidget(md, self.num_datasets+1, 0)
         md.active_toggled.connect(self.toggle_dataset_active)
@@ -218,12 +215,10 @@ class DataMatrix(QtWidgets.QWidget):
         self.plot_matrix.fill_elements()
         self.adjust_size()
         self.plot_matrix.adjust_size()  # important when opt/removing slots
-        self.setUpdatesEnabled(True)
         self.publish_matrix()
         return md
 
     def add_filter(self, identifier=None, state=None):
-        self.setUpdatesEnabled(False)
         mf = MatrixFilter(identifier=identifier, state=state)
         mf.active_toggled.connect(self.toggle_filter_active)
         mf.enabled_toggled.connect(self.toggle_filter_enable)
@@ -233,7 +228,6 @@ class DataMatrix(QtWidgets.QWidget):
         self.fill_elements()
         self.adjust_size()
         self.plot_matrix.adjust_size()  # important when opt/removing filters
-        self.setUpdatesEnabled(True)
         self.publish_matrix()
         return mf
 
@@ -377,7 +371,6 @@ class DataMatrix(QtWidgets.QWidget):
     @QtCore.pyqtSlot(str)
     def on_option_dataset(self, option):
         """Dataset option logic (remove, insert_anew, duplicate)"""
-        self.setUpdatesEnabled(False)
         dw_state = self.sender().__getstate__()
         slot_id = dw_state["identifier"]
         slot_index = self.get_slot_index(slot_id)
@@ -410,7 +403,6 @@ class DataMatrix(QtWidgets.QWidget):
         self.plot_matrix.__setstate__(pstate)
         self.plot_matrix.fill_elements()
         self.publish_matrix()
-        self.setUpdatesEnabled(True)
 
     @QtCore.pyqtSlot(str)
     def on_option_filter(self, option):

@@ -371,6 +371,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
         slot_ids = []
         # Create Dataslot instance and update block matrix
+        updates_enabled = self.updatesEnabled()
+        self.setUpdatesEnabled(False)
         for fn in fnames:
             if is_dcor:
                 path = fn
@@ -383,6 +385,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
             slot_id = self.pipeline.add_slot(path=path)
             self.block_matrix.add_dataset(slot_id=slot_id)
             slot_ids.append(slot_id)
+        self.setUpdatesEnabled(True)
+        self.repaint()
 
         # Update box filter limits
         self.widget_ana_view.widget_filter.update_box_ranges()
@@ -436,6 +440,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         else:
             e.ignore()
 
+    @widgets.show_wait_cursor
     def dropEvent(self, e):
         """Add dropped files to view"""
         urls = e.mimeData().urls()

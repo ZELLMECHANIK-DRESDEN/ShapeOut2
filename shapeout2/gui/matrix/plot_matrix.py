@@ -77,6 +77,7 @@ class PlotMatrix(QtWidgets.QWidget):
             self.old_layout.deleteLater()
         # add new layout
         self.glo = QtWidgets.QGridLayout()
+        self.glo.setAlignment(QtCore.Qt.AlignLeft)
         self.glo.setSpacing(2)
         self.glo.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.glo)

@@ -104,6 +104,8 @@ class MetaPanel(QtWidgets.QWidget):
                                  "online_filter")
             self.update_info_box(self.groupBox_setup, cfg,
                                  "setup")
+            self.update_info_box(self.groupBox_user, cfg,
+                                 "user")
         else:
             self.setEnabled(False)
 

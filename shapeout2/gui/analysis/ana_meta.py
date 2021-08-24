@@ -1,3 +1,4 @@
+import numbers
 import pkg_resources
 
 import dclab
@@ -63,8 +64,12 @@ class MetaPanel(QtWidgets.QWidget):
                 hbox = QtWidgets.QHBoxLayout()
                 hbox.setAlignment(QtCore.Qt.AlignLeft)
                 hbox.setContentsMargins(0, 0, 0, 0)
-                hbox.addWidget(QtWidgets.QLabel(k + ": "))
-                hbox.addWidget(QtWidgets.QLabel(v))
+                ldescr = QtWidgets.QLabel(k + ": ")
+                ldescr.setAlignment(QtCore.Qt.AlignTop)
+                hbox.addWidget(ldescr)
+                lvalue = QtWidgets.QLabel(v)
+                lvalue.setAlignment(QtCore.Qt.AlignBottom)
+                hbox.addWidget(lvalue)
                 widget.setLayout(hbox)
                 group_box.layout().addWidget(widget)
             group_box.show()
@@ -104,15 +109,11 @@ class MetaPanel(QtWidgets.QWidget):
 
 
 def format_config_key_value(section, key, value):
-    mdsec = dclab.dfn.CFG_METADATA[section]
-    for dckey, dctype, descr in mdsec:
-        if dckey == key:
-            break
-    else:
-        raise KeyError("Unknwon key [{}]: {}".format(section, key))
+    dtype = dclab.dfn.get_config_value_type(section, key)
+    descr = dclab.dfn.get_config_value_descr(section, key)
     tip = ""
     # Value formatting
-    if dctype == float:  # pretty-print floats
+    if dtype == numbers.Number:  # pretty-print floats
         if value == 0:
             string = "0.0"
         else:
@@ -131,6 +132,13 @@ def format_config_key_value(section, key, value):
             tip = form.strip("()'")
         elif key == "sample":
             descr = "Sample name"
+    elif section == "online_filter":
+        if key.endswith("polygon points"):
+            # format polygon points
+            descr = "\n".join(descr.split(" ", 1))
+            string = "\n".join([f"({x:.5g}, {y:.5g})" for x, y in value])
+        elif key.endswith("soft limit"):
+            descr = "\n".join(descr.split(", polygon ", 1))
     elif section == "setup":
         if key == "chip region":
             descr = descr.split(" (")[0]

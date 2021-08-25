@@ -113,6 +113,7 @@ class DataMatrix(QtWidgets.QWidget):
         else:
             MatrixElement._quick_view_instance = meqv
             self.update_content()
+        self.blockSignals(False)
 
     def _reset_layout(self):
         if self.glo is not None:

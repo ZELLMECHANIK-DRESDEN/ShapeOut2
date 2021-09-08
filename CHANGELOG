@@ -1,5 +1,6 @@
 2.7.2
- - setup: bump dclab from 0.35.4 to 0.35.6
+ - setup: bump dclab from 0.35.4 to 0.35.6 (Young's modulus could
+   not be computed in some cases)
 2.7.1
  - enh: display online polygon filters in metadata tab (#94)
  - enh: show user configuration section in metadata tab (#86)

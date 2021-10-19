@@ -1,5 +1,7 @@
+2.7.4
+ - setup: bump dclab from 0.35.6 to 0.36.1 (improved export speed)
 2.7.3
-- remove console window (#102)
+ - build: remove console window (#102)
 2.7.2
  - setup: bump dclab from 0.35.4 to 0.35.6 (Young's modulus could
    not be computed in some cases)

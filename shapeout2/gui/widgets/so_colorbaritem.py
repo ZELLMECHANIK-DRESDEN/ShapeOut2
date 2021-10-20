@@ -12,10 +12,6 @@ class ShapeOutColorBarItem(pg.ColorBarItem):
         """
         super(ShapeOutColorBarItem, self).__init__(*args, **kwargs)
 
-        for key in ['left', 'top', 'bottom']:
-            axis = self.getAxis(key)
-            axis.setTicks([])
-
         # show label on right side
         self.axis.setLabel(label)
 

@@ -210,7 +210,7 @@ class PipelinePlot(QtWidgets.QWidget):
             colorbar = ShapeOutColorBarItem(
                 yoffset=31,  # this is heuristic
                 height=min(300, lay["size y"] // 2),
-                cmap=cmap,
+                colorMap=cmap,
                 interactive=False,
                 width=15,
                 **colorbar_kwds

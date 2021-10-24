@@ -1,4 +1,5 @@
-2.8.0 - BREAKING CHANGE: The volume feature in all previous versions was
+2.8.0
+ - BREAKING CHANGE: The volume feature in all previous versions was
    overestimated by about 2µm³. Please re-run your analysis pipeline.
  - setup: bump pyqtgraph from 0.12.2 to 0.12.3
  - setup: bump dclab from 0.36.1 to 0.37.1 (faulty volume computation)

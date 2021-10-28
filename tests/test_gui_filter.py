@@ -5,16 +5,20 @@ import tempfile
 
 import dclab
 import numpy as np
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import QEventLoop
 
 from shapeout2.gui.main import ShapeOut2
 from shapeout2 import session
 import pytest
 
 
+data_path = pathlib.Path(__file__).parent / "data"
+
+
 def make_fake_dataset():
     """Return path of a temporary .rtdc file"""
-    path = pathlib.Path(__file__).parent / "data" / "calibration_beads_47.rtdc"
+    path = data_path / "calibration_beads_47.rtdc"
     with dclab.new_dataset(path) as ds:
         config = copy.deepcopy(ds.config)
 
@@ -124,3 +128,136 @@ def test_filter_min_max_inf(qtbot):
     ds = dclab.new_dataset(path)
     assert np.allclose(rcstate["start"], ds["area_ratio"][2], rtol=1e-4)
     assert np.allclose(rcstate["end"], 1.1, rtol=1e-4)
+
+
+def test_polygon_filter_basic(qtbot):
+    path = data_path / "calibration_beads_47.rtdc"
+
+    with dclab.new_dataset(path) as ds:
+        pf1 = dclab.PolygonFilter(
+            axes=("deform", "area_um"),
+            points=[[ds["deform"].min(), ds["area_um"].min()],
+                    [ds["deform"].min(), ds["area_um"].mean()],
+                    [ds["deform"].mean(), ds["area_um"].mean()],
+                    ],
+            name="Triangle of Death",
+        )
+
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+
+    # add the file
+    mw.add_dataslot(paths=[path])
+
+    # enable the filter
+    slot_id = mw.pipeline.slot_ids[0]
+    filt_id = mw.pipeline.filter_ids[0]
+    em = mw.block_matrix.get_widget(slot_id, filt_id)
+    qtbot.mouseClick(em, QtCore.Qt.LeftButton)
+    # did that work?
+    assert mw.pipeline.is_element_active(slot_id, filt_id)
+
+    assert len(mw.pipeline.slot_ids) == 1, "we added that"
+    assert len(mw.pipeline.filter_ids) == 1, "automatically added"
+
+    # open the filter edit in the Analysis View
+    fe = mw.block_matrix.get_widget(filt_plot_id=mw.pipeline.filter_ids[0])
+    qtbot.mouseClick(fe.toolButton_modify, QtCore.Qt.LeftButton)
+
+    # enable the polygon filter
+    wf = mw.widget_ana_view.widget_filter
+    filter_ids = list(wf._polygon_checkboxes.keys())
+    # sanity check
+    assert filter_ids == [pf1.unique_id]
+
+    wf._polygon_checkboxes[pf1.unique_id].setChecked(True)
+    assert wf._polygon_checkboxes[pf1.unique_id].isChecked()
+
+    # click apply
+    qtbot.mouseClick(wf.pushButton_apply, QtCore.Qt.LeftButton)
+
+    # check the filter
+    assert pf1.unique_id in mw.pipeline.filters[0].polylist
+
+    # get the dataset
+    assert len(mw.pipeline.slots) == 1
+    assert len(mw.pipeline.filters) == 1
+    ds_slot = mw.pipeline.slots[0].get_dataset()
+    ds = mw.pipeline.get_dataset(0)
+    assert ds_slot is not ds
+    assert np.sum(ds.filter.all) == 5
+    assert len(ds) == 47
+
+
+def test_polygon_filter_delete(qtbot):
+    path = data_path / "calibration_beads_47.rtdc"
+
+    with dclab.new_dataset(path) as ds:
+        pf1 = dclab.PolygonFilter(
+            axes=("deform", "area_um"),
+            points=[[ds["deform"].min(), ds["area_um"].min()],
+                    [ds["deform"].min(), ds["area_um"].mean()],
+                    [ds["deform"].mean(), ds["area_um"].mean()],
+                    ],
+            name="Triangle of Death",
+        )
+
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+
+    # add the file
+    mw.add_dataslot(paths=[path])
+
+    # enable the filter
+    slot_id = mw.pipeline.slot_ids[0]
+    filt_id = mw.pipeline.filter_ids[0]
+    em = mw.block_matrix.get_widget(slot_id, filt_id)
+    qtbot.mouseClick(em, QtCore.Qt.LeftButton)
+    # did that work?
+    assert mw.pipeline.is_element_active(slot_id, filt_id)
+
+    assert len(mw.pipeline.slot_ids) == 1, "we added that"
+    assert len(mw.pipeline.filter_ids) == 1, "automatically added"
+
+    # open the filter edit in the Analysis View
+    fe = mw.block_matrix.get_widget(filt_plot_id=mw.pipeline.filter_ids[0])
+    qtbot.mouseClick(fe.toolButton_modify, QtCore.Qt.LeftButton)
+
+    # enable the polygon filter
+    wf = mw.widget_ana_view.widget_filter
+    filter_ids = list(wf._polygon_checkboxes.keys())
+    # sanity check
+    assert filter_ids == [pf1.unique_id]
+
+    wf._polygon_checkboxes[pf1.unique_id].setChecked(True)
+    assert wf._polygon_checkboxes[pf1.unique_id].isChecked()
+
+    # click apply
+    qtbot.mouseClick(wf.pushButton_apply, QtCore.Qt.LeftButton)
+
+    # check the filter
+    assert pf1.unique_id in mw.pipeline.filters[0].polylist
+
+    # now remove the filter
+    em1 = mw.block_matrix.get_widget(slot_id, filt_id)
+    qtbot.mouseClick(em1, QtCore.Qt.LeftButton, QtCore.Qt.ShiftModifier)
+    qv = mw.widget_quick_view
+    qtbot.mouseClick(qv.toolButton_poly, QtCore.Qt.LeftButton)
+    qv.comboBox_poly.setCurrentIndex(1)
+    QtWidgets.QApplication.processEvents(QEventLoop.AllEvents, 300)
+    assert qv.pushButton_poly_save.isVisible()
+    assert qv.pushButton_poly_cancel.isVisible()
+    assert qv.pushButton_poly_delete.isVisible()
+    qtbot.mouseClick(qv.pushButton_poly_delete, QtCore.Qt.LeftButton)
+    assert not qv.pushButton_poly_delete.isVisible()
+
+    # did that work?
+    assert len(mw.pipeline.filters[0].polylist) == 0
+
+    # get the dataset
+    assert len(mw.pipeline.slots) == 1
+    assert len(mw.pipeline.filters) == 1
+
+    ds = mw.pipeline.get_dataset(0)
+    assert np.sum(ds.filter.all) == 47
+    assert len(ds) == 47

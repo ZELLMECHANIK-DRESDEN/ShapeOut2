@@ -151,6 +151,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # polygon filter creation
         self.widget_ana_view.widget_filter.request_new_polygon_filter.connect(
             self.on_new_polygon_filter)
+        self.widget_quick_view.polygon_filter_about_to_be_deleted.connect(
+            self.on_remove_polygon_filter_from_pipeline)
         self.widget_quick_view.polygon_filter_created.connect(
             self.widget_ana_view.widget_filter.update_polygon_filters)
         self.widget_quick_view.polygon_filter_modified.connect(
@@ -718,6 +720,13 @@ class ShapeOut2(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.information(self,
                                           "Software",
                                           sw_text)
+
+    @QtCore.pyqtSlot(int)
+    def on_remove_polygon_filter_from_pipeline(self, pf_id):
+        """Remove a polygon filter from all filters in the pipeline"""
+        for filt in self.pipeline.filters:
+            if pf_id in filt.polylist:
+                filt.polylist.remove(pf_id)
 
     @widgets.show_wait_cursor
     @QtCore.pyqtSlot()

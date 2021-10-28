@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1429</width>
+    <width>1486</width>
     <height>746</height>
    </rect>
   </property>
@@ -835,6 +835,13 @@
            <property name="topMargin">
             <number>0</number>
            </property>
+           <item>
+            <widget class="QPushButton" name="pushButton_poly_delete">
+             <property name="text">
+              <string>Delete</string>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="QPushButton" name="pushButton_poly_cancel">
              <property name="text">

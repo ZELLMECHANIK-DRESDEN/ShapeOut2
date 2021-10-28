@@ -58,14 +58,20 @@ class PathlibJSONDecoder(json.JSONDecoder):
 def export_filters(path, pipeline, filt_ids=None):
     """Export filters of a pipeline to a JSON file"""
     if filt_ids is None:
+        # export all filters
         filt_ids = pipeline.filter_ids
-    # First, get all relevant polygon filters
-    polyids = set([])
-    for filt in pipeline.filters:
-        if filt.identifier in filt_ids:
-            polyids |= set(filt.polylist)
+        # export all polygon filters as well
+        # (also if they are not used by any of the filters)
+        poly_ids = [pf.unique_id for pf in dclab.PolygonFilter.instances]
+    else:
+        # get all relevant polygon filters
+        poly_ids = set([])
+        for filt in pipeline.filters:
+            if filt.identifier in filt_ids:
+                poly_ids |= set(filt.polylist)
+
     poly_states = []
-    for pid in sorted(polyids):
+    for pid in sorted(poly_ids):
         pf = dclab.PolygonFilter.get_instance_from_id(pid)
         poly_states.append(pf.__getstate__())
     # Then, get the remaining filter settings

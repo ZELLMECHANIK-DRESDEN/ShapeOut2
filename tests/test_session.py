@@ -3,9 +3,13 @@ import pathlib
 import shutil
 import tempfile
 
+import dclab
 import h5py
 import numpy as np
 from shapeout2 import pipeline, session
+
+
+data_path = pathlib.Path(__file__).parent / "data"
 
 
 def equal_state(a, b):
@@ -38,8 +42,7 @@ def make_pipeline(nslots=2, nfilters=3, nplots=1, paths=None):
     - Every other filter/plot will be set active
     """
     if paths is None:
-        here = pathlib.Path(__file__).parent
-        paths = [here / "data" / "calibration_beads_47.rtdc"]
+        paths = [data_path / "calibration_beads_47.rtdc"]
 
     # circular iterator over paths
     pathcycle = itertools.cycle(paths)
@@ -59,9 +62,9 @@ def make_pipeline(nslots=2, nfilters=3, nplots=1, paths=None):
         feat = feats[jj]
         fmin, fmax = pl.get_min_max(feat)
         # modify the filter
-        filt.boxdict[filt_id] = {"start": fmin,
-                                 "end": (fmin + fmax)/2,
-                                 "active": True}
+        filt.boxdict[feat] = {"start": fmin,
+                              "end": (fmin + fmax)/2,
+                              "active": True}
 
     # set every other filter active
     active = True
@@ -123,8 +126,6 @@ def test_file_hash():
         h5.attrs["setup:medium"] = "unknown"
     hash2 = session.hash_file_partially(pp)
     assert hash1 != hash2
-    # cleanup
-    shutil.rmtree(tempdir, ignore_errors=True)
 
 
 def test_missing_path_in_session():
@@ -156,8 +157,6 @@ def test_missing_path_in_session():
     pc.rename(other / pp.name)  # must have same name as `pp`
     pl4 = session.open_session(spath, search_paths=[other])
     session.clear_session(pl4)
-    # cleanup
-    shutil.rmtree(tempdir, ignore_errors=True)
 
 
 def test_relative_paths():
@@ -188,8 +187,58 @@ def test_relative_paths():
     pp.rename(new_pp)
     # and load it (without search_paths as arguments)
     session.open_session(new_spath)
-    # cleanup
-    shutil.rmtree(tempdir, ignore_errors=True)
+
+
+def test_save_all_polygon_filters_issue_101():
+    pl = make_pipeline()
+
+    # add a polygon filter
+    ds = pl.get_dataset(0)
+    pf1 = dclab.PolygonFilter(
+        axes=("deform", "area_um"),
+        points=[[ds["deform"].min(), ds["area_um"].min()],
+                [ds["deform"].min(), ds["area_um"].mean()],
+                [ds["deform"].mean(), ds["area_um"].mean()],
+                ],
+        name="Triangle of Minimum",
+    )
+    pf2_state = dclab.PolygonFilter(
+        axes=("deform", "area_um"),
+        points=[[ds["deform"].max(), ds["area_um"].max()],
+                [ds["deform"].max(), ds["area_um"].mean()],
+                [ds["deform"].mean(), ds["area_um"].mean()],
+                ],
+        name="Triangle of Maximum",
+    ).__getstate__()
+    pl.filters[0].polylist.append(pf1.unique_id)
+    old_state = pl.__getstate__()
+
+    tempdir = pathlib.Path(tempfile.mkdtemp(prefix="test_shapeout2_session_"))
+    spath = tempdir / "session.so2"
+
+    session.save_session(spath, pl)
+
+    assert len(dclab.PolygonFilter.instances) == 2
+
+    session.clear_session(pl)
+
+    assert len(dclab.PolygonFilter.instances) == 0
+
+    # currently, there may only be one pipeline
+    session.open_session(spath, pl)
+    new_state = pl.__getstate__()
+
+    # This is the actual test for issue #101
+    assert len(dclab.PolygonFilter.instances) == 2
+
+    # This is a sanity check
+    assert equal_state(old_state, new_state)
+
+    # This is another sanity check
+    pf2_id = pf2_state["identifier"]
+    assert equal_state(
+        pf2_state,
+        dclab.PolygonFilter.get_instance_from_id(pf2_id).__getstate__())
 
 
 def test_simple_save_open_session():
@@ -210,8 +259,6 @@ def test_simple_save_open_session():
     # test opposite
     old_state["slots"][0]["emodulus"]["emodulus temperature"] = 10
     assert not equal_state(old_state, new_state)
-    # cleanup
-    shutil.rmtree(tempdir, ignore_errors=True)
 
 
 def test_wrong_hash():
@@ -241,8 +288,6 @@ def test_wrong_hash():
         assert pp in e.missing_paths
     else:
         assert False, "should have raised an error!"
-    # cleanup
-    shutil.rmtree(tempdir, ignore_errors=True)
 
 
 if __name__ == "__main__":

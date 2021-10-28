@@ -248,8 +248,6 @@ class Pipeline(object):
             whether to call `dataset.apply_filter` in the end;
             if set to `False`, only the filtering configuration
             of the dataset and its hierarchy parents are updated
-        ret_color: bool
-            also return the color of the dataset as a string
         """
         if not isinstance(slot_index, int):
             raise ValueError(

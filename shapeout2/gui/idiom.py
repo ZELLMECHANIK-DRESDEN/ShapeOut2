@@ -1,4 +1,4 @@
-from dclab.rtdc_dataset import ancillaries
+from dclab.rtdc_dataset import feat_anc_core
 
 #: integer-valued features
 INTEGER_FEATURES = [
@@ -15,4 +15,4 @@ INTEGER_FEATURES = [
 ]
 
 #: ancillary features that are easily computed
-QUICK_FEATURES = ancillaries.FEATURES_RAPID
+QUICK_FEATURES = feat_anc_core.FEATURES_RAPID

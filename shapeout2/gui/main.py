@@ -1,4 +1,4 @@
-import os
+import os.path as os_path
 import pathlib
 import pkg_resources
 import signal
@@ -14,6 +14,7 @@ import numpy
 import scipy
 
 from PyQt5 import uic, QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QStandardPaths
 import pyqtgraph as pg
 
 from . import analysis
@@ -27,6 +28,7 @@ from . import quick_view
 from . import update
 from . import widgets
 
+from ..extensions import ExtensionManager
 from .. import pipeline
 from .. import session
 
@@ -42,7 +44,7 @@ pg.setConfigOption("imageAxisOrder", "row-major")
 
 # set Qt icon theme search path
 QtGui.QIcon.setThemeSearchPaths([
-    os.path.join(pkg_resources.resource_filename("shapeout2", "img"),
+    os_path.join(pkg_resources.resource_filename("shapeout2", "img"),
                  "icon-theme")])
 QtGui.QIcon.setThemeName(".")
 
@@ -80,6 +82,19 @@ class ShapeOut2(QtWidgets.QMainWindow):
         dclab.rtdc_dataset.fmt_dcor.APIHandler.add_api_key(api_key)
         #: Analysis pipeline
         self.pipeline = pipeline.Pipeline()
+        #: Extensions
+        store_path = os_path.join(
+            QStandardPaths.writableLocation(
+                QStandardPaths.AppLocalDataLocation), "extensions")
+        try:
+            self.extensions = ExtensionManager(store_path)
+        except BaseException:
+            QtWidgets.QMessageBox.warning(
+                self,
+                "Extensions automatically disabled",
+                "Some extensions could not be loaded and were disabled:\n\n"
+                + traceback.format_exc(),
+                )
         # GUI
         self.setWindowTitle("Shape-Out {}".format(__version__))
         # Disable native menu bar (e.g. on Mac)
@@ -678,6 +693,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
     def on_action_preferences(self):
         """Show the DCOR import dialog"""
         dlg = preferences.Preferences(self)
+        dlg.feature_changed.connect(self.plots_changed)
+        dlg.feature_changed.connect(self.on_quickview_refresh)
         dlg.exec()
 
     @QtCore.pyqtSlot()

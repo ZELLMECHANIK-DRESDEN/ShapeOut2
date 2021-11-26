@@ -29,7 +29,7 @@ You can load and manage extensions via the *Edit | Preferences* dialog in the
 
 Example: Fluorescence volume
 ----------------------------
-Download the :download:`estension_fl1_density.py <data/estension_fl1_density.py>`
+Download the :download:`extension_fl1_density.py <data/extension_fl1_density.py>`
 extension and add it to Shape-Out. You will see a new scalar feature named
 "FL-1 density [a.u.]" that quantifies the collected fluorescence signal
 per object volume for the fluorescence channel 1. Using this extension as

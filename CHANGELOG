@@ -1,3 +1,5 @@
+2.9.1
+ - fix: mysterious behavior of subclassed pg.ColorBarItem (#109)
 2.9.0
  - feat: add support for extensions in the form of loading dclab
    plugin and machine-learning features (#85)

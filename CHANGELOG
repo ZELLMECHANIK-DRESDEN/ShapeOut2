@@ -1,4 +1,6 @@
 2.9.1
+ - enh: add button "Find best spacing" in Plot tab in Analysis View
+   that iteratively finds sane spacing values (#110)
  - fix: mysterious behavior of subclassed pg.ColorBarItem (#109)
 2.9.0
  - feat: add support for extensions in the form of loading dclab

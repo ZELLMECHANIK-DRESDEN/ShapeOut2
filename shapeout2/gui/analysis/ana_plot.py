@@ -8,6 +8,9 @@ from PyQt5 import uic, QtCore, QtWidgets
 from ...pipeline import Plot
 from ...pipeline.plot import STATE_OPTIONS
 
+from ..pipeline_plot import compute_contours, compute_contour_opening_angles
+
+from ..widgets import show_wait_cursor
 
 COLORMAPS = STATE_OPTIONS["scatter"]["colormap"]
 
@@ -55,6 +58,8 @@ class PlotPanel(QtWidgets.QWidget):
             self.on_column_num_changed)
         self.widget_range_x.range_changed.connect(self.on_range_changed)
         self.widget_range_y.range_changed.connect(self.on_range_changed)
+        # automatically set spacing
+        self.toolButton_spacing_auto.clicked.connect(self.on_spacing_auto)
 
     def __getstate__(self):
         feats_srt = self.get_features()
@@ -314,7 +319,7 @@ class PlotPanel(QtWidgets.QWidget):
         for spacing, spinBox in zip([spacing_x, spacing_y],
                                     [self.doubleSpinBox_spacing_x,
                                      self.doubleSpinBox_spacing_y]):
-            if spacing is None:
+            if spacing is None or np.isnan(spacing):
                 continue
             else:
                 if spacing >= 1:
@@ -332,6 +337,8 @@ class PlotPanel(QtWidgets.QWidget):
 
         - uses :func:`dclab.kde_methods.bin_width_percentile`
         - uses _set_contour_spacing
+
+        Not to be confused with `on_spacing_auto`!
         """
         if len(self.pipeline.slots) == 0:
             self.setEnabled(False)
@@ -410,6 +417,7 @@ class PlotPanel(QtWidgets.QWidget):
             feats_srt = [it[1] for it in lf]
         return feats_srt
 
+    @QtCore.pyqtSlot()
     def on_axis_changed(self):
         gen = self.__getstate__()["general"]
         if self.sender() == self.comboBox_axis_x:
@@ -423,6 +431,7 @@ class PlotPanel(QtWidgets.QWidget):
         elif self.sender() == self.comboBox_scale_y:
             self._set_contour_spacing_auto(axis_y=gen["axis y"])
 
+    @QtCore.pyqtSlot()
     def on_column_num_changed(self):
         """The user changed the number of columns
 
@@ -449,6 +458,7 @@ class PlotPanel(QtWidgets.QWidget):
         new_size_y = max(400, old_size_y + 200*(new_nrow - old_nrow))
         self.spinBox_size_y.setValue(new_size_y)
 
+    @QtCore.pyqtSlot()
     def on_hue_selected(self):
         """Show/hide options for feature-based hue selection"""
         selection = self.comboBox_marker_hue.currentData()
@@ -475,6 +485,7 @@ class PlotPanel(QtWidgets.QWidget):
         else:
             raise ValueError("Unknown selection: '{}'".format(selection))
 
+    @QtCore.pyqtSlot()
     def on_plot_duplicated(self):
         # determine the new filter state
         plot_state = self.__getstate__()
@@ -489,12 +500,74 @@ class PlotPanel(QtWidgets.QWidget):
         state = self.pipeline.__getstate__()
         self.pipeline_changed.emit(state)
 
+    @QtCore.pyqtSlot()
     def on_plot_removed(self):
         plot_state = self.__getstate__()
         self.pipeline.remove_plot(plot_state["identifier"])
         state = self.pipeline.__getstate__()
         self.pipeline_changed.emit(state)
 
+    @QtCore.pyqtSlot()
+    @show_wait_cursor
+    def on_spacing_auto(self):
+        """Iteratively find a good spacing for smooth contours (#110)"""
+        # https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/110
+        plot_id = self.current_plot.identifier
+        # Get all datasets belonging to this plot.
+        datasets, _ = self.pipeline.get_plot_datasets(plot_id)
+        state = self.__getstate__()
+        gen = state["general"]
+        # initial guess
+        # sensible start parameters
+        self._set_contour_spacing_auto(axis_x=gen["axis x"],
+                                       axis_y=gen["axis y"])
+
+        # retrieve state with updated spacings
+        state = self.__getstate__()
+        phi_conv = np.deg2rad(23)
+
+        for ii in range(15):  # hard-limit is 15 iterations
+            # maximum difference of opening angle from 180° [rad]
+            max_dphi = 0
+            for ds in datasets:
+                # Compute the contour for the highest percentile of the plot.
+                state["contour"]["percentiles"] = \
+                    [np.max(state["contour"]["percentiles"])]
+                cc = compute_contours(plot_state=state, rtdc_ds=ds)[0][0]
+                # Compute the opening angle for each point of the
+                # contour and take the point with the largest opening angle.
+                angles = compute_contour_opening_angles(
+                    plot_state=state, contour=cc)
+                if (np.allclose(np.abs(angles[0]), np.pi/2)
+                        and np.all(angles[1:6] == 0)):
+                    # We have probably encountered a contour at the boundary
+                    # of the image. We make sure the algorithm breaks here.
+                    dphi = phi_conv
+                elif len(angles) > 50:
+                    # Second stopping criterion
+                    dphi = phi_conv
+                else:
+                    dphi = np.max(np.abs(angles))
+                max_dphi = max(max_dphi, np.abs(dphi))
+            # If the absolute opening angle is too large,
+            # we assume that we have to reduce the spacing.
+            if max_dphi <= phi_conv:
+                # Normal stopping criterion (opening angle <= 23°)
+                break
+            else:
+                state["contour"]["spacing x"] /= 2
+                state["contour"]["spacing y"] /= 2
+        else:
+            raise ValueError(
+                "Could not automatically determine contour spacing")
+
+        # set the final spacing
+        new_state = self.__getstate__()
+        new_state["contour"]["spacing x"] = state["contour"]["spacing x"]
+        new_state["contour"]["spacing y"] = state["contour"]["spacing y"]
+        self.__setstate__(new_state)
+
+    @QtCore.pyqtSlot()
     def on_range_changed(self):
         """User changed x/y range -> disable auto range checkbox"""
         self.checkBox_auto_range.setChecked(False)

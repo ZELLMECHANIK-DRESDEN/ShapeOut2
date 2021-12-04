@@ -885,6 +885,13 @@
              <widget class="QDoubleSpinBox" name="doubleSpinBox_spacing_y"/>
             </item>
             <item>
+             <widget class="QToolButton" name="toolButton_spacing_auto">
+              <property name="text">
+               <string>Find best spacing</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <spacer name="horizontalSpacer_15">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>

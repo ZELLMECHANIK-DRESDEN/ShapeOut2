@@ -436,43 +436,8 @@ def add_label(text, anchor_parent, text_halign="center", text_valign="center",
 
 
 def add_contour(plot_item, plot_state, rtdc_ds, slot_state, legend=None):
-    gen = plot_state["general"]
+    contours = compute_contours(plot_state=plot_state, rtdc_ds=rtdc_ds)
     con = plot_state["contour"]
-    try:
-        x, y, density = plot_cache.get_contour_data(
-            rtdc_ds=rtdc_ds,
-            xax=gen["axis x"],
-            yax=gen["axis y"],
-            xacc=con["spacing x"],
-            yacc=con["spacing y"],
-            xscale=gen["scale x"],
-            yscale=gen["scale y"],
-            kde_type=gen["kde"],
-        )
-    except ValueError:
-        # most-likely there is nothing to compute a contour for
-        return []
-    if density.shape[0] < 3 or density.shape[1] < 3:
-        warnings.warn("Contour not possible; spacing may be too large!",
-                      ContourSpacingTooLarge)
-        return []
-    plev = kde_contours.get_quantile_levels(
-        density=density,
-        x=x,
-        y=y,
-        xp=rtdc_ds[gen["axis x"]][rtdc_ds.filter.all],
-        yp=rtdc_ds[gen["axis y"]][rtdc_ds.filter.all],
-        q=np.array(con["percentiles"])/100,
-        normalize=True)
-    contours = []
-    for level in plev:
-        # make sure that the contour levels are not at the boundaries
-        if not (np.allclose(level, 0, atol=1e-12, rtol=0)
-                or np.allclose(level, 1, atol=1e-12, rtol=0)):
-            cc = kde_contours.find_contours_level(
-                density, x=x, y=y, level=level)
-            contours.append(cc)
-
     elements = []
     for ii in range(len(contours)):
         style = linestyles[con["line styles"][ii]]
@@ -595,6 +560,85 @@ def add_scatter(plot_item, plot_state, rtdc_ds, slot_state):
     scatter.setData(x=x, y=y, brush=brush)
     scatter.setZValue(-50)
     return [scatter]
+
+
+def compute_contours(plot_state, rtdc_ds):
+    gen = plot_state["general"]
+    con = plot_state["contour"]
+    try:
+        x, y, density = plot_cache.get_contour_data(
+            rtdc_ds=rtdc_ds,
+            xax=gen["axis x"],
+            yax=gen["axis y"],
+            xacc=con["spacing x"],
+            yacc=con["spacing y"],
+            xscale=gen["scale x"],
+            yscale=gen["scale y"],
+            kde_type=gen["kde"],
+        )
+    except ValueError:
+        # most-likely there is nothing to compute a contour for
+        return []
+    if density.shape[0] < 3 or density.shape[1] < 3:
+        warnings.warn("Contour not possible; spacing may be too large!",
+                      ContourSpacingTooLarge)
+        return []
+    plev = kde_contours.get_quantile_levels(
+        density=density,
+        x=x,
+        y=y,
+        xp=rtdc_ds[gen["axis x"]][rtdc_ds.filter.all],
+        yp=rtdc_ds[gen["axis y"]][rtdc_ds.filter.all],
+        q=np.array(con["percentiles"]) / 100,
+        normalize=True)
+    contours = []
+    for level in plev:
+        # make sure that the contour levels are not at the boundaries
+        if not (np.allclose(level, 0, atol=1e-12, rtol=0)
+                or np.allclose(level, 1, atol=1e-12, rtol=0)):
+            cc = kde_contours.find_contours_level(
+                density, x=x, y=y, level=level)
+            contours.append(cc)
+    return contours
+
+
+def compute_contour_opening_angles(plot_state, contour):
+    """For each point of the contour, compute the opening angle
+
+    This takes the visible plot area into account.
+    """
+    cc = np.array(contour, copy=True)
+    if not np.all(cc[0] == cc[-1]):
+        cc = np.resize(cc, (len(contour)+1, 2))
+    # Normalize contour
+    rx = plot_state["general"]["range x"]
+    ry = plot_state["general"]["range y"]
+    cc[:, 0] = (cc[:, 0] - rx[0]) / (rx[1] - rx[0])
+    cc[:, 1] = (cc[:, 1] - ry[0]) / (ry[1] - ry[0])
+    # apply scale
+    sx = plot_state["general"]["scale x"]
+    assert sx in ["log", "linear"]
+    if sx == "log":
+        cc[:, 0] = np.log10(cc[:, 0])
+    sy = plot_state["general"]["scale y"]
+    assert sy in ["log", "linear"]
+    if sy == "log":
+        cc[:, 1] = np.log10(cc[:, 1])
+    opang = np.zeros(len(cc)-1, dtype=float)
+    for jj, c0 in enumerate(cc[:-1]):  # we have a closed contour
+        cl = cc[:-1][jj - 1]
+        cr = cc[jj + 1]
+        # vector a
+        a = np.array(cl) - np.array(c0)
+        # vector b
+        b = np.array(cr) - np.array(c0)
+        absa = np.sqrt(np.sum(a ** 2))
+        absb = np.sqrt(np.sum(b ** 2))
+        phi = np.arccos(np.sum(a * b) / (absa * absb))
+        if np.abs(phi) > np.pi/2:
+            phi -= np.sign(phi) * np.pi
+        opang[jj] = phi
+    return opang
 
 
 def get_axes_labels(plot_state, slot_states):

@@ -439,10 +439,14 @@ def add_contour(plot_item, plot_state, rtdc_ds, slot_state, legend=None):
     contours = compute_contours(plot_state=plot_state, rtdc_ds=rtdc_ds)
     con = plot_state["contour"]
     elements = []
+    num_unreliable_contours = 0
     for ii in range(len(contours)):
         style = linestyles[con["line styles"][ii]]
         width = con["line widths"][ii]
         for cci in contours[ii]:
+            if not compute_contour_reliable(plot_state=plot_state,
+                                            contour=cci):
+                num_unreliable_contours += 1
             cline = pg.PlotDataItem(x=cci[:, 0],
                                     y=cci[:, 1],
                                     pen=pg.mkPen(color=slot_state["color"],
@@ -457,6 +461,16 @@ def add_contour(plot_item, plot_state, rtdc_ds, slot_state, legend=None):
             # Always plot higher percentiles above lower percentiles
             # (useful if there are multiple contour plots overlapping)
             cline.setZValue(con["percentiles"][ii])
+    if num_unreliable_contours or not elements:
+        # Tell the user to refine contour spacing.
+        add_label("Please reduce contour spacing.",
+                  anchor_parent=plot_item,
+                  font_size_diff=-1,
+                  color="red",
+                  text_halign="center",
+                  text_valign="bottom",
+                  dx=20,
+                  )
     return elements
 
 
@@ -639,6 +653,25 @@ def compute_contour_opening_angles(plot_state, contour):
             phi -= np.sign(phi) * np.pi
         opang[jj] = phi
     return opang
+
+
+def compute_contour_reliable(plot_state, contour, thresh_ang=np.deg2rad(23)):
+    """Determine whether contour is reliable or not"""
+    # Compute the opening angle for each point of the
+    # contour and take the point with the largest opening angle.
+    angles = compute_contour_opening_angles(
+        plot_state=plot_state, contour=contour)
+    if (np.allclose(np.abs(angles[0]), np.pi / 2)
+            and np.all(angles[1:6] == 0)):
+        # We have probably encountered a contour at the boundary
+        # of the image. It looks like this is ok.
+        reliable = True
+    elif len(angles) > 50:
+        # The contour is long enough to be trusted.
+        reliable = True
+    else:
+        reliable = np.max(np.abs(angles)) <= thresh_ang
+    return reliable
 
 
 def get_axes_labels(plot_state, slot_states):

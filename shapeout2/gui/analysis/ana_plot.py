@@ -8,7 +8,8 @@ from PyQt5 import uic, QtCore, QtWidgets
 from ...pipeline import Plot
 from ...pipeline.plot import STATE_OPTIONS
 
-from ..pipeline_plot import compute_contours, compute_contour_opening_angles
+from ..pipeline_plot import (
+    compute_contours, compute_contour_opening_angles, compute_contour_reliable)
 
 from ..widgets import show_wait_cursor
 
@@ -534,27 +535,20 @@ class PlotPanel(QtWidgets.QWidget):
                 state["contour"]["percentiles"] = \
                     [np.max(state["contour"]["percentiles"])]
                 cc = compute_contours(plot_state=state, rtdc_ds=ds)[0][0]
-                # Compute the opening angle for each point of the
-                # contour and take the point with the largest opening angle.
-                angles = compute_contour_opening_angles(
-                    plot_state=state, contour=cc)
-                if (np.allclose(np.abs(angles[0]), np.pi/2)
-                        and np.all(angles[1:6] == 0)):
-                    # We have probably encountered a contour at the boundary
-                    # of the image. We make sure the algorithm breaks here.
-                    dphi = phi_conv
-                elif len(angles) > 50:
-                    # Second stopping criterion
-                    dphi = phi_conv
-                else:
+                if not compute_contour_reliable(
+                        plot_state=state, contour=cc, thresh_ang=phi_conv):
+                    # Compute the opening angle for each point of the cnotour
+                    # and take the point with the largest opening angle.
+                    angles = compute_contour_opening_angles(
+                        plot_state=state, contour=cc)
                     dphi = np.max(np.abs(angles))
-                max_dphi = max(max_dphi, np.abs(dphi))
-            # If the absolute opening angle is too large,
-            # we assume that we have to reduce the spacing.
+                    max_dphi = max(max_dphi, np.abs(dphi))
             if max_dphi <= phi_conv:
                 # Normal stopping criterion (opening angle <= 23°)
                 break
             else:
+                # If the absolute opening angle is too large,
+                # we assume that we have to reduce the spacing.
                 state["contour"]["spacing x"] /= 2
                 state["contour"]["spacing y"] /= 2
         else:

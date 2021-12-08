@@ -349,7 +349,7 @@ class PipelinePlotItem(SimplePlotItem):
 
                 if plot_state["scatter"]["show event count"]:
                     if True:
-                        add_label(text="{} events".format(len(sct[0].data)),
+                        add_label(text=f"{len(sct[0].data)} events",
                                   anchor_parent=self.axes["right"]["item"],
                                   font_size_diff=-1,
                                   color="black",
@@ -464,12 +464,12 @@ def add_contour(plot_item, plot_state, rtdc_ds, slot_state, legend=None):
     if num_unreliable_contours or not elements:
         # Tell the user to refine contour spacing.
         add_label("Please reduce contour spacing.",
-                  anchor_parent=plot_item,
+                  anchor_parent=plot_item.axes["bottom"]["item"],
                   font_size_diff=-1,
                   color="red",
-                  text_halign="center",
+                  text_halign="left",
                   text_valign="bottom",
-                  dx=20,
+                  dy=-12,
                   )
     return elements
 

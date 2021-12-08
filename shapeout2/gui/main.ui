@@ -228,6 +228,7 @@
     </property>
     <addaction name="actionLoadDataset"/>
     <addaction name="actionLoadDCOR"/>
+    <addaction name="actionClearDatasets"/>
     <addaction name="separator"/>
     <addaction name="actionOpenSession"/>
     <addaction name="actionSaveSession"/>
@@ -294,7 +295,7 @@
      <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>&amp;Load Dataset...</string>
+    <string>&amp;Load dataset...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
@@ -306,7 +307,7 @@
      <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>&amp;Open Session...</string>
+    <string>&amp;Open session...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -318,7 +319,7 @@
      <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>&amp;Save Session...</string>
+    <string>&amp;Save session...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -326,11 +327,11 @@
   </action>
   <action name="actionClearSession">
    <property name="icon">
-    <iconset theme="edit-clear">
+    <iconset theme="edit-clear-all">
      <normaloff>.</normaloff>.</iconset>
    </property>
    <property name="text">
-    <string>&amp;Clear Session...</string>
+    <string>&amp;Clear session</string>
    </property>
   </action>
   <action name="actionQuit">
@@ -470,6 +471,14 @@
    </property>
    <property name="text">
     <string>Statistical &amp;significance...</string>
+   </property>
+  </action>
+  <action name="actionClearDatasets">
+   <property name="icon">
+    <iconset theme="edit-clear"/>
+   </property>
+   <property name="text">
+    <string>C&amp;lear datasets</string>
    </property>
   </action>
  </widget>

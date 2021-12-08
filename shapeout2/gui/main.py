@@ -102,6 +102,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # File menu
         self.actionLoadDataset.triggered.connect(self.add_dataslot)
         self.actionLoadDCOR.triggered.connect(self.on_action_dcor)
+        self.actionClearDatasets.triggered.connect(
+            self.on_action_clear_datasets)
         self.actionClearSession.triggered.connect(self.on_action_clear)
         self.actionOpenSession.triggered.connect(self.on_action_open)
         self.actionQuit.triggered.connect(self.on_action_quit)
@@ -599,13 +601,30 @@ class ShapeOut2(QtWidgets.QMainWindow):
         if assume_yes:
             yes = True
         else:
-            buttonReply = QtWidgets.QMessageBox.question(
+            button_reply = QtWidgets.QMessageBox.question(
                 self, 'Clear Session', "All progress will be lost. Continue?",
                 QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
                 QtWidgets.QMessageBox.No)
-            yes = buttonReply == QtWidgets.QMessageBox.Yes
+            yes = button_reply == QtWidgets.QMessageBox.Yes
         if yes:
             session.clear_session(self.pipeline)
+            self.reload_pipeline()
+        return yes
+
+    @QtCore.pyqtSlot()
+    def on_action_clear_datasets(self, assume_yes=False):
+        if assume_yes:
+            yes = True
+        else:
+            button_reply = QtWidgets.QMessageBox.question(
+                self, 'Clear Datasets',
+                "Remove all datasets from this session?",
+                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                QtWidgets.QMessageBox.No)
+            yes = button_reply == QtWidgets.QMessageBox.Yes
+        if yes:
+            for slot_id in self.pipeline.slot_ids:
+                self.pipeline.remove_slot(slot_id)
             self.reload_pipeline()
         return yes
 

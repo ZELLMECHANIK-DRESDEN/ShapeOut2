@@ -2,6 +2,7 @@
  - enh: add button "Find best spacing" in Plot tab in Analysis View
    that iteratively finds sane spacing values (#110)
  - enh: notify user in plot if contour spacing is too large (#110)
+ - enh: add action to remove all datasets from a session (#97)
  - fix: mysterious behavior of subclassed pg.ColorBarItem (#109)
 2.9.0
  - feat: add support for extensions in the form of loading dclab

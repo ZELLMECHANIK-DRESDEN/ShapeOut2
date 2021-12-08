@@ -30,6 +30,7 @@ icons = {
         "document-save",
         "draw-watercolor",
         "edit-clear",
+        "edit-clear-all",
         "edit-paste",
         "folder",
         "folder-cloud",

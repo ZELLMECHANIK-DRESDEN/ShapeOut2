@@ -4,6 +4,8 @@
  - enh: notify user in plot if contour spacing is too large (#110)
  - enh: add action to remove all datasets from a session (#97)
  - fix: mysterious behavior of subclassed pg.ColorBarItem (#109)
+ - setup: bump dclab from 0.39.1 to 0.39.3 (increased verbosity,
+   renamed feature labels, refactored DCOR access)
 2.9.0
  - feat: add support for extensions in the form of loading dclab
    plugin and machine-learning features (#85)

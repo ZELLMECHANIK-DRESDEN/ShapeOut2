@@ -453,6 +453,16 @@ class ShapeOut2(QtWidgets.QMainWindow):
             sub.setFixedSize(sub.sizeHint())
         sub.show()
 
+    def closeEvent(self, event):
+        """Determine what happens when the user wants to quit"""
+        if self.pipeline.slots or self.pipeline.filters:
+            if self.on_action_clear():
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.accept()
+
     def dragEnterEvent(self, e):
         """Whether files are accepted"""
         if e.mimeData().hasUrls():

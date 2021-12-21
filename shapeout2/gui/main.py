@@ -607,31 +607,33 @@ class ShapeOut2(QtWidgets.QMainWindow):
         dlg.exec()
 
     @QtCore.pyqtSlot()
-    def on_action_clear(self, assume_yes=False):
-        if assume_yes:
-            yes = True
-        else:
+    def on_action_clear(self):
+        """Clear the entire session"""
+        if bool(int(self.settings.value("advanced/user confirm clear", "1"))):
             button_reply = QtWidgets.QMessageBox.question(
                 self, 'Clear Session', "All progress will be lost. Continue?",
                 QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
                 QtWidgets.QMessageBox.No)
             yes = button_reply == QtWidgets.QMessageBox.Yes
+        else:
+            yes = True
         if yes:
             session.clear_session(self.pipeline)
             self.reload_pipeline()
         return yes
 
     @QtCore.pyqtSlot()
-    def on_action_clear_datasets(self, assume_yes=False):
-        if assume_yes:
-            yes = True
-        else:
+    def on_action_clear_datasets(self):
+        """Clear only the datasets"""
+        if bool(int(self.settings.value("advanced/user confirm clear", "1"))):
             button_reply = QtWidgets.QMessageBox.question(
                 self, 'Clear Datasets',
                 "Remove all datasets from this session?",
                 QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
                 QtWidgets.QMessageBox.No)
             yes = button_reply == QtWidgets.QMessageBox.Yes
+        else:
+            yes = True
         if yes:
             for slot_id in self.pipeline.slot_ids:
                 self.pipeline.remove_slot(slot_id)

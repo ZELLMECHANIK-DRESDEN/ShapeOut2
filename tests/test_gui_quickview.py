@@ -50,7 +50,7 @@ def test_clear_session_issue_25(qtbot):
     assert mw.toolButton_quick_view.isChecked()
 
     # now clear the session (this raised the errror in #25)
-    mw.on_action_clear(assume_yes=True)
+    mw.on_action_clear()
 
 
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')  # 0-div in kde-methods

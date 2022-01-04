@@ -4,3 +4,5 @@ pyinstaller>=4.2
 scipy<1.5.0
 # https://github.com/pyinstaller/pyinstaller/issues/5631
 pyqt5==5.15.3
+# this can be removed when PyInstaller<4.7 is released
+numpy<1.22.0

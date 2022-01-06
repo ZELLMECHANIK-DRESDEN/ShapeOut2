@@ -4,7 +4,7 @@ import os
 import struct
 import sys
 import traceback
-import urllib
+import urllib.request
 
 from PyQt5 import QtCore
 

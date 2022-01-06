@@ -1,5 +1,6 @@
 2.9.3
  - fix: implement closeEvent in main and ask user before exiting
+ - fix: fix possible failure during update check
  - tests: use hidden settings variable to skip asking the user to
    clear the session
 2.9.2

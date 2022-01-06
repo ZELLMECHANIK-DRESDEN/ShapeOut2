@@ -134,7 +134,7 @@ class ExtensionManager:
             Extension instance, its hash or its index in
             ExtensionManager
         enabled: bool
-            Whether or not to enable the extension.
+            Whether to enable the extension.
         """
         ext = self.get_extension_or_bust(ext)
         ext.set_enabled(enabled)
@@ -166,7 +166,7 @@ class Extension:
 
     @property
     def enabled(self):
-        """Whether or not the extension is enabled"""
+        """Whether the extension is enabled"""
         return not self.path_lock_disabled.exists()
 
     @property
@@ -177,7 +177,7 @@ class Extension:
 
     @property
     def loaded(self):
-        """Whether or not the extension is currently loaded"""
+        """Whether the extension is currently loaded"""
         if self.type == "feat_anc_plugin":
             return bool(self.get_plugin_feature_instances())
         elif self.type == "feat_anc_ml":

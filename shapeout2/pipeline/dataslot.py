@@ -29,7 +29,7 @@ class Dataslot(object):
         self.identifier = identifier
         #: user-defined name of the filter
         self.name = name
-        #: whether or not to use this slot
+        #: whether to use this slot
         self.slot_used = True
         if identifier in Dataslot._instances:
             raise ValueError("Dataslot with identifier "

@@ -44,7 +44,7 @@ def check_release(ghrepo="user/repo", version=None, timeout=20):
         hdr = {}
     web = "https://github.com/{}/releases".format(ghrepo)
     errors = None  # error messages (str)
-    update = False  # whether or not an update is available
+    update = False  # whether an update is available
     binary = None  # download link to binary file
     new_version = None  # string identifying new version
     try:

@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset theme="gtk-preferences">
-    <normaloff>.</normaloff>.</iconset>
+    <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -170,6 +170,13 @@
          </item>
          <item row="1" column="1">
           <widget class="QLabel" name="label_r_version">
+           <property name="text">
+            <string>R version</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_5">
            <property name="text">
             <string>R version</string>
            </property>

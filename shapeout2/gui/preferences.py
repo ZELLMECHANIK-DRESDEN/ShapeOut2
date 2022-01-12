@@ -5,7 +5,8 @@ import traceback
 import pkg_resources
 import platform
 
-from dclab.lme4.rlibs import rpy2, MockRPackage
+from dclab.lme4.rlibs import (
+    rpy2, MockRPackage, RPY2UnavailableError, RUnavailableError)
 from dclab.lme4 import rsetup
 from PyQt5 import uic, QtCore, QtWidgets
 from PyQt5.QtCore import QStandardPaths
@@ -13,7 +14,11 @@ from PyQt5.QtCore import QStandardPaths
 from .widgets import show_wait_cursor
 from ..extensions import ExtensionManager, SUPPORTED_FORMATS
 
-RPY2_AVAILABLE = not isinstance(rpy2, MockRPackage)
+
+if isinstance(rpy2, MockRPackage):
+    RPY2_AVAILABLE = not isinstance(rpy2.exception, RPY2UnavailableError)
+else:
+    RPY2_AVAILABLE = True
 
 
 class ExtensionErrorWrapper:
@@ -113,9 +118,6 @@ class Preferences(QtWidgets.QDialog):
             else:
                 raise NotImplementedError("No rule for '{}'".format(key))
 
-        if RPY2_AVAILABLE:
-            self.reload_lme4()
-
         # peculiarities of developer mode
         devmode = bool(int(self.settings.value("advanced/developer mode", 0)))
         self.dcor_use_ssl.setVisible(devmode)  # show "use ssl" in dev mode
@@ -153,7 +155,16 @@ class Preferences(QtWidgets.QDialog):
         # set the binary
         binary = self.lme4_rpath.text()
         if pathlib.Path(binary).is_file():
-            rsetup.set_r_path(binary)
+            try:
+                rsetup.set_r_path(binary)
+            except RUnavailableError as exc:
+                QtWidgets.QMessageBox.information(
+                    self,
+                    "No compatible R version found",
+                    "The R/lme4 functionality is not available.\n\n"
+                    + f"{exc.__class__.__name__}: {exc}"
+                )
+
         # check lme4 package status
         if not rsetup.has_r():
             r_version = "unknown"
@@ -298,6 +309,9 @@ class Preferences(QtWidgets.QDialog):
             enabled = False
         else:
             enabled = True
+
+        if self.tabWidget.currentWidget() is self.tab_r:
+            self.reload_lme4()
 
         self.btn_apply.setEnabled(enabled)
         self.btn_cancel.setEnabled(enabled)

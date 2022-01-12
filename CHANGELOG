@@ -1,8 +1,12 @@
 2.9.3
  - fix: implement closeEvent in main and ask user before exiting
  - fix: fix possible failure during update check
+ - fix: show a message box when the R version is incompatible (#114)
+ - ref: only reload R/lme4 information in preferences when the
+   corresponding tab is selected to avoid preferences lock-up (#114)
  - tests: use hidden settings variable to skip asking the user to
    clear the session
+ - setup: bump dclab from 0.39.5 to 0.39.9
 2.9.2
  - setup: bump dclab from 0.39.3 to 0.39.5 (fix opening files
    with some online filter settings)

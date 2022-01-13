@@ -1,3 +1,5 @@
+2.9.4
+ - setup: drop support for older numpy versions
 2.9.3
  - fix: implement closeEvent in main and ask user before exiting
  - fix: fix possible failure during update check

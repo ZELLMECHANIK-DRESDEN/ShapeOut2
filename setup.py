@@ -27,7 +27,7 @@ setup(
     install_requires=["fcswrite>=0.5.1",
                       "dclab[dcor,lme4]>=0.39.9",
                       "h5py>=2.8.0",
-                      "numpy>=1.9.0",
+                      "numpy>=1.21.1",  # CVE-2021-33430
                       "pyqt5",
                       "pyqtgraph==0.12.3",
                       "requests",

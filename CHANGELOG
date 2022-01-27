@@ -1,5 +1,7 @@
 2.9.4
  - setup: drop support for older numpy versions
+ - setup: bump dclab from 0.39.9 to 0.39.13 (fix visualization of
+   the "ml_class" score when the ml_score features contain nans)
 2.9.3
  - fix: implement closeEvent in main and ask user before exiting
  - fix: fix possible failure during update check

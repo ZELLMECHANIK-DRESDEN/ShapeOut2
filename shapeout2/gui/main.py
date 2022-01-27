@@ -187,7 +187,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.slot_changed.connect(self.adopt_slot)
         # if "--version" was specified, print the version and exit
         if "--version" in arguments:
-            print(__version__)
+            print(version)
             QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents,
                                                  300)
             sys.exit(0)
@@ -526,9 +526,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             + "<a href='https://github.com/{gh}'>{gh}</a><br>".format(gh=gh) \
             + "Documentation: " \
             + "<a href='https://{rtd}'>{rtd}</a><br>".format(rtd=rtd)
-        QtWidgets.QMessageBox.about(self,
-                                    "Shape-Out {}".format(__version__),
-                                    about_text)
+        QtWidgets.QMessageBox.about(self, f"Shape-Out {version}", about_text)
 
     @QtCore.pyqtSlot()
     def on_action_change_dataset_order(self):
@@ -549,7 +547,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 self.on_action_check_update_finished)
             self._update_thread.start()
 
-            version = __version__
             ghrepo = "ZELLMECHANIK-DRESDEN/ShapeOut2"
 
             QtCore.QMetaObject.invokeMethod(self._update_worker,
@@ -761,18 +758,16 @@ class ShapeOut2(QtWidgets.QMainWindow):
         if not isinstance(rpy2, MockRPackage):
             libs.append(rpy2)
 
-        sw_text = "Shape-Out {}\n\n".format(__version__)
-        sw_text += "Python {}\n\n".format(sys.version)
+        sw_text = f"Shape-Out {version}\n\n"
+        sw_text += f"Python {sys.version}\n\n"
         sw_text += "Modules:\n"
         for lib in libs:
-            sw_text += "- {} {}\n".format(lib.__name__, lib.__version__)
-        sw_text += "- PyQt5 {}\n".format(QtCore.QT_VERSION_STR)
+            sw_text += f"- {lib.__name__} {lib.__version__}\n"
+        sw_text += f"- PyQt5 {QtCore.QT_VERSION_STR}\n"  # Extrawurst
         sw_text += "\n Breeze icon theme by the KDE Community (LGPL)."
         if hasattr(sys, 'frozen'):
             sw_text += "\nThis executable has been created using PyInstaller."
-        QtWidgets.QMessageBox.information(self,
-                                          "Software",
-                                          sw_text)
+        QtWidgets.QMessageBox.information(self, "Software", sw_text)
 
     @QtCore.pyqtSlot(int)
     def on_remove_polygon_filter_from_pipeline(self, pf_id):
@@ -925,8 +920,7 @@ def excepthook(etype, value, trace):
         prints the standard Python header: ``Traceback (most recent
         call last)``.
     """
-    vinfo = "Unhandled exception in Shape-Out version {}:\n".format(
-        __version__)
+    vinfo = f"Unhandled exception in Shape-Out version {version}:\n"
     tmp = traceback.format_exception(etype, value, trace)
     exception = "".join([vinfo]+tmp)
 

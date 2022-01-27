@@ -32,7 +32,7 @@ from ..extensions import ExtensionManager
 from .. import pipeline
 from .. import session
 
-from .._version import version as __version__
+from .._version import version
 
 
 # global plotting configuration parameters
@@ -96,7 +96,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 + traceback.format_exc(),
                 )
         # GUI
-        self.setWindowTitle("Shape-Out {}".format(__version__))
+        self.setWindowTitle(f"Shape-Out {version}")
         # Disable native menu bar (e.g. on Mac)
         self.menubar.setNativeMenuBar(False)
         # File menu
@@ -620,6 +620,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         if yes:
             session.clear_session(self.pipeline)
             self.reload_pipeline()
+            self.setWindowTitle(f"Shape-Out {version}")
         return yes
 
     @QtCore.pyqtSlot()
@@ -719,6 +720,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 else:
                     break
             self.reload_pipeline()
+            self.setWindowTitle(
+                f"{pathlib.Path(path).name} [Shape-Out {version}]")
 
     @QtCore.pyqtSlot()
     def on_action_preferences(self):
@@ -744,6 +747,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
             if not path.endswith(".so2"):
                 path += ".so2"
             session.save_session(path, self.pipeline)
+            self.setWindowTitle(
+                f"{pathlib.Path(path).name} [Shape-Out {version}]")
 
     @QtCore.pyqtSlot()
     def on_action_software(self):

@@ -41,7 +41,7 @@ class ExtensionErrorWrapper:
 
 
 class Preferences(QtWidgets.QDialog):
-    """Implements the plotting pipeline using pyqtgraph"""
+    """Preferences dialog to interact with QSettings"""
     instances = {}
     feature_changed = QtCore.pyqtSignal()
 
@@ -64,11 +64,11 @@ class Preferences(QtWidgets.QDialog):
 
         #: configuration keys, corresponding widgets, and defaults
         self.config_pairs = [
-            ["advanced/developer mode", self.advanced_developer_mode, 0],
-            ["check for updates", self.general_check_for_updates, 1],
+            ["advanced/developer mode", self.advanced_developer_mode, "0"],
+            ["check for updates", self.general_check_for_updates, "1"],
             ["dcor/api key", self.dcor_api_key, ""],
             ["dcor/servers", self.dcor_servers, ["dcor.mpl.mpg.de"]],
-            ["dcor/use ssl", self.dcor_use_ssl, 1],
+            ["dcor/use ssl", self.dcor_use_ssl, "1"],
             ["lme4/r path", self.lme4_rpath, rdefault],
         ]
 

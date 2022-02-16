@@ -1,7 +1,7 @@
 """Test of Quick View set functionalities"""
 import pathlib
 
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtWidgets
 
 import dclab
 import numpy as np
@@ -189,6 +189,87 @@ def test_remove_dataset_h5py_error(qtbot):
     # open Quick View
     qtbot.mouseClick(mw.toolButton_quick_view, QtCore.Qt.LeftButton)
     mw.close()
+
+
+def test_translate_polygon_filter_issue_115(qtbot):
+    """https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/115
+
+    When moving (with mouse drag-n-drop) a polygon filter in edit
+    mode and then saving it, it is as if the translation is not
+    detected. The polygon points are not updated.
+    """
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+
+    # add a dataslot
+    path = datapath / "calibration_beads_47.rtdc"
+    filt_id = mw.add_filter()
+    slot_ids = mw.add_dataslot(paths=[path])
+
+    assert len(mw.pipeline.slot_ids) == 1, "we added that"
+    assert len(mw.pipeline.filter_ids) == 1, "automatically added"
+
+    # activate a dataslot
+    slot_id = slot_ids[0]
+    em = mw.block_matrix.get_widget(slot_id, filt_id)
+    qtbot.mouseClick(em, QtCore.Qt.LeftButton, QtCore.Qt.ShiftModifier)
+
+    em = mw.block_matrix.get_widget(slot_id, filt_id)
+    qtbot.mouseClick(em, QtCore.Qt.LeftButton)
+
+    # did that work?
+    assert mw.toolButton_quick_view.isChecked()
+
+    # Add a polygon filter
+    assert len(dclab.PolygonFilter.instances) == 0
+    qv = mw.widget_quick_view
+    qtbot.mouseClick(qv.toolButton_poly, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(qv.pushButton_poly_create, QtCore.Qt.LeftButton)
+    # three positions (not sure how to do this with mouse clicks)
+    points = [[22, 0.01],
+              [30, 0.01],
+              [30, 0.014],
+              ]
+    qv.widget_scatter.set_poly_points(points)
+    qtbot.mouseClick(qv.pushButton_poly_save, QtCore.Qt.LeftButton)
+    # did that work?
+    assert len(dclab.PolygonFilter.instances) == 1
+    pf = dclab.PolygonFilter.instances[0]
+    assert np.allclose(pf.points, points)
+
+    # Add the polygon filter to the first filter
+    fe = mw.block_matrix.get_widget(filt_plot_id=filt_id)
+    qtbot.mouseClick(fe.toolButton_modify, QtCore.Qt.LeftButton)
+    fv = mw.widget_ana_view.widget_filter
+    cb = fv._polygon_checkboxes[pf.unique_id]
+    qtbot.mouseClick(cb, QtCore.Qt.LeftButton)
+    assert cb.isChecked()
+    qtbot.mouseClick(fv.pushButton_apply, QtCore.Qt.LeftButton)
+    # did that work?
+    ds = mw.pipeline.get_dataset(slot_index=0, filt_index=0,
+                                 apply_filter=True)
+    assert np.sum(ds.filter.all) == 15
+
+    # Modify the polygon filter by translating it
+    qv.comboBox_poly.setCurrentIndex(1)
+    # do this without mouse interaction in this test
+    qv.widget_scatter.poly_line_roi.translate(1, -.002, snap=False)
+    qtbot.mouseClick(qv.pushButton_poly_save, QtCore.Qt.LeftButton)
+    assert len(dclab.PolygonFilter.instances) == 1
+    pf2 = dclab.PolygonFilter.instances[0]
+    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 5000)
+    points2 = [[23, 0.008],
+               [31, 0.008],
+               [31, 0.012],
+               ]
+    assert np.allclose(pf2.points, points2)
+    assert pf is pf2
+    # now the filter should be updated (this worked already)
+    ds2 = mw.pipeline.get_dataset(slot_index=0, filt_index=0,
+                                  apply_filter=True)
+    assert np.sum(ds2.filter.all) == 8
+    # but the plots were not updated in #26
+    assert len(qv.widget_scatter.scatter.getData()[0]) == 8
 
 
 def test_update_polygon_filter_issue_26(qtbot):

@@ -74,6 +74,9 @@ class QuickViewScatterWidget(SimplePlotWidget):
             raise ValueError("No polygon selection active!")
         state = self.poly_line_roi.getState()
         points = np.array([[p.x(), p.y()] for p in state["points"]])
+        # Take into account manual movements of the entire ROI (issue #115)
+        points[:, 0] += state["pos"][0]
+        points[:, 1] += state["pos"][1]
         if self.xscale == "log":
             points[:, 0] = 10**points[:, 0]
         if self.yscale == "log":

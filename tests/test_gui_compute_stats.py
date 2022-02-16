@@ -42,6 +42,7 @@ def test_stats_basic(qtbot):
         dlg.done(True)
     assert tpath.exists()
     lines = tpath.read_text(encoding="utf-8").split("\n")
+    assert len(lines) == 6
     assert lines[0].count("Statistics Output")
     assert lines[1].count("Shape-Out")
     assert lines[3].count("Path")

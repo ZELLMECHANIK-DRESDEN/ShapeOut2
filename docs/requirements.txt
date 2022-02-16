@@ -2,6 +2,8 @@ dclab>=0.31.0
 h5py
 matplotlib
 numpy
+# Don't forget to set the environment variable RPY2_CFFI_MODE=ABI on rtd!
+rpy2
 pyqt5
 scipy
 sphinx==4.3.0

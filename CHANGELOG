@@ -1,3 +1,5 @@
+2.9.5
+ - setup: bump dclab from 0.39.13 to 0.39.15
 2.9.4
  - enh: display session file name in window title
  - setup: drop support for older numpy versions

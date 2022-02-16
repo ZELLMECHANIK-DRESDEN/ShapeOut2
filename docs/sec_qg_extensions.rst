@@ -27,8 +27,8 @@ You can load and manage extensions via the *Edit | Preferences* dialog in the
     :target: _images/qg_extensions.png
 
 
-Example: Fluorescence volume
-----------------------------
+Example: Fluorescence density
+-----------------------------
 Download the :download:`extension_fl1_density.py <data/extension_fl1_density.py>`
 extension and add it to Shape-Out. You will see a new scalar feature named
 "FL-1 density [a.u.]" that quantifies the collected fluorescence signal

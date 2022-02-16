@@ -23,11 +23,11 @@ class ExportData(QtWidgets.QDialog):
         # set pipeline
         self.pipeline = pipeline
         # update list widget
+        self.bulklist_features.set_title("Features")
         self.on_radio()
+        self.bulklist_features.on_select_all()
         # Signals
         self.pushButton_path.clicked.connect(self.on_browse)
-        self.toolButton_all.clicked.connect(self.on_select_all)
-        self.toolButton_none.clicked.connect(self.on_select_none)
         self.radioButton_fcs.clicked.connect(self.on_radio)
         self.radioButton_rtdc.clicked.connect(self.on_radio)
         self.radioButton_tsv.clicked.connect(self.on_radio)
@@ -52,10 +52,7 @@ class ExportData(QtWidgets.QDialog):
         """Export data to the desired file format"""
         out = pathlib.Path(self.path)
         # get features
-        features = []
-        for ii in range(self.listWidget.count()):
-            if self.listWidget.item(ii).checkState() == 2:
-                features.append(self.features[ii])
+        features = self.bulklist_features.get_selection()
         pend = len(self.pipeline.slots)
         prog = QtWidgets.QProgressDialog("Exporting...", "Abort", 1,
                                          pend, self)
@@ -124,16 +121,6 @@ class ExportData(QtWidgets.QDialog):
     def on_radio(self):
         self.update_feature_list()
 
-    def on_select_all(self):
-        for ii in range(self.listWidget.count()):
-            wid = self.listWidget.item(ii)
-            wid.setCheckState(2)
-
-    def on_select_none(self):
-        for ii in range(self.listWidget.count()):
-            wid = self.listWidget.item(ii)
-            wid.setCheckState(0)
-
     def update_feature_list(self, scalar=False):
         if self.file_format == "rtdc":
             self.features = self.pipeline.get_features(union=True,
@@ -145,9 +132,5 @@ class ExportData(QtWidgets.QDialog):
             self.features = self.pipeline.get_features(scalar=True,
                                                        union=True,
                                                        label_sort=True)
-
-        self.listWidget.clear()
-        for feat in self.features:
-            wid = QtWidgets.QListWidgetItem(dclab.dfn.get_feature_label(feat))
-            wid.setCheckState(2)
-            self.listWidget.addItem(wid)
+        labels = [dclab.dfn.get_feature_label(feat) for feat in self.features]
+        self.bulklist_features.set_items(self.features, labels)

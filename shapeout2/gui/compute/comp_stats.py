@@ -143,9 +143,9 @@ class ComputeStatistics(QtWidgets.QDialog):
         # Write rest
         with opath.open("a", encoding="utf-8") as fd:
             for line in header:
-                fd.write("# " + line + "\r\n")
+                fd.write("# " + line + "\n")
             for line in data:
-                fd.write(line + "\r\n")
+                fd.write(line + "\n")
         return True  # True means success
 
     def on_browse(self):

@@ -100,7 +100,7 @@ class Rlme4ResultsDialog(QtWidgets.QDialog):
             path = pathlib.Path(path)
             if path.suffix != ".txt":
                 path = path.with_name(path.name + ".txt")
-            path.write_text("\r\n".join(self.summary))
+            path.write_text("\n".join(self.summary))
 
 
 def format_float(value):

@@ -28,11 +28,9 @@ class ComputeStatistics(QtWidgets.QDialog):
         self.pushButton_path.clicked.connect(self.on_browse)
         self.comboBox.currentIndexChanged.connect(self.on_combobox)
         # Populate statistics methods
-        self.listWidget_stats.clear()
-        for meth in STAT_METHODS:
-            wid = QtWidgets.QListWidgetItem(meth)
-            wid.setCheckState(2)
-            self.listWidget_stats.addItem(wid)
+        self.bulklist_stats.set_title("Statistical methods")
+        self.bulklist_stats.set_items(STAT_METHODS)
+        self.bulklist_stats.on_select_all()
         # Populate filter ray comboBox
         self.comboBox_filter_ray.clear()
         self.comboBox_filter_ray.addItem("No filtering", None)
@@ -40,12 +38,15 @@ class ComputeStatistics(QtWidgets.QDialog):
             if slot.slot_used:
                 raytext = "Ray {} ({})".format(ii, slot.name)
                 self.comboBox_filter_ray.addItem(raytext, slot.identifier)
+        # initialize feature list
+        self.bulklist_features.set_title("Features")
         # initialize rest
         if len(self.pipeline.slots) == 0:
             self.comboBox.setCurrentIndex(1)
         else:
             self.comboBox.setCurrentIndex(0)
         self.on_combobox()  # computes self.features
+        self.bulklist_features.on_select_all()
 
     def done(self, r):
         if r:
@@ -60,16 +61,9 @@ class ComputeStatistics(QtWidgets.QDialog):
     def export_statistics(self):
         """Export statistics to .tsv"""
         # get features
-        features = []
-        for ii in range(self.listWidget_features.count()):
-            if self.listWidget_features.item(ii).checkState() == 2:
-                features.append(self.features[ii])
+        features = self.bulklist_features.get_selection()
         # get methods
-        methods = []
-        for ii in range(self.listWidget_stats.count()):
-            if self.listWidget_stats.item(ii).checkState() == 2:
-                methods.append(STAT_METHODS[ii])
-
+        methods = self.bulklist_stats.get_selection()
         prog = QtWidgets.QProgressDialog("Computing statistics...", "Abort", 1,
                                          1, self)
         prog.setMinimumDuration(0)
@@ -195,8 +189,5 @@ class ComputeStatistics(QtWidgets.QDialog):
             lf = sorted(zip(labs, features))
             self.features = [it[1] for it in lf]
 
-        self.listWidget_features.clear()
-        for feat in self.features:
-            wid = QtWidgets.QListWidgetItem(dclab.dfn.get_feature_label(feat))
-            wid.setCheckState(0)
-            self.listWidget_features.addItem(wid)
+        labels = [dclab.dfn.get_feature_label(feat) for feat in self.features]
+        self.bulklist_features.set_items(self.features, labels)

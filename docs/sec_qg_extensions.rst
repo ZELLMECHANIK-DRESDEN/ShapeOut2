@@ -10,7 +10,7 @@ You may need those if you need to quantify anything that is not
 covered by the :ref:`default features <dclab:sec_features>`.
 
 .. note::
-    If you installed Shape-In via installer (not via `pip`), then
+    If you installed Shape-Out via installer (not via `pip`), then
     many extensions might not work due to software dependencies that
     those extensions might have. If this happens, please create an
     issue in the Shape-Out 2 repository so we can find a solution.

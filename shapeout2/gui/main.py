@@ -85,7 +85,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         #: Extensions
         store_path = os_path.join(
             QStandardPaths.writableLocation(
-                QStandardPaths.AppLocalDataLocation), "extensions")
+                QStandardPaths.AppDataLocation), "extensions")
         try:
             self.extensions = ExtensionManager(store_path)
         except BaseException:

@@ -1,3 +1,5 @@
+2.9.6
+ - fix: extensions not loaded during startup on Windows (#117)
 2.9.5
  - fix: polygon translation via drag-n-drop in polygon edit mode
    was not taken into account (#115)

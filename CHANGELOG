@@ -1,3 +1,5 @@
+2.9.7
+ - setup: bump dclab from 0.39.15 to 0.39.16 (close #118)
 2.9.6
  - fix: extensions not loaded during startup on Windows (#117)
 2.9.5

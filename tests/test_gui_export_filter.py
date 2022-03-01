@@ -147,5 +147,10 @@ def test_gui_export_polygon_filters(qtbot, monkeypatch):
     pl1 = dclab.PolygonFilter(filename=paths[0], unique_id=3)
     pl2 = dclab.PolygonFilter(filename=paths[1], unique_id=4)
 
-    assert pl1 == pf1
-    assert pl2 == pf2
+    # ordering of files not well-defined
+    if pl1 == pf1:
+        assert pl2 == pf2
+    elif pl1 == pf2:
+        assert pl2 == pf1
+    else:
+        assert False

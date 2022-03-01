@@ -1,6 +1,6 @@
 2.10.0
  - feat: export filter ray for each dataset via shortcut (#119)
- - setup: bump dclab from 0.39.15 to 0.39.16 (#118)
+ - setup: bump dclab from 0.39.15 to 0.39.17 (#118)
 2.9.6
  - fix: extensions not loaded during startup on Windows (#117)
 2.9.5

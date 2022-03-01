@@ -81,7 +81,7 @@ class Dataslot(object):
             calc["emodulus scenario"] = "config"
 
         #: data file format
-        self.format = self.get_dataset().format
+        self.format = ds.format
 
     def __getstate__(self):
         state = {"color": self.color,

@@ -48,7 +48,14 @@ class FilterRay(object):
 
     @property
     def filters(self):
-        """filters currently used by the ray"""
+        """filters currently used by the ray
+
+        Notes
+        -----
+        This list may not be up-to-date. If you would like to
+        get the current list of filters for a dataset, always
+        use :func:`.Pipeline.get_filters_for_slot`.
+        """
         return self._filters
 
     @property
@@ -103,7 +110,7 @@ class FilterRay(object):
         if filters:
             # apply all filters
             for ii, filt in enumerate(filters):
-                # remmeber the previous hierarchy parent
+                # remember the previous hierarchy parent
                 # (ds is always used for the next iteration)
                 prev_ds = ds
                 if external:

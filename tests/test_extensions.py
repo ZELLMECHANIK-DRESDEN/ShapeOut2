@@ -102,6 +102,8 @@ def test_em_load_from_store():
 @pytest.mark.parametrize("path_name", ["ext_feat_anc_ml_tf_rbc.modc",
                                        "ext_feat_anc_plugin_ca.py"])
 def test_ex_all_enabled(path_name):
+    if path_name.endswith(".modc"):
+        pytest.importorskip("tensorflow")
     tmpd = pathlib.Path(tempfile.mkdtemp(prefix="extension_"))
     path_used = tmpd / path_name
     shutil.copy2(data_path / path_name, path_used)
@@ -114,6 +116,8 @@ def test_ex_all_enabled(path_name):
 @pytest.mark.parametrize("path_name", ["ext_feat_anc_ml_tf_rbc.modc",
                                        "ext_feat_anc_plugin_ca.py"])
 def test_ex_all_loaded(path_name):
+    if path_name.endswith(".modc"):
+        pytest.importorskip("tensorflow")
     tmpd = pathlib.Path(tempfile.mkdtemp(prefix="extension_"))
     path_used = tmpd / path_name
     shutil.copy2(data_path / path_name, path_used)
@@ -135,6 +139,8 @@ def test_ex_all_loaded(path_name):
 @pytest.mark.parametrize("path_name", ["ext_feat_anc_ml_tf_rbc.modc",
                                        "ext_feat_anc_plugin_ca.py"])
 def test_ex_all_loaded_2(path_name):
+    if path_name.endswith(".modc"):
+        pytest.importorskip("tensorflow")
     tmpd = pathlib.Path(tempfile.mkdtemp(prefix="extension_"))
     path_used = tmpd / path_name
     shutil.copy2(data_path / path_name, path_used)
@@ -152,6 +158,8 @@ def test_ex_all_loaded_2(path_name):
 @pytest.mark.parametrize("path_name", ["ext_feat_anc_ml_tf_rbc.modc",
                                        "ext_feat_anc_plugin_ca.py"])
 def test_ex_all_repr(path_name):
+    if path_name.endswith(".modc"):
+        pytest.importorskip("tensorflow")
     tmpd = pathlib.Path(tempfile.mkdtemp(prefix="extension_"))
     path_used = tmpd / path_name
     shutil.copy2(data_path / path_name, path_used)
@@ -160,6 +168,7 @@ def test_ex_all_repr(path_name):
 
 
 def test_ex_ml_description():
+    pytest.importorskip("tensorflow")
     path_name = "ext_feat_anc_ml_tf_rbc.modc"
     tmpd = pathlib.Path(tempfile.mkdtemp(prefix="extension_"))
     path_used = tmpd / path_name
@@ -170,6 +179,7 @@ def test_ex_ml_description():
 
 
 def test_ex_ml_title():
+    pytest.importorskip("tensorflow")
     path_name = "ext_feat_anc_ml_tf_rbc.modc"
     tmpd = pathlib.Path(tempfile.mkdtemp(prefix="extension_"))
     path_used = tmpd / path_name

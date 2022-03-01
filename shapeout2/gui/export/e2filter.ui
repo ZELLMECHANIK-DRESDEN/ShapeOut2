@@ -6,47 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>250</height>
+    <width>396</width>
+    <height>166</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Filter export</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="view-filter"/>
+   <iconset theme="view-filter">
+    <normaloff>../../../../../.designer/backup</normaloff>../../../../../.designer/backup</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QWidget" name="widget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Which filters should be exported?</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="radioButton_sof">
-        <property name="text">
-         <string>Export full filters (*.sof)</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="radioButton_poly">
-        <property name="text">
-         <string>Export polygon filters only (*.poly)</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
    <item>
     <widget class="QWidget" name="widget_2" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_3">

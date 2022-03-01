@@ -257,15 +257,10 @@ class Pipeline(object):
             # return the unfiltered dataset
             ds = slot.get_dataset()
         else:
-            if filt_index < 0:
-                filt_index = len(self.filters) - 1
             slot_id = slot.identifier
             # the filters used
-            filters = []
-            for filt_id in self.filter_ids[:filt_index+1]:
-                if (self.is_element_active(slot_id, filt_id)
-                        and filt_id in self.filters_used):
-                    filters.append(self.get_filter(filt_id))
+            filters = self.get_filters_for_slot(slot_id=slot_id,
+                                                max_filter_index=filt_index)
             # filter ray magic
             ray = self.get_ray(slot.identifier)
             ds = ray.get_dataset(filters, apply_filter=apply_filter)
@@ -351,6 +346,30 @@ class Pipeline(object):
             raise ValueError(
                 "Filter '{}' not part of this pipeline!".format(filt_id))
         return self.filters[self.filter_ids.index(filt_id)]
+
+    def get_filters_for_slot(self, slot_id, max_filter_index=-1):
+        """Return list of filters for a slot
+
+        Parameters
+        ----------
+        slot_id: str
+            identifier of the slot
+        max_filter_index: int
+            maximum filter index to include in the list. Note that
+            some filters may not be applied to a slot, so the final
+            length of the returned list may be smaller than this
+            value. Set to a negative value (default) to include all
+            filters applied to a dataset.
+        """
+        filters = []
+        if max_filter_index < 0:
+            # include all filters that are used for this slot
+            max_filter_index = len(self.filters) - 1
+        for filt_id in self.filter_ids[:max_filter_index + 1]:
+            if (self.is_element_active(slot_id, filt_id)
+                    and filt_id in self.filters_used):
+                filters.append(self.get_filter(filt_id))
+        return filters
 
     def get_min_max(self, feat, plot_id=None, margin=0.0):
         """Return minimum and maximum values for a feature
@@ -481,6 +500,7 @@ class Pipeline(object):
             if key not in self.slot_ids:
                 self.rays.pop(key)
         if slot_id not in self.rays:
+            # create filter ray if it does not exist
             self.rays[slot_id] = FilterRay(self.get_slot(slot_id))
         return self.rays[slot_id]
 

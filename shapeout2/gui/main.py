@@ -123,8 +123,16 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.actionComputeSignificance.setVisible(
             not isinstance(rpy2, MockRPackage))  # only show if rpy2 is there
         # Export menu
+        # data
         self.actionExportData.triggered.connect(self.on_action_export_data)
-        self.actionExportFilter.triggered.connect(self.on_action_export_filter)
+        # filters
+        self.action_export_filter_polygon.triggered.connect(
+            self.on_action_export_filter_polygon)
+        self.action_export_filter_pipeline.triggered.connect(
+            self.on_action_export_filter_pipeline)
+        self.action_export_filter_ray_dataset.triggered.connect(
+            self.on_action_export_filter_ray_dataset)
+        # plot
         self.actionExportPlot.triggered.connect(self.on_action_export_plot)
         # Import menu
         self.actionImportFilter.triggered.connect(self.on_action_import_filter)
@@ -655,9 +663,77 @@ class ShapeOut2(QtWidgets.QMainWindow):
             dlg.exec()
 
     @QtCore.pyqtSlot()
-    def on_action_export_filter(self):
-        dlg = export.ExportFilter(self, pipeline=self.pipeline)
+    def on_action_export_filter_pipeline(self):
+        """Export the entire filter pipeline"""
+        dlg = export.ExportFilter(self,
+                                  pipeline=self.pipeline,
+                                  file_format="sof")
         dlg.exec()
+        return dlg  # for testing
+
+    @QtCore.pyqtSlot()
+    def on_action_export_filter_polygon(self, exec_dialog=True):
+        """Export only polygon filters of the current pipeline"""
+        dlg = export.ExportFilter(self,
+                                  pipeline=self.pipeline,
+                                  file_format="poly")
+        dlg.exec()
+        return dlg  # for testing
+
+    @QtCore.pyqtSlot()
+    def on_action_export_filter_ray_dataset(self):
+        """Export the filter ray for each dataset to the dataset location"""
+        #: dictionary with paths as keys and filter ID list as values
+        filt_dict = {}
+        #: paths that already exist (user will be asked to override)
+        existing_paths = []
+        #: keeps track of datasets that are loaded twice (will notify user)
+        double_paths = []
+        #: keeps track of DCOR data
+        dcor_data = []
+        for slot in self.pipeline.slots:
+            if slot.format == "dcor":
+                dcor_data.append(slot.path)
+                continue
+            ray_path = slot.path.with_suffix(".sof")
+            if ray_path in filt_dict:
+                double_paths.append(ray_path)
+                continue
+            if ray_path.exists():
+                existing_paths.append(ray_path)
+            filters = self.pipeline.get_filters_for_slot(slot.identifier)
+            filt_dict[ray_path] = [ff.identifier for ff in filters]
+        if dcor_data:
+            QtWidgets.QMessageBox.warning(
+                self,
+                "Some datasets are DCOR data for which no filter rays ",
+                "will be exported:\n\n"
+                + "\n".join([str(p) for p in list(set(dcor_data))])
+            )
+        if double_paths:
+            QtWidgets.QMessageBox.warning(
+                self,
+                "Same datasets loaded in different slots",
+                "The following datasets are loaded twice. Only the first "
+                + "filter ray will be saved:\n\n"
+                + "\n".join([str(p) for p in list(set(double_paths))])
+            )
+        if existing_paths:
+            resp = QtWidgets.QMessageBox.question(
+                self,
+                "Override existing files?",
+                "The following files already exist, override?\n\n"
+                + "\n".join([str(p) for p in existing_paths])
+            )
+            if resp:
+                # if the user agrees, these files will be overridden
+                existing_paths.clear()
+        for path in filt_dict:
+            if path in existing_paths:
+                # not overriding this one
+                continue
+            else:
+                session.export_filters(path, self.pipeline, filt_dict[path])
 
     @QtCore.pyqtSlot()
     def on_action_export_plot(self):

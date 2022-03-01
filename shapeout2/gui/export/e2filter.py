@@ -10,20 +10,15 @@ from ...util import get_valid_filename
 
 
 class ExportFilter(QtWidgets.QDialog):
-    def __init__(self, parent, pipeline, *args, **kwargs):
+    def __init__(self, parent, pipeline, file_format, *args, **kwargs):
         QtWidgets.QWidget.__init__(self, parent, *args, **kwargs)
         path_ui = pkg_resources.resource_filename(
             "shapeout2.gui.export", "e2filter.ui")
         uic.loadUi(path_ui, self)
-        # set pipeline
+        #: current analysis pipeline
         self.pipeline = pipeline
-
-    @property
-    def file_format(self):
-        if self.radioButton_poly.isChecked():
-            return "poly"
-        else:
-            return "sof"
+        #: export file format
+        self.file_format = file_format
 
     @property
     def file_mode(self):

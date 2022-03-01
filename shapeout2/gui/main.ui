@@ -36,7 +36,7 @@
         </property>
         <property name="icon">
          <iconset theme="office-chart-ring">
-          <normaloff>.</normaloff>.</iconset>
+          <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
         </property>
         <property name="toolButtonStyle">
          <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -50,7 +50,7 @@
         </property>
         <property name="icon">
          <iconset theme="show-grid">
-          <normaloff>.</normaloff>.</iconset>
+          <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -73,7 +73,7 @@
         </property>
         <property name="icon">
          <iconset theme="view-filter">
-          <normaloff>.</normaloff>.</iconset>
+          <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
         </property>
         <property name="toolButtonStyle">
          <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -93,7 +93,7 @@
         </property>
         <property name="icon">
          <iconset theme="office-chart-scatter">
-          <normaloff>.</normaloff>.</iconset>
+          <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -126,7 +126,7 @@
         </property>
         <property name="icon">
          <iconset theme="draw-watercolor">
-          <normaloff>.</normaloff>.</iconset>
+          <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
         </property>
         <property name="toolButtonStyle">
          <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -147,7 +147,7 @@
         </property>
         <property name="icon">
          <iconset theme="tools-wizard">
-          <normaloff>.</normaloff>.</iconset>
+          <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
         </property>
         <property name="checkable">
          <bool>true</bool>
@@ -258,7 +258,11 @@
      <string>E&amp;xport</string>
     </property>
     <addaction name="actionExportData"/>
-    <addaction name="actionExportFilter"/>
+    <addaction name="separator"/>
+    <addaction name="action_export_filter_polygon"/>
+    <addaction name="action_export_filter_pipeline"/>
+    <addaction name="action_export_filter_ray_dataset"/>
+    <addaction name="separator"/>
     <addaction name="actionExportPlot"/>
    </widget>
    <widget class="QMenu" name="menuImport">
@@ -292,7 +296,7 @@
   <action name="actionLoadDataset">
    <property name="icon">
     <iconset theme="office-chart-ring">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>&amp;Load dataset...</string>
@@ -304,7 +308,7 @@
   <action name="actionOpenSession">
    <property name="icon">
     <iconset theme="document-open">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>&amp;Open session...</string>
@@ -316,7 +320,7 @@
   <action name="actionSaveSession">
    <property name="icon">
     <iconset theme="document-save">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>&amp;Save session...</string>
@@ -328,7 +332,7 @@
   <action name="actionClearSession">
    <property name="icon">
     <iconset theme="edit-clear-all">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>&amp;Clear session</string>
@@ -337,7 +341,7 @@
   <action name="actionQuit">
    <property name="icon">
     <iconset theme="application-exit">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>&amp;Quit</string>
@@ -346,7 +350,7 @@
   <action name="actionDocumentation">
    <property name="icon">
     <iconset theme="globe">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>&amp;Documentation</string>
@@ -355,7 +359,7 @@
   <action name="actionSoftware">
    <property name="icon">
     <iconset theme="code-context">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>&amp;Software</string>
@@ -364,7 +368,7 @@
   <action name="actionAbout">
    <property name="icon">
     <iconset theme="documentinfo">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>&amp;About</string>
@@ -373,7 +377,7 @@
   <action name="actionExportPlot">
    <property name="icon">
     <iconset theme="draw-watercolor">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>&amp;Plot...</string>
@@ -382,7 +386,7 @@
   <action name="actionExportData">
    <property name="icon">
     <iconset theme="office-chart-ring">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>&amp;Data...</string>
@@ -391,7 +395,7 @@
   <action name="actionExportFilter">
    <property name="icon">
     <iconset theme="view-filter">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>&amp;Filter...</string>
@@ -400,7 +404,7 @@
   <action name="actionImportFilter">
    <property name="icon">
     <iconset theme="view-filter">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>&amp;Filter...</string>
@@ -419,7 +423,7 @@
   <action name="actionComputeStatistics">
    <property name="icon">
     <iconset theme="view-statistics">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>Statistical &amp;data...</string>
@@ -428,7 +432,7 @@
   <action name="actionLoadDCOR">
    <property name="icon">
     <iconset theme="dcor">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>Load &amp;DCOR data...</string>
@@ -440,7 +444,7 @@
   <action name="actionPreferences">
    <property name="icon">
     <iconset theme="gtk-preferences">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>&amp;Preferences...</string>
@@ -449,7 +453,7 @@
   <action name="actionComputeEmodulus">
    <property name="icon">
     <iconset theme="emodulus">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>&amp;Young's modulus...</string>
@@ -458,7 +462,7 @@
   <action name="actionChangeDatasetOrder">
    <property name="icon">
     <iconset theme="object-order-lower">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>&amp;Change dataset order...</string>
@@ -467,7 +471,7 @@
   <action name="actionComputeSignificance">
    <property name="icon">
     <iconset theme="statistical_significance">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>Statistical &amp;significance...</string>
@@ -475,10 +479,40 @@
   </action>
   <action name="actionClearDatasets">
    <property name="icon">
-    <iconset theme="edit-clear"/>
+    <iconset theme="edit-clear">
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>C&amp;lear datasets</string>
+   </property>
+  </action>
+  <action name="action_export_filter_polygon">
+   <property name="icon">
+    <iconset theme="path-mode-polyline">
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
+   </property>
+   <property name="text">
+    <string>Polygon filter(s) (*.poly)...</string>
+   </property>
+  </action>
+  <action name="action_export_filter_pipeline">
+   <property name="icon">
+    <iconset theme="view-filter">
+     <normaloff>../../../../.designer/backup</normaloff>../../../../.designer/backup</iconset>
+   </property>
+   <property name="text">
+    <string>Entire filter pipeline (*.sof)...</string>
+   </property>
+  </action>
+  <action name="action_export_filter_ray_dataset">
+   <property name="icon">
+    <iconset theme="filter_ray"/>
+   </property>
+   <property name="text">
+    <string>Individual filter ray for each dataset (*.sof)</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Shift+F</string>
    </property>
   </action>
  </widget>

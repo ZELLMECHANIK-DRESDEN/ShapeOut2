@@ -23,7 +23,7 @@ def run_around_tests():
     session.clear_session()
 
 
-def test_stats_basic(qtbot):
+def test_gui_stats_basic(qtbot):
     mw = ShapeOut2()
     qtbot.addWidget(mw)
     path = data_path / "calibration_beads_47.rtdc"

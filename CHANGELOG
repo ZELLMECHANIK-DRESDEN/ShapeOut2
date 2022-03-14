@@ -1,3 +1,7 @@
+2.10.1
+ - setup: bump dclab from 0.39.17 to 0.40.0
+ - setup: bump scipy to 1.8.0
+ - build: bump Python version to 3.9
 2.10.0
  - feat: export filter ray for each dataset via shortcut (#119)
  - setup: bump dclab from 0.39.15 to 0.39.17 (#118)

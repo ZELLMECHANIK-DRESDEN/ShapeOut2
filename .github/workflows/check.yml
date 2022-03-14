@@ -13,8 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8']
-        os: [macos-10.15, ubuntu-latest]
+        python-version: ['3.9']
+        os: [macos-latest, ubuntu-latest]
     env:
       # Display must be available globally for linux to know where xvfb is
       DISPLAY: :0

@@ -76,6 +76,12 @@ class ShapeOut2(QtWidgets.QMainWindow):
         #: Shape-Out settings
         self.settings = QtCore.QSettings()
         self.settings.setIniCodec("utf-8")
+        # Register custom DCOR CA bundle directory with dclab
+        ca_path = pathlib.Path(
+            QStandardPaths.writableLocation(
+                QStandardPaths.AppDataLocation)) / "certificates"
+        ca_path.mkdir(exist_ok=True, parents=True)
+        dclab.rtdc_dataset.fmt_dcor.DCOR_CERTS_SEARCH_PATHS.append(ca_path)
         # Register user-defined DCOR API Key in case the user wants to
         # open a session with private data.
         api_key = self.settings.value("dcor/api key", "")

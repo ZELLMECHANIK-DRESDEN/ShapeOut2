@@ -175,7 +175,7 @@ class Pipeline(object):
             state from Dataslot.__getstate__(); At least `slot`
             or `path` need to be specified
         path: str or pathlib.Path
-            Path to a measurement
+            Path to a measurement or DCOR URL
         index: int
             Position in the slot list, defaults to `len(self.slots)`
 

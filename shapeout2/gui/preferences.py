@@ -7,6 +7,7 @@ import platform
 
 from dclab.lme4.rlibs import (
     rpy2, MockRPackage, RPY2UnavailableError, RUnavailableError)
+from dclab.rtdc_dataset.fmt_dcor import access_token
 from dclab.lme4 import rsetup
 from PyQt5 import uic, QtCore, QtWidgets
 from PyQt5.QtCore import QStandardPaths
@@ -91,6 +92,8 @@ class Preferences(QtWidgets.QDialog):
         self.btn_restore = self.buttonBox.button(
             QtWidgets.QDialogButtonBox.RestoreDefaults)
         self.btn_restore.clicked.connect(self.on_settings_restore)
+        # DCOR
+        self.pushButton_enc_token.clicked.connect(self.on_dcor_enc_token)
         # extension buttons
         self.checkBox_ext_enabled.clicked.connect(self.on_ext_enabled)
         self.pushButton_ext_load.clicked.connect(self.on_ext_load)
@@ -187,6 +190,48 @@ class Preferences(QtWidgets.QDialog):
             self.pushButton_lme4_install.setVisible(lme4_st == "not installed")
             self.label_r_version.setText(r_version)
             self.label_lme4_installed.setText(lme4_st)
+
+    @QtCore.pyqtSlot()
+    def on_dcor_enc_token(self):
+        """Load an encrypted DCOR access token and store the certificate"""
+        # get path
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            parent=self,
+            caption="SSpecify encrypted DCOR access token",
+            directory=self.settings.value("paths/encrypted access token", ""),
+            filter="DCOR access token (*.dcor-access)")
+        if not path:
+            return
+        path = pathlib.Path(path)
+        self.settings.setValue("paths/encrypted access token",
+                               str(path.parent))
+        # get password
+        pwd, cont = QtWidgets.QInputDialog.getText(
+            self,
+            "Password required",
+            f"Please enter the encryption password for {path.name}!",
+            QtWidgets.QLineEdit.Password)
+        pwd = pwd.strip()
+        if not pwd or not cont:
+            return
+        # get info
+        host = access_token.get_hostname(path, pwd)
+        api_key = access_token.get_api_key(path, pwd)
+        cert = access_token.get_certificate(path, pwd)
+        # write certificate to our global Shape-Out certs directory
+        ca_path = pathlib.Path(
+            QStandardPaths.writableLocation(
+                QStandardPaths.AppDataLocation)) / "certificates"
+        (ca_path / f"{host}.cert").write_bytes(cert)
+        # store other metadata
+        self.settings.setValue("dcor/api key", api_key)
+
+        servers = self.settings.value("dcor/servers", ["dcor.mpl.mpg.de"])
+        if host in servers:
+            servers.remove(host)
+        servers.insert(0, host)
+        self.settings.setValue("dcor/servers", servers)
+        self.reload()
 
     @QtCore.pyqtSlot(bool)
     def on_ext_enabled(self, enabled):

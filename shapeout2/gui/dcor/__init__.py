@@ -1,11 +1,11 @@
 import pkg_resources
-import requests
 import traceback as tb
 import urllib.parse
 import webbrowser
 
 import dclab
 from PyQt5 import uic, QtCore, QtGui, QtWidgets
+import requests
 
 from ..widgets import show_wait_cursor, run_async
 
@@ -240,7 +240,9 @@ class DCORLoader(QtWidgets.QDialog):
 
         pkg_res = []
         for url in urls:
-            req = requests.get(url, headers=api_headers)
+            req = requests.get(url,
+                               headers=api_headers,
+                               verify=get_server_cert_path())
             if not req.ok:
                 continue
             resp = req.json()["result"]
@@ -259,7 +261,10 @@ class DCORLoader(QtWidgets.QDialog):
                 # resource show
                 purl = api_base_url + "/action/package_show?id={}".format(
                     resp["package_id"])
-                pkg = requests.get(purl, headers=api_headers).json()["result"]
+                pkg = requests.get(purl,
+                                   headers=api_headers,
+                                   verify=get_server_cert_path(),
+                                   ).json()["result"]
                 pkg_res.append([pkg, resp])
                 break  # no additional search for package
 
@@ -273,7 +278,9 @@ class DCORLoader(QtWidgets.QDialog):
             # check availability of each resource
             c = api_base_url + "/action/dcserv?id={}&query=valid".format(
                 res["id"])
-            req = requests.get(c, headers=api_headers)
+            req = requests.get(c,
+                               headers=api_headers,
+                               verify=get_server_cert_path())
             if req.ok and req.json()["result"]:  # only use valid data
                 self.search_item_retrieved.emit(search_id, ii, pkg, res,
                                                 api_base_url)
@@ -281,3 +288,12 @@ class DCORLoader(QtWidgets.QDialog):
             else:
                 failed.append("{}: {}".format(res["id"], req.reason))
         return results, failed
+
+
+def get_server_cert_path(host=None):
+    """Return server certificate for current DCOR server if available"""
+    settings = QtCore.QSettings()
+    if host is None:
+        host = settings.value("dcor/servers", ["dcor.mpl.mpg.de"])[0]
+
+    return dclab.rtdc_dataset.fmt_dcor.get_server_cert_path(host)

@@ -1,5 +1,6 @@
-2.10.1
- - setup: bump dclab from 0.39.17 to 0.40.0
+2.11.0
+ - feat: allow to load encrypted dcor access tokens (#122)
+ - setup: bump dclab from 0.39.17 to 0.41.0
  - setup: bump scipy to 1.8.0
  - build: bump Python version to 3.9
 2.10.0

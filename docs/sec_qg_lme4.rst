@@ -4,9 +4,12 @@
 Statistical significance testing (R and lme4)
 =============================================
 Since version 2.5.0, Shape-Out 2 allows you to quantify the statistical
-significance (p-value) when comparing two measurement groups. The analysis
-uses linear mixed effects models (LMM) as described in :cite:`Herbig2018`
-and yields results identical to those obtained with Shape-Out 1.
+significance (p-value) when comparing two measurement groups. For this to
+work, you need to have R installed (tested with
+`R 3.6.3 <https://cran.r-project.org/bin/windows/base/old/3.6.3/>`_ ).
+The analysis uses linear mixed effects models (LMM) as described
+in :cite:`Herbig2018` and yields results identical to those obtained
+with Shape-Out 1.
 
 .. warning::
     Unfortunately, LMM analysis currently does not work with the .app or

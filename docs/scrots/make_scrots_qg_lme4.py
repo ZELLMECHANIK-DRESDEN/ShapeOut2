@@ -16,7 +16,7 @@ QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
 
 mw = ShapeOut2()
 mw.settings.setValue("check for updates", 0)
-mw.settings.setValue("advanced/check pyqtgraph version", 0)
+mw.settings.setValue("advanced/user confirm clear", 0)
 
 # build up a session
 mw.on_action_open(test_data / "version_2_5_0_dcor_lme4.so2")

@@ -18,7 +18,7 @@ QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
 
 mw = ShapeOut2()
 mw.settings.setValue("check for updates", 0)
-mw.settings.setValue("advanced/check pyqtgraph version", 0)
+mw.settings.setValue("advanced/user confirm clear", 0)
 
 # build up a session
 session.open_session(pathlib.Path(__file__).parent / "scrots.so2",

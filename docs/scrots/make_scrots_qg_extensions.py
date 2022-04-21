@@ -15,6 +15,7 @@ QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
 
 mw = ShapeOut2()
 mw.settings.setValue("check for updates", 0)
+mw.settings.setValue("advanced/user confirm clear", 0)
 
 try:
     mw.extensions.import_extension_from_path(

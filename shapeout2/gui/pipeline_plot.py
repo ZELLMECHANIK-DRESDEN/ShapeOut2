@@ -252,7 +252,7 @@ class PipelinePlotItem(SimplePlotItem):
         """
         # Create a plot window
         win = pg.GraphicsLayoutWidget(
-            size=(self.width() + 100, self.height() + 100),
+            size=(int(self.width() + 100), int(self.height() + 100)),
             show=True)
         # fill layout
         labelx, labely = get_axes_labels(self.plot_state, self.slot_states)

@@ -13,7 +13,7 @@ QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
 
 mw = ShapeOut2()
 mw.settings.setValue("check for updates", 0)
-mw.settings.setValue("advanced/check pyqtgraph version", 0)
+mw.settings.setValue("advanced/user confirm clear", 0)
 mw.settings.remove("dcor/api key")
 
 # show the dialog
@@ -31,3 +31,5 @@ dlg.listWidget.scrollToBottom()
 dlg.listWidget.scrollToTop()
 app.processEvents(QtCore.QEventLoop.AllEvents, 300)
 dlg.grab().save("_qg_dcor_dlg.png")
+
+mw.close()

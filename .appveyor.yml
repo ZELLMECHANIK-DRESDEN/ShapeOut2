@@ -11,6 +11,8 @@ notifications:
 environment:
   matrix:
     - PYTHON: "C:\\Python39-x64"
+  # set time zone for R (to avoid warnings during installation)
+  TZ: "GMT"
 
 init:
   - ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%
@@ -62,7 +64,7 @@ after_test:
   - ps: "ls dist"
   # Run pyinstaller
   - cd build-recipes
-  - pyinstaller -y --additional-hooks-dir . --log-level=WARN win_ShapeOut2.spec
+  - pyinstaller -y --log-level=WARN win_ShapeOut2.spec
   # Run the binary (the most simple test)
   - dist\\ShapeOut2\\ShapeOut2.exe --version
   # Create InnoSetup installers

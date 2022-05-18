@@ -1,3 +1,6 @@
+2.11.2
+ - setup: bump dclab from 0.42.0 to 0.42.1 (support background
+   image access from DCOR)
 2.11.1
  - fix: allow to specify 0.5 increments when filtering integer
    features (#123)

@@ -1,6 +1,7 @@
 2.11.1
  - fix: allow to specify 0.5 increments when filtering integer
    features (#123)
+ - setup: bump dclab from 0.41.0 to 0.42.0
 2.11.0
  - feat: allow to load encrypted dcor access tokens (#122)
  - setup: bump dclab from 0.39.17 to 0.41.0

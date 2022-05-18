@@ -41,8 +41,8 @@ class RangeControl(QtWidgets.QWidget):
 
         # integer-valued control
         if integer:
-            self.doubleSpinBox_min.setDecimals(0)
-            self.doubleSpinBox_max.setDecimals(0)
+            self.doubleSpinBox_min.setDecimals(1)
+            self.doubleSpinBox_max.setDecimals(1)
         self.is_integer = integer
 
         # reduce font size of name
@@ -75,6 +75,20 @@ class RangeControl(QtWidgets.QWidget):
         self.doubleSpinBox_min.blockSignals(False)
         self.doubleSpinBox_max.blockSignals(False)
         self.map_spin_values_to_range_slider()
+
+    def check_boundary(self, old_value):
+        """Make sure boundaries are properly set in the UI
+
+        The main purpose of this function is to fix #123. For integer
+        features we would like to have 0.5 step sizes to properly
+        filter out e.g. ML classes.
+        """
+        if self.is_integer:
+            # force an increment of 0.5
+            new_value = round(old_value * 2) / 2
+        else:
+            new_value = old_value
+        return new_value
 
     @QtCore.pyqtSlot(float, float)
     def map_spin_values_to_range_slider(self, vmin=None, vmax=None):
@@ -136,6 +150,9 @@ class RangeControl(QtWidgets.QWidget):
         vmin = lmin + (hmin - rmin) / dr * dl
         vmax = lmax - (rmax - hmax) / dr * dl
 
+        vmin = self.check_boundary(vmin)
+        vmax = self.check_boundary(vmax)
+
         self.doubleSpinBox_min.blockSignals(True)
         self.doubleSpinBox_max.blockSignals(True)
         self.doubleSpinBox_min.setValue(vmin)
@@ -147,12 +164,19 @@ class RangeControl(QtWidgets.QWidget):
     def is_active(self):
         return self.checkBox.isChecked()
 
+    @QtCore.pyqtSlot()
     def on_range(self):
         self.map_range_slider_to_spin_values()
         self.range_changed.emit(self.doubleSpinBox_min.value(),
                                 self.doubleSpinBox_max.value())
 
+    @QtCore.pyqtSlot()
     def on_spinbox(self):
+        self.doubleSpinBox_min.setValue(
+            self.check_boundary(self.doubleSpinBox_min.value()))
+        self.doubleSpinBox_max.setValue(
+            self.check_boundary(self.doubleSpinBox_max.value()))
+
         self.map_spin_values_to_range_slider()
         self.range_changed.emit(self.doubleSpinBox_min.value(),
                                 self.doubleSpinBox_max.value())

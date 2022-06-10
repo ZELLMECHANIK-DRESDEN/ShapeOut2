@@ -1,3 +1,6 @@
+2.11.3
+ - setup: bump dclab from 0.42.1 to 0.42.2 (lazy-load .rtdc data
+   which increases initial opening times)
 2.11.2
  - setup: bump dclab from 0.42.0 to 0.42.1 (support background
    image access from DCOR)

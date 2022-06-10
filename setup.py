@@ -29,7 +29,7 @@ setup(
                       "h5py>=2.8.0",
                       "numpy>=1.21",  # CVE-2021-33430
                       "pyqt5",
-                      "pyqtgraph==0.12.3",
+                      "pyqtgraph==0.12.4",
                       "requests",
                       "scipy>=1.8.0"],
     python_requires='>=3.8, <4',

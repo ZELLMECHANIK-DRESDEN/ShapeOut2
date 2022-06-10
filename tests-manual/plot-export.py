@@ -18,6 +18,7 @@ mw = ShapeOut2()
 
 # load session
 mw.on_action_open(here / "plot-export.so2")
+QApplication.processEvents(QtCore.QEventLoop.AllEvents, 300)
 
 # scatter-and-contour-export-png
 with mock.patch("PyQt5.QtWidgets.QFileDialog.getSaveFileName") as gsfn:

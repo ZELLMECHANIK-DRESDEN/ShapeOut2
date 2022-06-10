@@ -196,9 +196,9 @@ def test_save_all_polygon_filters_issue_101():
     ds = pl.get_dataset(0)
     pf1 = dclab.PolygonFilter(
         axes=("deform", "area_um"),
-        points=[[ds["deform"].min(), ds["area_um"].min()],
-                [ds["deform"].min(), ds["area_um"].mean()],
-                [ds["deform"].mean(), ds["area_um"].mean()],
+        points=[[np.min(ds["deform"]), np.min(ds["area_um"])],
+                [np.min(ds["deform"]), np.mean(ds["area_um"])],
+                [np.mean(ds["deform"]), np.mean(ds["area_um"])],
                 ],
         name="Triangle of Minimum",
     )

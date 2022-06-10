@@ -15,7 +15,7 @@ def test_get_heredity():
     # come up with a few filters
     # this does some simple things
     filt1 = pipeline.Filter()
-    filt1.boxdict["area_um"] = {"start": ds["area_um"].min(),
+    filt1.boxdict["area_um"] = {"start": np.min(ds["area_um"]),
                                 "end": np.mean(ds["area_um"]),
                                 "active": True}
     # this one does nothing (and should be ignored)
@@ -23,7 +23,7 @@ def test_get_heredity():
     filt2.filter_used = False
     # another one with simple things
     filt3 = pipeline.Filter()
-    filt3.boxdict["deform"] = {"start": ds["deform"].min(),
+    filt3.boxdict["deform"] = {"start": np.min(ds["deform"]),
                                "end": np.mean(ds["deform"]),
                                "active": True}
 
@@ -76,7 +76,7 @@ def test_filtering():
     # come up with a few filters
     # this does some simple things
     filt1 = pipeline.Filter()
-    filt1.boxdict["area_um"] = {"start": ds["area_um"].min(),
+    filt1.boxdict["area_um"] = {"start": np.min(ds["area_um"]),
                                 "end": np.mean(ds["area_um"]),
                                 "active": True}
     # this one does nothing (and should be ignored)
@@ -84,7 +84,7 @@ def test_filtering():
     filt2.filter_used = False
     # another one with simple things
     filt3 = pipeline.Filter()
-    filt3.boxdict["deform"] = {"start": ds["deform"].min(),
+    filt3.boxdict["deform"] = {"start": np.min(ds["deform"]),
                                "end": np.mean(ds["deform"]),
                                "active": True}
 

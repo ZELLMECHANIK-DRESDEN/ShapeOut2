@@ -3,6 +3,7 @@ import shutil
 import tempfile
 
 import dclab
+import numpy as np
 from PyQt5 import QtCore, QtWidgets
 
 import pytest
@@ -28,9 +29,9 @@ def test_gui_export_filter_ray(qtbot, monkeypatch):
     with dclab.new_dataset(path) as ds:
         pf1 = dclab.PolygonFilter(
             axes=("deform", "area_um"),
-            points=[[ds["deform"].min(), ds["area_um"].min()],
-                    [ds["deform"].min(), ds["area_um"].mean()],
-                    [ds["deform"].mean(), ds["area_um"].mean()],
+            points=[[np.min(ds["deform"]), np.min(ds["area_um"])],
+                    [np.min(ds["deform"]), np.mean(ds["area_um"])],
+                    [np.mean(ds["deform"]), np.mean(ds["area_um"])],
                     ],
             name="Triangle of Death",
         )
@@ -75,17 +76,17 @@ def test_gui_export_polygon_filters(qtbot, monkeypatch):
     with dclab.new_dataset(path) as ds:
         pf1 = dclab.PolygonFilter(
             axes=("deform", "area_um"),
-            points=[[ds["deform"].min(), ds["area_um"].min()],
-                    [ds["deform"].min(), ds["area_um"].mean()],
-                    [ds["deform"].mean(), ds["area_um"].mean()],
+            points=[[np.min(ds["deform"]), np.min(ds["area_um"])],
+                    [np.min(ds["deform"]), np.mean(ds["area_um"])],
+                    [np.mean(ds["deform"]), np.mean(ds["area_um"])],
                     ],
             name="Triangle of Death",
         )
         pf2 = dclab.PolygonFilter(
             axes=("deform", "area_um"),
-            points=[[ds["deform"].min(), ds["area_um"].min()],
-                    [ds["deform"].max(), ds["area_um"].mean()],
-                    [ds["deform"].mean(), ds["area_um"].mean()],
+            points=[[np.min(ds["deform"]), np.min(ds["area_um"])],
+                    [np.max(ds["deform"]), np.mean(ds["area_um"])],
+                    [np.mean(ds["deform"]), np.mean(ds["area_um"])],
                     ],
             name="Second Triangle of Death",
         )

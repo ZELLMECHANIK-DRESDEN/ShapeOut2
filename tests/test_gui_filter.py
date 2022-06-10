@@ -136,9 +136,9 @@ def test_polygon_filter_basic(qtbot):
     with dclab.new_dataset(path) as ds:
         pf1 = dclab.PolygonFilter(
             axes=("deform", "area_um"),
-            points=[[ds["deform"].min(), ds["area_um"].min()],
-                    [ds["deform"].min(), ds["area_um"].mean()],
-                    [ds["deform"].mean(), ds["area_um"].mean()],
+            points=[[np.min(ds["deform"]), np.min(ds["area_um"])],
+                    [np.min(ds["deform"]), np.mean(ds["area_um"])],
+                    [np.mean(ds["deform"]), np.mean(ds["area_um"])],
                     ],
             name="Triangle of Death",
         )
@@ -195,9 +195,9 @@ def test_polygon_filter_delete(qtbot):
     with dclab.new_dataset(path) as ds:
         pf1 = dclab.PolygonFilter(
             axes=("deform", "area_um"),
-            points=[[ds["deform"].min(), ds["area_um"].min()],
-                    [ds["deform"].min(), ds["area_um"].mean()],
-                    [ds["deform"].mean(), ds["area_um"].mean()],
+            points=[[np.min(ds["deform"]), np.min(ds["area_um"])],
+                    [np.min(ds["deform"]), np.mean(ds["area_um"])],
+                    [np.mean(ds["deform"]), np.mean(ds["area_um"])],
                     ],
             name="Triangle of Death",
         )

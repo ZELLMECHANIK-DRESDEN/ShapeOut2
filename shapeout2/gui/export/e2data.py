@@ -25,7 +25,7 @@ class ExportData(QtWidgets.QDialog):
         # update list widget
         self.bulklist_features.set_title("Features")
         self.on_radio()
-        self.bulklist_features.on_select_all()
+        self.on_select_features_innate()
         # Signals
         self.pushButton_path.clicked.connect(self.on_browse)
         self.radioButton_fcs.clicked.connect(self.on_radio)
@@ -120,6 +120,21 @@ class ExportData(QtWidgets.QDialog):
 
     def on_radio(self):
         self.update_feature_list()
+
+    def on_select_features_innate(self):
+        """Only select all innate features of the first dataset"""
+        if self.pipeline.num_slots:
+            ds = self.pipeline.get_dataset(0)
+            features_innate = ds.features_innate
+            lw = self.bulklist_features.listWidget
+            for ii in range(lw.count()):
+                wid = lw.item(ii)
+                for feat in features_innate:
+                    if wid.data(101) == feat:
+                        wid.setCheckState(QtCore.Qt.CheckState.Checked)
+                        break
+                else:
+                    wid.setCheckState(QtCore.Qt.CheckState.Unchecked)
 
     def update_feature_list(self, scalar=False):
         if self.file_format == "rtdc":

@@ -74,6 +74,9 @@ def test_export_datasets_rtdc_emodulus_only_in_one_issue_80(qtbot):
         with mock.patch.object(QtWidgets.QMessageBox, "warning") as mwarn:
             # create export dialog manually (asks user for directory)
             dlg = export.ExportData(mw, pipeline=mw.pipeline)
+            # select all features
+            qtbot.mouseClick(dlg.bulklist_features.toolButton_all,
+                             QtCore.Qt.LeftButton)
 
             # Everything is set-up already
             # (.rtdc export, all features selected).

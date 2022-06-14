@@ -1,3 +1,7 @@
+2.11.4
+ - enh: preselect only innate features in data export
+   to reduce computation time
+ - docs: minor improvements
 2.11.3
  - setup: bump dclab from 0.42.1 to 0.42.2 (lazy-load .rtdc data
    which increases initial opening times)

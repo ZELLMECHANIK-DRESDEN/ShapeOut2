@@ -14,4 +14,7 @@ from PyInstaller.utils.hooks import collect_data_files
 datas = collect_data_files("shapeout2", include_py_files=True)
 datas += collect_data_files("shapeout2", subdir="img")
 
+# Add the Zstandard library used by dclab
+datas += collect_data_files("hdf5plugin", includes=["plugins/libh5zstd.*"])
+
 hiddenimports = ["rpy2"]

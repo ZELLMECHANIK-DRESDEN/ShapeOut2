@@ -1,5 +1,5 @@
 2.11.5
- - build: use InnoSetup "autopf" feature for instllation directory
+ - build: use InnoSetup "autopf" feature for installation directory
 2.11.4
  - enh: preselect only innate features in data export
    to reduce computation time

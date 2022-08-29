@@ -25,7 +25,7 @@ setup(
     description=description,
     long_description=open('README.rst').read() if exists('README.rst') else '',
     install_requires=["fcswrite>=0.5.1",
-                      "dclab[dcor,lme4]>=0.43.0",
+                      "dclab[dcor,lme4]>=0.45.0",
                       "h5py>=2.8.0",
                       "numpy>=1.21",  # CVE-2021-33430
                       "pyqt5",

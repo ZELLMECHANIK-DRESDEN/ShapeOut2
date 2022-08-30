@@ -1,5 +1,5 @@
 2.11.7
- - build: fix macOS build pipeline
+ - build: fix build pipelines
 2.11.6
  - setup: bump dclab from 0.43.0 to 0.45.0 (scalar feature support)
 2.11.5

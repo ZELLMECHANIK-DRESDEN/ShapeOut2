@@ -1,41 +1,7 @@
-import hashlib
-import numbers
-import pathlib
-
-import h5py
-import numpy as np
-
-
-def hashobj(obj):
-    """Compute md5 hex-hash of a Python object"""
-    return hashlib.md5(obj2bytes(obj)).hexdigest()
-
-
-def obj2bytes(obj):
-    """String representation of an object for hashing"""
-    if isinstance(obj, str):
-        return obj.encode("utf-8")
-    elif isinstance(obj, pathlib.Path):
-        return obj2bytes(str(obj))
-    elif isinstance(obj, (bool, numbers.Number)):
-        return str(obj).encode("utf-8")
-    elif obj is None:
-        return b"none"
-    elif isinstance(obj, np.ndarray):
-        return obj.tobytes()
-    elif isinstance(obj, tuple):
-        return obj2bytes(list(obj))
-    elif isinstance(obj, list):
-        return b"".join(obj2bytes(o) for o in obj)
-    elif isinstance(obj, dict):
-        return obj2bytes(sorted(obj.items()))
-    elif hasattr(obj, "identifier"):
-        return obj2bytes(obj.identifier)
-    elif isinstance(obj, h5py.Dataset):
-        return obj2bytes(obj[0])
-    else:
-        raise ValueError("No rule to convert object '{}' to string.".
-                         format(obj.__class__))
+# hashobj is imported from several other submodules in Shape-Out.
+# Would we need to add additional functionalities in the future, which
+# are not within the scope of dclab, then we can patch this method here.
+from dclab.util import hashobj  # noqa: F401
 
 
 def get_valid_filename(value):

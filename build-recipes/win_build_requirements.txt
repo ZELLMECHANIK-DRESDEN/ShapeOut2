@@ -1,7 +1,5 @@
 # Any additional requirements for building the application
-# https://github.com/pyinstaller/pyinstaller/issues/5004
-pyinstaller>=4.7
+pyinstaller>=5.5
 # https://github.com/rpy2/rpy2/issues/796
 rpy2==3.4.5
-# https://github.com/pyinstaller/pyinstaller/issues/5631
-pyqt5==5.15.3
+setuptools

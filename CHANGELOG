@@ -1,6 +1,6 @@
 2.11.8
  - setup: bump dclab from 0.45.0 to 0.46.2 (#132)
- - build: bump pyinstaller version
+ - build: pin pyinstaller version to 5.3
  - ref: use `hashobj` from upstream dclab (#132)
 2.11.7
  - build: fix build pipelines

@@ -2,5 +2,6 @@
 # Issues with setuptools._distutils
 pyinstaller==5.3
 setuptools
+scipy<=1.9.1
 # https://github.com/rpy2/rpy2/issues/796
 rpy2==3.4.5

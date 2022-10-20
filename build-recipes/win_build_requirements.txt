@@ -1,5 +1,9 @@
 # Any additional requirements for building the application
 pyinstaller>=5.5
+# I tried to remove the below pinning, but things failed on AppVeyor
+# due to some setuptools issue...
+# https://github.com/pyinstaller/pyinstaller/issues/5631
+pyqt5==5.15.3
 # https://github.com/rpy2/rpy2/issues/796
 rpy2==3.4.5
 setuptools

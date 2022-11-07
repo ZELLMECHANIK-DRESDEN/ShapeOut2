@@ -32,7 +32,7 @@ your data analysis from Shape-Out 1 to Shape-Out 2:
 - Shape-Out 2 does not anymore support the .tdms file format. If you
   would like to use .tdms data in Shape-Out 2, you have to convert those
   data to the .rtdc file format first. You can do just that with
-  `DCKit <https://github.com/ZELLMECHANIK-DRESDEN/DCKit/releases/latest>`_,
+  `DCKit <https://github.com/DC-analysis/DCKit/releases/latest>`_,
   which provides a convenient GUI for several other RT-DC data
   management tasks as well. The .rtdc file format is faster, occupies less
   space on disk, and consists of only one file per measurement

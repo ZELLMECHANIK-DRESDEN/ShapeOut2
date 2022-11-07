@@ -136,7 +136,7 @@
  - setup: remove deprecated setup.py test
  - setup: bump dclab to 0.33.1 (filters were ignored when exporting
    trace data to hdf5,
-   see https://github.com/ZELLMECHANIK-DRESDEN/DCKit/issues/17)
+   see https://github.com/DC-analysis/DCKit/issues/17)
 2.6.0
  - feat: add background correction in quickview (#54)
  - fix: workaround for different plot widths due to title label (#33)

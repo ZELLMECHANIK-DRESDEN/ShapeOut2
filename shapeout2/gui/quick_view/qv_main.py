@@ -265,7 +265,7 @@ class QuickView(QtWidgets.QWidget):
             if state["event"]["image contour"]:
                 # Compute contour image from mask. If you are wondering
                 # whether this is kosher, please take a look at issue #76:
-                # https://github.com/ZELLMECHANIK-DRESDEN/dclab/issues/76
+                # https://github.com/DC-analysis/dclab/issues/76
                 cont = mask ^ binary_erosion(mask)
                 # set red contour pixel values in original image
                 cellimg[cont, 0] = int(255*.7)

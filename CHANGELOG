@@ -1,3 +1,5 @@
+2.11.9
+ - setup: bump dclab from 0.46.2 to 0.46.4 (new features)
 2.11.8
  - setup: bump dclab from 0.45.0 to 0.46.2 (#132)
  - build: pin pyinstaller version to 5.3

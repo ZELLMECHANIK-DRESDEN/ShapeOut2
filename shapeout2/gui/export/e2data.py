@@ -89,6 +89,7 @@ class ExportData(QtWidgets.QDialog):
                     ds.export.hdf5(
                         path=path,
                         features=[ff for ff in features if ff in ds.features],
+                        logs=True,
                         override=True)
                 elif self.file_format == "fcs":
                     ds.export.fcs(

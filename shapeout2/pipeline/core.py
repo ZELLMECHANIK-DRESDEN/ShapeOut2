@@ -270,6 +270,17 @@ class Pipeline(object):
         """Return all datasets with filters applied
 
         The parameters are passed to :func:`Pipeline.get_dataset`.
+
+        Parameters
+        ----------
+        filt_index: int or None
+            index of filter; if None, then the plain dataset is returned.
+            If negative (default), then the last dataset in the pipeline
+            is returned (all selected filters applied).
+        apply_filter: bool
+            whether to call `dataset.apply_filter` in the end;
+            if set to `False`, only the filtering configuration
+            of the dataset and its hierarchy parents are updated
         """
         kw = {"filt_index": filt_index,
               "apply_filter": apply_filter}

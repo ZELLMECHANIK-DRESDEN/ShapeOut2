@@ -1,4 +1,3 @@
-import functools
 import hashlib
 import io
 import json
@@ -9,6 +8,7 @@ import tempfile
 import zipfile
 
 import dclab
+from dclab.util import file_monitoring_lru_cache
 
 from .pipeline import Dataslot, Filter, Pipeline, Plot
 from ._version import version
@@ -162,7 +162,7 @@ def import_filter_set(path, pipeline, strict=False):
         pipeline.add_filter(filt=filt)
 
 
-@functools.lru_cache(maxsize=1000)
+@file_monitoring_lru_cache(maxsize=1000)
 def hash_file_partially(path, size=524288):
     """Hash parts of a file for basic identification
 

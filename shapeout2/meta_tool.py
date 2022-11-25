@@ -1,8 +1,53 @@
 """Convenience methods to retrieve meta data from .rtdc files"""
 import functools
+import pathlib
+
 import dclab
 
 import numpy as np
+
+
+class dataset_monitoring_lru_cache:
+    """Decorator for caching RT-DC data extracted from DCOR or files
+
+    This is a modification of dclab.util.file_monitoring_lru_cache
+    with an exception that when the `path` starts with "https://",
+    then caching is done as well.
+    """
+    def __init__(self, maxsize=100):
+        self.lru_cache = functools.lru_cache(maxsize=maxsize)
+        self.cached_wrapper = None
+
+    def __call__(self, func):
+        @self.lru_cache
+        def cached_wrapper(path, path_stats, *args, **kwargs):
+            assert path_stats, "We need stat for validating the cache"
+            return func(path, *args, **kwargs)
+
+        @functools.wraps(func)
+        def wrapper(path, *args, **kwargs):
+            full_path = pathlib.Path(path).resolve()
+            if full_path.exists():
+                path_stat = full_path.stat()
+                return cached_wrapper(
+                    path=full_path,
+                    path_stats=(path_stat.st_mtime_ns, path_stat.st_size),
+                    *args,
+                    **kwargs)
+            elif isinstance(path, str) and path.startswith("https://"):
+                # DCOR metadata does not change
+                return cached_wrapper(
+                    path=path,
+                    path_stats="placeholder",
+                    *args,
+                    **kwargs)
+            else:
+                return func(path, *args, **kwargs)
+
+        wrapper.cache_clear = cached_wrapper.cache_clear
+        wrapper.cache_info = cached_wrapper.cache_info
+
+        return wrapper
 
 
 def get_info(path, section, key):
@@ -22,14 +67,14 @@ def get_repr(path, append_path=False):
     return rep
 
 
-@functools.lru_cache(maxsize=100)
+@dataset_monitoring_lru_cache(maxsize=100)
 def get_rtdc_config(path):
     with dclab.new_dataset(path) as ds:
         config = ds.config.copy()
     return config
 
 
-@functools.lru_cache(maxsize=100)
+@dataset_monitoring_lru_cache(maxsize=100)
 def get_rtdc_features(path, scalar=True, only_loaded=False):
     """Return available features in a dataset"""
     av_feat = []
@@ -56,7 +101,7 @@ def get_rtdc_features_bulk(paths, scalar=True):
     return sorted(set(features))
 
 
-@functools.lru_cache(maxsize=10000)
+@dataset_monitoring_lru_cache(maxsize=10000)
 def get_rtdc_features_minmax(path, *features):
     """Return dict with min/max of scalar features in a dataset"""
     mmdict = {}

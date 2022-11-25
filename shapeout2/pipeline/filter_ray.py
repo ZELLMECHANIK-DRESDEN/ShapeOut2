@@ -149,6 +149,13 @@ class FilterRay(object):
         filters: list of Filter or None
             Filters used for computing the dataset hierarchy. If set
             to None, the current filters in `self.filters` are used.
+        apply_filter: bool
+            Whether to apply all filters and update the metadata of
+            the requested dataset. This should be True if you are
+            intending to work with the resulting data. You can set
+            it to false if you would just like to fetch the dataset,
+            apply some more filters and then call `rejuvenate`
+            yourself.
         """
         if filters is not None:
             # put the filters in place

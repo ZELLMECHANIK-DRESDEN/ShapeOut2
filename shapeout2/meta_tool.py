@@ -64,11 +64,11 @@ def get_rtdc_features_minmax(path, *features):
         for feat in features:
             assert dclab.dfn.scalar_feature_exists(feat)
             if feat in ds:
-                mmdict[feat] = ds[feat].min(), ds[feat].max()
+                mmdict[feat] = np.min(ds[feat]), np.max(ds[feat])
     return mmdict
 
 
-def get_rtdc_features_minmax_bulk(paths, features=[]):
+def get_rtdc_features_minmax_bulk(paths, features=None):
     """Perform `get_rtdc_features_minmax` on a list of paths
 
     Parameters
@@ -79,6 +79,8 @@ def get_rtdc_features_minmax_bulk(paths, features=[]):
         Names of the features to compute the min/max values for.
         If empty, all loaded features will be used.
     """
+    if features is None:
+        features = []
     mmdict = {}
     for pp in paths:
         mmdi = get_rtdc_features_minmax(pp, *features)

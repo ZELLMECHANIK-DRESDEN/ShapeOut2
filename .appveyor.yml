@@ -51,7 +51,7 @@ test_script:
   - python -c "import shapeout2; print(shapeout2.__version__)"
   - pip install coverage codecov
   - pip install -r tests/requirements.txt
-  - python -m coverage run --source=shapeout2 -m pytest tests
+  - python -m coverage run --source=shapeout2 -m pytest tests -x
   - python -m coverage report -m
   # Allow codecov to fail
   - codecov || exit 0

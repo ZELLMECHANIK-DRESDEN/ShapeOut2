@@ -2,6 +2,8 @@
 import functools
 import dclab
 
+import numpy as np
+
 
 def get_info(path, section, key):
     config = get_rtdc_config(path)

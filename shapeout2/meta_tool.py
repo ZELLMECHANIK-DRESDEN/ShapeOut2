@@ -26,8 +26,9 @@ class dataset_monitoring_lru_cache:
 
         @functools.wraps(func)
         def wrapper(path, *args, **kwargs):
-            full_path = pathlib.Path(path).resolve()
-            if full_path.exists():
+            local_path = pathlib.Path(path)
+            if local_path.exists():
+                full_path = local_path.resolve()
                 path_stat = full_path.stat()
                 return cached_wrapper(
                     path=full_path,

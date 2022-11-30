@@ -1,3 +1,5 @@
+2.11.11
+ - enh: strip http(s):// from DCOR server string in settings
 2.11.10
  - fix: detect chaged files on disk when reloading metadata
  - setup: bump dclab from 0.46.4 to 0.47.0 (new bg_med feature

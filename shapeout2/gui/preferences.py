@@ -332,6 +332,13 @@ class Preferences(QtWidgets.QDialog):
                 curtext = self.dcor_servers.currentText()
                 items = self.settings.value(key, default)
                 if curtext in items:
+                    # We do it again below to be on the safe side
+                    items.remove(curtext)
+                for bad_start in ["https://", "http://"]:
+                    if curtext.startswith(bad_start):
+                        curtext = curtext[len(bad_start):]
+                if curtext in items:
+                    # We do it again with the stripped version
                     items.remove(curtext)
                 items.insert(0, curtext)
                 value = items

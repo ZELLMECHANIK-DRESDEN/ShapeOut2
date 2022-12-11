@@ -534,6 +534,12 @@ class QuickView(QtWidgets.QWidget):
     def plot_auto(self):
         """Update the plot only if the "Auto-apply" checkbox is checked"""
         if self.checkBox_auto_apply.isChecked():
+            sender = self.sender()
+            if sender is self.spinBox_downsample:
+                # Do not replot if the user changes the downsampling
+                # value while downsampling is disabled.
+                if not self.checkBox_downsample.isChecked():
+                    return
             self.plot()
 
     @show_wait_cursor

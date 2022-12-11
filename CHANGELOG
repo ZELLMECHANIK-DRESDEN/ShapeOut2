@@ -1,5 +1,7 @@
 2.11.12
  - enh: make auto-apply in QuickView plot settings optional
+ - fix: do not perform auto-apply when changing downsampling
+   value and downsampling is disabled in QuickView
 2.11.11
  - enh: strip http(s):// from DCOR server string in settings
  - enh: improve GUI of QuickView (#133, #43)

@@ -26,6 +26,10 @@ class QuickViewScatterWidget(SimplePlotWidget):
         self.select.hide()
         self.xscale = "linear"
         self.yscale = "linear"
+        self.kde_type = "none",
+        self.kde_kwargs = {}
+        self.hue_type = "none"
+        self.hue_kwargs = {}
         #: Boolean array identifying the plotted events w.r.t. the full
         #: dataset
         self.events_plotted = None
@@ -85,6 +89,7 @@ class QuickViewScatterWidget(SimplePlotWidget):
 
     def plot_data(self, rtdc_ds, slot, xax="area_um", yax="deform",
                   xscale="linear", yscale="linear",  downsample=False,
+                  hue_type="none", hue_kwargs=None,
                   isoelastics=False):
         self.rtdc_ds = rtdc_ds
         self.slot = slot
@@ -92,23 +97,44 @@ class QuickViewScatterWidget(SimplePlotWidget):
         self.yax = yax
         self.xscale = xscale
         self.yscale = yscale
+        self.hue_type = hue_type
+        self.hue_kwargs = hue_kwargs if hue_kwargs else {}
+        if hue_type != "kde":
+            self.kde_type = "none"
+            self.kde_kwargs = {}
+        else:
+            self.kde_type = hue_kwargs["kde_type"]
+            self.kde_kwargs = hue_kwargs.get("kde_kwargs")
         x, y, kde, idx = plot_cache.get_scatter_data(
             rtdc_ds=self.rtdc_ds,
             downsample=downsample,
             xax=self.xax,
             yax=self.yax,
             xscale=self.xscale,
-            yscale=self.yscale)
+            yscale=self.yscale,
+            kde_type=self.kde_type,
+            kde_kwargs=self.kde_kwargs)
         self.events_plotted = idx
         #: unfiltered x data
         self.data_x = self.rtdc_ds[self.xax]
         #: unfiltered y data
         self.data_y = self.rtdc_ds[self.yax]
-        # define colormap
-        brush = []
-        cmap = pg.ColorMap(*zip(*Gradients["viridis"]["ticks"]))
-        for k in kde:
-            brush.append(cmap.mapToQColor(k))
+        if self.hue_type == "none":
+            brush = "k"
+        else:
+            # define colormap
+            brush = []
+            cmap = pg.ColorMap(*zip(*Gradients["viridis"]["ticks"]))
+            if self.hue_type == "kde":
+                for k in kde:
+                    brush.append(cmap.mapToQColor(k))
+            elif self.hue_type == "feature":
+                fdata = self.rtdc_ds[self.hue_kwargs["feat"]][idx]
+                fdata -= fdata.min()
+                fdata /= fdata.max()
+                for f in fdata:
+                    brush.append(cmap.mapToQColor(f))
+
         if x.size:  # test for empty x/y (#37)
             # set viewbox
             pipeline_plot.set_viewbox(plot=self,

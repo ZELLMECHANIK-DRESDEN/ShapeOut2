@@ -38,6 +38,11 @@ class QuickView(QtWidgets.QWidget):
             cb.addItem("linear", "linear")
             cb.addItem("logarithmic", "log")
 
+        # Set marker hue options (with data)
+        self.comboBox_hue.clear()
+        self.comboBox_hue.addItem("KDE", "kde")
+        self.comboBox_hue.addItem("feature", "feature")
+
         # settings button
         self.toolButton_event.toggled.connect(self.on_tool)
         self.toolButton_poly.toggled.connect(self.on_tool)
@@ -89,6 +94,9 @@ class QuickView(QtWidgets.QWidget):
                                self.comboBox_xscale,
                                self.comboBox_yscale,
                                self.checkBox_isoelastics,
+                               self.comboBox_z_hue,
+                               self.comboBox_hue,
+                               self.checkBox_hue,
                                ]
         for w in self.signal_widgets:
             if hasattr(w, "currentIndexChanged"):
@@ -138,6 +146,9 @@ class QuickView(QtWidgets.QWidget):
             "scale x": self.comboBox_xscale.currentData(),
             "scale y": self.comboBox_yscale.currentData(),
             "isoelastics": self.checkBox_isoelastics.isChecked(),
+            "marker hue": self.checkBox_hue.isChecked(),
+            "marker hue value": self.comboBox_hue.currentData(),
+            "marker hue feature": self.comboBox_z_hue.currentData(),
         }
         event = {
             "index": self.spinBox_event.value(),
@@ -162,17 +173,23 @@ class QuickView(QtWidgets.QWidget):
         # downsampling
         self.checkBox_downsample.setChecked(plot["downsampling"])
         self.spinBox_downsample.setValue(plot["downsampling value"])
-        # axes labels
+        self.checkBox_hue.setChecked(plot["marker hue"])
+        # combo box key selection
         self.update_feature_choices()
-        idx = self.comboBox_x.findData(plot["axis x"])
-        self.comboBox_x.setCurrentIndex(idx)
-        idy = self.comboBox_y.findData(plot["axis y"])
-        self.comboBox_y.setCurrentIndex(idy)
-        # scaling
-        idxs = self.comboBox_xscale.findData(plot["scale x"])
-        self.comboBox_xscale.setCurrentIndex(idxs)
-        idys = self.comboBox_yscale.findData(plot["scale y"])
-        self.comboBox_yscale.setCurrentIndex(idys)
+        for key, cb in [
+            # axes labels
+            ("axis x", self.comboBox_x),
+            ("axis y", self.comboBox_y),
+            # scaling
+            ("scale x", self.comboBox_xscale),
+            ("scale y", self.comboBox_yscale),
+            # marker hue
+            ("marker hue value", self.comboBox_hue),
+            ("marker hue feature", self.comboBox_z_hue),
+        ]:
+            idx = cb.findData(plot[key])
+            idx = idx if idx > 0 else 0
+            cb.setCurrentIndex(idx)
         # isoelastics
         self.checkBox_isoelastics.setChecked(plot["isoelastics"])
         for tb in self.signal_widgets:
@@ -327,7 +344,11 @@ class QuickView(QtWidgets.QWidget):
             # get corrected index
             event = np.where(plotted)[0][point.index()]
             if "image" in self.rtdc_ds:
-                cellimg, imkw = self.get_event_image(self.rtdc_ds, event)
+                try:
+                    cellimg, imkw = self.get_event_image(self.rtdc_ds, event)
+                except IndexError:
+                    # the plot got updated, and we still have the old data
+                    cellimg, imkw = self.get_event_image(self.rtdc_ds, 0)
                 self.imageView_image_poly.setImage(cellimg, **imkw)
                 self.imageView_image_poly.show()
             else:
@@ -511,7 +532,15 @@ class QuickView(QtWidgets.QWidget):
         if self.rtdc_ds is not None:
             plot = self.__getstate__()["plot"]
             downsample = plot["downsampling"] * plot["downsampling value"]
-
+            hue_kwargs = {}
+            if self.checkBox_hue.isChecked():
+                hue_type = self.comboBox_hue.currentData()
+                if hue_type == "kde":
+                    hue_kwargs = {"kde_type": "histogram"}
+                if hue_type == "feature":
+                    hue_kwargs = {"feat": self.comboBox_z_hue.currentData()}
+            else:
+                hue_type = "none"
             self.widget_scatter.plot_data(rtdc_ds=self.rtdc_ds,
                                           slot=self.slot,
                                           downsample=downsample,
@@ -519,6 +548,8 @@ class QuickView(QtWidgets.QWidget):
                                           yax=plot["axis y"],
                                           xscale=plot["scale x"],
                                           yscale=plot["scale y"],
+                                          hue_type=hue_type,
+                                          hue_kwargs=hue_kwargs,
                                           isoelastics=plot["isoelastics"])
             # make sure the correct plot items are visible
             # (e.g. scatter select)
@@ -535,12 +566,17 @@ class QuickView(QtWidgets.QWidget):
         """Update the plot only if the "Auto-apply" checkbox is checked"""
         if self.checkBox_auto_apply.isChecked():
             sender = self.sender()
-            if sender is self.spinBox_downsample:
-                # Do not replot if the user changes the downsampling
-                # value while downsampling is disabled.
-                if not self.checkBox_downsample.isChecked():
-                    return
-            self.plot()
+            for cb, sen in [
+                (self.checkBox_downsample, [self.spinBox_downsample]),
+                (self.checkBox_hue, [self.comboBox_hue,
+                                     self.comboBox_z_hue])]:
+                # Do not replot if the user changes the options for a
+                # disabled settings (e.g. downsampling, hue)
+                if sender in sen:
+                    if not cb.isChecked():
+                        break
+            else:
+                self.plot()
 
     @show_wait_cursor
     @QtCore.pyqtSlot(int)
@@ -721,7 +757,7 @@ class QuickView(QtWidgets.QWidget):
             ds_feats = self.rtdc_ds.features_scalar
             ds_labels = [dclab.dfn.get_feature_label(f) for f in ds_feats]
             ds_fl = sorted(zip(ds_labels, ds_feats))
-            for cb in [self.comboBox_x, self.comboBox_y]:
+            for cb in [self.comboBox_x, self.comboBox_y, self.comboBox_z_hue]:
                 fcur = cb.currentData()
                 blocked = cb.signalsBlocked()  # remember block state
                 cb.blockSignals(True)

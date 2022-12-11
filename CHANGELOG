@@ -6,6 +6,7 @@
  - fix: catch IndexError when trying to view an event that is not
    there anymore in polygon-selection-mode in QuickView
  - enh: make auto-apply in QuickView plot settings optional
+ - docs: update screenshot scripts
 2.11.11
  - enh: strip http(s):// from DCOR server string in settings
  - enh: improve GUI of QuickView (#133, #43)

@@ -2,7 +2,6 @@
 
 Data available at https://doi.org/10.6084/m9.figshare.11302595.v1
 """
-
 import pathlib
 import sys
 
@@ -72,6 +71,8 @@ idy = mw.widget_quick_view.comboBox_y.findData("fl2_max_ctc")
 mw.widget_quick_view.comboBox_y.setCurrentIndex(idy)
 mw.widget_quick_view.comboBox_xscale.setCurrentIndex(1)
 mw.widget_quick_view.comboBox_yscale.setCurrentIndex(1)
+mw.widget_quick_view.checkBox_hue.click()
+mw.widget_quick_view.toolButton_apply.click()
 QApplication.processEvents(QtCore.QEventLoop.AllEvents, 300)
 mw.widget_quick_view.grab().save("_ui_qv_settings.png")
 mw.widget_quick_view.toolButton_event.toggle()

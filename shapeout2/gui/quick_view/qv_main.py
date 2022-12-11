@@ -79,6 +79,8 @@ class QuickView(QtWidgets.QWidget):
         self.tabWidget_event.currentChanged.connect(
             self.on_event_scatter_update)
 
+        # apply button
+        self.toolButton_apply.clicked.connect(self.plot)
         # value changed signals for plot
         self.signal_widgets = [self.checkBox_downsample,
                                self.spinBox_downsample,
@@ -90,11 +92,11 @@ class QuickView(QtWidgets.QWidget):
                                ]
         for w in self.signal_widgets:
             if hasattr(w, "currentIndexChanged"):
-                w.currentIndexChanged.connect(self.plot)
+                w.currentIndexChanged.connect(self.plot_auto)
             elif hasattr(w, "stateChanged"):
-                w.stateChanged.connect(self.plot)
+                w.stateChanged.connect(self.plot_auto)
             elif hasattr(w, "valueChanged"):
-                w.valueChanged.connect(self.plot)
+                w.valueChanged.connect(self.plot_auto)
         # copy statistics to clipboard
         self.toolButton_stats2clipboard.clicked.connect(
             self.on_stats2clipboard)
@@ -527,6 +529,12 @@ class QuickView(QtWidgets.QWidget):
             self.label_poly_y.setText(
                 dclab.dfn.get_feature_label(plot["axis y"]))
             self.show_statistics()
+
+    @QtCore.pyqtSlot()
+    def plot_auto(self):
+        """Update the plot only if the "Auto-apply" checkbox is checked"""
+        if self.checkBox_auto_apply.isChecked():
+            self.plot()
 
     @show_wait_cursor
     @QtCore.pyqtSlot(int)

@@ -62,7 +62,7 @@ jobs:
         # github token required for testing update.py
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-         coverage run --source=shapeout2 -m pytest tests
+         coverage run --source=shapeout2 -m pytest -x tests
     - name: Lint with flake8
       run: |
         flake8 .

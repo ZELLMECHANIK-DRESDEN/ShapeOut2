@@ -1,5 +1,7 @@
-2.12.1
+2.13.0
+ - feat: support new viscosity model buyukurganci-2022
  - enh: turn on auto-apply in QuickView by default
+ - setup: bump dclab from 0.47.2 to 0.48.0
 2.12.0
  - feat: allow to disable KDE or use feature data as marker
    hue in QuickView

@@ -64,6 +64,7 @@ class Dataslot(object):
                 "emodulus scenario": "manual",
                 "emodulus temperature": np.nan,
                 "emodulus viscosity": np.nan,
+                "emodulus viscosity model": "herold-2017",
             }
         }
 
@@ -150,6 +151,7 @@ class Dataslot(object):
         lut = self.config["emodulus"]["emodulus lut"]
         medium = self.config["emodulus"]["emodulus medium"]
         visc = self.config["emodulus"]["emodulus viscosity"]
+        visc_model = self.config["emodulus"]["emodulus viscosity model"]
         scenario = self.config["emodulus"]["emodulus scenario"]
         if scenario == "config":
             # Force the temperature from the dataset metadata
@@ -166,12 +168,16 @@ class Dataslot(object):
         # known media
         if medium in dclab.features.emodulus.viscosity.KNOWN_MEDIA:
             dataset.config["calculation"]["emodulus medium"] = medium
+            dataset.config["calculation"]["emodulus viscosity model"] = \
+                visc_model
         # temperature
         if not np.isnan(temp):
             dataset.config["calculation"]["emodulus temperature"] = temp
         # viscosity
         if medium not in KNOWN_MEDIA and not np.isnan(visc):
             dataset.config["calculation"]["emodulus viscosity"] = visc
+            if "emodulus viscosity model" in dataset.config["calculation"]:
+                dataset.config["calculation"].pop("emodulus viscosity model")
 
     def get_dataset(self):
         """Return the corresponding dataset

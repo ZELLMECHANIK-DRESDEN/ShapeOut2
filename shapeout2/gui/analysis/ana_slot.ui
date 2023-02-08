@@ -194,36 +194,41 @@
         <string>Young's modulus</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="1" column="1">
-         <widget class="QComboBox" name="comboBox_temp">
+        <item row="1" column="5">
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Medium</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QComboBox" name="comboBox_visc_model">
           <item>
            <property name="text">
-            <string>Configuration</string>
+            <string>buyukurganci-2022</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Feature</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Manual</string>
+            <string>herold-2017</string>
            </property>
           </item>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="DoubleSpinBoxNan" name="doubleSpinBox_visc">
-          <property name="showGroupSeparator" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="suffix">
-           <string> mPa·s</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
+        <item row="0" column="2">
          <widget class="QComboBox" name="comboBox_medium">
           <property name="currentIndex">
            <number>0</number>
@@ -255,7 +260,17 @@
           </item>
          </widget>
         </item>
-        <item row="1" column="2">
+        <item row="2" column="3">
+         <widget class="DoubleSpinBoxNan" name="doubleSpinBox_visc">
+          <property name="showGroupSeparator" stdset="0">
+           <bool>false</bool>
+          </property>
+          <property name="suffix">
+           <string> mPa·s</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
          <widget class="DoubleSpinBoxNan" name="doubleSpinBox_temp">
           <property name="wrapping">
            <bool>false</bool>
@@ -280,6 +295,13 @@
           </property>
          </widget>
         </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Viscosity model</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_temp">
           <property name="text">
@@ -287,32 +309,34 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>Viscosity</string>
-          </property>
+        <item row="1" column="2">
+         <widget class="QComboBox" name="comboBox_temp">
+          <item>
+           <property name="text">
+            <string>Configuration</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Feature</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Manual</string>
+           </property>
+          </item>
          </widget>
         </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_6">
+        <item row="2" column="4">
+         <widget class="QLabel" name="label_5">
           <property name="text">
-           <string>Medium</string>
+           <string>&lt;a href=&quot;https://shapeout2.readthedocs.io/en/stable/sec_qg_youngs_modulus.html&quot;&gt; What is this? &lt;/a&gt;</string>
+          </property>
+          <property name="openExternalLinks">
+           <bool>true</bool>
           </property>
          </widget>
-        </item>
-        <item row="1" column="3">
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>0</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
         </item>
        </layout>
       </widget>

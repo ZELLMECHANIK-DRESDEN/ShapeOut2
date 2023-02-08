@@ -3,7 +3,7 @@ import pkg_resources
 import warnings
 
 import dclab
-from dclab.features.emodulus.viscosity import KNOWN_MEDIA
+from dclab.features.emodulus.viscosity import ALIAS_MEDIA, KNOWN_MEDIA
 import numpy as np
 from PyQt5 import uic, QtCore, QtWidgets
 
@@ -36,6 +36,8 @@ class SlotPanel(QtWidgets.QWidget):
         self.comboBox_slots.currentIndexChanged.connect(self.update_content)
         self.comboBox_medium.currentIndexChanged.connect(self.on_ui_changed)
         self.comboBox_temp.currentIndexChanged.connect(self.on_ui_changed)
+        self.comboBox_visc_model.currentIndexChanged.connect(
+            self.on_ui_changed)
         self.doubleSpinBox_temp.valueChanged.connect(self.on_ui_changed)
         # init
         self._update_emodulus_medium_choices()
@@ -50,7 +52,7 @@ class SlotPanel(QtWidgets.QWidget):
         else:
             emod_temp = np.nan
         if self.comboBox_medium.currentData() in KNOWN_MEDIA:
-            emod_visc = np.nan  # viscosity computed from LUT
+            emod_visc = np.nan  # viscosity computed for known medium
             scenario = self.comboBox_temp.currentData()
         elif self.comboBox_medium.currentData() == "unknown":
             emod_visc = np.nan  # viscosity not defined
@@ -85,6 +87,8 @@ class SlotPanel(QtWidgets.QWidget):
                 "emodulus scenario": scenario,
                 "emodulus temperature": emod_temp,
                 "emodulus viscosity": emod_visc,
+                "emodulus viscosity model": \
+                    self.comboBox_visc_model.currentText(),
             }
         }
         return state
@@ -131,6 +135,12 @@ class SlotPanel(QtWidgets.QWidget):
             self.comboBox_temp.blockSignals(True)
             self.comboBox_temp.setCurrentIndex(idx_scen)
             self.comboBox_temp.blockSignals(False)
+        idx_vm = self.comboBox_visc_model.findText(
+            emodulus.get("emodulus viscosity model", ""))
+        if idx_vm == -1:
+            # use defaults from previous session (Herold-2107)
+            idx_vm = 1
+        self.comboBox_visc_model.setCurrentIndex(idx_vm)
         # This has to be done after setting the scenario
         # (otherwise it might be overridden in the frontend)
         self.doubleSpinBox_temp.setValue(emodulus["emodulus temperature"])
@@ -298,7 +308,7 @@ class SlotPanel(QtWidgets.QWidget):
         slot_state = self.__getstate__()
         new_slot = Dataslot(slot_state["path"])
         pos = self.pipeline.slot_ids.index(slot_state["identifier"])
-        self.pipeline.add_slot(new_slot, index=pos+1)
+        self.pipeline.add_slot(new_slot, index=pos + 1)
         state = self.pipeline.__getstate__()
         self.pipeline_changed.emit(state)
 
@@ -313,7 +323,7 @@ class SlotPanel(QtWidgets.QWidget):
         new_slot.__setstate__(new_state)
         # determine the filter position
         pos = self.pipeline.slot_ids.index(slot_state["identifier"])
-        self.pipeline.add_slot(new_slot, index=pos+1)
+        self.pipeline.add_slot(new_slot, index=pos + 1)
         state = self.pipeline.__getstate__()
         self.pipeline_changed.emit(state)
 
@@ -336,10 +346,14 @@ class SlotPanel(QtWidgets.QWidget):
         """Called when the user modifies the medium or temperature options"""
         medium = self.comboBox_medium.currentData()
         tselec = self.comboBox_temp.currentData()
+        medium_key = ALIAS_MEDIA.get(medium, medium)
+        visc_model = self.comboBox_visc_model.currentText()
         if medium in KNOWN_MEDIA:  # medium registered with dclab
             self.comboBox_temp.setEnabled(True)
             self.doubleSpinBox_visc.setEnabled(True)
             self.doubleSpinBox_visc.setReadOnly(True)
+            # Only show model selection if we are dealing with MC-PBS
+            self.comboBox_visc_model.setVisible(medium_key.count("MC-PBS"))
             if tselec == "manual":
                 temperature = self.doubleSpinBox_temp.value()
                 self.doubleSpinBox_temp.setEnabled(True)
@@ -359,8 +373,7 @@ class SlotPanel(QtWidgets.QWidget):
                 assert tselec is None, "We should still be in init"
                 return
             # For user convenience, also show the viscosity
-            if (medium in dclab.features.emodulus.viscosity.KNOWN_MEDIA
-                    and not np.isnan(temperature)):
+            if medium in KNOWN_MEDIA and not np.isnan(temperature):
                 # compute viscosity
                 state = self.__getstate__()
                 cfg = meta_tool.get_rtdc_config(state["path"])
@@ -371,11 +384,13 @@ class SlotPanel(QtWidgets.QWidget):
                         medium=medium,
                         channel_width=cfg["setup"]["channel width"],
                         flow_rate=cfg["setup"]["flow rate"],
-                        temperature=temperature)
+                        temperature=temperature,
+                        model=visc_model,
+                    )
                     for wi in w:
                         if issubclass(wi.category,
                                       dclab.features.emodulus.viscosity.
-                                      TemperatureOutOfRangeWarning):
+                                              TemperatureOutOfRangeWarning):
                             vstyle = "color: #950000; border-width: 2px"
                             break
                     else:

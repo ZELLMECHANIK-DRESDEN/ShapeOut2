@@ -214,91 +214,10 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="2">
-         <widget class="QComboBox" name="comboBox_visc_model">
-          <item>
-           <property name="text">
-            <string>buyukurganci-2022</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>herold-2017</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QComboBox" name="comboBox_medium">
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>CellCarrier</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>CellCarrier B</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>water</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>other</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>unknown</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="2" column="3">
-         <widget class="DoubleSpinBoxNan" name="doubleSpinBox_visc">
-          <property name="showGroupSeparator" stdset="0">
-           <bool>false</bool>
-          </property>
-          <property name="suffix">
-           <string> mPa·s</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="DoubleSpinBoxNan" name="doubleSpinBox_temp">
-          <property name="wrapping">
-           <bool>false</bool>
-          </property>
-          <property name="readOnly">
-           <bool>false</bool>
-          </property>
-          <property name="specialValueText">
-           <string/>
-          </property>
-          <property name="suffix">
-           <string>°C</string>
-          </property>
-          <property name="minimum">
-           <double>10.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>45.000000000000000</double>
-          </property>
-          <property name="value">
-           <double>23.000000000000000</double>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_8">
           <property name="text">
-           <string>Viscosity model</string>
+           <string>Viscosity</string>
           </property>
          </widget>
         </item>
@@ -309,29 +228,131 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="2">
-         <widget class="QComboBox" name="comboBox_temp">
+        <item row="2" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <property name="text">
-            <string>Configuration</string>
-           </property>
+           <widget class="QComboBox" name="comboBox_visc_model">
+            <property name="toolTip">
+             <string>Viscosity model</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>buyukurganci-2022</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>herold-2017</string>
+             </property>
+            </item>
+           </widget>
           </item>
           <item>
-           <property name="text">
-            <string>Feature</string>
-           </property>
+           <widget class="DoubleSpinBoxNan" name="doubleSpinBox_visc">
+            <property name="showGroupSeparator" stdset="0">
+             <bool>false</bool>
+            </property>
+            <property name="suffix">
+             <string> mPa·s</string>
+            </property>
+           </widget>
           </item>
-          <item>
-           <property name="text">
-            <string>Manual</string>
-           </property>
-          </item>
-         </widget>
+         </layout>
         </item>
-        <item row="0" column="3">
+        <item row="1" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QComboBox" name="comboBox_temp">
+            <item>
+             <property name="text">
+              <string>Configuration</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Feature</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Manual</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="DoubleSpinBoxNan" name="doubleSpinBox_temp">
+            <property name="wrapping">
+             <bool>false</bool>
+            </property>
+            <property name="readOnly">
+             <bool>false</bool>
+            </property>
+            <property name="specialValueText">
+             <string/>
+            </property>
+            <property name="suffix">
+             <string>°C</string>
+            </property>
+            <property name="minimum">
+             <double>10.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>45.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>23.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="0" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QComboBox" name="comboBox_medium">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <item>
+             <property name="text">
+              <string>CellCarrier</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>CellCarrier B</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>water</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>other</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>unknown</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="0" column="4">
          <widget class="QLabel" name="label_5">
           <property name="text">
-           <string>&lt;a href=&quot;https://shapeout2.readthedocs.io/en/stable/sec_qg_youngs_modulus.html&quot;&gt; Online help &lt;/a&gt;</string>
+           <string>&lt;a href=&quot;https://shapeout2.readthedocs.io/en/stable/sec_qg_youngs_modulus.html&quot;&gt; help &lt;/a&gt;</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

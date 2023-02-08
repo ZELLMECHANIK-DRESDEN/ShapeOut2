@@ -41,7 +41,7 @@ for st in settings:
     Emax = 30
 
     x = np.linspace(0, st["x max"], 400)
-    y = np.linspace(0, 0.17, 800)
+    y = np.linspace(0, 0.20, 800)
 
     x, y = np.meshgrid(x, y)
 
@@ -49,6 +49,7 @@ for st in settings:
               "deform": y,
               "temperature": temperature,
               "px_um": pixel_size,
+              "visc_model": "buyukurganci-2022",
               }
 
     E_CC_1 = get_emodulus(medium="CellCarrier",
@@ -93,10 +94,10 @@ for st in settings:
     # start with a rectangular Figure
     plt.rcParams['axes.grid'] = True
     fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(7, 5),
-                           sharey=True, sharex=True)
+                           sharey="all", sharex="all")
     fig.suptitle(str(st["channel width"])+" µm channel")
     ax[0, 0].set_xlim(st["x range"])
-    ax[0, 0].set_ylim([0, 0.17])
+    ax[0, 0].set_ylim([0, 0.22])
     ax[2, 0].set_xlabel("Area [µm²]")
     ax[2, 1].set_xlabel("Area [µm²]")
     ax[2, 2].set_xlabel("Area [µm²]")
@@ -110,7 +111,7 @@ for st in settings:
               "marker": "o",
               "linewidth": 0,
               "zorder": 3,
-              "cmap": "nipy_spectral",
+              "cmap": "jet",
               }
     pem = ax[0, 0].scatter(c=E_CC_1, **scatkw)
     ax[0, 1].scatter(c=E_CC_2, **scatkw)
@@ -142,7 +143,7 @@ for st in settings:
     row_ax.spines['left'].set_visible(False)
     textkw = {"rotation": "vertical",
               "fontsize": 10,
-              "fontweight": "demibold",
+              "fontweight": "semibold",
               "va": "center"}
     row_ax.text(0.5, 0.23, "Water", **textkw)
     row_ax.text(0.5, 0.5, "CellCarrier B", **textkw)

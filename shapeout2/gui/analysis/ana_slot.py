@@ -350,12 +350,16 @@ class SlotPanel(QtWidgets.QWidget):
         tselec = self.comboBox_temp.currentData()
         medium_key = ALIAS_MEDIA.get(medium, medium)
         visc_model = self.comboBox_visc_model.currentText()
+        # Only show model selection if we are dealing with MC-PBS
+        self.comboBox_visc_model.setVisible(medium_key.count("MC-PBS"))
+        self.doubleSpinBox_visc.setStyleSheet("")
         if medium in KNOWN_MEDIA:  # medium registered with dclab
+            self.label_temp.setVisible(True)
+            self.comboBox_temp.setVisible(True)
+            self.doubleSpinBox_temp.setVisible(True)
             self.comboBox_temp.setEnabled(True)
             self.doubleSpinBox_visc.setEnabled(True)
             self.doubleSpinBox_visc.setReadOnly(True)
-            # Only show model selection if we are dealing with MC-PBS
-            self.comboBox_visc_model.setVisible(medium_key.count("MC-PBS"))
             if tselec == "manual":
                 temperature = self.doubleSpinBox_temp.value()
                 self.doubleSpinBox_temp.setEnabled(True)
@@ -370,6 +374,7 @@ class SlotPanel(QtWidgets.QWidget):
             elif tselec == "feature":
                 temperature = np.nan
                 self.doubleSpinBox_temp.setEnabled(False)
+                self.doubleSpinBox_temp.setVisible(False)
                 self.doubleSpinBox_temp.setValue(temperature)
             else:
                 assert tselec is None, "We should still be in init"
@@ -396,29 +401,32 @@ class SlotPanel(QtWidgets.QWidget):
                             break
                     else:
                         vstyle = "border-width: 2px"
+                self.doubleSpinBox_visc.setVisible(True)
                 self.doubleSpinBox_visc.setEnabled(True)
                 self.doubleSpinBox_visc.setReadOnly(True)
                 self.doubleSpinBox_visc.setValue(visc)
                 self.doubleSpinBox_visc.setStyleSheet(vstyle)
             else:
                 self.doubleSpinBox_visc.setEnabled(False)
+                self.doubleSpinBox_visc.setVisible(False)
                 self.doubleSpinBox_visc.setReadOnly(True)
                 self.doubleSpinBox_visc.setValue(np.nan)
-                self.doubleSpinBox_visc.setStyleSheet("border-width: 2px")
         elif medium == "undefined":
-            self.comboBox_temp.setEnabled(False)
+            self.label_temp.setVisible(False)
+            self.comboBox_temp.setVisible(False)
+            self.doubleSpinBox_temp.setVisible(False)
             self.doubleSpinBox_temp.setEnabled(False)
             self.doubleSpinBox_temp.setValue(np.nan)
             self.doubleSpinBox_visc.setValue(np.nan)
             self.doubleSpinBox_visc.setEnabled(False)
-            self.doubleSpinBox_visc.setStyleSheet("border-width: 2px")
         else:  # "other" or user-defined
-            self.comboBox_temp.setEnabled(False)
+            self.label_temp.setVisible(False)
+            self.comboBox_temp.setVisible(False)
+            self.doubleSpinBox_temp.setVisible(False)
             self.doubleSpinBox_temp.setEnabled(False)
             self.doubleSpinBox_temp.setValue(np.nan)
             self.doubleSpinBox_visc.setEnabled(True)
             self.doubleSpinBox_visc.setReadOnly(False)
-            self.doubleSpinBox_visc.setStyleSheet("border-width: 2px")
 
     def set_pipeline(self, pipeline):
         self._pipeline = pipeline

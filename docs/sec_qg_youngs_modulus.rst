@@ -7,6 +7,9 @@ With Shape-Out, it is possible to translate the measured area and deformation
 to the Young's modulus based on numerical simulation for
 fully elastic spheres according to Mokbel et al. :cite:`Mokbel2017`.
 
+The theoretical background, including the computation of the viscosity for
+the MC-PBS media used in RT-DC, is discussed in more detail in the
+:ref:`dclab docs <dclab:sec_av_emodulus>`.
 
 .. note::
 
@@ -22,7 +25,7 @@ Parameter settings
     :target: _images/qg_emodulus_config.png
     :align: right
 
-    Temperature taken from the meta data.
+    Temperature taken from the metadata.
 
 .. _qg_emodulus_feature:
 .. figure:: scrots/qg_emodulus_feature.png
@@ -39,7 +42,7 @@ correction), and viscosity. For known media, such as CellCarrier, the
 viscosity can be derived from channel width, flow rate, and temperature.
 In some RT-DC setups, the chip temperature is recorded during the measurement.
 For instance, in :numref:`qg_emodulus_config`, the average chip temperature
-of 22.5°C from the [setup] meta data section is used. The value of the
+of 22.5°C from the [setup] metadata section is used. The value of the
 resulting viscosity is shown below.
 If the chip temperature is recorded for each event, then the user may select
 the *From feature* option (:numref:`qg_emodulus_feature`). In this case,
@@ -53,10 +56,10 @@ the Young's modulus is computed from the individual viscosities for each event.
 
     Temperature outside of known range.
 
-If the temperature is not given as a feature or as meta data, then
+If the temperature is not given as a feature or as metadata, then
 you may select the temperature manually. This case is visualized in
 :numref:`qg_emodulus_badtemp`. Here, the temperature is purposely set outside of
-the known range defined in :cite:`Herold2017`, which is highlighted by
+the known range defined in :cite:`Buyukurganci2022`, which is highlighted by
 coloring the viscosity red.
 
 .. _qg_emodulus_other:
@@ -70,7 +73,7 @@ You may also set the viscosity manually by selecting *other* as a medium
 (:numref:`qg_emodulus_other`).
 In this case, the values for temperature are irrelevant. Please only use
 this option if you know what you are doing (e.g. you have considered
-shear-thinning :cite:`Herold2017`).
+shear-thinning and temperature-dependence :cite:`Herold2017, Buyukurganci2022`).
 
 Click *Apply* for any changes to take effect. The Young's modulus is then
 available for the selected dataset.
@@ -91,7 +94,7 @@ for all datasets of the current session. Note that the options
 in this dialog do not necessarily reflect the options available for the
 individual datasets. Only valid options are adopted. For instance,
 you will not be able to change the medium for a dataset if a medium is
-already given in its meta data. To verify the options set, you can always
+already given in its metadata. To verify the options set, you can always
 check the current setting via the *Analysis View* (see above).
 
 
@@ -114,8 +117,9 @@ is checked in the *Filter* configuration tab.
     shown depend on the channel size, the flow rate, the temperature,
     and the viscosity of the medium :cite:`Mietke2015`.
     Here, they are computed for a 20 µm wide channel at 23°C with an
-    effective pixel size of 0.34 µm. The data are corrected for pixelation
-    effects according to :cite:`Herold2017`.
+    effective pixel size of 0.34 µm. The viscosity of the MC-PBS buffers
+    is computed according to :cite:`Buyukurganci2022` and the data are corrected
+    for pixelation effects according to :cite:`Herold2017`.
 
 The invalid regions (white in the figure above) include objects that
 are very small or objects with very low deformation values.

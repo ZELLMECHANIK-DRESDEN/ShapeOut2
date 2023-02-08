@@ -35,7 +35,8 @@ mw.reload_pipeline()
 mw.on_modify_slot(mw.pipeline.slot_ids[0])
 mw.widget_ana_view.repaint()
 wsl = mw.widget_ana_view.widget_slot
-wsl.groupBox_emod.setFixedSize(420, wsl.groupBox_emod.sizeHint().height())
+wsl.comboBox_visc_model.setCurrentIndex(0)
+wsl.groupBox_emod.setFixedSize(420, 140)
 
 wsl.comboBox_medium.setCurrentIndex(
     wsl.comboBox_medium.findData("CellCarrier"))
@@ -52,7 +53,7 @@ wsl.groupBox_emod.grab().save("_qg_emodulus_feature.png")
 wsl.comboBox_medium.setCurrentIndex(
     wsl.comboBox_medium.findData("CellCarrier"))
 wsl.comboBox_temp.setCurrentIndex(wsl.comboBox_temp.findData("manual"))
-wsl.doubleSpinBox_temp.setValue(31)
+wsl.doubleSpinBox_temp.setValue(38)
 app.processEvents(QtCore.QEventLoop.AllEvents, 300)
 wsl.groupBox_emod.grab().save("_qg_emodulus_badtemp.png")
 

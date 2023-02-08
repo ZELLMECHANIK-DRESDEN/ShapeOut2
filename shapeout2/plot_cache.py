@@ -10,7 +10,7 @@ def get_contour_data(rtdc_ds, xax, yax, xacc, yacc, xscale, yscale,
     cfg = rtdc_ds.config
     tohash = [
         rtdc_ds.identifier, rtdc_ds.filter.all,
-        cfg["calculation"] if "calculation" in cfg else "",
+        cfg.get("calculation", ""),
         xax, yax, xacc, yacc, xscale, yscale,
         kde_type, kde_kwargs]
     shash = util.hashobj(tohash)
@@ -40,7 +40,7 @@ def get_scatter_data(rtdc_ds, downsample, xax, yax, xscale, yscale,
     cfg = rtdc_ds.config
     tohash = [
         rtdc_ds.identifier, rtdc_ds.filter.all, downsample,
-        cfg["calculation"] if "calculation" in cfg else "",
+        cfg.get("calculation", ""),
         xax, yax, xscale, yscale, kde_type, kde_kwargs]
     shash = util.hashobj(tohash)
     if shash in cache_data:

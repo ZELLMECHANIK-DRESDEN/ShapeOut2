@@ -3,7 +3,9 @@ import pkg_resources
 import warnings
 
 import dclab
-from dclab.features.emodulus.viscosity import ALIAS_MEDIA, KNOWN_MEDIA
+from dclab.features.emodulus.viscosity import (
+    ALIAS_MEDIA, KNOWN_MEDIA, TemperatureOutOfRangeWarning
+)
 import numpy as np
 from PyQt5 import uic, QtCore, QtWidgets
 
@@ -60,6 +62,7 @@ class SlotPanel(QtWidgets.QWidget):
         else:  # "other", user-defined medium
             emod_visc = self.doubleSpinBox_visc.value()  # user input
             scenario = None
+        emod_visc_model = self.comboBox_visc_model.currentText()
         state = {
             "identifier": slot_state["identifier"],
             "name": self.lineEdit_name.text(),
@@ -87,8 +90,7 @@ class SlotPanel(QtWidgets.QWidget):
                 "emodulus scenario": scenario,
                 "emodulus temperature": emod_temp,
                 "emodulus viscosity": emod_visc,
-                "emodulus viscosity model": \
-                    self.comboBox_visc_model.currentText(),
+                "emodulus viscosity model": emod_visc_model,
             }
         }
         return state
@@ -389,8 +391,7 @@ class SlotPanel(QtWidgets.QWidget):
                     )
                     for wi in w:
                         if issubclass(wi.category,
-                                      dclab.features.emodulus.viscosity.
-                                              TemperatureOutOfRangeWarning):
+                                      TemperatureOutOfRangeWarning):
                             vstyle = "color: #950000; border-width: 2px"
                             break
                     else:

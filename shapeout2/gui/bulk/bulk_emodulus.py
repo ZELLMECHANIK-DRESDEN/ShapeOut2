@@ -1,6 +1,6 @@
 import pkg_resources
 
-from dclab.features.emodulus.viscosity import KNOWN_MEDIA
+from dclab.features.emodulus.viscosity import SAME_MEDIA
 
 from PyQt5 import uic, QtCore, QtWidgets
 
@@ -25,15 +25,19 @@ class BulkActionEmodulus(QtWidgets.QDialog):
 
         # ui choices
         self.comboBox_medium.clear()
-        choices = KNOWN_MEDIA + ["other"]
-        for choice in choices:
-            if choice == "CellCarrierB":
-                name = "CellCarrier B"  # [sic]
+        self.comboBox_medium.addItem("Other", "other")
+        for name in SAME_MEDIA:
+            for sk in SAME_MEDIA[name]:
+                if sk.count("Cell"):  # just add CellCarrier information
+                    info = f" ({sk})"
+                    break
             else:
-                name = choice
-            self.comboBox_medium.addItem(name, choice)
-        self.comboBox_medium.addItem("not defined", "undefined")
-        self.comboBox_medium.addItem("unchanged", "unchanged")
+                info = ""
+            self.comboBox_medium.addItem(name+info, name)
+
+        self.comboBox_medium.addItem("Not defined", "undefined")
+        self.comboBox_medium.addItem("Unchanged", "unchanged")
+
         self.comboBox_medium.currentIndexChanged.connect(self.on_cb_medium)
         self.comboBox_medium.setCurrentIndex(self.comboBox_medium.count()-1)
 
@@ -56,7 +60,7 @@ class BulkActionEmodulus(QtWidgets.QDialog):
     def on_cb_medium(self):
         """User changed medium"""
         medium = self.comboBox_medium.currentData()
-        if medium in KNOWN_MEDIA + ["unchanged"]:
+        if medium in list(SAME_MEDIA.keys()) + ["unchanged"]:
             self.doubleSpinBox_visc.setEnabled(False)
             self.comboBox_temp.setEnabled(True)
         else:

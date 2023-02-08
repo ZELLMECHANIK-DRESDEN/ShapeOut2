@@ -118,6 +118,7 @@ def test_simple(qtbot):
         ds.config["calculation"]["emodulus medium"] = \
             ds.config["setup"]["medium"]
         ds.config["calculation"]["emodulus lut"] = "LE-2D-FEM-19"
+        ds.config["calculation"]["emodulus viscosity model"] = "herold-2017"
         emodA = np.array(ds["emodulus"], copy=True)
         ds.config["calculation"]["emodulus temperature"] = \
             ds.config["setup"]["temperature"]

@@ -1,6 +1,6 @@
 import pkg_resources
 
-from dclab.features.emodulus.viscosity import SAME_MEDIA
+from dclab.features.emodulus.viscosity import KNOWN_MEDIA, SAME_MEDIA
 
 from PyQt5 import uic, QtCore, QtWidgets
 
@@ -48,6 +48,13 @@ class BulkActionEmodulus(QtWidgets.QDialog):
         self.comboBox_temp.currentIndexChanged.connect(self.on_cb_temp)
         self.comboBox_temp.setCurrentIndex(self.comboBox_temp.count()-1)
 
+        self.comboBox_visc_model.clear()
+        self.comboBox_visc_model.addItem("buyukurganci-2022",
+                                         "buyukurganci-2022")
+        self.comboBox_visc_model.addItem("herold-2017", "herold-2017")
+        self.comboBox_visc_model.setCurrentIndex(0)
+        self.comboBox_visc_model.currentIndexChanged.connect(self.on_cb_medium)
+
         # buttons
         btn_ok = self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok)
         btn_ok.clicked.connect(self.on_ok)
@@ -63,9 +70,11 @@ class BulkActionEmodulus(QtWidgets.QDialog):
         if medium in list(SAME_MEDIA.keys()) + ["unchanged"]:
             self.doubleSpinBox_visc.setEnabled(False)
             self.comboBox_temp.setEnabled(True)
+            self.comboBox_visc_model.setEnabled(True)
         else:
             self.doubleSpinBox_visc.setEnabled(True)
             self.comboBox_temp.setEnabled(False)
+            self.comboBox_visc_model.setEnabled(False)
         self.on_cb_temp()
 
     def on_cb_temp(self):
@@ -82,6 +91,7 @@ class BulkActionEmodulus(QtWidgets.QDialog):
     def set_emodulus_properties(self):
         """Set the given emodulus properties for all datasets"""
         medium = self.comboBox_medium.currentData()
+        visc_model = self.comboBox_visc_model.currentData()
         if self.comboBox_temp.isEnabled():
             scen = self.comboBox_temp.currentData()
         else:
@@ -102,24 +112,31 @@ class BulkActionEmodulus(QtWidgets.QDialog):
             ds = slot.get_dataset()
 
             # Use the internal sanity checks to determine whether
-            # or not we can set the medium or temperature scenarios.
+            # we can set the medium or temperature scenarios.
             valid_media = SlotPanel.get_dataset_choices_medium(ds)
             valid_scenarios = SlotPanel.get_dataset_choices_temperature(ds)
+
+            state = slot.__getstate__()
+
             if medium in [m[1] for m in valid_media]:
-                state = slot.__getstate__()
                 state["emodulus"]["emodulus medium"] = medium
                 # Set the viscosity here, because unknown media are
                 # available.
                 if viscval is not None:
                     state["emodulus"]["emodulus viscosity"] = viscval
-                slot.__setstate__(state)
 
             if scen in [s[1] for s in valid_scenarios]:  # scen is not None
-                state = slot.__getstate__()
                 state["emodulus"]["emodulus scenario"] = scen
                 if tempval is not None:
                     state["emodulus"]["emodulus temperature"] = tempval
-                slot.__setstate__(state)
+
+            if state["emodulus"]["emodulus medium"] in KNOWN_MEDIA:
+                state["emodulus"]["emodulus viscosity model"] = visc_model
+            else:
+                if "emodulus viscosity model" in state["emodulus"]:
+                    state["emodulus"].pop("emodulus viscosity model")
+
+            slot.__setstate__(state)
 
     def update_ui(self):
         """Update all relevant parts of the main user interface"""

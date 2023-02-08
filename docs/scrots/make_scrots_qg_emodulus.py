@@ -35,7 +35,7 @@ mw.reload_pipeline()
 mw.on_modify_slot(mw.pipeline.slot_ids[0])
 mw.widget_ana_view.repaint()
 wsl = mw.widget_ana_view.widget_slot
-wsl.groupBox_emod.setFixedSize(350, wsl.groupBox_emod.sizeHint().height())
+wsl.groupBox_emod.setFixedSize(420, wsl.groupBox_emod.sizeHint().height())
 
 wsl.comboBox_medium.setCurrentIndex(
     wsl.comboBox_medium.findData("CellCarrier"))

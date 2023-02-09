@@ -209,7 +209,7 @@ class QuickView(QtWidgets.QWidget):
     def _check_file_open(self, rtdc_ds):
         """Check whether a dataset is still open"""
         if isinstance(rtdc_ds, dclab.rtdc_dataset.RTDC_HDF5):
-            if rtdc_ds._h5:
+            if rtdc_ds.h5file:
                 # the file is open
                 isopen = True
             else:

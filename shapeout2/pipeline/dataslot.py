@@ -129,7 +129,7 @@ class Dataslot(object):
         ds = slot._dataset
         if ds is not None:
             if isinstance(ds, dclab.rtdc_dataset.RTDC_HDF5):
-                ds._h5.close()
+                ds.h5file.close()
         Dataslot._instances.pop(slot_id)
 
     @property

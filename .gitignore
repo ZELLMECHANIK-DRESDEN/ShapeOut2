@@ -113,3 +113,6 @@ docs/*.bib.bak
 .idea
 build-recipes/ShapeOut2Launcher.spec
 .Rhistory
+
+# line profiler
+*.lprof

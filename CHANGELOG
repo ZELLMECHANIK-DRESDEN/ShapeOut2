@@ -1,5 +1,6 @@
 2.13.0
  - feat: support new viscosity model buyukurganci-2022 (#136)
+ - enh: increase speed of QuickView event visualization
  - enh: turn on auto-apply in QuickView by default
  - setup: bump dclab from 0.47.2 to 0.48.1
 2.12.0

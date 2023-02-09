@@ -259,17 +259,17 @@ class RTDCScatterPlot(pg.ScatterPlotItem):
         """Unlike `ScatterPlotItem.pointsAt`, return the closest point"""
         x = pos.x()
         y = pos.y()
+
         pw = self.pixelWidth()
         ph = self.pixelHeight()
-        p = self.points()[0]
-        d = np.inf
-        for s in self.points():
-            sp = s.pos()
-            di = ((sp.x() - x)/pw)**2 + ((sp.y() - y)/ph)**2
-            if di < d:
-                p = s
-                d = di
-        return p
+
+        # compute the distances of all points to x and y
+        dists = np.abs((self.data["x"] - x)/pw) \
+            + np.abs((self.data["y"] - y)/ph)
+        ide = np.argmin(dists)
+
+        # calling `self.points` populates the data["item"] column.
+        return self.points()[ide]
 
     def set_point(self, view_pos):
         pos = self.mapFromView(view_pos)

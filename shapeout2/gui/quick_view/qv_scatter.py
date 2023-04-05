@@ -131,6 +131,7 @@ class QuickViewScatterWidget(SimplePlotWidget):
             elif self.hue_type == "feature":
                 fdata = self.rtdc_ds[self.hue_kwargs["feat"]][idx]
                 fdata -= fdata.min()
+                fdata = np.array(fdata, dtype=float)  # cast int to float
                 fdata /= fdata.max()
                 for f in fdata:
                     brush.append(cmap.mapToQColor(f))

@@ -4,6 +4,7 @@ import tempfile
 from unittest import mock
 
 import dclab
+import numpy as np
 from PyQt5 import QtCore, QtWidgets
 import pytest
 from shapeout2.gui.main import ShapeOut2
@@ -97,3 +98,48 @@ def test_export_datasets_rtdc_emodulus_only_in_one_issue_80(qtbot):
         assert "emodulus" not in ds
     with dclab.new_dataset(exported[2]) as ds:
         assert "emodulus" not in ds
+
+
+def test_export_datasets_rtdc_logs(qtbot):
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+
+    # add 1 dataslots
+    path = data_path / "cytoshot_blood.rtdc"
+    slot_ids = mw.add_dataslot(paths=[path])
+
+    # add a filter and activate it
+    filt_id = mw.add_filter()
+    filt = mw.pipeline.get_filter(filt_id)
+    filt.limit_events = [True, 3]
+    mw.pipeline.set_element_active(slot_ids[0], filt_id)
+
+    # perform the export
+    tmpd = tempfile.mkdtemp(prefix="shapeout2_test_data_export_")
+    with mock.patch.object(QtWidgets.QFileDialog, "getExistingDirectory",
+                           return_value=tmpd):
+
+        # create export dialog manually (asks user for directory)
+        dlg = export.ExportData(mw, pipeline=mw.pipeline)
+
+        # Everything is set-up already (.rtdc export, all features selected).
+        # Click OK.
+        buttons = dlg.buttonBox.buttons()
+        qtbot.mouseClick(buttons[0], QtCore.Qt.LeftButton)
+
+    # make sure we have one .rtdc file
+    exported = list(pathlib.Path(tmpd).glob("*.rtdc"))
+    assert len(exported) == 1
+
+    # make sure that file has three events and contains the logs and tables
+    with dclab.new_dataset(exported[0]) as ds:
+        assert len(ds) == 3
+        assert len(ds.logs) == 5
+        assert "so2exp_src_cytoshot-acquisition" in ds.logs
+        print(sorted(ds.logs))
+        assert np.allclose(
+            ds.tables["so2exp_src_cytoshot_monitor"]["brightness"][0],
+            146.22099383,
+            atol=0,
+            rtol=1e-10)
+

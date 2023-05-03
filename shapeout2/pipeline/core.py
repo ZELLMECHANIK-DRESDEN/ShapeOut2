@@ -410,15 +410,15 @@ class Pipeline(object):
         fmin = np.inf
         fmax = -np.inf
         for ds in dslist:
-            if np.sum(ds.filter.all):
+            if np.any(ds.filter.all):
                 if feat in ds:
                     fdata = ds[feat][ds.filter.all]
                     invalid = np.logical_or(np.isnan(fdata), np.isinf(fdata))
                     vdata = fdata[~invalid]
                     vmin = np.min(vdata)
                     vmax = np.max(vdata)
-                    fmin = np.min([fmin, vmin])
-                    fmax = np.max([fmax, vmax])
+                    fmin = min(fmin, vmin)
+                    fmax = max(fmax, vmax)
                 else:
                     warnings.warn("Dataset {} does not ".format(ds.identifier)
                                   + "contain the feature '{}'!".format(feat),

@@ -1,6 +1,7 @@
 2.13.3
  - fix: casting error when using integer feature for plot color
  - fix: also export logs and tables to .rtdc with prefix "so2exp_"
+ - enh: minor minimization in waiting times
  - setup: bump dclab from 0.48.4 to 0.50.1
 2.13.2
  - docs: don't build PDF on rtd (failed)

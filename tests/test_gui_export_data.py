@@ -142,4 +142,3 @@ def test_export_datasets_rtdc_logs(qtbot):
             146.22099383,
             atol=0,
             rtol=1e-10)
-

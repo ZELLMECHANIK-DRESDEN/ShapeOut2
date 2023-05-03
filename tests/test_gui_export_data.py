@@ -136,7 +136,6 @@ def test_export_datasets_rtdc_logs(qtbot):
         assert len(ds) == 3
         assert len(ds.logs) == 5
         assert "so2exp_src_cytoshot-acquisition" in ds.logs
-        print(sorted(ds.logs))
         assert np.allclose(
             ds.tables["so2exp_src_cytoshot_monitor"]["brightness"][0],
             146.22099383,

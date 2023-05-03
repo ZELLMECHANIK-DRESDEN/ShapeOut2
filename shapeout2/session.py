@@ -9,6 +9,7 @@ import zipfile
 
 import dclab
 from dclab.util import file_monitoring_lru_cache
+import numpy as np
 
 from .pipeline import Dataslot, Filter, Pipeline, Plot
 from ._version import version
@@ -20,14 +21,17 @@ class DataFileNotFoundError(BaseException):
         super(DataFileNotFoundError, self).__init__(*args)
 
 
-class PathlibJSONEncoder(json.JSONEncoder):
+class ShapeOutSessionJSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, pathlib.Path):
             return {"__type__": "path",
                     "__data__": o.as_posix()
                     }
+        elif isinstance(o, np.floating):  # handle np.float32
+            return float(o)
+
         # Let the base class default method raise the TypeError
-        return super(PathlibJSONEncoder, self).default(o)
+        return super(ShapeOutSessionJSONEncoder, self).default(o)
 
 
 class PathlibJSONDecoder(json.JSONDecoder):
@@ -81,7 +85,7 @@ def export_filters(path, pipeline, filt_ids=None):
             filt_states.append(filt.__getstate__())
     state = {"polygon filters": poly_states,
              "filters": filt_states}
-    dump = json.dumps(state, sort_keys=True, indent=2)
+    dump = json.dumps(state, **JSON_DUMP_KWARGS)
     pathlib.Path(path).write_text(dump)
 
 
@@ -186,21 +190,14 @@ def save_session(path, pipeline):
     export_filters(tempdir / "filters.sof", pipeline)
     # slots
     for ii, slot in enumerate(pipeline.slots):
-        sdump = json.dumps(slot.__getstate__(),
-                           cls=PathlibJSONEncoder,
-                           sort_keys=True,
-                           indent=2)
+        sdump = json.dumps(slot.__getstate__(), **JSON_DUMP_KWARGS)
         (tempdir / "slot_{}.json".format(ii)).write_text(sdump)
     # plots
     for jj, plot in enumerate(pipeline.plots):
-        pdump = json.dumps(plot.__getstate__(),
-                           sort_keys=True,
-                           indent=2)
+        pdump = json.dumps(plot.__getstate__(), **JSON_DUMP_KWARGS)
         (tempdir / "plot_{}.json".format(jj)).write_text(pdump)
     # pipeline block matrix
-    mdump = json.dumps(pipeline.element_states,
-                       sort_keys=True,
-                       indent=2)
+    mdump = json.dumps(pipeline.element_states, **JSON_DUMP_KWARGS)
     (tempdir / "matrix.json").write_text(mdump)
     # additional information
     search_paths = {}
@@ -228,10 +225,7 @@ def save_session(path, pipeline):
                "formats": dataset_formats,
                "version": version,
                }
-    rdump = json.dumps(remarks,
-                       cls=PathlibJSONEncoder,
-                       sort_keys=True,
-                       indent=2)
+    rdump = json.dumps(remarks, **JSON_DUMP_KWARGS)
     (tempdir / "remarks.json").write_text(rdump)
     # zip everything
     with zipfile.ZipFile(path, mode='w') as arc:
@@ -376,3 +370,10 @@ def open_session(path, pipeline=None, search_paths=None):
         estates = json.loads(arc.read("matrix.json"))
         pipeline.element_states = estates
     return pipeline
+
+
+JSON_DUMP_KWARGS = {
+    "cls": ShapeOutSessionJSONEncoder,
+    "sort_keys": True,
+    "indent": 2,
+}

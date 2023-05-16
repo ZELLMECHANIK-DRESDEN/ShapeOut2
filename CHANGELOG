@@ -1,3 +1,5 @@
+2.13.4
+ - tests: fix fake dataset creation
 2.13.3
  - fix: casting error when using integer feature for plot color
  - fix: also export logs and tables to .rtdc with prefix "so2exp_"

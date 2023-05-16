@@ -49,13 +49,14 @@ def test_get_min_max_inf():
         config = copy.deepcopy(ds.config)
 
     tmp = tempfile.mktemp(".rtdc", prefix="example_filter_inf_")
-    ds2 = dclab.new_dataset({"deform": np.linspace(0, .01, 100),
-                             "area_um": np.linspace(20, 200, 100),
-                             "area_ratio": np.linspace(1, 1.1, 100)
-                             })
+    ddict = {"deform": np.linspace(0, .01, 100),
+             "area_um": np.linspace(20, 200, 100),
+             "area_ratio": np.linspace(1, 1.1, 100)
+             }
+    ddict["area_ratio"][0] = np.inf
+    ddict["area_ratio"][1] = np.nan
+    ds2 = dclab.new_dataset(ddict)
     ds2.config.update(config)
-    ds2["area_ratio"][0] = np.inf
-    ds2["area_ratio"][1] = np.nan
     ds2.export.hdf5(tmp, features=["area_um", "deform", "area_ratio"])
 
     # initiate the pipeline

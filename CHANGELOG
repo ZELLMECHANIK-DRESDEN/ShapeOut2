@@ -3,7 +3,7 @@
  - fix: also export logs and tables to .rtdc with prefix "so2exp_"
  - enh: minor minimization in waiting times
  - ref: unify json dumps when saving sessions
- - setup: bump dclab from 0.48.4 to 0.50.1
+ - setup: bump dclab from 0.48.4 to 0.50.4
 2.13.2
  - docs: don't build PDF on rtd (failed)
  - setup: bump dclab from 0.48.2 to 0.48.4 (don't load invalid

@@ -30,7 +30,7 @@ setup(
                       "numpy>=1.21",  # CVE-2021-33430
                       "pyqt5",
                       "pyqtgraph==0.12.4",
-                      "requests",
+                      "requests>=2.31.0",  # CVE-2023-32681
                       "scipy>=1.8.0"],
     python_requires='>=3.8, <4',
     entry_points={"gui_scripts": ['shapeout2 = shapeout2.__main__:main']},

@@ -31,7 +31,7 @@ setup(
                       "pyqt5",
                       "pyqtgraph==0.12.4",
                       "requests>=2.31.0",  # CVE-2023-32681
-                      "scipy>=1.8.0"],
+                      "scipy>=1.10.0"],  # CVE-2023-25399
     python_requires='>=3.8, <4',
     entry_points={"gui_scripts": ['shapeout2 = shapeout2.__main__:main']},
     keywords=["RT-DC", "deformability", "cytometry", "zellmechanik"],

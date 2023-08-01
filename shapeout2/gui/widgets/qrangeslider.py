@@ -77,9 +77,9 @@ class Element(QtWidgets.QGroupBox):
         return getattr(self, '__textColor', QtGui.QColor(125, 125, 125))
 
     def setTextColor(self, color):
-        if type(color) == tuple and len(color) == 3:
+        if type(color) is tuple and len(color) == 3:
             color = QtGui.QColor(color[0], color[1], color[2])
-        elif type(color) == int:
+        elif type(color) is int:
             color = QtGui.QColor(color, color, color)
         setattr(self, '__textColor', color)
 

@@ -1,6 +1,7 @@
 2.13.5
  - setup: bump requests to 2.31.0 (CVE-2023-32681)
  - setup: bump scipy to 1.10.0 (CVE-2023-25399)
+ - setup: bump dclab from 0.50.4 to 0.52.0
 2.13.4
  - tests: fix fake dataset creation
 2.13.3

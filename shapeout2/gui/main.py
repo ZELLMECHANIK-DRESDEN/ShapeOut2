@@ -85,7 +85,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         # Register user-defined DCOR API Key in case the user wants to
         # open a session with private data.
         api_key = self.settings.value("dcor/api key", "")
-        dclab.rtdc_dataset.fmt_dcor.APIHandler.add_api_key(api_key)
+        dclab.rtdc_dataset.fmt_dcor.api.APIHandler.add_api_key(api_key)
         #: Analysis pipeline
         self.pipeline = pipeline.Pipeline()
         #: Extensions

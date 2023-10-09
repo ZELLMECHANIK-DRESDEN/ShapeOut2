@@ -55,7 +55,7 @@ jobs:
          coverage run --source=shapeout2 -m pytest -x tests
     - name: Lint with flake8
       run: |
-        flake8 .
+        flake8 --exclude _version.py .
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
     - name: Create app and check if it runs (macOS)

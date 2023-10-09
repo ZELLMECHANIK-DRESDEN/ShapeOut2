@@ -72,7 +72,7 @@ class DCORLoader(QtWidgets.QDialog):
         """Return the API headers (Authorization with API key)"""
         api_key = self.settings.value("dcor/api key", "")
         # Add this API Key to the known API keys (dclab)
-        dclab.rtdc_dataset.fmt_dcor.APIHandler.add_api_key(api_key)
+        dclab.rtdc_dataset.fmt_dcor.api.APIHandler.add_api_key(api_key)
 
         if api_key:
             api_headers = {"Authorization": api_key}

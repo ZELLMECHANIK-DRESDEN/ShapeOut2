@@ -1,3 +1,6 @@
+2.14.0
+ - setup: drop support for Python 3.8
+ - build: use Python 3.10 for building executables
 2.13.7
  - ci: fix rtd build pipeline
  - setup: bump dclab from 0.52.0 to 0.54.2 (improved basin support)

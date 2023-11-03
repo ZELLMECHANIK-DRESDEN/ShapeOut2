@@ -29,6 +29,8 @@ def run_around_tests():
 
 
 @pytest.mark.skipif(not NET_AVAILABLE, reason="No network connection!")
+@pytest.mark.filterwarnings(
+    'ignore::dclab.rtdc_dataset.config.WrongConfigurationTypeWarning')
 def test_lme4_with_dcor_session(qtbot):
     """
     Open a session with DCOR data and perform lme4 analysis from
@@ -68,6 +70,8 @@ def test_lme4_with_dcor_session(qtbot):
 
 
 @pytest.mark.skipif(not NET_AVAILABLE, reason="No network connection!")
+@pytest.mark.filterwarnings(
+    'ignore::dclab.rtdc_dataset.config.WrongConfigurationTypeWarning')
 def test_lme4_with_dcor_session_differential(qtbot):
     """
     Perform differential deformation test

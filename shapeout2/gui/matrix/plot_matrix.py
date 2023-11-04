@@ -192,8 +192,8 @@ class PlotMatrix(QtWidgets.QWidget):
         ncols = self.glo.columnCount()
         nrows = self.glo.rowCount()
         for ii in range(1, nrows):
-            ds = self.data_matrix.glo.itemAtPosition(ii, 0).widget()
-            if ds.identifier == dataset_id:
+            dw = self.data_matrix.glo.itemAtPosition(ii, 0).widget()
+            if dw.identifier == dataset_id:
                 for jj in range(ncols):
                     f = self.glo.itemAtPosition(0, jj).widget()
                     if f.identifier == plot_id:

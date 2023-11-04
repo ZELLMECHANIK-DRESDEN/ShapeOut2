@@ -304,8 +304,8 @@ class DataMatrix(QtWidgets.QWidget):
         return fw.__getstate__()
 
     def get_slot_index(self, slot_id):
-        for ii, ds in enumerate(self.dataset_widgets):
-            if ds.identifier == slot_id:
+        for ii, dw in enumerate(self.dataset_widgets):
+            if dw.identifier == slot_id:
                 break
         else:
             raise KeyError("Dataset '{}' not found!".format(slot_id))

@@ -25,9 +25,9 @@ class Dataslot(object):
         cfg = meta_tool.get_rtdc_config(path)
         if name is None:
             name = cfg["experiment"]["sample"]
-        #: unique identifier of the filter
+        #: session-unique identifier of the slot
         self.identifier = identifier
-        #: user-defined name of the filter
+        #: user-defined name of the slot
         self.name = name
         #: whether to use this slot
         self.slot_used = True
@@ -188,7 +188,7 @@ class Dataslot(object):
             Loaded dataset
         """
         if self._dataset is None:
-            ds = dclab.new_dataset(self.path, identifier=self.identifier)
+            ds = dclab.new_dataset(self.path)
             self._dataset = ds
         else:
             ds = self._dataset

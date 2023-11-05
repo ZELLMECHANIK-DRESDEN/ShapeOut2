@@ -32,12 +32,10 @@ jobs:
         # start xvfb in the background
         sudo /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
     - name: install R
-      if: matrix.extras == 'all'
       uses: r-lib/actions/setup-r@v2
       with:
         r-version: '3.6.3'
     - name: install lme4
-      if: matrix.extras == 'all'
       uses: r-lib/actions/setup-r-dependencies@v2
       with:
         extra-packages: any::lme4

@@ -42,9 +42,10 @@ jobs:
         # https://github.com/rpy2/rpy2/issues/1044
         python -m pip install rpy2==3.5.12
     - name: install lme4
+      if: runner.os == 'Windows'
       shell: bash
       run: |
-        R -e "install.packages('lme4', repos='http://cran.rstudio.org')"
+        R -e "install.packages('lme4', repos='http://cran.rstudio.org', type='binary')"
     - name: Install Python dependencies
       run: |
         # prerequisites

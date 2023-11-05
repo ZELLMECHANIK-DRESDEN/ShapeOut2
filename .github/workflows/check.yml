@@ -42,7 +42,7 @@ jobs:
       with:
         extra-packages: any::lme4
     - name: Downgrade rpy2 (Windows)
-      if: runner.os == 'Windows' && matrix.extras == 'all'
+      if: runner.os == 'Windows'
       run: |
         # Force installation of rpy2 3.5.12
         # https://github.com/rpy2/rpy2/issues/1044

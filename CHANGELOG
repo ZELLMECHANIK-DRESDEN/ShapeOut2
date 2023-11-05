@@ -1,7 +1,7 @@
 2.14.0
  - ref: don't set RTDCBase.identifier to slot identifier
  - setup: drop support for Python 3.8
- - setup: bump dclab from 0.54.2 to 0.55.0 (better DCOR support)
+ - setup: bump dclab from 0.54.2 to 0.55.4 (better DCOR support)
  - build: use Python 3.10 for building executables
 2.13.7
  - ci: fix rtd build pipeline

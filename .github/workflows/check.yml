@@ -41,7 +41,7 @@ jobs:
         # Force installation of rpy2 3.5.12
         # https://github.com/rpy2/rpy2/issues/1044
         python -m pip install rpy2==3.5.12
-    - name: install lme4
+    - name: install lme4 (Windows)
       if: runner.os == 'Windows'
       shell: bash
       run: |

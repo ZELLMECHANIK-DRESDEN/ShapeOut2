@@ -20,6 +20,17 @@ class MissingFeatureWarning(UserWarning):
 
 class Pipeline(object):
     def __init__(self, state=None):
+        #: Filters are instances of :class:`shapeout2.pipeline.Filter`
+        self.filters = []
+        #: Plots are instances of :class:`shapeout2.pipeline.Plot`
+        self.plots = []
+        #: Filter rays of the current pipeline
+        self.rays = {}
+        #: Slots are instances of :class:`shapeout2.pipeline.Dataslot`
+        self.slots = []
+        #: individual element states
+        self.element_states = {}
+
         self.reset()
         #: previous state (see __setstate__)
         self._old_state = {}
@@ -49,13 +60,12 @@ class Pipeline(object):
             raise ValueError("Bad pipeline state ('slots used' don't match)")
 
     def __getstate__(self):
-        state = {}
-        state["elements"] = copy.deepcopy(self.element_states)
-        state["filters"] = [filt.__getstate__() for filt in self.filters]
-        state["filters used"] = self.filters_used
-        state["plots"] = [plot.__getstate__() for plot in self.plots]
-        state["slots"] = [slot.__getstate__() for slot in self.slots]
-        state["slots used"] = self.slots_used
+        state = {"elements": copy.deepcopy(self.element_states),
+                 "filters": [filt.__getstate__() for filt in self.filters],
+                 "filters used": self.filters_used,
+                 "plots": [plot.__getstate__() for plot in self.plots],
+                 "slots": [slot.__getstate__() for slot in self.slots],
+                 "slots used": self.slots_used}
         return state
 
     @property
@@ -282,7 +292,7 @@ class Pipeline(object):
         """
         if not isinstance(slot_index, int):
             raise ValueError(
-                "`slot_index` must be an integer, got '{}'".format(slot_index))
+                f"`slot_index` must be an integer, got '{slot_index}'")
         slot = self.slots[slot_index]
         if filt_index is None or (filt_index == -1 and len(self.slots) == 0):
             # return the unfiltered dataset
@@ -385,8 +395,7 @@ class Pipeline(object):
     def get_filter(self, filt_id):
         """Return the Filter matching the identifier"""
         if filt_id not in self.filter_ids:
-            raise ValueError(
-                "Filter '{}' not part of this pipeline!".format(filt_id))
+            raise ValueError(f"Filter '{filt_id}' not part of this pipeline!")
         return self.filters[self.filter_ids.index(filt_id)]
 
     def get_filters_for_slot(self, slot_id, max_filter_index=-1):
@@ -451,12 +460,12 @@ class Pipeline(object):
                     fmin = min(fmin, vmin)
                     fmax = max(fmax, vmax)
                 else:
-                    warnings.warn("Dataset {} does not ".format(ds.identifier)
-                                  + "contain the feature '{}'!".format(feat),
+                    warnings.warn(f"Dataset {ds.identifier} does not "
+                                  f"contain the feature '{feat}'!",
                                   MissingFeatureWarning)
             else:
-                warnings.warn("Dataset {} does not ".format(ds.identifier)
-                              + "contain any events when filtered!",
+                warnings.warn(f"Dataset {ds.identifier} does not "
+                              f"contain any events when filtered!",
                               EmptyDatasetWarning)
         if margin:
             diff = fmax - fmin
@@ -470,8 +479,7 @@ class Pipeline(object):
 
     def get_plot(self, plot_id):
         if plot_id not in self.plot_ids:
-            raise ValueError(
-                "Plot '{}' not part of this pipeline!".format(plot_id))
+            raise ValueError(f"Plot '{plot_id}' not part of this pipeline!")
         self.check_contour_spacing(plot_id)
         return self.plots[self.plot_ids.index(plot_id)]
 
@@ -510,8 +518,7 @@ class Pipeline(object):
             if plot_id == pstate["identifier"]:
                 break
         else:
-            raise KeyError(
-                "Plot '{}' not given in pipeline state!".format(plot_id))
+            raise KeyError(f"Plot '{plot_id}' not given in pipeline state!")
 
         # number of datasets in that plot
         num_scat = 0
@@ -527,7 +534,7 @@ class Pipeline(object):
         elif div == "multiscatter+contour":
             num_plots = num_scat + 1
         else:
-            raise ValueError("Unrecognized division: '{}'".format(div))
+            raise ValueError(f"Unrecognized division: '{div}'")
 
         # column count
         col_count = min(pstate["layout"]["column count"], num_plots)
@@ -553,8 +560,7 @@ class Pipeline(object):
         if slot_id in self.slot_ids:
             slot = self.slots[self.slot_ids.index(slot_id)]
         else:
-            raise ValueError("Unknown dataset identifier: "
-                             + "`{}`".format(slot_id))
+            raise ValueError(f"Unknown dataset identifier: `{slot_id}`")
         return slot
 
     def is_element_active(self, slot_id, filt_plot_id):
@@ -594,8 +600,8 @@ class Pipeline(object):
         """
         # sanity checks
         if sorted(indices) != list(range(len(self.slots))):
-            raise ValueError("Cannot reorder slots with inconclusive "
-                             "ordering sequence '{}'!".format(indices))
+            raise ValueError(f"Cannot reorder slots with inconclusive "
+                             f"ordering sequence '{indices}'!")
         new_slots = []
         for idx in indices:
             new_slots.append(self.slots[idx])
@@ -603,16 +609,11 @@ class Pipeline(object):
 
     def reset(self):
         """Reset the pipeline"""
-        #: Filters are instances of :class:`shapeout2.pipeline.Filter`
-        self.filters = []
-        #: Plots are instances of :class:`shapeout2.pipeline.Plot`
-        self.plots = []
-        #: Filter rays of the current pipeline
-        self.rays = {}
-        #: Slots are instances of :class:`shapeout2.pipeline.Dataslot`
-        self.slots = []
-        #: individual element states
-        self.element_states = {}
+        self.filters.clear()
+        self.plots.clear()
+        self.rays.clear()
+        self.slots.clear()
+        self.element_states.clear()
 
     def set_element_active(self, slot_id, filt_plot_id, active=True):
         """Activate an element in the block matrix"""

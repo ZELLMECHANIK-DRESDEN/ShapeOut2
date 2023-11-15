@@ -4,6 +4,8 @@ import warnings
 import dclab
 import numpy as np
 
+from ..idiom import SLOPING_FEATURES
+
 from .dataslot import Dataslot
 from .filter import Filter
 from .filter_ray import FilterRay
@@ -453,10 +455,20 @@ class Pipeline(object):
             if np.any(ds.filter.all):
                 if feat in ds:
                     fdata = ds[feat][ds.filter.all]
-                    invalid = np.logical_or(np.isnan(fdata), np.isinf(fdata))
-                    vdata = fdata[~invalid]
-                    vmin = np.min(vdata)
-                    vmax = np.max(vdata)
+                    invalid = np.isinf(fdata)
+                    if np.any(invalid):
+                        vdata = fdata[~invalid]
+                    else:
+                        vdata = fdata
+                    if feat in SLOPING_FEATURES:
+                        # We are a little faster here.
+                        vmin = min(np.nanmin(vdata[:1000]),
+                                   np.nanmin(vdata[-1000:]))
+                        vmax = max(np.nanmax(vdata[:1000]),
+                                   np.nanmax(vdata[-1000:]))
+                    else:
+                        vmin = np.nanmin(vdata)
+                        vmax = np.nanmax(vdata)
                     fmin = min(fmin, vmin)
                     fmax = max(fmax, vmax)
                 else:

@@ -1,3 +1,5 @@
+2.14.1
+ - fix: perform sanity check for contour spacing before plotting
 2.14.0
  - ref: don't set RTDCBase.identifier to slot identifier
  - setup: drop support for Python 3.8

@@ -8,7 +8,7 @@ import dclab
 from ...pipeline import Filter
 
 from ..widgets import RangeControl
-from .. import idiom
+from ... import idiom
 
 
 class FilterPanel(QtWidgets.QWidget):

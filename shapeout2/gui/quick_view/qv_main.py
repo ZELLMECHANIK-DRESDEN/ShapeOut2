@@ -8,7 +8,7 @@ import pyqtgraph as pg
 from scipy.ndimage import binary_erosion
 
 from ..compute.comp_stats import STAT_METHODS
-from .. import idiom
+from ... import idiom
 from ..widgets import show_wait_cursor
 
 

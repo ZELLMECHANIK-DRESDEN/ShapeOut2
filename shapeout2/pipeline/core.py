@@ -36,6 +36,7 @@ class Pipeline(object):
             self.add_filter(filt_state)
         for plot_state in state["plots"]:
             self.add_plot(plot_state)
+            self.check_contour_spacing(plot_state["identifier"])
         for slot_state in state["slots"]:
             self.add_slot(slot=slot_state)
         # set element states at the end
@@ -232,6 +233,36 @@ class Pipeline(object):
         ray = self.get_ray(slot_id)
         ds = ray.get_final_child(rtdc_ds)
         return ds
+
+    def check_contour_spacing(self, plot_id):
+        """Check the contour spacing for a specific plot against the data
+
+        This method was implemented to avoid tiny contour spacings for
+        plotting, which could lead to OOM events.
+        """
+        plot = self.plots[self.plot_ids.index(plot_id)]
+        plot_state = plot.__getstate__()
+        old_plot_state = copy.deepcopy(plot_state)
+        if plot_state["general"]["auto range"]:
+            for ax in ["x", "y"]:
+                feat = plot_state["general"][f"axis {ax}"]
+                spacing = plot_state["contour"][f"spacing {ax}"]
+                for ds, slot_state in zip(*self.get_plot_datasets(
+                        plot_id, apply_filter=False)):
+                    slot_id = slot_state["identifier"]
+                    slot = self.get_slot(slot_id)
+                    sp_min, sp_max = slot.get_sane_spacing_range(feat=feat)
+                    if spacing < sp_min:
+                        warnings.warn(f"Setting contour spacing for {slot_id} "
+                                      f"to minimum ({spacing}<{sp_min})")
+                        spacing = sp_min
+                    elif spacing > sp_max:
+                        warnings.warn(f"Setting contour spacing for {slot_id} "
+                                      f"to maximum ({spacing}>{sp_max})")
+                        spacing = sp_max
+                    plot_state["contour"][f"spacing {ax}"] = spacing
+        if old_plot_state != plot_state:
+            plot.__setstate__(plot_state)
 
     def get_dataset(self, slot_index, filt_index=-1, apply_filter=True):
         """Return dataset with all filters updated (optionally applied)
@@ -441,6 +472,7 @@ class Pipeline(object):
         if plot_id not in self.plot_ids:
             raise ValueError(
                 "Plot '{}' not part of this pipeline!".format(plot_id))
+        self.check_contour_spacing(plot_id)
         return self.plots[self.plot_ids.index(plot_id)]
 
     def get_plot_datasets(self, plot_id, apply_filter=True):

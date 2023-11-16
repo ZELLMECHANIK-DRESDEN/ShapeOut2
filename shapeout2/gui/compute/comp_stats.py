@@ -46,7 +46,8 @@ class ComputeStatistics(QtWidgets.QDialog):
         else:
             self.comboBox.setCurrentIndex(0)
         self.on_combobox()  # computes self.features
-        self.bulklist_features.on_select_all()
+        # Only select innate features
+        self.on_select_features_innate()
 
     def done(self, r):
         if r:
@@ -172,6 +173,22 @@ class ComputeStatistics(QtWidgets.QDialog):
             # Datasets from current session
             self.widget_other.hide()
             self.update_feature_list(use_pipeline=True)
+
+    def on_select_features_innate(self):
+        """Only select all innate features of the first dataset"""
+
+        if self.pipeline.num_slots:
+            ds = self.pipeline.get_dataset(0)
+            features_innate = ds.features_innate
+            lw = self.bulklist_features.listWidget
+            for ii in range(lw.count()):
+                wid = lw.item(ii)
+                for feat in features_innate:
+                    if wid.data(101) == feat:
+                        wid.setCheckState(QtCore.Qt.CheckState.Checked)
+                        break
+                else:
+                    wid.setCheckState(QtCore.Qt.CheckState.Unchecked)
 
     def update_feature_list(self, use_pipeline=True):
         if use_pipeline:

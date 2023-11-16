@@ -1,8 +1,10 @@
 2.14.1
  - fix: perform sanity check for contour spacing before plotting
+ - fix: use pyqtgraph.SpinBox to edit box filters (#149)
  - enh: minor optimization of min/max feature algorithm
  - enh: only preselect innate features when computing statistics (#150)
  - setup: bump dclab to 0.55.6 (new scalar features, dcor access)
+ - setup: bump pyqtgraph from 0.12.4 to 0.13.3
 2.14.0
  - ref: don't set RTDCBase.identifier to slot identifier
  - setup: drop support for Python 3.8

@@ -25,6 +25,12 @@ class RangeControl(QtWidgets.QWidget):
             "shapeout2.gui.widgets", "rangecontrol.ui")
         uic.loadUi(path_ui, self)
 
+        for spinbox in (self.doubleSpinBox_min, self.doubleSpinBox_max):
+            spinbox.setOpts(
+                format="{scaledValue:.{decimals}f}{suffixGap}{suffix}",
+                compactHeight=False,
+            )
+
         # arbitrary data
         self.data = data
 

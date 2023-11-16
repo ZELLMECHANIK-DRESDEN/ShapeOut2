@@ -39,7 +39,7 @@ class NanFloatValidator(QtGui.QValidator):
             text = "nan"
         if valid_nanfloat_string(string):
             return self.Acceptable, text, position
-        if string == "":
+        elif string == "":
             return self.Intermediate, text, position
         return self.Invalid, text, position
 

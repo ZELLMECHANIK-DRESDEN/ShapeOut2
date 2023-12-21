@@ -1,3 +1,5 @@
+2.14.2
+ - setup: bump dclab from 0.55.6 to 0.55.7
 2.14.1
  - fix: perform sanity check for contour spacing before plotting
  - fix: use pyqtgraph.SpinBox to edit box filters (#149)

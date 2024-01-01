@@ -311,6 +311,7 @@ class QuickView(QtWidgets.QWidget):
         else:
             return None, None
 
+    @QtCore.pyqtSlot(object, object)
     def on_event_scatter_clicked(self, plot, point):
         """User clicked on scatter plot
 
@@ -321,19 +322,25 @@ class QuickView(QtWidgets.QWidget):
         point: QPoint
             Selected point (determined by scatter plot widget)
         """
-        # `self.on_tool` (`self.toolButton_event`) takes care of this:
-        # self.widget_scatter.select.show()
-        if not self.toolButton_event.isChecked():
-            # emulate mouse toggle
-            self.toolButton_event.setChecked(True)
-            self.toolButton_event.toggled.emit(True)
         if self.widget_scatter.events_plotted is not None:
             # plotted events
             plotted = self.widget_scatter.events_plotted
             # get corrected index
             ds_idx = np.where(plotted)[0][point.index()]
             self.show_event(ds_idx)
+        # Note that triggering the toolButton_event must be done after
+        # calling show_event, otherwise the first event is shown and
+        # only after that the desired one. This would be a drawback when
+        # events come from remote locations.
+        #
+        # `self.on_tool` (`self.toolButton_event`) takes care of this:
+        # self.widget_scatter.select.show()
+        if not self.toolButton_event.isChecked():
+            # emulate mouse toggle
+            self.toolButton_event.setChecked(True)
+            self.toolButton_event.toggled.emit(True)
 
+    @QtCore.pyqtSlot(QtCore.QPointF)
     def on_event_scatter_hover(self, pos):
         """Update the image view in the polygon widget """
         if self.rtdc_ds is not None and self.toolButton_poly.isChecked():
@@ -354,15 +361,18 @@ class QuickView(QtWidgets.QWidget):
             else:
                 self.imageView_image_poly.hide()
 
+    @QtCore.pyqtSlot(int)
     def on_event_scatter_spin(self, event):
         """Sping control for event selection changed"""
         self.show_event(event - 1)
 
+    @QtCore.pyqtSlot()
     def on_event_scatter_update(self):
         """Just update the event shown"""
         event = self.spinBox_event.value()
         self.show_event(event - 1)
 
+    @QtCore.pyqtSlot()
     def on_poly_create(self):
         """User wants to create a polygon filter"""
         self.pushButton_poly_create.setEnabled(False)
@@ -386,6 +396,7 @@ class QuickView(QtWidgets.QWidget):
         mdiwin.update()
         self.update()
 
+    @QtCore.pyqtSlot()
     def on_poly_done(self):
         """User is done creating or modifying a polygon filter"""
         self.pushButton_poly_create.setEnabled(True)
@@ -433,6 +444,7 @@ class QuickView(QtWidgets.QWidget):
         elif mode == "modify":
             self.polygon_filter_modified.emit()
 
+    @QtCore.pyqtSlot()
     def on_poly_modify(self):
         """User wants to modify a polygon filter"""
         self.pushButton_poly_create.setEnabled(False)
@@ -457,6 +469,7 @@ class QuickView(QtWidgets.QWidget):
         # add ROI
         self.widget_scatter.activate_poly_mode(pf.points)
 
+    @QtCore.pyqtSlot()
     def on_stats2clipboard(self):
         """Copy the statistics as tsv data to the clipboard"""
         h, v = self.get_statistics()
@@ -633,7 +646,7 @@ class QuickView(QtWidgets.QWidget):
                     else:
                         show = True
                     flid = key.split("_")[0]
-                    if (key in ds["trace"] and show):
+                    if key in ds["trace"] and show:
                         # show the trace information
                         tracey = ds["trace"][key][event]  # trace data
                         range_fl[0] = min(range_fl[0], tracey.min())
@@ -736,8 +749,9 @@ class QuickView(QtWidgets.QWidget):
         self.__setstate__(state)
         # scatter plot
         self.plot()
-        # select first event in event viewer (also updates selection point)
-        self.show_event(0)
+        # reset image view
+        self.groupBox_image.hide()
+        self.groupBox_trace.hide()
         # this only updates the size of the tools (because there is no
         # sender)
         self.on_tool()

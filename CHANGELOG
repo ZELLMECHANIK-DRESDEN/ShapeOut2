@@ -1,5 +1,6 @@
 2.14.3
- - setup: bump dclab from 0.55.7 to 0.56.2 (enhanced basin support)
+ - enh: avoid showing first dataset event when user clicks in QuickView
+ - setup: bump dclab from 0.55.7 to 0.56.3 (enhanced basin support)
 2.14.2
  - setup: bump dclab from 0.55.6 to 0.55.7
 2.14.1

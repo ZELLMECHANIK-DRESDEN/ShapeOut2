@@ -263,7 +263,7 @@ class QuickView(QtWidgets.QWidget):
         # automatic contrast
         if state["event"]["image auto contrast"]:
             vmin, vmax = cellimg.min(), cellimg.max()
-            cellimg = (cellimg - vmin) / (vmax - vmin) * 255
+            cellimg = (cellimg - vmin) / max(vmax - vmin, 1) * 255
         # convert to RGB
         cellimg = cellimg.reshape(
             cellimg.shape[0], cellimg.shape[1], 1)
@@ -692,6 +692,7 @@ class QuickView(QtWidgets.QWidget):
             self.tableWidget_feats.set_key_vals(keys, vals)
 
     @show_wait_cursor
+    @QtCore.pyqtSlot(object, object)
     def show_rtdc(self, rtdc_ds, slot):
         """Display an RT-DC measurement given by `path` and `filters`"""
         # Create a hierarchy child so that the user can browse
@@ -742,7 +743,6 @@ class QuickView(QtWidgets.QWidget):
         self.spinBox_event.blockSignals(True)
         self.spinBox_event.setMaximum(event_count)
         self.spinBox_event.setToolTip("total: {}".format(event_count))
-        self.spinBox_event.setValue(1)
         self.spinBox_event.blockSignals(False)
 
         # set quick view state

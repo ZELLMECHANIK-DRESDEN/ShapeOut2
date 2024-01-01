@@ -1,6 +1,7 @@
 2.14.3
  - fix: intermediate plotting of first event whenever a slot is added
  - fix: catch zero-division warning when plotting empty image
+ - enh: remember selected events in QuickView
  - enh: avoid showing first dataset event when user clicks in QuickView
  - setup: bump dclab from 0.55.7 to 0.56.3 (enhanced basin support)
 2.14.2

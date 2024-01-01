@@ -965,7 +965,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
             the one where QuickView is currently set active. If
             False, nothing is changed.
         """
-        print("SHOW", self.sender())
         ds = self.pipeline.get_dataset(slot_index=slot_index,
                                        filt_index=filt_index,
                                        apply_filter=True)

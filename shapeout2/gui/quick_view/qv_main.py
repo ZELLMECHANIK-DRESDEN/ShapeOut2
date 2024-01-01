@@ -135,6 +135,8 @@ class QuickView(QtWidgets.QWidget):
 
         # set initial empty dataset
         self._rtdc_ds = None
+        #: A cache for the event index plotted for a dataset
+        self._dataset_event_plot_indices_cache = {}
         self.slot = None
 
     def __getstate__(self):
@@ -605,6 +607,8 @@ class QuickView(QtWidgets.QWidget):
         """
         # dataset
         ds = self.rtdc_ds
+        self._dataset_event_plot_indices_cache[
+            id(self.rtdc_ds.hparent)] = event
         event_count = ds.config["experiment"]["event count"]
         if event_count == 0:
             # nothing to do
@@ -739,10 +743,14 @@ class QuickView(QtWidgets.QWidget):
                         # If there is only one feature, at least we
                         # have set the state to a reasonable value.
                         break
+
         # set control ranges
         self.spinBox_event.blockSignals(True)
         self.spinBox_event.setMaximum(event_count)
         self.spinBox_event.setToolTip("total: {}".format(event_count))
+        cur_value = self._dataset_event_plot_indices_cache.get(
+            id(rtdc_ds), 0) + 1
+        self.spinBox_event.setValue(cur_value)
         self.spinBox_event.blockSignals(False)
 
         # set quick view state

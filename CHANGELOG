@@ -1,3 +1,5 @@
+2.14.4
+ - enh: avoid creating hierarchy when no filters are applied (speed)
 2.14.3
  - fix: intermediate plotting of first event whenever a slot is added
  - fix: catch zero-division warning when plotting empty image

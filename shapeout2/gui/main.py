@@ -941,7 +941,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def on_quickview_refresh(self):
         """Refresh quickview with the currently shown dataset"""
-        print("REFRESH", self.sender())
         slot_index, filt_index = self.block_matrix.get_quickview_indices()
         if slot_index is not None:
             self.on_quickview_show_dataset(slot_index, filt_index,

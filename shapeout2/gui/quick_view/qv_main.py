@@ -699,9 +699,13 @@ class QuickView(QtWidgets.QWidget):
     @QtCore.pyqtSlot(object, object)
     def show_rtdc(self, rtdc_ds, slot):
         """Display an RT-DC measurement given by `path` and `filters`"""
-        # Create a hierarchy child so that the user can browse
-        # comfortably through the data without seeing hidden events.
-        self.rtdc_ds = dclab.new_dataset(rtdc_ds)
+        if np.all(rtdc_ds.filter.all):
+            # No filers applied, no hierarchy child required.
+            self.rtdc_ds = rtdc_ds
+        else:
+            # Create a hierarchy child so that the user can browse
+            # comfortably through the data without seeing hidden events.
+            self.rtdc_ds = dclab.new_dataset(rtdc_ds)
         event_count = self.rtdc_ds.config["experiment"]["event count"]
         if event_count == 0:
             self.widget_scatter.hide()

@@ -1,3 +1,4 @@
+import collections
 import pathlib
 import pkg_resources
 
@@ -138,6 +139,8 @@ class QuickView(QtWidgets.QWidget):
         #: A cache for the event index plotted for a dataset
         self._dataset_event_plot_indices_cache = {}
         self.slot = None
+
+        self._statistics_cache = collections.OrderedDict()
 
     def __getstate__(self):
         plot = {
@@ -304,12 +307,19 @@ class QuickView(QtWidgets.QWidget):
 
     def get_statistics(self):
         if self.rtdc_ds is not None:
-            features = [self.comboBox_x.currentData(),
-                        self.comboBox_y.currentData()]
-            h, v = dclab.statistics.get_statistics(ds=self.rtdc_ds,
-                                                   features=features,
-                                                   methods=STAT_METHODS)
-            return h, v
+            # cache statistics from
+            dsid = f"{hex(id(self.rtdc_ds))}{self.rtdc_ds.filter._parent_hash}"
+            if dsid not in self._statistics_cache:
+                features = [self.comboBox_x.currentData(),
+                            self.comboBox_y.currentData()]
+                stats = dclab.statistics.get_statistics(ds=self.rtdc_ds,
+                                                        features=features,
+                                                        methods=STAT_METHODS)
+                self._statistics_cache[dsid] = stats
+            if len(self._statistics_cache) > 1000:
+                # avoid a memory leak
+                self._statistics_cache.popitem(last=False)
+            return self._statistics_cache[dsid]
         else:
             return None, None
 

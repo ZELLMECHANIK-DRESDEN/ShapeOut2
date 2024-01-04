@@ -308,7 +308,7 @@ class QuickView(QtWidgets.QWidget):
     def get_statistics(self):
         if self.rtdc_ds is not None:
             # cache statistics from
-            dsid = f"{hex(id(self.rtdc_ds))}{self.rtdc_ds.filter._parent_hash}"
+            dsid = self.rtdc_ds.identifier + self.rtdc_ds.filter._parent_hash
             if dsid not in self._statistics_cache:
                 features = [self.comboBox_x.currentData(),
                             self.comboBox_y.currentData()]
@@ -715,7 +715,9 @@ class QuickView(QtWidgets.QWidget):
         else:
             # Create a hierarchy child so that the user can browse
             # comfortably through the data without seeing hidden events.
-            self.rtdc_ds = dclab.new_dataset(rtdc_ds)
+            self.rtdc_ds = dclab.new_dataset(
+                rtdc_ds,
+                identifier=f"child-of-{rtdc_ds.identifier}")
         event_count = self.rtdc_ds.config["experiment"]["event count"]
         if event_count == 0:
             self.widget_scatter.hide()

@@ -648,7 +648,13 @@ def compute_contour_opening_angles(plot_state, contour):
         b = np.array(cr) - np.array(c0)
         absa = np.sqrt(np.sum(a ** 2))
         absb = np.sqrt(np.sum(b ** 2))
-        phi = np.arccos(np.sum(a * b) / (absa * absb))
+        denom = absa * absb
+        # avoid division by zero warnings
+        if isinstance(denom, np.ndarray):
+            denom[denom == 0] = np.nan
+        elif denom == 0:
+            denom = np.nan
+        phi = np.arccos(np.sum(a * b) / denom)
         if np.abs(phi) > np.pi/2:
             phi -= np.sign(phi) * np.pi
         opang[jj] = phi

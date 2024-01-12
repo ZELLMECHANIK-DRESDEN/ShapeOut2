@@ -1,3 +1,5 @@
+2.15.1
+ - fix: statistics not updating when changing plot axes (#154)
 2.15.0
  - enh: avoid creating hierarchy when no filters are applied (speed)
  - enh: cache computed statistics

@@ -307,11 +307,14 @@ class QuickView(QtWidgets.QWidget):
 
     def get_statistics(self):
         if self.rtdc_ds is not None:
+            features = [self.comboBox_x.currentData(),
+                        self.comboBox_y.currentData()]
             # cache statistics from
-            dsid = self.rtdc_ds.identifier + self.rtdc_ds.filter._parent_hash
+            dsid = "-".join(features
+                            + [self.rtdc_ds.identifier,
+                               self.rtdc_ds.filter._parent_hash]
+                            )
             if dsid not in self._statistics_cache:
-                features = [self.comboBox_x.currentData(),
-                            self.comboBox_y.currentData()]
                 stats = dclab.statistics.get_statistics(ds=self.rtdc_ds,
                                                         features=features,
                                                         methods=STAT_METHODS)

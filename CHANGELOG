@@ -1,3 +1,6 @@
+2.15.2
+ - fix: handle zero-valued contour spacing
+ - setup: bump dclab to 0.57.4 (handle zero-valued spacing for KDE contour)
 2.15.1
  - fix: statistics not updating when changing plot axes (#154)
  - setup: bump dclab from 0.57.0 to 0.57.1

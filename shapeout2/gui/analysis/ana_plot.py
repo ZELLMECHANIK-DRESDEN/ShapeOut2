@@ -320,7 +320,7 @@ class PlotPanel(QtWidgets.QWidget):
         for spacing, spinBox in zip([spacing_x, spacing_y],
                                     [self.doubleSpinBox_spacing_x,
                                      self.doubleSpinBox_spacing_y]):
-            if spacing is None or np.isnan(spacing):
+            if spacing is None or np.isnan(spacing) or spacing == 0:
                 continue
             else:
                 if spacing >= 1:

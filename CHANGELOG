@@ -1,3 +1,6 @@
+2.15.3
+ - build: PyInstaller to rebuild its bootloader (avoid false positive
+   malware detection)
 2.15.2
  - fix: handle zero-valued contour spacing
  - setup: bump dclab to 0.57.4 (handle zero-valued spacing for KDE contour)

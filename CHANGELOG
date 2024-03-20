@@ -1,3 +1,5 @@
+2.15.4
+ - fix: very small numbers not parsed when showing metadata (#158)
 2.15.3
  - build: PyInstaller to rebuild its bootloader (avoid false positive
    malware detection)

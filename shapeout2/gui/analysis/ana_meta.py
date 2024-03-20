@@ -116,7 +116,8 @@ def format_config_key_value(section, key, value):
     tip = ""
     # Value formatting
     if dtype == numbers.Number:  # pretty-print floats
-        if value == 0:
+        if abs(value) < 1e-12:
+            # small enough to be considered zero for all metadata
             string = "0.0"
         else:
             # determine number of decimals

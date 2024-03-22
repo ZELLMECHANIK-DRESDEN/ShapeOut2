@@ -45,7 +45,8 @@ jobs:
       if: runner.os == 'Windows'
       shell: bash
       run: |
-        R -e "install.packages('lme4', repos='http://cran.rstudio.org', type='binary')"
+        # R -e "install.packages('lme4', repos='http://cran.rstudio.org', type='binary')"
+        R -e "install.packages('http://cran.rstudio.org/bin/windows/contrib/r-old-release/lme4_1.1-35.1.zip', repos=NULL, type='binary')"
     - name: Install Python dependencies
       run: |
         # prerequisites

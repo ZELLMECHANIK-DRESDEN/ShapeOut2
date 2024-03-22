@@ -84,7 +84,7 @@ class ExportData(QtWidgets.QDialog):
                     features=[ff for ff in features if ff in ds.features],
                     logs=True,
                     tables=True,
-                    meta_prefix="so2exp_",
+                    meta_prefix="",
                     override=False)
             elif self.file_format == "fcs":
                 ds.export.fcs(

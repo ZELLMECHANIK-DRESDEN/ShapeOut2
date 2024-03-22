@@ -2,6 +2,7 @@
  - fix: very small numbers not parsed when showing metadata (#158)
  - fix: do not allow question mark "?" in exported file names (#156)
  - fix: do not override files when exporting data (#153)
+ - fix: remove the "so2exp" prefix when exporting data (#157)
 2.15.3
  - build: PyInstaller to rebuild its bootloader (avoid false positive
    malware detection)

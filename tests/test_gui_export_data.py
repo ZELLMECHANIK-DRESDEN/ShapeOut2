@@ -163,9 +163,9 @@ def test_export_datasets_rtdc_logs(qtbot):
     with dclab.new_dataset(exported[0]) as ds:
         assert len(ds) == 3
         assert len(ds.logs) == 5
-        assert "so2exp_src_cytoshot-acquisition" in ds.logs
+        assert "src_cytoshot-acquisition" in ds.logs
         assert np.allclose(
-            ds.tables["so2exp_src_cytoshot_monitor"]["brightness"][0],
+            ds.tables["src_cytoshot_monitor"]["brightness"][0],
             146.22099383,
             atol=0,
             rtol=1e-10)

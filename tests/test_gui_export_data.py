@@ -50,6 +50,34 @@ def test_export_datasets_rtdc(qtbot):
     assert len(list(pathlib.Path(tmpd).glob("*.rtdc"))) == 3
 
 
+def test_export_datasets_rtdc_no_override(qtbot):
+    """Shape-Out should not override existing files during export"""
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+
+    # add 3 dataslots
+    path = data_path / "calibration_beads_47.rtdc"
+    mw.add_dataslot(paths=[path, path, path])
+
+    # perform the export
+    tmpd = tempfile.mkdtemp(prefix="shapeout2_test_data_export_")
+    with mock.patch.object(QtWidgets.QFileDialog, "getExistingDirectory",
+                           return_value=tmpd):
+
+        for _ in range(2):
+            # create export dialog manually (asks user for directory)
+            dlg = export.ExportData(mw, pipeline=mw.pipeline)
+
+            # Everything is set-up already (.rtdc export, all features
+            # selected).
+            # Click OK.
+            buttons = dlg.buttonBox.buttons()
+            qtbot.mouseClick(buttons[0], QtCore.Qt.LeftButton)
+
+    # make sure we have six .rtdc files, because we exported twice
+    assert len(list(pathlib.Path(tmpd).glob("*.rtdc"))) == 6
+
+
 @pytest.mark.filterwarnings(
     "ignore::dclab.features.emodulus.YoungsModulusLookupTableExceededWarning")
 def test_export_datasets_rtdc_emodulus_only_in_one_issue_80(qtbot):

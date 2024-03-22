@@ -1,6 +1,5 @@
 import pathlib
 import pkg_resources
-import time
 
 from PyQt5 import uic, QtCore, QtWidgets
 
@@ -50,7 +49,6 @@ class ExportData(QtWidgets.QDialog):
     @QtCore.pyqtSlot()
     def export_data(self):
         """Export data to the desired file format"""
-        out = pathlib.Path(self.path)
         # get features
         features = self.bulklist_features.get_selection()
         pend = len(self.pipeline.slots)
@@ -59,58 +57,95 @@ class ExportData(QtWidgets.QDialog):
         prog.setWindowTitle("Data Export")
         prog.setWindowModality(QtCore.Qt.WindowModal)
         prog.setMinimumDuration(0)
-        time.sleep(0.01)
         prog.setValue(0)
         QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 300)
-        for slot_index in range(len(self.pipeline.slots)):
-            slot = self.pipeline.slots[slot_index]
-            if slot.slot_used:  # only export slots "used" (#15)
-                ds = self.pipeline.get_dataset(slot_index)
-                fn = "SO2-export_{}_{}.{}".format(slot_index,
-                                                  slot.name,
-                                                  self.file_format)
-                # remove bad characters from file name
-                fn = get_valid_filename(fn)
-                path = out / fn
-                # check features
-                fmiss = [ff for ff in features if ff not in ds.features]
-                if fmiss:
-                    lmiss = [dclab.dfn.get_feature_label(ff) for ff in fmiss]
-                    QtWidgets.QMessageBox.warning(
-                        self,
-                        "Features missing!",
-                        (f"Dataslot {slot_index} does not have these features:"
-                         + "\n"
-                         + "".join([f"\n- {fl}" for fl in lmiss])
-                         + "\n\n"
-                         + f"They are not exported to .{self.file_format}!")
-                    )
-                if self.file_format == "rtdc":
-                    ds.export.hdf5(
-                        path=path,
-                        features=[ff for ff in features if ff in ds.features],
-                        logs=True,
-                        tables=True,
-                        meta_prefix="so2exp_",
-                        override=True)
-                elif self.file_format == "fcs":
-                    ds.export.fcs(
-                        path=path,
-                        features=[ff for ff in features if ff in ds.features],
-                        meta_data={"Shape-Out version": version},
-                        override=True)
-                else:
-                    ds.export.tsv(
-                        path=path,
-                        features=[ff for ff in features if ff in ds.features],
-                        meta_data={"Shape-Out version": version},
-                        override=True)
+
+        slots_n_paths = self.get_export_filenames()
+        prog.setMaximum(len(slots_n_paths))  # correct dialog maximum
+
+        for slot_index, path in slots_n_paths:
+            ds = self.pipeline.get_dataset(slot_index)
+            # check features
+            fmiss = [ff for ff in features if ff not in ds.features]
+            if fmiss:
+                lmiss = [dclab.dfn.get_feature_label(ff) for ff in fmiss]
+                QtWidgets.QMessageBox.warning(
+                    self,
+                    "Features missing!",
+                    (f"Dataslot {slot_index} does not have these features:"
+                     + "\n"
+                     + "".join([f"\n- {fl}" for fl in lmiss])
+                     + "\n\n"
+                     + f"They are not exported to .{self.file_format}!")
+                )
+            if self.file_format == "rtdc":
+                ds.export.hdf5(
+                    path=path,
+                    features=[ff for ff in features if ff in ds.features],
+                    logs=True,
+                    tables=True,
+                    meta_prefix="so2exp_",
+                    override=False)
+            elif self.file_format == "fcs":
+                ds.export.fcs(
+                    path=path,
+                    features=[ff for ff in features if ff in ds.features],
+                    meta_data={"Shape-Out version": version},
+                    override=False)
+            else:
+                ds.export.tsv(
+                    path=path,
+                    features=[ff for ff in features if ff in ds.features],
+                    meta_data={"Shape-Out version": version},
+                    override=False)
             if prog.wasCanceled():
                 break
             prog.setValue(slot_index + 1)
             QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents,
                                                  300)
         prog.setValue(pend)
+
+    def get_export_filenames(self):
+        """Compute names for exporting data, avoiding overriding anything
+
+        Return a list of tuples `(slot_index, filename)`.
+        """
+        # for every slot there is a path
+        slots_n_paths = []
+        out = pathlib.Path(self.path)
+        # assemble the slots
+        slots = []
+        for s_index in range(len(self.pipeline.slots)):
+            slot = self.pipeline.slots[s_index]
+            if slot.slot_used:
+                slots.append((s_index, slot))
+        # find non-existent file names
+        ap = ""  # this gets appended to the file stem if the file exists
+        counter = 0  # counts up an index for appending to the file
+        while True:
+            slots_n_paths.clear()
+            for s_index, slot in slots:
+                fn = f"SO2-export_{s_index}_{slot.name}{ap}.{self.file_format}"
+                # remove bad characters from file name
+                fn = get_valid_filename(fn)
+                path = out / fn
+                if path.exists():
+                    # The file already exists. Break here and the counter
+                    # is incremented for a next iteration.
+                    break
+                else:
+                    # Everything good so far.
+                    slots_n_paths.append((s_index, path))
+            else:
+                # If nothing in the for loop caused it to break, then we
+                # have a fully populated list of slots_n_paths and we can
+                # exit this while-loop.
+                break
+
+            counter += 1
+            ap = f"_{counter}"
+        # Return the list of slots and corresponding paths
+        return slots_n_paths
 
     def on_browse(self):
         out = QtWidgets.QFileDialog.getExistingDirectory(self,

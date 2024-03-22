@@ -138,7 +138,7 @@ class ExportData(QtWidgets.QDialog):
                     slots_n_paths.append((s_index, path))
             else:
                 # If nothing in the for loop caused it to break, then we
-                # have a fully populated list of slots_n_paths and we can
+                # have a fully populated list of slots_n_paths, and we can
                 # exit this while-loop.
                 break
 

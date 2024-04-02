@@ -1,3 +1,5 @@
+2.16.0
+ - enh: color feature data in QuickView combobox according to availability
 2.15.5
  - fix: right-click menu not working for plot widgets (#160)
  - ref: introduce `FeatureComboBox` class for listing features

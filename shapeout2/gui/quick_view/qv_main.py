@@ -594,6 +594,8 @@ class QuickView(QtWidgets.QWidget):
             self.label_poly_y.setText(
                 dclab.dfn.get_feature_label(plot["axis y"]))
             self.show_statistics()
+            # Make sure features are properly colored in the comboboxes
+            self.update_feature_choices()
 
     @QtCore.pyqtSlot()
     def plot_auto(self):

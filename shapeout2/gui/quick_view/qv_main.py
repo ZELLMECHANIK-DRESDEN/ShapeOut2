@@ -752,20 +752,16 @@ class QuickView(QtWidgets.QWidget):
 
         # check whether axes exist in ds and change them to defaults
         # if necessary
-        ds_features = self.rtdc_ds.features_scalar
-        if plot["axis x"] not in ds_features:
-            for feat in dclab.dfn.scalar_feature_names:
-                if feat in ds_features:
-                    plot["axis x"] = feat
-                    break
-        if plot["axis y"] not in ds_features:
-            for feat in dclab.dfn.scalar_feature_names:
-                if feat in ds_features:
-                    plot["axis y"] = feat
-                    if feat != plot["axis y"]:
-                        # If there is only one feature, at least we
-                        # have set the state to a reasonable value.
-                        break
+        ds_features = sorted(self.rtdc_ds.features_scalar)
+        if plot["axis x"] not in ds_features and ds_features:
+            plot["axis x"] = ds_features[0]
+        if plot["axis y"] not in ds_features and ds_features:
+            if len(ds_features) > 1:
+                plot["axis y"] = ds_features[1]
+            else:
+                # If there is only one feature, at least we
+                # have set the state to a reasonable value.
+                plot["axis y"] = ds_features[0]
 
         # set control ranges
         self.spinBox_event.blockSignals(True)

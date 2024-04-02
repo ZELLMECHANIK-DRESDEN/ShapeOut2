@@ -46,5 +46,5 @@ class SimpleImageViewBox(SimpleViewBox):
                        lambda: self.export.emit("png"))
 
         pos = ev.screenPos()
-        menu.popup(QtCore.QPoint(pos.x(), pos.y()))
+        menu.popup(QtCore.QPoint(int(pos.x()), int(pos.y())))
         return True

@@ -109,5 +109,5 @@ class SimpleViewBox(pg.ViewBox):
                        lambda: self.export.emit("svg"))
 
         pos = ev.screenPos()
-        menu.popup(QtCore.QPoint(pos.x(), pos.y()))
+        menu.popup(QtCore.QPoint(int(pos.x()), int(pos.y())))
         return True

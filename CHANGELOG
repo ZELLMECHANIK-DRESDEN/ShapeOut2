@@ -1,3 +1,5 @@
+2.15.5
+ - fix: right-click menu not working for plot widgets (#160)
 2.15.4
  - fix: very small numbers not parsed when showing metadata (#158)
  - fix: do not allow question mark "?" in exported file names (#156)

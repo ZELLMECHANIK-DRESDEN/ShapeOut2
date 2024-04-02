@@ -63,8 +63,6 @@ class PlotPanel(QtWidgets.QWidget):
         self.toolButton_spacing_auto.clicked.connect(self.on_spacing_auto)
 
     def __getstate__(self):
-        feats_srt = self.get_features()
-
         rx = self.widget_range_x.__getstate__()
         ry = self.widget_range_y.__getstate__()
 
@@ -92,8 +90,8 @@ class PlotPanel(QtWidgets.QWidget):
             },
             "general": {
                 "auto range": self.checkBox_auto_range.isChecked(),
-                "axis x": feats_srt[self.comboBox_axis_x.currentIndex()],
-                "axis y": feats_srt[self.comboBox_axis_y.currentIndex()],
+                "axis x": self.comboBox_axis_x.currentData(),
+                "axis y": self.comboBox_axis_y.currentData(),
                 "isoelastics": self.checkBox_isoelastics.isChecked(),
                 "kde": self.comboBox_kde.currentData(),
                 "range x": [rx["start"], rx["end"]],
@@ -135,7 +133,6 @@ class PlotPanel(QtWidgets.QWidget):
     def __setstate__(self, state):
         if self.current_plot.identifier != state["identifier"]:
             raise ValueError("Plot identifier mismatch!")
-        feats_srt = self.get_features()
         toblock = [
             self.comboBox_axis_x,
             self.comboBox_axis_y,
@@ -158,8 +155,10 @@ class PlotPanel(QtWidgets.QWidget):
         # General
         gen = state["general"]
         self.checkBox_auto_range.setChecked(gen["auto range"])
-        self.comboBox_axis_x.setCurrentIndex(feats_srt.index(gen["axis x"]))
-        self.comboBox_axis_y.setCurrentIndex(feats_srt.index(gen["axis y"]))
+        self.comboBox_axis_x.setCurrentIndex(
+            self.comboBox_axis_x.findData(gen["axis x"]))
+        self.comboBox_axis_y.setCurrentIndex(
+            self.comboBox_axis_y.findData(gen["axis y"]))
         self.checkBox_isoelastics.setChecked(gen["isoelastics"])
         kde_index = self.comboBox_kde.findData(gen["kde"])
         self.comboBox_kde.setCurrentIndex(kde_index)
@@ -181,10 +180,8 @@ class PlotPanel(QtWidgets.QWidget):
         hue_index = self.comboBox_marker_hue.findData(sca["marker hue"])
         self.comboBox_marker_hue.setCurrentIndex(hue_index)
         self.doubleSpinBox_marker_size.setValue(sca["marker size"])
-        if sca["hue feature"] in feats_srt:
-            feat_index = feats_srt.index(sca["hue feature"])
-        else:
-            feat_index = 0  # feature not available in datasets
+        feat_index = self.comboBox_marker_feature.findData(sca["hue feature"])
+        feat_index = feat_index or 0
         self.comboBox_marker_feature.setCurrentIndex(feat_index)
         color_index = COLORMAPS.index(sca["colormap"])
         self.comboBox_colormap.setCurrentIndex(color_index)
@@ -607,7 +604,7 @@ class PlotPanel(QtWidgets.QWidget):
                     cb.addItem(dclab.dfn.get_feature_label(feat), feat)
                 if curfeat is not None:
                     # write back current selection
-                    curidx = feats_srt.index(curfeat)
+                    curidx = cb.findData(curfeat)
                     cb.setCurrentIndex(curidx)
                 cb.blockSignals(False)
             # populate content

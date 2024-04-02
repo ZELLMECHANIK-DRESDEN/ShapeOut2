@@ -195,6 +195,7 @@ class QuickView(QtWidgets.QWidget):
             idx = cb.findData(plot[key])
             idx = idx if idx > 0 else 0
             cb.setCurrentIndex(idx)
+
         # isoelastics
         self.checkBox_isoelastics.setChecked(plot["isoelastics"])
         for tb in self.signal_widgets:
@@ -254,6 +255,11 @@ class QuickView(QtWidgets.QWidget):
         # "image_bg" not in dataset
         contains_bg_feat = "image_bg" in rtdc_ds
         self.checkBox_image_background.setVisible(contains_bg_feat)
+
+        # set the dataset for the FeatureComboBoxes
+        self.comboBox_x.set_dataset(rtdc_ds, default_choice="area_um")
+        self.comboBox_y.set_dataset(rtdc_ds, default_choice="deform")
+        self.comboBox_z_hue.set_dataset(rtdc_ds)
 
     def get_event_image(self, ds, event):
         state = self.__getstate__()
@@ -741,11 +747,7 @@ class QuickView(QtWidgets.QWidget):
         state.pop("event")
 
         self.slot = slot
-        # default features (plot axes)
-        if plot["axis x"] is None:
-            plot["axis x"] = "area_um"
-        if plot["axis y"] is None:
-            plot["axis y"] = "deform"
+
         # check whether axes exist in ds and change them to defaults
         # if necessary
         ds_features = self.rtdc_ds.features_scalar
@@ -795,22 +797,9 @@ class QuickView(QtWidgets.QWidget):
         """
         if self.rtdc_ds is not None:
             # axes combobox choices
-            ds_feats = self.rtdc_ds.features_scalar
-            ds_labels = [dclab.dfn.get_feature_label(f) for f in ds_feats]
-            ds_fl = sorted(zip(ds_labels, ds_feats))
-            for cb in [self.comboBox_x, self.comboBox_y, self.comboBox_z_hue]:
-                fcur = cb.currentData()
-                blocked = cb.signalsBlocked()  # remember block state
-                cb.blockSignals(True)
-                # set features
-                cb.clear()
-                for label, feat in ds_fl:
-                    if feat in ds_feats:
-                        cb.addItem(label, feat)
-                idcur = cb.findData(fcur)
-                if idcur >= 0:
-                    cb.setCurrentIndex(idcur)
-                cb.blockSignals(blocked)
+            self.comboBox_x.update_feature_list(default_choice="area_um")
+            self.comboBox_y.update_feature_list(default_choice="deform")
+            self.comboBox_z_hue.update_feature_list()
 
     def update_polygon_panel(self):
         """Update polygon filter combobox etc."""

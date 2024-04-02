@@ -234,7 +234,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QComboBox" name="comboBox_x"/>
+           <widget class="FeatureComboBox" name="comboBox_x"/>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_2">
@@ -244,7 +244,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QComboBox" name="comboBox_y"/>
+           <widget class="FeatureComboBox" name="comboBox_y"/>
           </item>
           <item row="1" column="2">
            <widget class="QWidget" name="widget_yrange" native="true">
@@ -426,7 +426,7 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QComboBox" name="comboBox_z_hue"/>
+               <widget class="FeatureComboBox" name="comboBox_z_hue"/>
               </item>
              </layout>
             </widget>
@@ -1091,6 +1091,11 @@
   <customwidget>
    <class>KeyValueTableWidget</class>
    <extends>QTableWidget</extends>
+   <header>shapeout2.gui.widgets</header>
+  </customwidget>
+  <customwidget>
+   <class>FeatureComboBox</class>
+   <extends>QComboBox</extends>
    <header>shapeout2.gui.widgets</header>
   </customwidget>
  </customwidgets>

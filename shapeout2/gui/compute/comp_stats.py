@@ -8,6 +8,7 @@ import dclab
 from PyQt5 import uic, QtCore, QtWidgets
 
 from ..widgets import show_wait_cursor
+from ..widgets.feature_combobox import HIDDEN_FEATURES
 from ..._version import version
 
 STAT_METHODS = sorted(dclab.statistics.Statistics.available_methods.keys())
@@ -61,6 +62,16 @@ class ComputeStatistics(QtWidgets.QDialog):
     @QtCore.pyqtSlot()
     def export_statistics(self):
         """Export statistics to .tsv"""
+        # Output path
+        opath, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, 'Save statistics', '', 'tab-separated values (*.tsv)')
+        if not opath:
+            # Abort export
+            return False
+        elif not opath.endswith(".tsv"):
+            opath += ".tsv"
+        opath = pathlib.Path(opath)
+
         # get features
         features = self.bulklist_features.get_selection()
         # get methods
@@ -112,15 +123,7 @@ class ComputeStatistics(QtWidgets.QDialog):
                 prog.setValue(ii + 1)
                 QtWidgets.QApplication.processEvents(
                     QtCore.QEventLoop.AllEvents, 300)
-        # Output path
-        opath, _ = QtWidgets.QFileDialog.getSaveFileName(
-            self, 'Save statistics', '', 'tab-separated values (*.tsv)')
-        if not opath:
-            # Abort export
-            return False
-        elif not opath.endswith(".tsv"):
-            opath += ".tsv"
-        opath = pathlib.Path(opath)
+
         # Header
         header = ["Statistics Output",
                   "Shape-Out {}".format(version),
@@ -149,6 +152,7 @@ class ComputeStatistics(QtWidgets.QDialog):
                 fd.write(line + "\n")
         return True  # True means success
 
+    @QtCore.pyqtSlot()
     def on_browse(self):
         out = QtWidgets.QFileDialog.getExistingDirectory(self,
                                                          'Export directory')
@@ -160,6 +164,7 @@ class ComputeStatistics(QtWidgets.QDialog):
             self.path = None
             self.comboBox.setCurrentIndex(0)
 
+    @QtCore.pyqtSlot()
     def on_combobox(self):
         if self.comboBox.currentIndex() == 1:
             # Datasets from a folder
@@ -174,6 +179,7 @@ class ComputeStatistics(QtWidgets.QDialog):
             self.widget_other.hide()
             self.update_feature_list(use_pipeline=True)
 
+    @QtCore.pyqtSlot()
     def on_select_features_innate(self):
         """Only select all innate features of the first dataset"""
 
@@ -205,6 +211,11 @@ class ComputeStatistics(QtWidgets.QDialog):
             labs = [dclab.dfn.get_feature_label(f) for f in features]
             lf = sorted(zip(labs, features))
             self.features = [it[1] for it in lf]
+
+        # do not compute statistics for basinmap features
+        for feat in HIDDEN_FEATURES + ["index"]:
+            if feat in self.features:
+                self.features.remove(feat)
 
         labels = [dclab.dfn.get_feature_label(feat) for feat in self.features]
         self.bulklist_features.set_items(self.features, labels)

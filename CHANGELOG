@@ -1,4 +1,5 @@
 2.16.0
+ - fix: ask for .tsv output path before computing statistics
  - enh: color feature data in QuickView combobox according to availability
  - enh: hide basinmap features in scatter plot selections (#159)
  - docs: remove reference to Shape-Out 1 in introduction

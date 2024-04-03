@@ -86,7 +86,7 @@ class FeatureComboBox(QtWidgets.QComboBox):
                 ds_colors.append("#C0E8FF")
                 ds_tips.append("feature data located in basin")
             elif feat in feats_ancillary:
-                ds_colors.append("#FFCACA")
+                ds_colors.append("#FFD9C1")
                 ds_tips.append("feature data needs to be computed")
             else:
                 # fall-back

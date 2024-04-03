@@ -178,7 +178,7 @@ availability:
 - *blue*: The feature data are part of another dataset,
   a :ref:`basin <dclab:sec_av_basins>`, which may at a remote location
   (e.g. on `DCOR <https://dcor.mpl.mpg.de/>`_) or on the local file system.
-- *red*: The feature data must be computed before it can be displayed. The
+- *orange*: The feature data must be computed before it can be displayed. The
   feature is an :ref:`ancillary feature <dclab:sec_features_ancillary>`.
 
 .. image:: scrots/ui_qv_settings.png

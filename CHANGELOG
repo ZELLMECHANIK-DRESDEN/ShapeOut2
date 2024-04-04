@@ -4,8 +4,8 @@
  - enh: hide basinmap features in scatter plot selections (#159)
  - docs: remove reference to Shape-Out 1 in introduction
  - docs: mention basins and link to dclab (#159)
+ - docs: add quick guide for data export
  - ref: reduce usage of `dclab.dfn.scalar_feature_names` (#108)
- - setup: bump dclab to 0.58.0
 2.15.5
  - fix: right-click menu not working for plot widgets (#160)
  - ref: introduce `FeatureComboBox` class for listing features

@@ -5,7 +5,8 @@ from PyQt5 import uic, QtCore, QtWidgets
 
 import dclab
 
-from ..widgets import show_wait_cursor
+from ..widgets import get_directory, show_wait_cursor
+from ..widgets.feature_combobox import HIDDEN_FEATURES
 
 from ...util import get_valid_filename
 from ..._version import version
@@ -17,19 +18,41 @@ class ExportData(QtWidgets.QDialog):
         path_ui = pkg_resources.resource_filename(
             "shapeout2.gui.export", "e2data.ui")
         uic.loadUi(path_ui, self)
+        # output path
+        self._path = None
         # Get output path
-        self.on_browse()
+        self.on_browse(force_dialog=False)
         # set pipeline
         self.pipeline = pipeline
         # update list widget
         self.bulklist_features.set_title("Features")
         self.on_radio()
         self.on_select_features_innate()
+        # Set storage strategy options
+        self.comboBox_storage.clear()
+        self.comboBox_storage.addItem(
+            "No basins: Store only selected features (legacy behavior)",
+            "no-basins"
+        )
+        self.comboBox_storage.addItem(
+            "With basins: Store features, link to original data (recommended)",
+            "with-basins"
+        )
+        self.comboBox_storage.addItem(
+            "Only basins: Do not store features, link to original data (fast)",
+            "only-basins"
+        )
+        self.comboBox_storage.setCurrentIndex(
+            self.comboBox_storage.findData("with-basins"))
         # Signals
         self.pushButton_path.clicked.connect(self.on_browse)
+        # file type selection
         self.radioButton_fcs.clicked.connect(self.on_radio)
         self.radioButton_rtdc.clicked.connect(self.on_radio)
         self.radioButton_tsv.clicked.connect(self.on_radio)
+        # storage strategy selection
+        self.comboBox_storage.currentIndexChanged.connect(
+            self.on_storage_strategy)
 
     @property
     def file_format(self):
@@ -39,6 +62,24 @@ class ExportData(QtWidgets.QDialog):
             return "rtdc"
         else:
             return "tsv"
+
+    @property
+    def path(self):
+        return self._path
+
+    @path.setter
+    def path(self, value):
+        if value and pathlib.Path(value).exists():
+            self._path = value
+            self.lineEdit_path.setText(value)
+
+    @property
+    def storage_strategy(self):
+        if self.file_format == "rtdc":
+            storage_strategy = self.comboBox_storage.currentData()
+        else:
+            storage_strategy = "no-basins"
+        return storage_strategy
 
     def done(self, r):
         if r:
@@ -50,7 +91,11 @@ class ExportData(QtWidgets.QDialog):
     def export_data(self):
         """Export data to the desired file format"""
         # get features
-        features = self.bulklist_features.get_selection()
+        if self.storage_strategy == "only-basins":
+            # This case will also only happen for the .rtdc format
+            features = []
+        else:
+            features = self.bulklist_features.get_selection()
         pend = len(self.pipeline.slots)
         prog = QtWidgets.QProgressDialog("Exporting...", "Abort", 1,
                                          pend, self)
@@ -84,6 +129,7 @@ class ExportData(QtWidgets.QDialog):
                     features=[ff for ff in features if ff in ds.features],
                     logs=True,
                     tables=True,
+                    basins=self.storage_strategy != "no-basins",
                     meta_prefix="",
                     override=False)
             elif self.file_format == "fcs":
@@ -147,18 +193,25 @@ class ExportData(QtWidgets.QDialog):
         # Return the list of slots and corresponding paths
         return slots_n_paths
 
-    def on_browse(self):
-        out = QtWidgets.QFileDialog.getExistingDirectory(self,
-                                                         'Export directory')
-        if out:
-            self.path = out
-            self.lineEdit_path.setText(self.path)
-        else:
-            self.path = None
+    @QtCore.pyqtSlot()
+    def on_browse(self, force_dialog=True):
+        self.path = get_directory(
+            parent=self,
+            identifier="export data",
+            caption="Export directory",
+            force_dialog=force_dialog
+        )
 
+    @QtCore.pyqtSlot()
     def on_radio(self):
         self.update_feature_list()
+        self.widget_storage_strategy.setEnabled(self.file_format == "rtdc")
+        # set storage strategy based on file format
+        strategy = "with-basins" if self.file_format == "rtdc" else "no-basins"
+        self.comboBox_storage.setCurrentIndex(
+            self.comboBox_storage.findData(strategy))
 
+    @QtCore.pyqtSlot()
     def on_select_features_innate(self):
         """Only select all innate features of the first dataset"""
         if self.pipeline.num_slots:
@@ -174,6 +227,11 @@ class ExportData(QtWidgets.QDialog):
                 else:
                     wid.setCheckState(QtCore.Qt.CheckState.Unchecked)
 
+    @QtCore.pyqtSlot()
+    def on_storage_strategy(self):
+        self.bulklist_features.setEnabled(
+            self.storage_strategy != "only-basins")
+
     def update_feature_list(self, scalar=False):
         if self.file_format == "rtdc":
             self.features = self.pipeline.get_features(union=True,
@@ -185,5 +243,10 @@ class ExportData(QtWidgets.QDialog):
             self.features = self.pipeline.get_features(scalar=True,
                                                        union=True,
                                                        label_sort=True)
+        # do not export basinmap features
+        for feat in HIDDEN_FEATURES + ["index"]:
+            if feat in self.features:
+                self.features.remove(feat)
+
         labels = [dclab.dfn.get_feature_label(feat) for feat in self.features]
         self.bulklist_features.set_items(self.features, labels)

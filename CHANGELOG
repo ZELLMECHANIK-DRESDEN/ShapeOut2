@@ -1,3 +1,6 @@
+2.16.1
+ - setup: bump dclab to 0.58.3 (reduced memory usage when computing
+   contour-based features such as volume)
 2.16.0
  - feat: enable storage strategy (basin control) in export dialog (#159)
  - fix: ask for .tsv output path before computing statistics

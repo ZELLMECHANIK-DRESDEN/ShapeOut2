@@ -80,4 +80,4 @@ Why are not all features selected automatically? And why does exporting data tak
     first time you export from a dataset. Note that **you are not losing any
     feature data when you are exporting with the default settings**, unless you
     are exporting to .fcs or .tsv files, because Shape-Out can also compute
-    missing features for the exported files.
+    missing features after opening the exported files.

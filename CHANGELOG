@@ -1,3 +1,6 @@
+2.16.2
+ - fix: data export feature selection must default to features_loaded
+ - enh: added links to docs explaining default export selection
 2.16.1
  - setup: bump dclab to 0.58.4 (reduced memory usage when computing
    contour-based features such as volume, export dataset configuration

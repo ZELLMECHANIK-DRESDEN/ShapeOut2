@@ -216,11 +216,11 @@ class ExportData(QtWidgets.QDialog):
         """Only select all innate features of the first dataset"""
         if self.pipeline.num_slots:
             ds = self.pipeline.get_dataset(0)
-            features_innate = ds.features_innate
+            features_loaded = ds.features_loaded
             lw = self.bulklist_features.listWidget
             for ii in range(lw.count()):
                 wid = lw.item(ii)
-                for feat in features_innate:
+                for feat in features_loaded:
                     if wid.data(101) == feat:
                         wid.setCheckState(QtCore.Qt.CheckState.Checked)
                         break
@@ -250,3 +250,4 @@ class ExportData(QtWidgets.QDialog):
 
         labels = [dclab.dfn.get_feature_label(feat) for feat in self.features]
         self.bulklist_features.set_items(self.features, labels)
+        self.on_select_features_innate()

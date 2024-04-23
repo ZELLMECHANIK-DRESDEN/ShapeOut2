@@ -4,6 +4,8 @@
 Export DC data
 ==============
 
+Use cases
+=========
 Sometimes you would like to thin out the number of events or features in a dataset
 and export the result to a file. For instance, Shape-Out can export your DC data to the
 `flow cytometry standard (.fcs) <https://en.wikipedia.org/wiki/Flow_Cytometry_Standard>`_
@@ -20,6 +22,8 @@ that can interface with HDF5 data.
     Data export for current session
 
 
+Export options
+==============
 If you export to the .rtdc file format, you have several options that allow
 you to fine-tune what should be stored in the output file:
 
@@ -59,3 +63,21 @@ Storage strategy
       You can achieve that by working with data on DCOR, by making sure that
       the source files are always available on the same path or by exporting
       the data to the same directory as the source file.
+
+
+.. _sec_qg_export_data_faq:
+
+Frequently asked questions
+==========================
+
+Why are not all features selected automatically? And why does exporting data take very long when I click on *select all* before?
+    By default, Shape-Out only selects those features that are readily available.
+    Some features, such as volume, have to be computed by Shape-Out before they
+    can be exported. The computation of features always happens for the **entire**
+    dataset (not only for the features that you are exporting). Thus, even if
+    you only export ~500 events, data export can take very long if the input
+    file is large. This is also the reason why data export only takes long the
+    first time you export from a dataset. Note that **you are not losing any
+    feature data when you are exporting with the default settings**, unless you
+    are exporting to .fcs or .tsv files, because Shape-Out can also compute
+    missing features for the exported files.

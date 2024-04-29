@@ -532,14 +532,13 @@ class ShapeOut2(QtWidgets.QMainWindow):
     def on_action_about(self):
         gh = "ZELLMECHANIK-DRESDEN/ShapeOut2"
         rtd = "shapeout2.readthedocs.io"
-        about_text = "Shape-Out 2 is the successor of Shape-Out, " \
-            + "a graphical user interface for the analysis and " \
-            + "visualization of RT-DC data sets.<br><br>" \
-            + "Author: Paul Müller<br>" \
-            + "GitHub: " \
-            + "<a href='https://github.com/{gh}'>{gh}</a><br>".format(gh=gh) \
-            + "Documentation: " \
-            + "<a href='https://{rtd}'>{rtd}</a><br>".format(rtd=rtd)
+        about_text = (
+                f"Shape-Out 2 is a graphical user interface for the analysis "
+                f"and visualization of RT-DC data sets.<br><br>"
+                f"Author: Paul Müller<br>"
+                f"GitHub: <a href='https://github.com/{gh}'>{gh}</a><br>"
+                f"Documentation: <a href='https://{rtd}'>{rtd}</a><br>"
+                )
         QtWidgets.QMessageBox.about(self, f"Shape-Out {version}", about_text)
 
     @QtCore.pyqtSlot()

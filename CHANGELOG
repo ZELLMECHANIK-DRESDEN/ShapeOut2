@@ -2,6 +2,7 @@
  - fix: data export feature selection must default to features_loaded
  - enh: added links to docs explaining default export selection
  - docs: remove Shape-Out 1 reference
+ - setup: migrate from setup.py to pyproject.toml
 2.16.1
  - setup: bump dclab to 0.58.4 (reduced memory usage when computing
    contour-based features such as volume, export dataset configuration

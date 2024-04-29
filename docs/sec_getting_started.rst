@@ -74,4 +74,4 @@ If you use Shape-Out in a scientific publication, please cite it with:
    Available at https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2.
 
 If the journal does not accept ``and others``, you can fill in the missing
-names from the `credits file <https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/blob/master/CREDITS>`_.
+names in the authors section of the `pyproject.toml file <https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/blob/master/pyproject.toml>`_.

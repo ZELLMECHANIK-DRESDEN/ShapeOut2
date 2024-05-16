@@ -60,14 +60,16 @@ class MetaPanel(QtWidgets.QWidget):
             for key, value in items:
                 k, v, t = format_config_key_value(section, key, value)
                 widget = QtWidgets.QWidget()
-                widget.setToolTip(t)
                 hbox = QtWidgets.QHBoxLayout()
                 hbox.setAlignment(QtCore.Qt.AlignLeft)
                 hbox.setContentsMargins(0, 0, 0, 0)
                 ldescr = QtWidgets.QLabel(k + ": ")
+                ldescr.setToolTip(f"{section}:{key}")
                 ldescr.setAlignment(QtCore.Qt.AlignTop)
                 hbox.addWidget(ldescr)
                 lvalue = QtWidgets.QLabel(v)
+                if t:
+                    lvalue.setToolTip(t)
                 lvalue.setAlignment(QtCore.Qt.AlignBottom)
                 hbox.addWidget(lvalue)
                 widget.setLayout(hbox)

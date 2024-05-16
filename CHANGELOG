@@ -1,6 +1,7 @@
 2.16.2
  - fix: data export feature selection must default to features_loaded
  - enh: show dcnum pipeline identifiers in Analysis view
+ - enh: add section:key tool tips for analysis view metadata
  - enh: added links to docs explaining default export selection
  - docs: remove Shape-Out 1 reference
  - setup: migrate from setup.py to pyproject.toml

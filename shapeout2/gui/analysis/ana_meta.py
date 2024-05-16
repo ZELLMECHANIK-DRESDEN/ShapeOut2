@@ -94,6 +94,8 @@ class MetaPanel(QtWidgets.QWidget):
             cfg = meta_tool.get_rtdc_config(slot_state["path"])
             self.update_info_box(self.groupBox_experiment, cfg,
                                  "experiment")
+            self.update_info_box(self.groupBox_pipeline, cfg,
+                                 "pipeline")
             self.update_info_box(self.groupBox_fluorescence, cfg,
                                  "fluorescence")
             self.update_info_box(self.groupBox_imaging, cfg,
@@ -165,6 +167,17 @@ def format_config_key_value(section, key, value):
 def sort_config_section_items(section, items):
     if section == "experiment":
         order = ["sample", "run index", "event count", "date", "time"]
+    elif section == "pipeline":
+        order = ["dcnum generation",
+                 "dcnum data",
+                 "dcnum background",
+                 "dcnum segmenter",
+                 "dcnum feature",
+                 "dcnum gate",
+                 "dcnum hash",
+                 "dcnum mapping",
+                 "dcnum yield",
+                 ]
     elif section == "setup":
         order = ["medium", "channel width"]
     else:

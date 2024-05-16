@@ -703,7 +703,7 @@ class QuickView(QtWidgets.QWidget):
                 self.groupBox_trace.hide()
         else:
             # only use computed features (speed)
-            fcands = ds.features_loaded
+            fcands = ds.features_local
             feats = [f for f in fcands if f in ds.features_scalar]
             lf = sorted([(dclab.dfn.get_feature_label(f), f) for f in feats])
             keys = []

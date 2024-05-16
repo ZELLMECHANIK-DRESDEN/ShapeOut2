@@ -1,5 +1,6 @@
 2.16.2
  - fix: data export feature selection must default to features_loaded
+ - enh: only show local features in QuickView Event Feature tab
  - enh: show dcnum pipeline identifiers in Analysis view
  - enh: add section:key tool tips for analysis view metadata
  - enh: added links to docs explaining default export selection

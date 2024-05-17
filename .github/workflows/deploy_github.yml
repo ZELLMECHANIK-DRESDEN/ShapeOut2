@@ -44,6 +44,11 @@ jobs:
         dist\\ShapeOut2\\ShapeOut2.exe --version
         python win_make_iss.py
         ISCC.exe /Q win_shapeout2.iss
+    - name: Build macOS app
+      if: runner.os == 'macOS'
+      working-directory: ./build-recipes
+      run: |
+        bash ./macos_build_app.sh ShapeOut2 ${{ env.RELEASE_VERSION }}
     - name: Release Assets
       uses: softprops/action-gh-release@v1
       with:

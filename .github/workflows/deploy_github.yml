@@ -36,7 +36,7 @@ jobs:
         pip install .
         # remove rpy2 from build pipeline
         # https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/161
-        pip uninstall rpy2
+        pip uninstall -y rpy2
     - name: Build windows executable
       if: runner.os == 'windows'
       working-directory: ./build-recipes

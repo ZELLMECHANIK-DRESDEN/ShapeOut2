@@ -50,7 +50,7 @@ jobs:
       run: |
         # Remove rpy2 from build pipeline
         # https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/161
-        python -m pip uninstall rpy2
+        python -m pip uninstall -y rpy2
     - name: Start application and print version
       env:
         # Display must be available globally for linux to know where xvfb is

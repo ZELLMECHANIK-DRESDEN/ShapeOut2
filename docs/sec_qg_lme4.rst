@@ -13,8 +13,11 @@ with Shape-Out 1.
 
 .. warning::
     Unfortunately, LMM analysis currently does not work with the .app or
-    .pkg bundle on macOS. This problem is tracked in `issue #73
-    <https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/73>`_.
+    .pkg bundle on macOS or the Windows installer. This problem is tracked in
+    `issue #73
+    <https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/73>`_ and
+    `issue #161
+    <https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/161>`_.
     If you are using macOS and you would like to use LMM analysis, you have to
     install Shape-Out 2 as a Python package (see :ref:`sec_installation`).
 

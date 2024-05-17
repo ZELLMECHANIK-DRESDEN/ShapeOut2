@@ -1,3 +1,5 @@
+2.16.3
+ - maintenance release
 2.16.2
  - fix: data export feature selection must default to features_loaded
  - enh: only show local features in QuickView Event Feature tab

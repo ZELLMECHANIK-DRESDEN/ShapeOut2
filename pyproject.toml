@@ -30,7 +30,7 @@ classifiers = [
 license = {text = "GPL v3"}
 dependencies = [
     "fcswrite>=0.5.1",
-    "dclab[dcor,http]>=0.59.0",
+    "dclab[dcor,http]>=0.59.1",
     "h5py>=2.8.0",
     "numpy>=1.21",  # CVE-2021-33430
     "pyqt5",

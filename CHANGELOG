@@ -1,3 +1,5 @@
+2.16.5
+ - setup: bump dclab to 0.59.1 (mapped-basin now fully supported)
 2.16.4
  - setup: bump dclab to 0.59.0 (improved support for basin features)
 2.16.3

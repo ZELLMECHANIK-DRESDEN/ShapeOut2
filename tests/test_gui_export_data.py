@@ -159,7 +159,7 @@ def test_export_datasets_rtdc_logs(qtbot):
     # make sure that file has three events and contains the logs and tables
     with dclab.new_dataset(exported[0]) as ds:
         assert len(ds) == 3
-        assert len(ds.logs) == 5
+        assert len(ds.logs) == 6
         assert "src_cytoshot-acquisition" in ds.logs
         assert np.allclose(
             ds.tables["src_cytoshot_monitor"]["brightness"][0],

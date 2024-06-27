@@ -1,7 +1,10 @@
-2.17.1
+2.18.0
+ - BREAKING CHANGE: set default viscosity model for Young's modulus
+   computation to "buyukurganci-2022", because it is more accurate
+   and also because it is defined for the "0.83% MC-PBS" medium
  - setup: bump dclab to 0.60.1 (fix basin-based array access)
 2.17.0
- - setup: bump dclab to 0.30.1 (internal basin support, export logs)
+ - setup: bump dclab to 0.60.1 (internal basin support, export logs)
 2.16.5
  - setup: bump dclab to 0.59.1 (mapped-basin now fully supported)
 2.16.4

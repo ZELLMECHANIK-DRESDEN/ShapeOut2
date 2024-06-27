@@ -1,5 +1,7 @@
+2.17.1
+ - setup: bump dclab to 0.60.1 (fix basin-based array access)
 2.17.0
- - setup: bump dclab to 0.30.0 (internal basin support, export logs)
+ - setup: bump dclab to 0.30.1 (internal basin support, export logs)
 2.16.5
  - setup: bump dclab to 0.59.1 (mapped-basin now fully supported)
 2.16.4

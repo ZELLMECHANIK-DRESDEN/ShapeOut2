@@ -229,7 +229,7 @@ class Preferences(QtWidgets.QDialog):
         servers = self.settings.value("dcor/servers", ["dcor.mpl.mpg.de"])
         if host in servers:
             servers.remove(host)
-        servers.insert(0, host)
+        servers.insert(0, host.strip("/"))
         self.settings.setValue("dcor/servers", servers)
         self.reload()
 

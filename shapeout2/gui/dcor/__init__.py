@@ -62,10 +62,11 @@ class DCORLoader(QtWidgets.QDialog):
     def get_api_base_url(self):
         """Return the API url in the form https://dcor.mpl.mpg.de/api/3"""
         server = self.settings.value("dcor/servers", ["dcor.mpl.mpg.de"])[0]
+        server = server.strip("/")  # remove leading/trailing slashes
         use_ssl = bool(int(self.settings.value("dcor/use ssl", 1)))
         # ready API
-        http = "https" if use_ssl else "http"
-        base = "{}://{}/api/3".format(http, server)
+        proto = "https" if use_ssl else "http"
+        base = f"{proto}://{server}/api/3"
         return base
 
     def get_api_headers(self):
@@ -295,5 +296,6 @@ def get_server_cert_path(host=None):
     settings = QtCore.QSettings()
     if host is None:
         host = settings.value("dcor/servers", ["dcor.mpl.mpg.de"])[0]
+        host = host.strip("/")  # remove leading/trailing slashes
 
     return dclab.rtdc_dataset.fmt_dcor.get_server_cert_path(host)

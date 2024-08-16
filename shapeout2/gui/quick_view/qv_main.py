@@ -221,7 +221,7 @@ class QuickView(QtWidgets.QWidget):
             else:
                 isopen = False
         elif isinstance(rtdc_ds, dclab.rtdc_dataset.RTDC_Hierarchy):
-            isopen = self._check_file_open(rtdc_ds.hparent)
+            isopen = self._check_file_open(rtdc_ds.get_root_parent())
         else:
             # DCOR
             isopen = True

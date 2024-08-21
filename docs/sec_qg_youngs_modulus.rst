@@ -23,14 +23,12 @@ Parameter settings
 .. _qg_emodulus_config:
 .. figure:: scrots/qg_emodulus_config.png
     :target: _images/qg_emodulus_config.png
-    :align: right
 
     Temperature taken from the metadata.
 
 .. _qg_emodulus_feature:
 .. figure:: scrots/qg_emodulus_feature.png
     :target: _images/qg_emodulus_feature.png
-    :align: right
 
     Use the temperature (temp) feature.
 
@@ -52,7 +50,6 @@ the Young's modulus is computed from the individual viscosities for each event.
 .. _qg_emodulus_badtemp:
 .. figure:: scrots/qg_emodulus_badtemp.png
     :target: _images/qg_emodulus_badtemp.png
-    :align: right
 
     Temperature outside of known range.
 
@@ -65,7 +62,6 @@ coloring the viscosity red.
 .. _qg_emodulus_other:
 .. figure:: scrots/qg_emodulus_other.png
     :target: _images/qg_emodulus_other.png
-    :align: right
 
     Manually set the viscosity.
 

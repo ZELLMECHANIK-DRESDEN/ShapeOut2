@@ -17,7 +17,6 @@ that can interface with HDF5 data.
 .. _qg_export_data:
 .. figure:: scrots/qg_export_data.png
     :target: _images/qg_export_data.png
-    :align: right
 
     Data export for current session
 

@@ -49,7 +49,6 @@ Basic usage
 ===========
 .. image:: scrots/ui_main.png
     :target: _images/ui_main.png
-    :align: right
     :scale: 20%
 
 The user interface is split into several parts: the menu bar and the tool
@@ -74,7 +73,6 @@ Block Matrix
 ------------
 .. image:: scrots/ui_block_matrix.png
     :target: _images/ui_block_matrix.png
-    :align: right
     :scale: 65%
 
 The Block Matrix gives an overview of the current analysis

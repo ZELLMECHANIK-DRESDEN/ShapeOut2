@@ -81,9 +81,10 @@ available for the selected dataset.
 .. note::
 
     In order to prevent users from doing a wrong analysis, Shape-Out does not
-    allow users to change the buffer in the *Dataset* tab if CellCarrier,
-    CellCarrier B or water/PBS were selected in Shape-In. Therefore, the
-    analysis of the Young's modulus cannot be re-done for a different buffer.
+    allow users to change the buffer in the *Dataset* tab if the buffer medium
+    (e.g. 0.59% MC-PBS) was selected in Shape-In or CytoShot. Therefore,
+    the analysis of the Young's modulus cannot be re-done for a different
+    buffer.
 
 
 Bulk actions

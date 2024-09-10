@@ -1,5 +1,4 @@
 """Screenshots for quick guide extensions"""
-import os
 import pathlib
 import sys
 

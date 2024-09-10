@@ -1,4 +1,5 @@
 """Screenshots for quick guide extensions"""
+import os
 import pathlib
 import sys
 
@@ -17,20 +18,8 @@ mw = ShapeOut2()
 mw.settings.setValue("check for updates", 0)
 mw.settings.setValue("advanced/user confirm clear", 0)
 
-try:
-    mw.extensions.import_extension_from_path(
-        data_path / "naive_rbc_score.modc")
-except BaseException:
-    # Probably already loaded
-    pass
-
-try:
-    mw.extensions.import_extension_from_path(
-        data_path / "estension_fl1_density.py")
-except BaseException:
-    # Probably already loaded
-    pass
-
+mw.extensions.import_extension_from_path(
+    data_path / "extension_fl1_density.py")
 
 # open the dialog window
 dlg = preferences.Preferences(mw)

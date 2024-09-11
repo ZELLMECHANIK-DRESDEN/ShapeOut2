@@ -5,8 +5,8 @@
  - BREAKING CHANGE: remove support for machine learning extensions
    (.modc files), because they are not used
  - fix: remove leading/trailing slashes for DCOR servers
- - setup: bump dclab to 0.60.5 (fix basin-based array access, export from
-   datasets with internal basins)
+ - setup: bump dclab to 0.61.1 (fix basin-based array access, export from
+   datasets with internal basins, other minor fixes)
 2.17.0
  - setup: bump dclab to 0.60.0 (internal basin support, export logs)
 2.16.5

@@ -2,12 +2,15 @@
 import pathlib
 import socket
 
+from dclab.lme4 import Rlme4, bootstrapped_median_distributions, rsetup
 from shapeout2.gui.main import ShapeOut2
 from shapeout2 import session
 from shapeout2.gui.compute.comp_lme4 import ComputeSignificance
 import pytest
 
-pytest.importorskip("rpy2")
+
+if not (rsetup.has_r() and rsetup.has_lme4()):
+    pytest.skip(allow_module_level=True)
 
 data_path = pathlib.Path(__file__).parent / "data"
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

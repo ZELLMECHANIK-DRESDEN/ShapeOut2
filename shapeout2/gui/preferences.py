@@ -5,21 +5,14 @@ import traceback
 import pkg_resources
 import platform
 
-from dclab.lme4.rlibs import (
-    rpy2, MockRPackage, RPY2UnavailableError, RUnavailableError)
 from dclab.rtdc_dataset.fmt_dcor import access_token
 from dclab.lme4 import rsetup
 from PyQt5 import uic, QtCore, QtWidgets
 from PyQt5.QtCore import QStandardPaths
 
+from dclab.lme4.rsetup import RNotFoundError
 from .widgets import show_wait_cursor
 from ..extensions import ExtensionManager, SUPPORTED_FORMATS
-
-
-if isinstance(rpy2, MockRPackage):
-    RPY2_AVAILABLE = not isinstance(rpy2.exception, RPY2UnavailableError)
-else:
-    RPY2_AVAILABLE = True
 
 
 class ExtensionErrorWrapper:
@@ -55,13 +48,13 @@ class Preferences(QtWidgets.QDialog):
         self.parent = parent
 
         # Get default R path
-        if RPY2_AVAILABLE and rsetup.has_r():
+        if rsetup.has_r():
             rdefault = rsetup.get_r_path()
         else:
             rdefault = ""
 
         # disable R settings
-        self.tab_r.setEnabled(RPY2_AVAILABLE)
+        self.tab_r.setEnabled(rsetup.has_r())
 
         #: configuration keys, corresponding widgets, and defaults
         self.config_pairs = [
@@ -160,7 +153,7 @@ class Preferences(QtWidgets.QDialog):
         if pathlib.Path(binary).is_file():
             try:
                 rsetup.set_r_path(binary)
-            except RUnavailableError as exc:
+            except RNotFoundError as exc:
                 QtWidgets.QMessageBox.information(
                     self,
                     "No compatible R version found",

@@ -38,13 +38,20 @@ class Rlme4ResultsDialog(QtWidgets.QDialog):
 
         # summary text
         summary = []
+        if res["lme4 messages"]:
+            summary += ["lme4 messages"]
+            summary += ["-------------"]
+            summary += str(res["lme4 messages"]).split("\n")
+            summary += "\n"
         summary += ["Model summary"]
         summary += ["-------------"]
         summary += self.parse_r_model_summary(
             str(res["r model summary"]).split("\n"))
+        summary += "\n"
         summary += ["Coefficient table"]
         summary += ["-----------------"]
         summary += str(res["r model coefficients"]).split("\n")
+        summary += "\n"
         summary += ["Anova test"]
         summary += ["----------"]
         summary += str(res["r anova"]).split("\n")

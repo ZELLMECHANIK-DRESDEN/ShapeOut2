@@ -7,7 +7,6 @@ import traceback
 import webbrowser
 
 import dclab
-from dclab.lme4.rlibs import rpy2, MockRPackage
 from dclab.lme4 import rsetup
 import h5py
 import numpy
@@ -126,8 +125,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.on_action_compute_statistics)
         self.actionComputeSignificance.triggered.connect(
             self.on_action_compute_significance)
-        self.actionComputeSignificance.setVisible(
-            not isinstance(rpy2, MockRPackage))  # only show if rpy2 is there
         # Export menu
         # data
         self.actionExportData.triggered.connect(self.on_action_export_data)
@@ -607,7 +604,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
         else:
             QtWidgets.QMessageBox.critical(
                 self, "R not found!",
-                "The R executable was not found by rpy2. Please add it "
+                "The R executable was not found. Please add it "
                 + "to the PATH variable or define it manually in the "
                 + "Shape-Out preferences.")
 
@@ -837,8 +834,6 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 pg,
                 scipy,
                 ]
-        if not isinstance(rpy2, MockRPackage):
-            libs.append(rpy2)
 
         sw_text = f"Shape-Out {version}\n\n"
         sw_text += f"Python {sys.version}\n\n"

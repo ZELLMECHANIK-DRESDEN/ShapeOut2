@@ -2,7 +2,7 @@
 import pathlib
 import socket
 
-from dclab.lme4 import Rlme4, bootstrapped_median_distributions, rsetup
+from dclab.lme4 import rsetup
 from shapeout2.gui.main import ShapeOut2
 from shapeout2 import session
 from shapeout2.gui.compute.comp_lme4 import ComputeSignificance

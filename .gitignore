@@ -116,3 +116,5 @@ build-recipes/ShapeOut2Launcher.spec
 
 # line profiler
 *.lprof
+
+*.ui.autosave

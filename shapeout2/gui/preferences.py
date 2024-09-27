@@ -53,9 +53,6 @@ class Preferences(QtWidgets.QDialog):
         else:
             rdefault = ""
 
-        # disable R settings
-        self.tab_r.setEnabled(rsetup.has_r())
-
         #: configuration keys, corresponding widgets, and defaults
         self.config_pairs = [
             ["advanced/developer mode", self.advanced_developer_mode, "0"],
@@ -148,6 +145,9 @@ class Preferences(QtWidgets.QDialog):
     @show_wait_cursor
     def reload_lme4(self, install=False):
         """Reload information about lme4, optionally installing it"""
+        # enable/disable lme4-install button
+        self.pushButton_lme4_install.setEnabled(rsetup.has_r())
+
         # set the binary
         binary = self.lme4_rpath.text()
         if pathlib.Path(binary).is_file():

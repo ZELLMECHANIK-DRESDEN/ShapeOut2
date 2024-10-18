@@ -145,13 +145,13 @@ class Preferences(QtWidgets.QDialog):
     @show_wait_cursor
     def reload_lme4(self, install=False):
         """Reload information about lme4, optionally installing it"""
-        # enable/disable lme4-install button
-        self.pushButton_lme4_install.setEnabled(rsetup.has_r())
-
         # set the binary
         binary = self.lme4_rpath.text()
         if pathlib.Path(binary).is_file():
             rsetup.set_r_path(binary)
+
+        # enable/disable lme4-install button
+        self.pushButton_lme4_install.setEnabled(rsetup.has_r())
 
         # check lme4 package status
         if not rsetup.has_r():
@@ -166,7 +166,7 @@ class Preferences(QtWidgets.QDialog):
 
         if install and lme4_st == "not installed":
             self.setEnabled(False)
-            rsetup.install_lme4()
+            rsetup.require_lme4()
             self.setEnabled(True)
             # update interface with installed lme4
             self.reload_lme4(install=False)

@@ -151,7 +151,7 @@ class Preferences(QtWidgets.QDialog):
         # location where we can install lme4 and set the environment variable
         # R_LIBS_USER accordingly.
         r_libs_user = self.settings.value("lme4/r libs user", None)
-        if r_libs_user is None:
+        if r_libs_user is None or not pathlib.Path(r_libs_user).exists():
             r_libs_user = pathlib.Path(
                 QStandardPaths.writableLocation(
                     QStandardPaths.AppLocalDataLocation)) / "r-libs"

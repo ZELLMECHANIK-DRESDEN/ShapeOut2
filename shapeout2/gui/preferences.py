@@ -10,7 +10,6 @@ from dclab.lme4 import rsetup
 from PyQt5 import uic, QtCore, QtWidgets
 from PyQt5.QtCore import QStandardPaths
 
-from dclab.lme4.rsetup import RNotFoundError
 from .widgets import show_wait_cursor
 from ..extensions import ExtensionManager, SUPPORTED_FORMATS
 
@@ -145,6 +144,18 @@ class Preferences(QtWidgets.QDialog):
     @show_wait_cursor
     def reload_lme4(self, install=False):
         """Reload information about lme4, optionally installing it"""
+        # Before we do anything, we have to find a persistent writable
+        # location where we can install lme4 and set the environment variable
+        # R_LIBS_USER accordingly.
+        r_libs_user = self.settings.value("lme4/r libs user", None)
+        if r_libs_user is None:
+            r_libs_user = pathlib.Path(
+                QStandardPaths.writableLocation(
+                    QStandardPaths.AppDataLocation)) / "r-libs"
+            r_libs_user.mkdir(parents=True, exist_ok=True)
+            r_libs_user = str(r_libs_user)
+            self.settings.setValue("lme4/r libs user", r_libs_user)
+
         # set the binary
         binary = self.lme4_rpath.text()
         if pathlib.Path(binary).is_file():

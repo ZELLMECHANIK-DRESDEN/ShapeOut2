@@ -84,6 +84,9 @@ class ComputeSignificance(QtWidgets.QDialog):
         r_path = settings.value("lme4/r path", "")
         if r_path:
             lme4.set_r_path(r_path)
+        r_libs_path = settings.value("lme4/r libs user", "")
+        if r_libs_path:
+            lme4.set_r_lib_path(r_libs_path)
         # compute LMM
         with ShowWaitCursor():
             rlme4 = lme4.Rlme4(model=self.model, feature=self.feature)

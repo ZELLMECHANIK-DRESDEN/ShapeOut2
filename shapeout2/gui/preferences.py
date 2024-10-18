@@ -114,6 +114,9 @@ class Preferences(QtWidgets.QDialog):
         devmode = bool(int(self.settings.value("advanced/developer mode", 0)))
         self.dcor_use_ssl.setVisible(devmode)  # show "use ssl" in dev mode
 
+        if self.tabWidget.currentWidget() is self.tab_r:
+            self.reload_lme4()
+
         self.reload_ext()
 
     def reload_ext(self):
@@ -151,7 +154,7 @@ class Preferences(QtWidgets.QDialog):
         if r_libs_user is None:
             r_libs_user = pathlib.Path(
                 QStandardPaths.writableLocation(
-                    QStandardPaths.AppDataLocation)) / "r-libs"
+                    QStandardPaths.AppLocalDataLocation)) / "r-libs"
             r_libs_user.mkdir(parents=True, exist_ok=True)
             r_libs_user = str(r_libs_user)
             self.settings.setValue("lme4/r libs user", r_libs_user)

@@ -151,15 +151,7 @@ class Preferences(QtWidgets.QDialog):
         # set the binary
         binary = self.lme4_rpath.text()
         if pathlib.Path(binary).is_file():
-            try:
-                rsetup.set_r_path(binary)
-            except RNotFoundError as exc:
-                QtWidgets.QMessageBox.information(
-                    self,
-                    "No compatible R version found",
-                    "The R/lme4 functionality is not available.\n\n"
-                    + f"{exc.__class__.__name__}: {exc}"
-                )
+            rsetup.set_r_path(binary)
 
         # check lme4 package status
         if not rsetup.has_r():

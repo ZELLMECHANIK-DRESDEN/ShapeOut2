@@ -155,6 +155,7 @@ class Preferences(QtWidgets.QDialog):
             r_libs_user.mkdir(parents=True, exist_ok=True)
             r_libs_user = str(r_libs_user)
             self.settings.setValue("lme4/r libs user", r_libs_user)
+        rsetup.set_r_lib_path(r_libs_user)
 
         # set the binary
         binary = self.lme4_rpath.text()

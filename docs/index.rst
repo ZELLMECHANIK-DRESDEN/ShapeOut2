@@ -20,6 +20,7 @@ Documentation
    sec_rtdc_basics
    sec_interface
    sec_quick_guides
+   sec_devs
 
 .. toctree::
    :maxdepth: 1

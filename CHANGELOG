@@ -1,3 +1,5 @@
+2.19.1
+ - docs: add developer's section
 2.19.0
  - feat: support accessing private S3 basins (#174)
  - enh: enable lut selection in analysis view plots (#71)

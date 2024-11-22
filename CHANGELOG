@@ -1,4 +1,5 @@
 2.19.1
+ - ref: remove distutils dependency
  - docs: add developer's section
 2.19.0
  - feat: support accessing private S3 basins (#174)

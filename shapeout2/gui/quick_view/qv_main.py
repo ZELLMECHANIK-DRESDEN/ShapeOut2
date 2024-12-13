@@ -142,10 +142,37 @@ class QuickView(QtWidgets.QWidget):
         self.legend_trace = self.graphicsView_trace.addLegend(
             offset=(-.01, +.01))
 
+        # qpi_pha cmaps
+        self.cmap_pha = pg.colormap.get('CET-D1A', skipCache=True)
+        self.cmap_pha_with_black = pg.colormap.get('CET-D1A', skipCache=True)
+        self.cmap_pha_with_black.color[0] = [0, 0, 0, 1]
+
+        # image display default range of values that the cmap will cover
+        self.levels_image = (0, 255)
+        self.levels_qpi_pha = (-3.14, 3.14)
+        self.levels_qpi_amp = (0, 2)
+
         #: default parameters for the event image
-        self.imkw = dict(autoLevels=False,
-                         levels=(0, 255),
-                         )
+        self.img_info = {
+            "image": {
+                "view_event": self.imageView_image,
+                "view_poly": self.imageView_image_poly,
+                "cmap": None,
+                "kwargs": dict(autoLevels=False, levels=self.levels_image),
+            },
+            "qpi_pha": {
+                "view_event": self.imageView_image_pha,
+                "view_poly": self.imageView_image_poly_pha,
+                "cmap": self.cmap_pha,
+                "kwargs": dict(autoLevels=False, levels=self.levels_qpi_pha),
+            },
+            "qpi_amp": {
+                "view_event": self.imageView_image_amp,
+                "view_poly": self.imageView_image_poly_amp,
+                "cmap": None,
+                "kwargs": dict(autoLevels=False, levels=self.levels_qpi_amp),
+            },
+        }
 
         # set initial empty dataset
         self._rtdc_ds = None
@@ -277,31 +304,79 @@ class QuickView(QtWidgets.QWidget):
         self.comboBox_y.set_dataset(rtdc_ds, default_choice="deform")
         self.comboBox_z_hue.set_dataset(rtdc_ds)
 
-    def get_event_image(self, ds, event):
-        state = self.__getstate__()
-        imkw = self.imkw.copy()
-        cellimg = ds["image"][event]
-        # apply background correction
-        if "image_bg" in ds:
-            if state["event"]["image background"]:
-                bgimg = ds["image_bg"][event].astype(np.int16)
-                cellimg = cellimg.astype(np.int16)
-                cellimg = cellimg - bgimg + int(np.mean(bgimg))
-        # automatic contrast
-        if state["event"]["image auto contrast"]:
-            vmin, vmax = cellimg.min(), cellimg.max()
-            cellimg = (cellimg - vmin) / max(vmax - vmin, 1) * 255
-        # convert to RGB
-        cellimg = cellimg.reshape(
-            cellimg.shape[0], cellimg.shape[1], 1)
-        cellimg = np.repeat(cellimg, 3, axis=2)
-        # clip and convert to int
-        cellimg = np.clip(cellimg, 0, 255)
-        cellimg = np.require(cellimg, np.uint8, 'C')
+    def get_event_and_display(self, ds, event, feat, view):
+        """Convenience method to get the event image and display in one step"""
+        cellimg = self.get_event_image(ds, event, feat)
+        self.display_img(feat, view, cellimg)
 
+    def get_event_image(self, ds, event, feat):
+        """Handle the image processing and contour processing for the event"""
+        state = self.__getstate__()
+        cellimg = ds[feat][event]
+        cellimg = self.display_image(ds, event, state, cellimg, feat)
+        cellimg = self.display_contour(ds, event, state, cellimg, feat)
+        return cellimg
+
+    def display_image(self, ds, event, state, cellimg, feat):
+        """Apply background, auto-contrast and format conversion"""
+        if feat == "image":
+            # apply background correction
+            if "image_bg" in ds:
+                if state["event"]["image background"]:
+                    bgimg = ds["image_bg"][event].astype(np.int16)
+                    cellimg = cellimg.astype(np.int16)
+                    cellimg = cellimg - bgimg + int(np.mean(bgimg))
+            # automatic contrast
+            if state["event"]["image auto contrast"]:
+                vmin, vmax = cellimg.min(), cellimg.max()
+                cellimg = (cellimg - vmin) / (vmax - vmin) * 255
+            cellimg = self._convert_to_rgb(cellimg)
+            # clip and convert to int
+            cellimg = np.clip(cellimg, 0, 255)
+            cellimg = np.require(cellimg, np.uint8, 'C')
+
+        elif feat == "qpi_pha":
+            if state["event"]["image auto contrast"]:
+                vmin, vmax = self._vmin_max_around_zero(cellimg)
+
+                if state["event"]["image contour"]:
+                    # offset required for auto-contrast with contour
+                    # two times the contrast range, divided by the cmap length
+                    # this essentially adds a cmap point for our contour
+                    offset = 2 * ((vmax - vmin) / len(self.cmap_pha.color))
+                    vmin = vmin - offset
+                    self.img_info[feat]["cmap"] = self.cmap_pha_with_black
+                else:
+                    self.img_info[feat]["cmap"] = self.cmap_pha
+
+            else:
+                vmin, vmax = self.levels_qpi_pha
+            self.img_info[feat]["kwargs"]["levels"] = (vmin, vmax)
+
+        elif feat == "qpi_amp":
+            if state["event"]["image auto contrast"]:
+                vmin, vmax = cellimg.min(), cellimg.max()
+            else:
+                vmin, vmax = self.levels_qpi_amp
+            self.img_info[feat]["kwargs"]["levels"] = (vmin, vmax)
+            # to get the correct contour colour it is easier to view the
+            # amplitude as an RGB image
+            cellimg = self._convert_to_rgb(cellimg)
+
+        return cellimg
+
+    def _vmin_max_around_zero(self, cellimg):
+        vmin_abs, vmax_abs = np.abs(cellimg.min()), np.abs(cellimg.max())
+        v_largest = max(vmax_abs, vmin_abs)
+        vmin, vmax = -v_largest, v_largest
+        return vmin, vmax
+
+    def display_contour(self, ds, event, state, cellimg, feat):
+        """Add the contour to the image if requested"""
         # Only load contour data if there is an image column.
         # We don't know how big the images should be so we
         # might run into trouble displaying random contours.
+        imkw = self.img_info[feat]["kwargs"]
         if "mask" in ds and len(ds["mask"]) > event:
             mask = ds["mask"][event]
             if state["event"]["image contour"]:
@@ -310,22 +385,44 @@ class QuickView(QtWidgets.QWidget):
                 # https://github.com/DC-analysis/dclab/issues/76
                 cont = mask ^ binary_erosion(mask)
                 # set red contour pixel values in original image
-                cellimg[cont, 0] = int(255*.7)
-                cellimg[cont, 1] = 0
-                cellimg[cont, 2] = 0
+                if feat == "image" or feat == "qpi_amp":
+                    # for RGB images
+                    ch_red = imkw["levels"][1] * 0.7
+                    ch_other = int(imkw["levels"][0]) if \
+                        imkw["levels"][1] == 255 else imkw["levels"][0]
+                    # assign channel values for contour
+                    cellimg[cont, 0] = int(
+                        ch_red) if imkw["levels"][1] == 255 else ch_red
+                    cellimg[cont, 1] = ch_other
+                    cellimg[cont, 2] = ch_other
+                elif feat == "qpi_pha":
+                    # use the lowest value from the colormap
+                    cellimg[cont] = imkw["levels"][0]
+
             if state["event"]["image zoom"]:
-                xv, yv = np.where(mask)
-                idminx = xv.min() - 5
-                idminy = yv.min() - 5
-                idmaxx = xv.max() + 5
-                idmaxy = yv.max() + 5
-                idminx = idminx if idminx >= 0 else 0
-                idminy = idminy if idminy >= 0 else 0
-                shx, shy = mask.shape
-                idmaxx = idmaxx if idmaxx < shx else shx
-                idmaxy = idmaxy if idmaxy < shy else shy
-                cellimg = cellimg[idminx:idmaxx, idminy:idmaxy]
-        return cellimg, imkw
+                cellimg = self.image_zoom(cellimg, mask)
+
+            return cellimg
+
+    @staticmethod
+    def _convert_to_rgb(cellimg):
+        cellimg = cellimg.reshape(
+            cellimg.shape[0], cellimg.shape[1], 1)
+        return np.repeat(cellimg, 3, axis=2)
+
+    @staticmethod
+    def image_zoom(cellimg, mask):
+        xv, yv = np.where(mask)
+        idminx = xv.min() - 5
+        idminy = yv.min() - 5
+        idmaxx = xv.max() + 5
+        idmaxy = yv.max() + 5
+        idminx = idminx if idminx >= 0 else 0
+        idminy = idminy if idminy >= 0 else 0
+        shx, shy = mask.shape
+        idmaxx = idmaxx if idmaxx < shx else shx
+        idmaxy = idmaxy if idmaxy < shy else shy
+        return cellimg[idminx:idmaxx, idminy:idmaxy]
 
     def get_statistics(self):
         if self.rtdc_ds is not None:
@@ -377,26 +474,41 @@ class QuickView(QtWidgets.QWidget):
             self.toolButton_event.setChecked(True)
             self.toolButton_event.toggled.emit(True)
 
+    def display_img(self, feat, view, cellimg):
+        self.img_info[feat][view].setImage(cellimg,
+                                           **self.img_info[feat]["kwargs"])
+        if self.img_info[feat]["cmap"] is not None:
+            self.img_info[feat][view].setColorMap(self.img_info[feat]["cmap"])
+        self.img_info[feat][view].show()
+
     @QtCore.pyqtSlot(QtCore.QPointF)
     def on_event_scatter_hover(self, pos):
         """Update the image view in the polygon widget """
         if self.rtdc_ds is not None and self.toolButton_poly.isChecked():
+            ds = self.rtdc_ds
             # plotted events
             plotted = self.widget_scatter.events_plotted
             spos = self.widget_scatter.scatter.mapFromView(pos)
             point = self.widget_scatter.scatter.pointAt(spos)
             # get corrected index
             event = np.where(plotted)[0][point.index()]
-            if "image" in self.rtdc_ds:
-                try:
-                    cellimg, imkw = self.get_event_image(self.rtdc_ds, event)
-                except IndexError:
-                    # the plot got updated, and we still have the old data
-                    cellimg, imkw = self.get_event_image(self.rtdc_ds, 0)
-                self.imageView_image_poly.setImage(cellimg, **imkw)
-                self.imageView_image_poly.show()
-            else:
-                self.imageView_image_poly.hide()
+
+            view = "view_poly"
+            for key in self.img_info.keys():
+                self.img_info[key][view].hide()
+
+            try:
+                # if we have qpi data, image might be a different shape
+                if "qpi_pha" in ds:
+                    self.get_event_and_display(ds, event, "qpi_pha", view)
+                    if "qpi_amp" in ds:
+                        self.get_event_and_display(ds, event, "qpi_amp", view)
+                elif "image" in ds:
+                    self.get_event_and_display(ds, event, "image", view)
+
+            except IndexError:
+                # the plot got updated, and we still have the old data
+                self.get_event_and_display(ds, 0, "image", view)
 
     @QtCore.pyqtSlot(int)
     def on_event_scatter_spin(self, event):
@@ -544,8 +656,8 @@ class QuickView(QtWidgets.QWidget):
         else:
             # keep everything as-is but update the sizes
             show_event = self.stackedWidget.currentWidget() is self.page_event
-            show_settings = self.stackedWidget.currentWidget() \
-                is self.page_settings
+            show_settings = (
+                    self.stackedWidget.currentWidget() is self.page_settings)
             show_poly = self.stackedWidget.currentWidget() is self.page_poly
 
         # toolbutton checked
@@ -661,12 +773,22 @@ class QuickView(QtWidgets.QWidget):
         if self.tabWidget_event.currentIndex() == 0:
             # update image
             state = self.__getstate__()
-            if "image" in ds:
-                cellimg, imkw = self.get_event_image(ds, event)
-                self.imageView_image.setImage(cellimg, **imkw)
-                self.groupBox_image.show()
-            else:
-                self.groupBox_image.hide()
+            self.groupBox_image.hide()
+
+            view = "view_event"
+            for key in self.img_info.keys():
+                self.img_info[key][view].hide()
+
+            # if we have qpi data, image might be a different shape
+            if "qpi_pha" in ds:
+                self.get_event_and_display(ds, event, "qpi_pha", view)
+                if "qpi_amp" in ds:
+                    self.get_event_and_display(ds, event, "qpi_amp", view)
+            elif "image" in ds:
+                self.get_event_and_display(ds, event, "image", view)
+
+            self.groupBox_image.show()
+
             if "trace" in ds:
                 # remove legend items
                 for item in reversed(self.legend_trace.items):
@@ -705,8 +827,9 @@ class QuickView(QtWidgets.QWidget):
                                 range_t[1] = flpos + 1.5 * flwidth
                                 range_t[2] = flmax
                         # set legend name
-                        ln = "{} {}".format(self.slot.fl_name_dict[
-                            "FL-{}".format(key[2])], key[4:])
+                        ln = "{} {}".format(
+                            self.slot.fl_name_dict[
+                                "FL-{}".format(key[2])], key[4:])
                         self.legend_trace.addItem(self.trace_plots[key], ln)
                         self.legend_trace.update()
                     else:

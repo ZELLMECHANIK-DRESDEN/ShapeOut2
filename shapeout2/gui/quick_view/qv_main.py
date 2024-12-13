@@ -347,27 +347,27 @@ class QuickView(QtWidgets.QWidget):
             cellimg = np.require(cellimg, np.uint8, 'C')
 
         elif feat == "qpi_pha":
-            old_cmap = self.img_info[feat]["cmap"]
-            new_cmap = self.img_info[feat]["cmap"]
-
+            # colormap levels
             if state["event"]["image auto contrast"]:
                 vmin, vmax = self._vmin_max_around_zero(cellimg)
-
                 if state["event"]["image contour"]:
                     # offset required for auto-contrast with contour
                     # two times the contrast range, divided by the cmap length
                     # this essentially adds a cmap point for our contour
                     offset = 2 * ((vmax - vmin) / len(self.cmap_pha.color))
                     vmin = vmin - offset
-                    new_cmap = self.cmap_pha_with_black
-                else:
-                    new_cmap = self.cmap_pha
             else:
                 vmin, vmax = self.levels_qpi_pha
             self.img_info[feat]["kwargs"]["levels"] = (vmin, vmax)
 
-            if old_cmap != new_cmap:
+            # update colormap
+            if state["event"]["image contour"]:
+                new_cmap = self.cmap_pha_with_black
+            else:
+                new_cmap = self.cmap_pha
+            if self.img_info[feat]["cmap"] != new_cmap:
                 self.img_info[feat]["cmap"] = new_cmap
+                # performance
                 self.img_info[feat]["cmap_changed"] = True
 
         elif feat == "qpi_amp":

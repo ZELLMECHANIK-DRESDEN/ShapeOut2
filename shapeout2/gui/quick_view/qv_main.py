@@ -19,6 +19,8 @@ class QuickView(QtWidgets.QWidget):
     polygon_filter_about_to_be_deleted = QtCore.pyqtSignal(int)
 
     def __init__(self, *args, **kwargs):
+        self._hover_ds = None
+        self._hover_event = None
         super(QuickView, self).__init__(*args, **kwargs)
         ref = importlib.resources.files(
             "shapeout2.gui.quick_view") / "qv_main.ui"
@@ -274,6 +276,8 @@ class QuickView(QtWidgets.QWidget):
         return isopen
 
     def _set_initial_ui(self):
+        self._hover_ds = None
+        self._hover_event = None
         # Initially, only show the info about how QuickView works
         self.widget_tool.setEnabled(False)
         self.widget_scatter.hide()
@@ -295,6 +299,10 @@ class QuickView(QtWidgets.QWidget):
 
     @rtdc_ds.setter
     def rtdc_ds(self, rtdc_ds):
+        if self._rtdc_ds is not rtdc_ds:
+            self._hover_ds = None
+            self._hover_event = None
+
         self._rtdc_ds = rtdc_ds
 
         # Hide "Subtract Background"-Checkbox if feature
@@ -505,22 +513,29 @@ class QuickView(QtWidgets.QWidget):
             # get corrected index
             event = np.where(plotted)[0][point.index()]
 
-            view = "view_poly"
-            for key in self.img_info.keys():
-                self.img_info[key][view].hide()
+            # Only plot if we have not plotted this event before
+            if self._hover_ds is not ds or self._hover_event != event:
+                # remember where we were
+                self._hover_ds = ds
+                self._hover_event = event
+                view = "view_poly"
+                for key in self.img_info.keys():
+                    self.img_info[key][view].hide()
 
-            try:
-                # if we have qpi data, image might be a different shape
-                if "qpi_pha" in ds:
-                    self.get_event_and_display(ds, event, "qpi_pha", view)
-                    if "qpi_amp" in ds:
-                        self.get_event_and_display(ds, event, "qpi_amp", view)
-                elif "image" in ds:
-                    self.get_event_and_display(ds, event, "image", view)
-
-            except IndexError:
-                # the plot got updated, and we still have the old data
-                self.get_event_and_display(ds, 0, "image", view)
+                try:
+                    # if we have qpi data, image might be a different shape
+                    if "qpi_pha" in ds:
+                        self.get_event_and_display(
+                            ds, event, "qpi_pha", view)
+                        if "qpi_amp" in ds:
+                            self.get_event_and_display(
+                                ds, event, "qpi_amp", view)
+                    elif "image" in ds:
+                        self.get_event_and_display(
+                            ds, event, "image", view)
+                except IndexError:
+                    # the plot got updated, and we still have the old data
+                    self.get_event_and_display(ds, 0, "image", view)
 
     @QtCore.pyqtSlot(int)
     def on_event_scatter_spin(self, event):

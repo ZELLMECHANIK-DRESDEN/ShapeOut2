@@ -158,18 +158,21 @@ class QuickView(QtWidgets.QWidget):
                 "view_event": self.imageView_image,
                 "view_poly": self.imageView_image_poly,
                 "cmap": None,
+                "cmap_changed": False,
                 "kwargs": dict(autoLevels=False, levels=self.levels_image),
             },
             "qpi_pha": {
                 "view_event": self.imageView_image_pha,
                 "view_poly": self.imageView_image_poly_pha,
                 "cmap": self.cmap_pha,
+                "cmap_changed": False,
                 "kwargs": dict(autoLevels=False, levels=self.levels_qpi_pha),
             },
             "qpi_amp": {
                 "view_event": self.imageView_image_amp,
                 "view_poly": self.imageView_image_poly_amp,
                 "cmap": None,
+                "cmap_changed": False,
                 "kwargs": dict(autoLevels=False, levels=self.levels_qpi_amp),
             },
         }
@@ -336,6 +339,9 @@ class QuickView(QtWidgets.QWidget):
             cellimg = np.require(cellimg, np.uint8, 'C')
 
         elif feat == "qpi_pha":
+            old_cmap = self.img_info[feat]["cmap"]
+            new_cmap = self.img_info[feat]["cmap"]
+
             if state["event"]["image auto contrast"]:
                 vmin, vmax = self._vmin_max_around_zero(cellimg)
 
@@ -345,13 +351,16 @@ class QuickView(QtWidgets.QWidget):
                     # this essentially adds a cmap point for our contour
                     offset = 2 * ((vmax - vmin) / len(self.cmap_pha.color))
                     vmin = vmin - offset
-                    self.img_info[feat]["cmap"] = self.cmap_pha_with_black
+                    new_cmap = self.cmap_pha_with_black
                 else:
-                    self.img_info[feat]["cmap"] = self.cmap_pha
-
+                    new_cmap = self.cmap_pha
             else:
                 vmin, vmax = self.levels_qpi_pha
             self.img_info[feat]["kwargs"]["levels"] = (vmin, vmax)
+
+            if old_cmap != new_cmap:
+                self.img_info[feat]["cmap"] = new_cmap
+                self.img_info[feat]["cmap_changed"] = True
 
         elif feat == "qpi_amp":
             if state["event"]["image auto contrast"]:
@@ -477,7 +486,10 @@ class QuickView(QtWidgets.QWidget):
     def display_img(self, feat, view, cellimg):
         self.img_info[feat][view].setImage(cellimg,
                                            **self.img_info[feat]["kwargs"])
-        if self.img_info[feat]["cmap"] is not None:
+        if (self.img_info[feat]["cmap"] is not None
+                # performance
+                and self.img_info[feat]["cmap_changed"]):
+            self.img_info[feat]["cmap_changed"] = False
             self.img_info[feat][view].setColorMap(self.img_info[feat]["cmap"])
         self.img_info[feat][view].show()
 

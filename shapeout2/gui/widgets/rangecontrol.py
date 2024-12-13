@@ -100,8 +100,7 @@ class RangeControl(QtWidgets.QWidget):
         # limits
         lmin = self.minimum
         lmax = self.maximum
-        assert lmin <= smin
-        assert lmax >= smax
+
         # current range slider limits [a.u.]
         rmin = self.range_slider.min()
         rmax = self.range_slider.max()

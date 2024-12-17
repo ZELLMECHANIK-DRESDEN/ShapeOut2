@@ -1,6 +1,8 @@
 """Test of Quick View set functionalities"""
 import pathlib
+import shutil
 
+import h5py
 from PyQt6 import QtCore, QtWidgets
 
 import dclab
@@ -795,6 +797,53 @@ def test_contour_display_qpi_pha(qtbot):
     # there is one pixel actually set at the lowest value during auto-contrast
     assert not np.sum(np.all(
         image_without_contour == lowest_cmap_val, axis=-1))
+
+
+def test_image_without_mask_data(qtbot, tmp_path):
+    """Make sure image is plotted when there is no mask data"""
+    path_in = tmp_path / "test.rtdc"
+    shutil.copy2(datapath / "calibration_beads_47.rtdc", path_in)
+    with h5py.File(path_in, "a") as h5:
+        del h5["events/contour"]
+        del h5["events/mask"]
+
+    # Create main window
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+
+    mw.add_dataslot(paths=[path_in])
+
+    assert len(mw.pipeline.slot_ids) == 1, "we added those"
+    assert len(mw.pipeline.filter_ids) == 1, "automatically added"
+
+    # Test if CheckBox is visible for dataset
+    # and if it is checked by default
+
+    # Activate dataslots
+    slot_id1 = mw.pipeline.slot_ids[0]
+    filt_id = mw.pipeline.filter_ids[0]
+    em1 = mw.block_matrix.get_widget(slot_id1, filt_id)
+
+    # Activate
+    qtbot.mouseClick(em1, QtCore.Qt.MouseButton.LeftButton)
+    # Open QuickView-window
+    qtbot.mouseClick(em1, QtCore.Qt.MouseButton.LeftButton,
+                     QtCore.Qt.KeyboardModifier.ShiftModifier)
+
+    # Check if QuickView-window is open
+    assert mw.toolButton_quick_view.isChecked(), "Quickview not Open"
+
+    # Get QuickView instance
+    qv = mw.widget_quick_view
+
+    # Open event tool of QuickView
+    event_tool = qv.toolButton_event
+    qtbot.mouseClick(event_tool, QtCore.Qt.MouseButton.LeftButton)
+
+    # Test if data changes when CheckBox is unchecked
+    image_with_contrast = qv.imageView_image.getImageItem().image
+
+    assert np.any(image_with_contrast)
 
 
 def test_isoelasticity_lines_with_lut_selection(qtbot):

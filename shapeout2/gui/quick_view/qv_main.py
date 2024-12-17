@@ -419,7 +419,7 @@ class QuickView(QtWidgets.QWidget):
             if state["event"]["image zoom"]:
                 cellimg = self.image_zoom(cellimg, mask)
 
-            return cellimg
+        return cellimg
 
     @staticmethod
     def _convert_to_rgb(cellimg):

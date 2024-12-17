@@ -1,3 +1,5 @@
+2.20.1
+ - fix: regression TypeError when trying to plot contour data
 2.20.0
  - feat: display and handle quantitative phase imaging data
  - fix: filter range control not updating limits, displaying value "100" (#183)

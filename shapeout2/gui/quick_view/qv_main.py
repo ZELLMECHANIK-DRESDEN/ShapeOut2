@@ -13,6 +13,16 @@ from ... import idiom
 from ..widgets import show_wait_cursor
 
 
+#: default choices for x-axis in plots in descending order
+AXES_DEFAULT_CHOICES_X = [
+    "area_um", "index", "frame", "index_online", "time",
+]
+#: default choices for y-axis in plots in descending order
+AXES_DEFAULT_CHOICES_Y = [
+    "deform", "bright_avg", "bright_bc_avg", "bg_med", "index",
+]
+
+
 class QuickView(QtWidgets.QWidget):
     polygon_filter_created = QtCore.pyqtSignal()
     polygon_filter_modified = QtCore.pyqtSignal()
@@ -33,6 +43,8 @@ class QuickView(QtWidgets.QWidget):
             stylesheet = pathlib.Path(path_css).read_text()
         self.groupBox_image.setStyleSheet(stylesheet)
         self.groupBox_trace.setStyleSheet(stylesheet)
+        self.comboBox_x.default_choices = AXES_DEFAULT_CHOICES_X
+        self.comboBox_y.default_choices = AXES_DEFAULT_CHOICES_Y
 
         self.setWindowTitle("Quick View")
 
@@ -311,8 +323,8 @@ class QuickView(QtWidgets.QWidget):
         self.checkBox_image_background.setVisible(contains_bg_feat)
 
         # set the dataset for the FeatureComboBoxes
-        self.comboBox_x.set_dataset(rtdc_ds, default_choice="area_um")
-        self.comboBox_y.set_dataset(rtdc_ds, default_choice="deform")
+        self.comboBox_x.set_dataset(rtdc_ds)
+        self.comboBox_y.set_dataset(rtdc_ds)
         self.comboBox_z_hue.set_dataset(rtdc_ds)
 
     def get_event_and_display(self, ds, event, feat, view):
@@ -962,8 +974,8 @@ class QuickView(QtWidgets.QWidget):
         """
         if self.rtdc_ds is not None:
             # axes combobox choices
-            self.comboBox_x.update_feature_list(default_choice="area_um")
-            self.comboBox_y.update_feature_list(default_choice="deform")
+            self.comboBox_x.update_feature_list()
+            self.comboBox_y.update_feature_list()
             self.comboBox_z_hue.update_feature_list()
 
     def update_polygon_panel(self):

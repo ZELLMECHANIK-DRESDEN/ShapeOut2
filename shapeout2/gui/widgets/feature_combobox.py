@@ -31,6 +31,7 @@ class FeatureComboBox(QtWidgets.QComboBox):
         """
         super(FeatureComboBox, self).__init__(*args, **kwargs)
         self.rtdc_ds = None
+        self.default_choices = []
 
         # determine whether we should hide certain features
         settings = QtCore.QSettings()
@@ -59,12 +60,12 @@ class FeatureComboBox(QtWidgets.QComboBox):
         return super(FeatureComboBox, self).findData(data, role=role,
                                                      *args, **kwargs)
 
-    def set_dataset(self, rtdc_ds, default_choice=None):
+    def set_dataset(self, rtdc_ds):
         self.rtdc_ds = rtdc_ds
-        self.update_feature_list(default_choice=default_choice)
+        self.update_feature_list()
 
     @QtCore.pyqtSlot()
-    def update_feature_list(self, default_choice=None):
+    def update_feature_list(self):
         """Update the colors of all features in the combobox"""
         if self.rtdc_ds is None:
             raise ValueError("Please call `set_dataset` first!")
@@ -95,14 +96,17 @@ class FeatureComboBox(QtWidgets.QComboBox):
 
         ds_fl = sorted(zip(ds_labels, ds_feats, ds_colors, ds_tips))
 
-        feat_cur = self.currentData() or default_choice  # current selection
+        # Remember current index. If it is -1, we can select a best feature
+        # based on self.default_choices in the end.
+        idx_cur = self.currentIndex()
+
         blocked = self.signalsBlocked()  # remember block state
         self.blockSignals(True)
 
         # set features
         self.clear()
         model = self.model()
-        for ii, (label, feat, color, tip) in enumerate(ds_fl):
+        for (label, feat, color, tip) in ds_fl:
             item = QtGui.QStandardItem(label)
             item.setData(feat, self.data_role)
             item.setBackground(QtGui.QColor(color))
@@ -110,8 +114,14 @@ class FeatureComboBox(QtWidgets.QComboBox):
             item.setToolTip(tip)
             model.appendRow(item)
 
+        if idx_cur < 0:  # no selection made by user
+            # Use the first available feature in `default_choices`
+            for choice in self.default_choices:
+                idx_choice = self.findData(choice)
+                if idx_choice >= 0:
+                    idx_cur = idx_choice
+                    break
+        self.setCurrentIndex(idx_cur)
+
         # set previous selection
-        idx_cur = self.findData(feat_cur)
-        if idx_cur >= 0:
-            self.setCurrentIndex(idx_cur)
         self.blockSignals(blocked)

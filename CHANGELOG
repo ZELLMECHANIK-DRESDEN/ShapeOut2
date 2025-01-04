@@ -1,3 +1,5 @@
+2.20.2
+ - enh: more Quick View default choices than "deform" and "area_um"
 2.20.1
  - fix: regression TypeError when trying to plot contour data
 2.20.0

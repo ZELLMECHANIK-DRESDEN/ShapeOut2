@@ -1,4 +1,5 @@
-2.20.2
+2.21.0
+ - feat: implement showing dataset logs in the analysis view (#140)
  - enh: more Quick View default choices than "deform" and "area_um"
  - enh: update icon theme
 2.20.1

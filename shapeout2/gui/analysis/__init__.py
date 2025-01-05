@@ -5,4 +5,5 @@ from .ana_log import LogPanel
 from .ana_meta import MetaPanel
 from .ana_plot import PlotPanel
 from .ana_slot import SlotPanel
+from .ana_tables import TablesPanel
 from .ana_view import AnalysisView

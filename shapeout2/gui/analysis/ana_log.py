@@ -74,9 +74,11 @@ class LogPanel(QtWidgets.QWidget):
 
                 for ii, lt in enumerate(linetypes):
                     if lt == "e":
-                        lines[ii] = f"<div style='color:#A60000'>{lines[ii]}</div>"
+                        lines[ii] = \
+                            f"<div style='color:#A60000'>{lines[ii]}</div>"
                     elif lt == "w":
-                        lines[ii] = f"<div style='color:#7C4B00'>{lines[ii]}</div>"
+                        lines[ii] = \
+                            f"<div style='color:#7C4B00'>{lines[ii]}</div>"
                     else:
                         lines[ii] = f"<div>{lines[ii]}</div>"
 

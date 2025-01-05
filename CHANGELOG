@@ -1,5 +1,6 @@
 2.21.0
  - feat: implement showing dataset logs in the analysis view (#140)
+ - feat: implement showing dataset tables in the analysis view (#141)
  - enh: more Quick View default choices than "deform" and "area_um"
  - enh: update icon theme
  - setup: pygments (for json formatting) is now an explicit dependency

@@ -73,6 +73,31 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tab_tables">
+      <attribute name="icon">
+       <iconset theme="office-chart-line-stacked"/>
+      </attribute>
+      <attribute name="title">
+       <string>Tables</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="TablesPanel" name="widget_tables" native="true"/>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="tab_log">
       <attribute name="icon">
        <iconset theme="view-calendar-list"/>
@@ -81,6 +106,18 @@
        <string>Logs</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="LogPanel" name="widget_log" native="true"/>
        </item>
@@ -195,6 +232,12 @@
   </customwidget>
   <customwidget>
    <class>LogPanel</class>
+   <extends>QWidget</extends>
+   <header>shapeout2.gui.analysis</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TablesPanel</class>
    <extends>QWidget</extends>
    <header>shapeout2.gui.analysis</header>
    <container>1</container>

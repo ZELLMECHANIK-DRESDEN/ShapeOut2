@@ -2,6 +2,7 @@
  - feat: implement showing dataset logs in the analysis view (#140)
  - enh: more Quick View default choices than "deform" and "area_um"
  - enh: update icon theme
+ - setup: pygments (for json formatting) is now an explicit dependency
 2.20.1
  - fix: regression TypeError when trying to plot contour data
 2.20.0

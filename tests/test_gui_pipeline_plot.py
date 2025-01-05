@@ -8,7 +8,7 @@ def test_compute_contour_opening_angles():
         [0, 0],
         [1, 0],
         [0.5, np.sqrt(3)/2]
-        ]
+    ]
     plot_state = {"general": {"range x": [0, 1],
                               "range y": [0, 1],
                               "scale x": "linear",
@@ -24,7 +24,7 @@ def test_compute_contour_opening_angles_shifted():
         [0, 0],
         [1, 0],
         [0.5, np.sqrt(3)/2]
-        ]
+    ]
     contour = np.array(contour) + 1
     plot_state = {"general": {"range x": [0, 1],
                               "range y": [0, 1],
@@ -44,7 +44,7 @@ def test_compute_contour_opening_angles_advanced():
         [1.5, np.sqrt(3) / 2],
         [0, np.sqrt(3) / 2],
         [0, 0],
-        ]
+    ]
     expected = [np.pi/6, np.pi/3, np.pi/3, np.pi/3, np.pi/2]
     plot_state = {"general": {"range x": [0, 1],
                               "range y": [0, 1],
@@ -61,7 +61,7 @@ def test_compute_contour_opening_angles_log_scale():
         [0, 0],
         [1, 0],
         [0.5, np.sqrt(3)/2]
-        ]
+    ]
     contour = 10**(np.array(contour) + 1)
     plot_state = {"general": {"range x": [0, 1],
                               "range y": [0, 1],

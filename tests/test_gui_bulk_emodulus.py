@@ -77,7 +77,7 @@ def test_manual_basic(qtbot):
         assert ds.config["calculation"]["emodulus medium"] == "CellCarrierB"
         assert ds.config["calculation"]["emodulus temperature"] == 29.5
         assert ds.config["calculation"]["emodulus viscosity model"] == \
-               "buyukurganci-2022"
+            "buyukurganci-2022"
         assert "emodulus viscosity" not in ds.config["calculation"]
 
 
@@ -108,7 +108,7 @@ def test_manual_wrong_medium(qtbot):
         assert ds.config["calculation"]["emodulus medium"] == "CellCarrierB"
         assert ds.config["calculation"]["emodulus temperature"] == 29.5
         assert ds.config["calculation"]["emodulus viscosity model"] == \
-               "buyukurganci-2022"
+            "buyukurganci-2022"
         assert "emodulus viscosity" not in ds.config["calculation"]
 
 
@@ -135,7 +135,7 @@ def test_temperature_feature(qtbot):
         assert "emodulus temperature" not in ds.config["calculation"]
         assert "emodulus viscosity" not in ds.config["calculation"]
         assert ds.config["calculation"]["emodulus viscosity model"] == \
-               "buyukurganci-2022"
+            "buyukurganci-2022"
 
 
 def test_viscosity(qtbot):
@@ -190,7 +190,7 @@ def test_wrong_medium_viscosity(qtbot):
         assert "emodulus temperature" not in ds.config["calculation"]
         assert "emodulus viscosity" not in ds.config["calculation"]
         assert ds.config["calculation"]["emodulus viscosity model"] == \
-               "buyukurganci-2022"
+            "buyukurganci-2022"
 
 
 def test_lut_selection(qtbot):
@@ -219,4 +219,4 @@ def test_lut_selection(qtbot):
         assert "emodulus temperature" not in ds.config["calculation"]
         assert "emodulus viscosity" not in ds.config["calculation"]
         assert ds.config["calculation"]["emodulus viscosity model"] == \
-               "buyukurganci-2022"
+            "buyukurganci-2022"

@@ -43,6 +43,7 @@ def test_empty_plot_with_one_plot_per_dataset_issue_41(qtbot):
     pe = mw.block_matrix.get_widget(filt_plot_id=plot_id)
     qtbot.mouseClick(pe.toolButton_modify, QtCore.Qt.MouseButton.LeftButton)
 
+    mw.widget_ana_view.tabWidget.setCurrentWidget(mw.widget_ana_view.tab_plot)
     pv = mw.widget_ana_view.widget_plot
 
     # Change to "each" and apply
@@ -94,6 +95,7 @@ def test_handle_axis_selection_empty_plot(qtbot):
     pe = mw.block_matrix.get_widget(filt_plot_id=plot_id)
     qtbot.mouseClick(pe.toolButton_modify, QtCore.Qt.MouseButton.LeftButton)
 
+    mw.widget_ana_view.tabWidget.setCurrentWidget(mw.widget_ana_view.tab_plot)
     pv = mw.widget_ana_view.widget_plot
 
     # This lead to:
@@ -142,6 +144,9 @@ def test_handle_empty_plots_issue_27(qtbot):
     fe = mw.block_matrix.get_widget(filt_plot_id=filt_id)
     qtbot.mouseClick(fe.toolButton_modify, QtCore.Qt.MouseButton.LeftButton)
     fv = mw.widget_ana_view.widget_filter
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_filter)
+
     qtbot.mouseClick(fv.toolButton_moreless, QtCore.Qt.MouseButton.LeftButton)
     rc = fv._box_range_controls["area_um"]
     qtbot.mouseClick(rc.checkBox, QtCore.Qt.MouseButton.LeftButton)

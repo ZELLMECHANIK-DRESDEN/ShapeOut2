@@ -60,7 +60,7 @@ def test_on_action_about(qtbot):
         mw.close()
 
         assert mock_about.call_args.args[1] == \
-               f"Shape-Out {shapeout2.__version__}"
+            f"Shape-Out {shapeout2.__version__}"
         assert "Shape-Out 2" in mock_about.call_args.args[2]
 
 

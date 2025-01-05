@@ -65,6 +65,8 @@ def test_box_filter_selection_no_preselection_issue_67(qtbot):
     qtbot.mouseClick(fe.toolButton_modify, QtCore.Qt.MouseButton.LeftButton)
 
     # box filtering
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_filter)
     wf = mw.widget_ana_view.widget_filter
     # enable selection
     qtbot.mouseClick(wf.toolButton_moreless, QtCore.Qt.MouseButton.LeftButton)
@@ -83,6 +85,9 @@ def test_box_filter_selection_no_preselection_issue_67(qtbot):
 
     # make sure that "area_ratio" is not preselected
     wf = mw.widget_ana_view.widget_filter
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_filter)
+
     # enable selection
     qtbot.mouseClick(wf.toolButton_moreless, QtCore.Qt.MouseButton.LeftButton)
     # find the porosity item and click the checkbox
@@ -114,6 +119,9 @@ def test_filter_min_max_inf(qtbot):
 
     # box filtering
     wf = mw.widget_ana_view.widget_filter
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_filter)
+
     # enable selection
     qtbot.mouseClick(wf.toolButton_moreless, QtCore.Qt.MouseButton.LeftButton)
     # find the porosity item and click the checkbox
@@ -168,6 +176,9 @@ def test_polygon_filter_basic(qtbot):
 
     # enable the polygon filter
     wf = mw.widget_ana_view.widget_filter
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_filter)
+
     filter_ids = list(wf._polygon_checkboxes.keys())
     # sanity check
     assert filter_ids == [pf1.unique_id]
@@ -227,6 +238,9 @@ def test_polygon_filter_delete(qtbot):
 
     # enable the polygon filter
     wf = mw.widget_ana_view.widget_filter
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_filter)
+
     filter_ids = list(wf._polygon_checkboxes.keys())
     # sanity check
     assert filter_ids == [pf1.unique_id]

@@ -119,6 +119,8 @@ def test_no_events_issue_37(qtbot):
     fe = mw.block_matrix.get_widget(filt_plot_id=filt_id)
     qtbot.mouseClick(fe.toolButton_modify, QtCore.Qt.MouseButton.LeftButton)
     fv = mw.widget_ana_view.widget_filter
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_filter)
     qtbot.mouseClick(fv.toolButton_moreless, QtCore.Qt.MouseButton.LeftButton)
     rc = fv._box_range_controls["area_um"]
     qtbot.mouseClick(rc.checkBox, QtCore.Qt.MouseButton.LeftButton)
@@ -251,6 +253,8 @@ def test_translate_polygon_filter_issue_115(qtbot):
     fe = mw.block_matrix.get_widget(filt_plot_id=filt_id)
     qtbot.mouseClick(fe.toolButton_modify, QtCore.Qt.MouseButton.LeftButton)
     fv = mw.widget_ana_view.widget_filter
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_filter)
     cb = fv._polygon_checkboxes[pf.unique_id]
     qtbot.mouseClick(cb, QtCore.Qt.MouseButton.LeftButton)
     assert cb.isChecked()
@@ -334,6 +338,8 @@ def test_update_polygon_filter_issue_26(qtbot):
     fe = mw.block_matrix.get_widget(filt_plot_id=filt_id)
     qtbot.mouseClick(fe.toolButton_modify, QtCore.Qt.MouseButton.LeftButton)
     fv = mw.widget_ana_view.widget_filter
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_filter)
     cb = fv._polygon_checkboxes[pf.unique_id]
     qtbot.mouseClick(cb, QtCore.Qt.MouseButton.LeftButton)
     assert cb.isChecked()

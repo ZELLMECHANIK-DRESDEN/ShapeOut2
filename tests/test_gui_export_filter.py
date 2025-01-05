@@ -52,6 +52,8 @@ def test_gui_export_filter_ray(qtbot, monkeypatch):
 
     # enable the polygon filter
     wf = mw.widget_ana_view.widget_filter
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_filter)
     wf._polygon_checkboxes[pf1.unique_id].setChecked(True)
     assert wf._polygon_checkboxes[pf1.unique_id].isChecked()
 
@@ -107,6 +109,8 @@ def test_gui_export_polygon_filters(qtbot, monkeypatch):
 
     # enable the polygon filter
     wf = mw.widget_ana_view.widget_filter
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_filter)
     filter_ids = list(wf._polygon_checkboxes.keys())
     # sanity check
     assert filter_ids == [pf1.unique_id, pf2.unique_id]

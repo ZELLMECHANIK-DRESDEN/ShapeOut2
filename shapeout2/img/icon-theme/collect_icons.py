@@ -41,6 +41,7 @@ icons = {
         "object-columns",
         "object-order-lower",
         "object-rows",
+        "office-chart-line-stacked",
         "office-chart-ring",
         "office-chart-scatter",
         "remove",
@@ -48,6 +49,7 @@ icons = {
         "show-grid",
         "special_paste",
         "tools-wizard",
+        "view-calendar-list",
         "view-filter",
         "view-statistics",
         "visibility",
@@ -74,18 +76,22 @@ Type=Fixed
 icon_root = pathlib.Path("/usr/share/icons")
 
 
-def find_icons(name, theme):
+def find_icons(name, theme, resolutions_used):
     cands = sorted((icon_root / theme).rglob("{}.svg".format(name)))
     cands += sorted((icon_root / theme).rglob("{}.png".format(name)))
+    # Only allow directories with the resolutions used
+    cands = [c for c in cands
+             if (set(resolutions_used) & set([cp.name for cp in c.parents]))]
     return cands
 
 
 if __name__ == "__main__":
+    resolutions_used = ["16", "22", "24", "32", "64", "128"]
     directories = []
     here = pathlib.Path(__file__).parent
     for theme in icons:
         for name in icons[theme]:
-            ipaths = find_icons(name, theme)
+            ipaths = find_icons(name, theme, resolutions_used)
             if not ipaths:
                 print("Could not find {} {}".format(theme, name))
                 continue
@@ -109,9 +115,9 @@ if __name__ == "__main__":
         fd.write(index_item.format(directory="shapeout2", res="128"))
         # theme icons
         for dd in directories:
-            for res in ["16", "22", "24", "32", "64", "128"]:
+            for res in resolutions_used:
                 if res in str(dd):
                     break
             else:
-                raise ValueError("No resolution for {}!".format(dd))
+                raise ValueError(f"No resolution found for {dd}!")
             fd.write(index_item.format(directory=dd, res=res))

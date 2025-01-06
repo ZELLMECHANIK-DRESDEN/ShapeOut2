@@ -109,7 +109,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_plot">
       <attribute name="title">
@@ -127,7 +127,11 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
-        <widget class="QTextEdit" name="textEdit_raw"/>
+        <widget class="QPlainTextEdit" name="plainTextEdit_raw">
+         <property name="lineWrapMode">
+          <enum>QPlainTextEdit::LineWrapMode::NoWrap</enum>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

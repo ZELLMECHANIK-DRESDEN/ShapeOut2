@@ -1,4 +1,5 @@
 import importlib.resources
+import io
 
 import numpy as np
 import pyqtgraph as pg
@@ -54,6 +55,7 @@ class TablesPanel(QtWidgets.QWidget):
                                     offset=(40, 20))
         self.legend.setParentItem(self.graphicsView.graphicsItem())
         self.graphicsView.showGrid(True, True)
+        self.tabWidget.setCurrentIndex(0)
 
         self.listWidget_dataset.currentRowChanged.connect(
             self.on_select_dataset)
@@ -108,6 +110,7 @@ class TablesPanel(QtWidgets.QWidget):
             # show the graph
             self.show_graph(x_vals, graph_list)
             self.show_raw_data(graph_list)
+            self.graphicsView.autoRange()
         else:
             self.listWidget_table_graphs.clear()
 
@@ -152,7 +155,12 @@ class TablesPanel(QtWidgets.QWidget):
         self.graphicsView.plotItem.setLabels(bottom=x_vals["name"])
 
     def show_raw_data(self, graph_list):
-        pass
+        text = "\t".join(it["name"] for it in graph_list)
+        # save the array into a temporary string
+        s = io.StringIO()
+        data = np.array([it["data"] for it in graph_list]).transpose()
+        np.savetxt(s, data, delimiter="\t", fmt="%.5g", header=text)
+        self.plainTextEdit_raw.setPlainText(s.getvalue())
 
     def update_content(self, event=None, filt_index=None):
         if self._pipeline and self._pipeline.slots:

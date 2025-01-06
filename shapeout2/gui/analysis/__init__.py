@@ -1,5 +1,6 @@
 # flake8: noqa: F401
 from .dlg_slot_reorder import DlgSlotReorder
+from .ana_basins import BasinsPanel
 from .ana_filter import FilterPanel
 from .ana_log import LogPanel
 from .ana_meta import MetaPanel

@@ -51,6 +51,7 @@ icons = {
         "tools-wizard",
         "view-calendar-list",
         "view-filter",
+        "view-list-tree",
         "view-statistics",
         "visibility",
         "path-mode-polyline",

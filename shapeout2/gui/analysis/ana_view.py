@@ -33,6 +33,7 @@ class AnalysisView(QtWidgets.QWidget):
         self.update_content()
 
     def set_pipeline(self, pipeline):
+        self.widget_basins.set_pipeline(pipeline)
         self.widget_filter.set_pipeline(pipeline)
         self.widget_log.set_pipeline(pipeline)
         self.widget_tables.set_pipeline(pipeline)
@@ -41,6 +42,7 @@ class AnalysisView(QtWidgets.QWidget):
         self.adopt_pipeline(pipeline.__getstate__())
 
     def update_content(self):
+        self.widget_basins.update_content()
         self.widget_filter.update_content()
         self.widget_log.update_content()
         self.widget_tables.update_content()

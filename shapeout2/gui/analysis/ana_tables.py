@@ -52,6 +52,8 @@ class TablesPanel(QtWidgets.QWidget):
             uic.loadUi(path_ui, self)
         # current Shape-Out 2 pipeline
         self._pipeline = None
+        self._selected_table = None
+        self._selected_graphs = []
         self.legend = pg.LegendItem((80, 60),
                                     offset=(40, 20))
         self.legend.setParentItem(self.graphicsView.graphicsItem())
@@ -77,16 +79,62 @@ class TablesPanel(QtWidgets.QWidget):
         self.listWidget_table_graphs.clear()
         if ds_idx >= 0:
             ds = self._pipeline.slots[ds_idx].get_dataset()
-            for table in ds.tables:
+            table_names = list(ds.tables.keys())
+            self.listWidget_table_name.blockSignals(True)
+            for table in table_names:
                 self.listWidget_table_name.addItem(table)
+            self.listWidget_table_name.blockSignals(False)
+
+            # Apply previously selected tables
+            if self._selected_table in table_names:
+                table_idx = table_names.index(self._selected_table)
+                self.listWidget_table_name.setCurrentRow(table_idx)
+
+    @QtCore.pyqtSlot(int)
+    def on_select_table(self, table_index):
+        """Show the tables of the dataset in the right-hand list widget"""
+        ds_idx = self.listWidget_dataset.currentRow()
+        if ds_idx >= 0 and table_index >= 0:
+            ds = self._pipeline.slots[ds_idx].get_dataset()
+            self._selected_table = list(ds.tables.keys())[table_index]
+            table = ds.tables[self._selected_table]
+            names = table[:].dtype.names
+
+            self.listWidget_table_graphs.blockSignals(True)
+            self.listWidget_table_graphs.clear()
+
+            for ii, graph in enumerate(names):
+                self.listWidget_table_graphs.addItem(graph)
+                color = table.attrs.get(f"COLOR_{graph}",
+                                        FALLBACK_COLORS.get(graph,
+                                                            "black")
+                                        )
+                self.listWidget_table_graphs.item(ii).setBackground(
+                    QtGui.QColor(color))
+                self.listWidget_table_graphs.item(ii).setForeground(
+                    QtGui.QColor(get_foreground_for_background(color)))
+
+            # Apply previously selected graphs
+            for graph in names:
+                if graph in list(self._selected_graphs):
+                    graph_index = names.index(graph)
+                    item = self.listWidget_table_graphs.item(graph_index)
+                    if item:
+                        item.setSelected(True)
+            self.listWidget_table_graphs.blockSignals(False)
+            self.on_select_graphs()
+        else:
+            self.listWidget_table_name.clear()
+            self.listWidget_table_graphs.clear()
 
     @QtCore.pyqtSlot()
     def on_select_graphs(self):
+        """Show the graphs of one table of a dataset"""
         ds_idx = self.listWidget_dataset.currentRow()
         table_index = self.listWidget_table_name.currentRow()
         if ds_idx >= 0 and table_index >= 0:
             items = self.listWidget_table_graphs.selectedIndexes()
-            graphs = [it.data() for it in items]
+            self._selected_graphs = [it.data() for it in items]
             ds = self._pipeline.slots[ds_idx].get_dataset()
             table = ds.tables[list(ds.tables.keys())[table_index]]
             table_data = table[:]
@@ -99,7 +147,7 @@ class TablesPanel(QtWidgets.QWidget):
                 x_vals = {"name": "index",
                           "data": np.arange(len(table_data))}
 
-            for graph in graphs:
+            for graph in self._selected_graphs:
                 graph_list.append({
                     "name": graph,
                     "data": table_data[graph].flatten(),
@@ -114,28 +162,6 @@ class TablesPanel(QtWidgets.QWidget):
             self.graphicsView.autoRange()
         else:
             self.listWidget_table_graphs.clear()
-
-    @QtCore.pyqtSlot(int)
-    def on_select_table(self, table_index):
-        """Show the tables of the dataset in the right-hand list widget"""
-        ds_idx = self.listWidget_dataset.currentRow()
-        self.listWidget_table_graphs.clear()
-        if ds_idx >= 0:
-            ds = self._pipeline.slots[ds_idx].get_dataset()
-            table = ds.tables[list(ds.tables.keys())[table_index]]
-            names = table[:].dtype.names
-            for ii, graph in enumerate(names):
-                self.listWidget_table_graphs.addItem(graph)
-                color = table.attrs.get(f"COLOR_{graph}",
-                                        FALLBACK_COLORS.get(graph,
-                                                            "black")
-                                        )
-                self.listWidget_table_graphs.item(ii).setBackground(
-                    QtGui.QColor(color))
-                self.listWidget_table_graphs.item(ii).setForeground(
-                    QtGui.QColor(get_foreground_for_background(color)))
-        else:
-            self.listWidget_table_name.clear()
 
     def set_pipeline(self, pipeline):
         self._pipeline = pipeline

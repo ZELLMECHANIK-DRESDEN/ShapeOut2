@@ -911,7 +911,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
     @widgets.show_wait_cursor
     @QtCore.pyqtSlot(str)
     def on_modify_filter(self, filt_id):
-        self.widget_ana_view.tabWidget.setCurrentIndex(2)
+        self.widget_ana_view.tabWidget.setCurrentWidget(
+            self.widget_ana_view.tab_filter)
         self.widget_ana_view.widget_filter.show_filter(filt_id)
         # finally, check the button
         self.toolButton_ana_view.setChecked(True)
@@ -923,7 +924,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
     @widgets.show_wait_cursor
     @QtCore.pyqtSlot(str)
     def on_modify_plot(self, plot_id):
-        self.widget_ana_view.tabWidget.setCurrentIndex(3)
+        self.widget_ana_view.tabWidget.setCurrentWidget(
+            self.widget_ana_view.tab_plot)
         self.widget_ana_view.widget_plot.show_plot(plot_id)
         # finally, check the button
         self.toolButton_ana_view.setChecked(True)
@@ -935,7 +937,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
     @widgets.show_wait_cursor
     @QtCore.pyqtSlot(str)
     def on_modify_slot(self, slot_id):
-        self.widget_ana_view.tabWidget.setCurrentIndex(1)
+        self.widget_ana_view.tabWidget.setCurrentWidget(
+            self.widget_ana_view.tab_slot)
         self.widget_ana_view.widget_slot.show_slot(slot_id)
         # finally, check the button
         self.toolButton_ana_view.setChecked(True)

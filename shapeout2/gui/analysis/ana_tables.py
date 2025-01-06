@@ -43,6 +43,7 @@ class TablesPanel(QtWidgets.QWidget):
 
     Visualizes tables stored in the .rtdc file
     """
+
     def __init__(self, *args, **kwargs):
         super(TablesPanel, self).__init__(*args, **kwargs)
         ref = importlib.resources.files(
@@ -149,7 +150,7 @@ class TablesPanel(QtWidgets.QWidget):
                 x=x_vals["data"],
                 y=item["data"],
                 name=item["name"],
-                )
+            )
 
             self.legend.addItem(pl, item["name"])
         self.graphicsView.plotItem.setLabels(bottom=x_vals["name"])

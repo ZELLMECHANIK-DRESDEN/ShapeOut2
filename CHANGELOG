@@ -7,6 +7,8 @@
  - setup: pygments (for json formatting) is now an explicit dependency
  - setup: bump dclab to 0.62.9
  - ref: simplify logic in Analysis View
+ - ref: do not override `QtWidgets`' `__setstate__` and `__getstate__`;
+   use `write_pipeline_state` and `read_pipeline_state` instead
 2.20.1
  - fix: regression TypeError when trying to plot contour data
 2.20.0

@@ -236,6 +236,8 @@ def test_plot_ml_score(qtbot):
     assert "ml_class" in ds
 
     # Now set the x axis to Voyager
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_plot)
     pv = mw.widget_ana_view.widget_plot
     idvoy = pv.comboBox_axis_x.findData("ml_score_voy")
     assert idvoy >= 0
@@ -295,6 +297,8 @@ def test_changing_lut_identifier_in_analysis_view_plots(qtbot):
     pe = mw.block_matrix.get_widget(filt_plot_id=plot_id)
     qtbot.mouseClick(pe.toolButton_modify, QtCore.Qt.MouseButton.LeftButton)
 
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_plot)
     pv = mw.widget_ana_view.widget_plot
 
     # Change to "HE-2D-FEM-22" and apply

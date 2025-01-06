@@ -256,6 +256,9 @@ def test_translate_polygon_filter_issue_115(qtbot):
     mw.widget_ana_view.tabWidget.setCurrentWidget(
         mw.widget_ana_view.tab_filter)
     cb = fv._polygon_checkboxes[pf.unique_id]
+    assert not cb.isChecked()
+    assert cb.isEnabled()
+    assert cb.isVisible()
     qtbot.mouseClick(cb, QtCore.Qt.MouseButton.LeftButton)
     assert cb.isChecked()
     qtbot.mouseClick(fv.pushButton_apply, QtCore.Qt.MouseButton.LeftButton)

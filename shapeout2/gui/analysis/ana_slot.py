@@ -51,7 +51,7 @@ class SlotPanel(QtWidgets.QWidget):
 
         self.update_content()
 
-    def __getstate__(self):
+    def read_pipeline_state(self):
         slot_state = self.current_slot_state
         if self.comboBox_temp.currentData() in ["manual", "config"]:
             emod_temp = self.doubleSpinBox_temp.value()
@@ -100,7 +100,7 @@ class SlotPanel(QtWidgets.QWidget):
         }
         return state
 
-    def __setstate__(self, state):
+    def write_pipeline_state(self, state):
         cur_state = self.current_slot_state
         if cur_state["identifier"] != state["identifier"]:
             raise ValueError("Slot identifier mismatch!")
@@ -344,7 +344,7 @@ class SlotPanel(QtWidgets.QWidget):
 
     @QtCore.pyqtSlot()
     def on_anew_slot(self):
-        slot_state = self.__getstate__()
+        slot_state = self.read_pipeline_state()
         new_slot = Dataslot(slot_state["path"])
         pos = self.pipeline.slot_ids.index(slot_state["identifier"])
         self.pipeline.add_slot(new_slot, index=pos + 1)
@@ -354,7 +354,7 @@ class SlotPanel(QtWidgets.QWidget):
     @QtCore.pyqtSlot()
     def on_duplicate_slot(self):
         # determine the new filter state
-        slot_state = self.__getstate__()
+        slot_state = self.read_pipeline_state()
         new_state = copy.deepcopy(slot_state)
         new_slot = Dataslot(slot_state["path"])
         new_state["identifier"] = new_slot.identifier
@@ -368,7 +368,7 @@ class SlotPanel(QtWidgets.QWidget):
 
     @QtCore.pyqtSlot()
     def on_remove_slot(self):
-        slot_state = self.__getstate__()
+        slot_state = self.read_pipeline_state()
         self.pipeline.remove_slot(slot_state["identifier"])
         state = self.pipeline.__getstate__()
         self.pipeline_changed.emit(state)
@@ -419,7 +419,7 @@ class SlotPanel(QtWidgets.QWidget):
             # For user convenience, also show the viscosity
             if medium in KNOWN_MEDIA and not np.isnan(temperature):
                 # compute viscosity
-                state = self.__getstate__()
+                state = self.read_pipeline_state()
                 cfg = meta_tool.get_rtdc_config(state["path"])
                 with warnings.catch_warnings(record=True) as w:
                     # Warn the user if the temperature is out-of-range
@@ -486,7 +486,7 @@ class SlotPanel(QtWidgets.QWidget):
             self.comboBox_slots.blockSignals(False)
             # populate content
             slot_state = self.pipeline.slots[slot_index].__getstate__()
-            self.__setstate__(slot_state)
+            self.write_pipeline_state(slot_state)
             self.on_ui_changed()
         else:
             self.setEnabled(False)
@@ -494,7 +494,7 @@ class SlotPanel(QtWidgets.QWidget):
     def write_slot(self):
         """Update the shapeout2.pipeline.Dataslot instance"""
         # get current index
-        slot_state = self.__getstate__()
+        slot_state = self.read_pipeline_state()
         slot = self.pipeline.get_slot(slot_state["identifier"])
         # This is important, otherwise update_content will not have the
         # latest state.

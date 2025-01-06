@@ -33,15 +33,15 @@ class MatrixPlot(QtWidgets.QWidget):
             # set tooltip/label
             self.update_content()
         else:
-            self.__setstate__(state)
+            self.write_pipeline_state(state)
 
-    def __getstate__(self):
+    def read_pipeline_state(self):
         state = {"name": self.name,
                  "identifier": self.identifier,
                  }
         return state
 
-    def __setstate__(self, state):
+    def write_pipeline_state(self, state):
         self.identifier = state["identifier"]
         self.name = state["name"]
         self.update_content()

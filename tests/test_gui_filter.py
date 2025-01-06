@@ -131,7 +131,7 @@ def test_filter_min_max_inf(qtbot):
     qtbot.mouseClick(wf.toolButton_moreless, QtCore.Qt.MouseButton.LeftButton)
 
     # check that the range control does not have all-zero values
-    rcstate = rc.__getstate__()
+    rcstate = rc.read_pipeline_state()
     assert rcstate["start"] != 0
     assert rcstate["end"] != 0
     # only approximate (b/c they were converted on the range scale)

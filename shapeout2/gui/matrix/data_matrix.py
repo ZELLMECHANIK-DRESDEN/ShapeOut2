@@ -31,13 +31,13 @@ class DataMatrix(QtWidgets.QWidget):
         # used for remembering quickview element
         self._old_quickview_instance = None
 
-    def __getstate__(self):
+    def read_pipeline_state(self):
         """State of the current data matrix"""
         # slots
         slot_states = []
         slots_used = []
         for dw in self.dataset_widgets:
-            dw_state = dw.__getstate__()
+            dw_state = dw.read_pipeline_state()
             slot = pipeline.Dataslot.get_slot(dw_state["identifier"])
             slot.slot_used = dw_state["enabled"]
             slot_states.append(slot.__getstate__())
@@ -48,7 +48,7 @@ class DataMatrix(QtWidgets.QWidget):
         filter_states = []
         filters_used = []
         for fw in self.filter_widgets:
-            fw_state = fw.__getstate__()
+            fw_state = fw.read_pipeline_state()
             filt = pipeline.Filter.get_filter(fw_state["identifier"])
             filter_states.append(filt.__getstate__())
             if fw_state["enabled"]:
@@ -62,7 +62,7 @@ class DataMatrix(QtWidgets.QWidget):
                 # We only store the information about whether the user
                 # clicked this element. The state about "enabled" is stored
                 # in `slots_used` and `filters_used`.
-                idict[fw.identifier] = me.__getstate__()["active"]
+                idict[fw.identifier] = me.read_pipeline_state()["active"]
             mestates[dw.identifier] = idict
         state = {"elements": mestates,
                  "filters": filter_states,
@@ -72,7 +72,7 @@ class DataMatrix(QtWidgets.QWidget):
                  }
         return state
 
-    def __setstate__(self, state):
+    def write_pipeline_state(self, state):
         # remember current QuickView identifiers
         qv_slot_id, qv_filt_id = self.get_quickview_ids()
         self.blockSignals(True)
@@ -102,9 +102,9 @@ class DataMatrix(QtWidgets.QWidget):
             ds_state = state["elements"][slot_id]
             for filt_id in ds_state:
                 me = self.get_matrix_element(slot_id, filt_id)
-                me_state = me.__getstate__()
+                me_state = me.read_pipeline_state()
                 me_state["active"] = ds_state[filt_id]
-                me.__setstate__(me_state)
+                me.write_pipeline_state(me_state)
         # re-apply current quickview ids
         try:
             meqv = self.get_matrix_element(qv_slot_id, qv_filt_id)
@@ -280,7 +280,7 @@ class DataMatrix(QtWidgets.QWidget):
                     me.element_changed.connect(self.changed_element)
                     self.glo.addWidget(me, ii+1, jj+1)
         # make sure enabled/disabled is honored
-        state = self.__getstate__()
+        state = self.read_pipeline_state()
         for slot_sate in state["slots"]:
             slot_id = slot_sate["identifier"]
             for filt_state in state["filters"]:
@@ -288,9 +288,9 @@ class DataMatrix(QtWidgets.QWidget):
                 if not (slot_id in state["slots used"]
                         and filt_id in state["filters used"]):
                     me = self.get_matrix_element(slot_id, filt_id)
-                    mstate = me.__getstate__()
+                    mstate = me.read_pipeline_state()
                     mstate["enabled"] = False
-                    me.__setstate__(mstate)
+                    me.write_pipeline_state(mstate)
 
     def get_filter_index(self, filter_id):
         for ii, fs in enumerate(self.filter_widgets):
@@ -303,7 +303,7 @@ class DataMatrix(QtWidgets.QWidget):
     def get_filter_widget_state(self, filter_id):
         ii = self.get_filter_index(filter_id)
         fw = self.filter_widgets[ii]
-        return fw.__getstate__()
+        return fw.read_pipeline_state()
 
     def get_slot_index(self, slot_id):
         for ii, dw in enumerate(self.dataset_widgets):
@@ -317,9 +317,9 @@ class DataMatrix(QtWidgets.QWidget):
         ii = self.get_slot_index(slot_id)
         dw = self.dataset_widgets[ii]
         if ret_index:
-            return dw.__getstate__(), ii
+            return dw.read_pipeline_state(), ii
         else:
-            return dw.__getstate__()
+            return dw.read_pipeline_state()
 
     def get_matrix_element(self, slot_id, filt_id):
         """Return matrix element matching dataset and filter identifiers"""
@@ -347,7 +347,7 @@ class DataMatrix(QtWidgets.QWidget):
         current = MatrixElement._quick_view_instance
         if current is not None:
             try:
-                state = self.__getstate__()
+                state = self.read_pipeline_state()
             except KeyError:
                 # the state is not valid (issue #25)
                 return None, None
@@ -374,11 +374,11 @@ class DataMatrix(QtWidgets.QWidget):
     @QtCore.pyqtSlot(str)
     def on_option_dataset(self, option):
         """Dataset option logic (remove, insert_anew, duplicate)"""
-        dw_state = self.sender().__getstate__()
+        dw_state = self.sender().read_pipeline_state()
         slot_id = dw_state["identifier"]
         slot_index = self.get_slot_index(slot_id)
-        state = self.__getstate__()
-        pstate = self.plot_matrix.__getstate__()
+        state = self.read_pipeline_state()
+        pstate = self.plot_matrix.read_pipeline_state()
         if option == "remove":
             state["slots"].pop(slot_index)
             if slot_id in state["slots used"]:
@@ -400,10 +400,10 @@ class DataMatrix(QtWidgets.QWidget):
             state["slots"].insert(slot_index+1, new_state)
             state["slots used"].append(new_id)
         # this also takes care of filling up matrix elements
-        self.__setstate__(state)
+        self.write_pipeline_state(state)
         # this correctly assigns elements in plot matrix
         # (also when option is not remove)
-        self.plot_matrix.__setstate__(pstate)
+        self.plot_matrix.write_pipeline_state(pstate)
         self.plot_matrix.fill_elements()
         self.publish_matrix()
 
@@ -413,7 +413,7 @@ class DataMatrix(QtWidgets.QWidget):
         fw_state = self.sender().__getstate__()
         filt_id = fw_state["identifier"]
         filt_index = self.get_filter_index(filt_id)
-        state = self.__getstate__()
+        state = self.read_pipeline_state()
         if option == "remove":
             state["filters"].pop(filt_index)
             # remove matrix elements
@@ -427,7 +427,7 @@ class DataMatrix(QtWidgets.QWidget):
             state["filters"].insert(filt_index+1, new_state)
             state["filters used"].append(filt.identifier)
             filt.__setstate__(new_state)
-        self.__setstate__(state)
+        self.write_pipeline_state(state)
         self.publish_matrix()
 
     def publish_matrix(self):
@@ -447,7 +447,7 @@ class DataMatrix(QtWidgets.QWidget):
         self.semi_states_filter = {}  # sic
         sender = self.sender()
         slot_id = sender.identifier
-        state = self.__getstate__()["elements"][slot_id]
+        state = self.read_pipeline_state()["elements"][slot_id]
         num_actives = sum([s for s in state.values()])
 
         # update state according to the scheme in the docstring
@@ -482,16 +482,16 @@ class DataMatrix(QtWidgets.QWidget):
     def toggle_dataset_enable(self, enabled):
         sender = self.sender()
         slot_id = sender.identifier
-        state = self.__getstate__()
+        state = self.read_pipeline_state()
         for filt_id in state["elements"][slot_id]:
             # make sure that disabled filters are honored
             fstate = self.get_filter_widget_state(filt_id)
             fenabled = fstate["enabled"]
             # update element widget
             me = self.get_matrix_element(slot_id, filt_id)
-            mstate = me.__getstate__()
+            mstate = me.read_pipeline_state()
             mstate["enabled"] = np.logical_and(enabled, fenabled)
-            me.__setstate__(mstate)
+            me.write_pipeline_state(mstate)
         self.publish_matrix()
 
     @QtCore.pyqtSlot()
@@ -506,7 +506,7 @@ class DataMatrix(QtWidgets.QWidget):
         sender = self.sender()
         filt_id = sender.identifier
 
-        states = self.__getstate__()["elements"]
+        states = self.read_pipeline_state()["elements"]
         state = {}
         for slot_id in states:
             state[slot_id] = states[slot_id][filt_id]
@@ -545,16 +545,16 @@ class DataMatrix(QtWidgets.QWidget):
     def toggle_filter_enable(self, enabled):
         sender = self.sender()
         sid = sender.identifier
-        state = self.__getstate__()
+        state = self.read_pipeline_state()
         for slot_id in state["elements"]:
             # make sure that disabled filters are honored
             dstate = self.get_slot_widget_state(slot_id)
             denabled = dstate["enabled"]
             # update element widget
             me = self.get_matrix_element(slot_id, sid)
-            mstate = me.__getstate__()
+            mstate = me.read_pipeline_state()
             mstate["enabled"] = np.logical_and(enabled, denabled)
-            me.__setstate__(mstate)
+            me.write_pipeline_state(mstate)
         self.publish_matrix()
 
     def update_content(self):

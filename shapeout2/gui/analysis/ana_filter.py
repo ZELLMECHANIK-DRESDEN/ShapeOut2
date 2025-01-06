@@ -53,7 +53,7 @@ class FilterPanel(QtWidgets.QWidget):
         self.update_content()
         self.setUpdatesEnabled(True)
 
-    def __getstate__(self):
+    def read_pipeline_state(self):
         state = {
             "filter used": self.checkBox_enable.isChecked(),
             "identifier": self.current_filter.identifier,
@@ -66,7 +66,7 @@ class FilterPanel(QtWidgets.QWidget):
         box = {}
         for feat in self.active_box_features:
             rc = self._box_range_controls[feat]
-            box[feat] = rc.__getstate__()
+            box[feat] = rc.read_pipeline_state()
         state["box filters"] = box
         # polygon filters
         pflist = []
@@ -76,7 +76,7 @@ class FilterPanel(QtWidgets.QWidget):
         state["polygon filters"] = pflist
         return state
 
-    def __setstate__(self, state):
+    def write_pipeline_state(self, state):
         if self.current_filter.identifier != state["identifier"]:
             raise ValueError("Filter identifier mismatch!")
         self.checkBox_enable.setChecked(state["filter used"])
@@ -90,7 +90,7 @@ class FilterPanel(QtWidgets.QWidget):
             rc = self._box_range_controls[feat]
             if feat in box:
                 rc.show()
-                rc.__setstate__(box[feat])
+                rc.write_pipeline_state(box[feat])
             else:
                 rc.setActive(False)  # uncheck range control (#67)
                 rc.hide()
@@ -193,7 +193,7 @@ class FilterPanel(QtWidgets.QWidget):
 
     def on_duplicate_filter(self):
         # determine the new filter state
-        filt_state = self.__getstate__()
+        filt_state = self.read_pipeline_state()
         new_state = copy.deepcopy(filt_state)
         new_filt = Filter()
         new_state["identifier"] = new_filt.identifier
@@ -206,7 +206,7 @@ class FilterPanel(QtWidgets.QWidget):
         self.pipeline_changed.emit(state)
 
     def on_remove_filter(self):
-        filt_state = self.__getstate__()
+        filt_state = self.read_pipeline_state()
         self.pipeline.remove_filter(filt_state["identifier"])
         state = self.pipeline.__getstate__()
         self.pipeline_changed.emit(state)
@@ -267,7 +267,7 @@ class FilterPanel(QtWidgets.QWidget):
             # populate content
             filt = Filter.get_filter(identifier=self.filter_ids[filt_index])
             state = filt.__getstate__()
-            self.__setstate__(state)
+            self.write_pipeline_state(state)
             self.update_box_ranges()
         else:
             self.setEnabled(False)
@@ -324,11 +324,11 @@ class FilterPanel(QtWidgets.QWidget):
             self.verticalLayout_poly.addWidget(button)
         # update current filters
         if update_state and self.current_filter is not None:
-            self.__setstate__(self.current_filter.__getstate__())
+            self.write_pipeline_state(self.current_filter.__getstate__())
 
     def write_filter(self):
         """Update the shapeout2.pipeline.Filter instance"""
         # get current index
-        filter_state = self.__getstate__()
+        filter_state = self.read_pipeline_state()
         self.filter_changed.emit(filter_state)
         self.update_content()  # update filter selection combobox

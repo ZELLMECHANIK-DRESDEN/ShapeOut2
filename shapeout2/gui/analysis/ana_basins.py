@@ -10,6 +10,7 @@ class BasinsPanel(QtWidgets.QWidget):
 
     Visualizes tables stored in the .rtdc file
     """
+
     def __init__(self, *args, **kwargs):
         super(BasinsPanel, self).__init__(*args, **kwargs)
         ref = importlib.resources.files(
@@ -75,7 +76,7 @@ class BasinsPanel(QtWidgets.QWidget):
                           formatters.HtmlFormatter(full=True,
                                                    noclasses=True,
                                                    nobackground=True))
-                )
+            )
 
             if available and bn is not None and not current.childCount():
                 # Add child tree nodes

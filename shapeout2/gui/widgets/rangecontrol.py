@@ -65,7 +65,7 @@ class RangeControl(QtWidgets.QWidget):
         # call show to make sure slider is updated
         self.show()
 
-    def __getstate__(self):
+    def read_pipeline_state(self):
         state = {
             "active": self.checkBox.isChecked(),
             "start": self.doubleSpinBox_min.value(),
@@ -73,7 +73,7 @@ class RangeControl(QtWidgets.QWidget):
         }
         return state
 
-    def __setstate__(self, state):
+    def write_pipeline_state(self, state):
         self.checkBox.setChecked(state["active"])
         self.setSpinRange(state["start"], state["end"])
 

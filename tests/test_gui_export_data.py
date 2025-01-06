@@ -87,7 +87,10 @@ def test_export_datasets_rtdc_emodulus_only_in_one_issue_80(qtbot):
     mw.add_dataslot(paths=[path, path, path])
 
     # set metadata for Young's modulus only in one slot
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_slot)
     wsl = mw.widget_ana_view.widget_slot
+    wsl.comboBox_slots.setCurrentIndex(0)
     wsl.doubleSpinBox_temp.setValue(23)
     qtbot.mouseClick(wsl.pushButton_apply, QtCore.Qt.MouseButton.LeftButton)
     # make sure that worked

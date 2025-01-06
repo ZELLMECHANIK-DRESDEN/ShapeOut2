@@ -21,13 +21,13 @@ class MatrixElement(QtWidgets.QWidget):
 
         self.update_content()
 
-    def __getstate__(self):
+    def read_pipeline_state(self):
         state = {"active": self.active and not self.invalid,
                  "enabled": self.enabled,
                  "invalid": self.invalid}
         return state
 
-    def __setstate__(self, state):
+    def write_pipeline_state(self, state):
         self.active = state["active"] and not state["invalid"]
         self.enabled = state["enabled"]
         self.invalid = state["invalid"]
@@ -54,9 +54,9 @@ class MatrixElement(QtWidgets.QWidget):
             event.accept()
 
     def set_active(self, b=True):
-        state = self.__getstate__()
+        state = self.read_pipeline_state()
         state["active"] = b
-        self.__setstate__(state)
+        self.write_pipeline_state(state)
 
     def update_content(self, quickview=False):
         if self.invalid:

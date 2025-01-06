@@ -63,9 +63,9 @@ class PlotPanel(QtWidgets.QWidget):
         # automatically set spacing
         self.toolButton_spacing_auto.clicked.connect(self.on_spacing_auto)
 
-    def __getstate__(self):
-        rx = self.widget_range_x.__getstate__()
-        ry = self.widget_range_y.__getstate__()
+    def read_pipeline_state(self):
+        rx = self.widget_range_x.read_pipeline_state()
+        ry = self.widget_range_y.read_pipeline_state()
 
         # hue min/max
         marker_hue = self.comboBox_marker_hue.currentData()
@@ -73,7 +73,7 @@ class PlotPanel(QtWidgets.QWidget):
             hmin = 0
             hmax = 1
         elif marker_hue == "feature":
-            rstate = self.widget_range_feat.__getstate__()
+            rstate = self.widget_range_feat.read_pipeline_state()
             hmin = rstate["start"]
             hmax = rstate["end"]
         else:
@@ -132,7 +132,7 @@ class PlotPanel(QtWidgets.QWidget):
         }
         return state
 
-    def __setstate__(self, state):
+    def write_pipeline_state(self, state):
         if self.current_plot.identifier != state["identifier"]:
             raise ValueError("Plot identifier mismatch!")
         toblock = [
@@ -279,10 +279,10 @@ class PlotPanel(QtWidgets.QWidget):
                     fmin = lim[0]
                 if fmax is None:
                     fmax = lim[1]
-                self.widget_range_feat.__setstate__({"active": True,
-                                                     "start": fmin,
-                                                     "end": fmax,
-                                                     })
+                self.widget_range_feat.write_pipeline_state({"active": True,
+                                                             "start": fmin,
+                                                             "end": fmax,
+                                                             })
 
     def _set_range_xy_state(self, axis_x=None, range_x=None,
                             axis_y=None, range_y=None):
@@ -310,10 +310,10 @@ class PlotPanel(QtWidgets.QWidget):
                         rang = self.pipeline.get_min_max(feat=axis,
                                                          plot_id=plot_id,
                                                          margin=0.05)
-                    rc.__setstate__({"active": True,
-                                     "start": rang[0],
-                                     "end": rang[1],
-                                     })
+                    rc.write_pipeline_state({"active": True,
+                                             "start": rang[0],
+                                             "end": rang[1],
+                                             })
 
     def _set_contour_spacing(self, spacing_x=None, spacing_y=None):
         """Set the contour spacing in the spin boxes
@@ -426,7 +426,7 @@ class PlotPanel(QtWidgets.QWidget):
 
     @QtCore.pyqtSlot()
     def on_axis_changed(self):
-        gen = self.__getstate__()["general"]
+        gen = self.read_pipeline_state()["general"]
         if self.sender() == self.comboBox_axis_x:
             self._set_range_xy_state(axis_x=gen["axis x"])
             self._set_contour_spacing_auto(axis_x=gen["axis x"])
@@ -455,7 +455,7 @@ class PlotPanel(QtWidgets.QWidget):
         old_ncol, old_nrow = self.pipeline.get_plot_col_row_count(plot_id)
         # new parameters
         new_pipeline_state = self.pipeline.__getstate__()
-        new_pipeline_state["plots"][plot_index] = self.__getstate__()
+        new_pipeline_state["plots"][plot_index] = self.read_pipeline_state()
         new_ncol, new_nrow = self.pipeline.get_plot_col_row_count(
             plot_id, new_pipeline_state)
         # size x (minimum of 400)
@@ -495,12 +495,12 @@ class PlotPanel(QtWidgets.QWidget):
     @QtCore.pyqtSlot()
     def on_plot_duplicated(self):
         # determine the new filter state
-        plot_state = self.__getstate__()
+        plot_state = self.read_pipeline_state()
         new_state = copy.deepcopy(plot_state)
         new_plot = Plot()
         new_state["identifier"] = new_plot.identifier
         new_state["layout"]["name"] = new_plot.name
-        new_plot.__setstate__(new_state)
+        new_plot.write_pipeline_state(new_state)
         # determine the filter position
         pos = self.pipeline.plot_ids.index(plot_state["identifier"])
         self.pipeline.add_plot(new_plot, index=pos+1)
@@ -509,7 +509,7 @@ class PlotPanel(QtWidgets.QWidget):
 
     @QtCore.pyqtSlot()
     def on_plot_removed(self):
-        plot_state = self.__getstate__()
+        plot_state = self.read_pipeline_state()
         self.pipeline.remove_plot(plot_state["identifier"])
         state = self.pipeline.__getstate__()
         self.pipeline_changed.emit(state)
@@ -522,7 +522,7 @@ class PlotPanel(QtWidgets.QWidget):
         plot_id = self.current_plot.identifier
         # Get all datasets belonging to this plot.
         datasets, _ = self.pipeline.get_plot_datasets(plot_id)
-        state = self.__getstate__()
+        state = self.read_pipeline_state()
         gen = state["general"]
         # initial guess
         # sensible start parameters
@@ -530,7 +530,7 @@ class PlotPanel(QtWidgets.QWidget):
                                        axis_y=gen["axis y"])
 
         # retrieve state with updated spacings
-        state = self.__getstate__()
+        state = self.read_pipeline_state()
         phi_conv = np.deg2rad(23)
 
         for ii in range(15):  # hard-limit is 15 iterations
@@ -562,10 +562,10 @@ class PlotPanel(QtWidgets.QWidget):
                 "Could not automatically determine contour spacing")
 
         # set the final spacing
-        new_state = self.__getstate__()
+        new_state = self.read_pipeline_state()
         new_state["contour"]["spacing x"] = state["contour"]["spacing x"]
         new_state["contour"]["spacing y"] = state["contour"]["spacing y"]
-        self.__setstate__(new_state)
+        self.write_pipeline_state(new_state)
 
     @QtCore.pyqtSlot()
     def on_range_changed(self):
@@ -619,7 +619,7 @@ class PlotPanel(QtWidgets.QWidget):
             # populate content
             plot = Plot.get_plot(identifier=self.plot_ids[plot_index])
             state = plot.__getstate__()
-            self.__setstate__(state)
+            self.write_pipeline_state(state)
         else:
             self.setEnabled(False)
 
@@ -628,7 +628,7 @@ class PlotPanel(QtWidgets.QWidget):
         # get current index
         plot_index = self.comboBox_plots.currentIndex()
         plot = Plot.get_plot(identifier=self.plot_ids[plot_index])
-        plot_state = self.__getstate__()
+        plot_state = self.read_pipeline_state()
         plot.__setstate__(plot_state)
         self.update_content()  # update plot selection combobox
         self.plot_changed.emit(plot_state)

@@ -199,7 +199,7 @@ class QuickView(QtWidgets.QWidget):
 
         self._statistics_cache = collections.OrderedDict()
 
-    def __getstate__(self):
+    def read_pipeline_state(self):
         plot = {
             "downsampling": self.checkBox_downsample.isChecked(),
             "downsampling value": self.spinBox_downsample.value(),
@@ -229,7 +229,7 @@ class QuickView(QtWidgets.QWidget):
         }
         return state
 
-    def __setstate__(self, state):
+    def write_pipeline_state(self, state):
         plot = state["plot"]
         for tb in self.signal_widgets:
             tb.blockSignals(True)
@@ -334,7 +334,7 @@ class QuickView(QtWidgets.QWidget):
 
     def get_event_image(self, ds, event, feat):
         """Handle the image processing and contour processing for the event"""
-        state = self.__getstate__()
+        state = self.read_pipeline_state()
         cellimg = ds[feat][event]
         cellimg = self.display_image(ds, event, state, cellimg, feat)
         cellimg = self.display_contour(ds, event, state, cellimg, feat)
@@ -649,10 +649,10 @@ class QuickView(QtWidgets.QWidget):
         self.lineEdit_poly.setText(pf.name)
         self.checkBox_poly.setChecked(pf.inverted)
         # set axes
-        state = self.__getstate__()
+        state = self.read_pipeline_state()
         state["plot"]["axis x"] = pf.axes[0]
         state["plot"]["axis y"] = pf.axes[1]
-        self.__setstate__(state)
+        self.write_pipeline_state(state)
         self.plot()
         # add ROI
         self.widget_scatter.activate_poly_mode(pf.points)
@@ -696,7 +696,7 @@ class QuickView(QtWidgets.QWidget):
             # keep everything as-is but update the sizes
             show_event = self.stackedWidget.currentWidget() is self.page_event
             show_settings = (
-                    self.stackedWidget.currentWidget() is self.page_settings)
+                self.stackedWidget.currentWidget() is self.page_settings)
             show_poly = self.stackedWidget.currentWidget() is self.page_poly
 
         # toolbutton checked
@@ -731,7 +731,7 @@ class QuickView(QtWidgets.QWidget):
     def plot(self):
         """Update the plot using the current state of the UI"""
         if self.rtdc_ds is not None:
-            plot = self.__getstate__()["plot"]
+            plot = self.read_pipeline_state()["plot"]
             downsample = plot["downsampling"] * plot["downsampling value"]
             hue_kwargs = {}
             if self.checkBox_hue.isChecked():
@@ -811,7 +811,7 @@ class QuickView(QtWidgets.QWidget):
         self.widget_scatter.setSelection(event)
         if self.tabWidget_event.currentIndex() == 0:
             # update image
-            state = self.__getstate__()
+            state = self.read_pipeline_state()
             self.groupBox_image.hide()
 
             view = "view_event"
@@ -922,7 +922,7 @@ class QuickView(QtWidgets.QWidget):
             self.widget_scatter.show()
             self.widget_tool.setEnabled(True)
         # get the state
-        state = self.__getstate__()
+        state = self.read_pipeline_state()
         plot = state["plot"]
         # remove event state (ill-defined for different datasets)
         state.pop("event")
@@ -952,7 +952,7 @@ class QuickView(QtWidgets.QWidget):
         self.spinBox_event.blockSignals(False)
 
         # set quick view state
-        self.__setstate__(state)
+        self.write_pipeline_state(state)
         # scatter plot
         self.plot()
         # reset image view

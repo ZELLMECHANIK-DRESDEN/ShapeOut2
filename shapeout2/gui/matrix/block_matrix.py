@@ -32,16 +32,16 @@ class BlockMatrix(QtWidgets.QWidget):
         self.plot_matrix.matrix_changed.connect(self.on_matrix_changed)
         self.plot_matrix.plot_modify_clicked.connect(self.plot_modify_clicked)
 
-    def __getstate__(self):
-        state = self.data_matrix.__getstate__()
-        statep = self.plot_matrix.__getstate__()
+    def read_pipeline_state(self):
+        state = self.data_matrix.read_pipeline_state()
+        statep = self.plot_matrix.read_pipeline_state()
         state["plots"] = statep["plots"]
         for ss in statep["elements"]:
             for plot in statep["elements"][ss]:
                 state["elements"][ss][plot] = statep["elements"][ss][plot]
         return state
 
-    def __setstate__(self, state):
+    def write_pipeline_state(self, state):
         # DataMatrix
         stated = copy.deepcopy(state)
         stated.pop("plots")
@@ -50,7 +50,7 @@ class BlockMatrix(QtWidgets.QWidget):
             for plot_state in state["plots"]:
                 plot_id = plot_state["identifier"]
                 stated["elements"][slot_id].pop(plot_id)
-        self.data_matrix.__setstate__(stated)
+        self.data_matrix.write_pipeline_state(stated)
         # PlotMatrix
         statep = copy.deepcopy(state)
         statep.pop("filters")
@@ -61,7 +61,7 @@ class BlockMatrix(QtWidgets.QWidget):
             for filt_state in state["filters"]:
                 filt_id = filt_state["identifier"]
                 statep["elements"][slot_id].pop(filt_id)
-        self.plot_matrix.__setstate__(statep)
+        self.plot_matrix.write_pipeline_state(statep)
 
     def add_dataset(self, *args, **kwargs):
         self.data_matrix.add_dataset(*args, **kwargs)
@@ -73,7 +73,7 @@ class BlockMatrix(QtWidgets.QWidget):
         self.plot_matrix.add_plot(*args, **kwargs)
 
     def adopt_pipeline(self, pipeline_state):
-        self.__setstate__(pipeline_state)
+        self.write_pipeline_state(pipeline_state)
 
     def enable_quickview(self, view):
         self.data_matrix.enable_quickview(view)
@@ -133,7 +133,7 @@ class BlockMatrix(QtWidgets.QWidget):
             em.update_content()
 
     def on_matrix_changed(self):
-        state = self.__getstate__()
+        state = self.read_pipeline_state()
         self.pipeline_changed.emit(state)
 
     def update(self, *args, **kwargs):

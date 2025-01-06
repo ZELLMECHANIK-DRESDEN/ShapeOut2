@@ -9,6 +9,7 @@ class LogPanel(QtWidgets.QWidget):
 
     Visualizes logs stored in the .rtdc file
     """
+
     def __init__(self, *args, **kwargs):
         super(LogPanel, self).__init__(*args, **kwargs)
         ref = importlib.resources.files(

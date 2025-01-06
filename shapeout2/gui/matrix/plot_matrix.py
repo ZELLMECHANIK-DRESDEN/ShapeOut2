@@ -21,12 +21,12 @@ class PlotMatrix(QtWidgets.QWidget):
         # used for toggling between all active, all inactive and semi state
         self.semi_states_plot = {}
 
-    def __getstate__(self):
+    def read_pipeline_state(self):
         """State of the current plot matrix"""
         # plots
         plots = []
         for pw in self.plot_widgets:
-            pw_state = pw.__getstate__()
+            pw_state = pw.read_pipeline_state()
             plot = pipeline.Plot._instances[pw_state["identifier"]]
             plots.append(plot.__getstate__())
         # elements
@@ -36,13 +36,13 @@ class PlotMatrix(QtWidgets.QWidget):
             idict = {}
             for pw in self.plot_widgets:
                 me = self.get_matrix_element(dw.identifier, pw.identifier)
-                idict[pw.identifier] = me.__getstate__()["active"]
+                idict[pw.identifier] = me.read_pipeline_state()["active"]
             mestates[dw.identifier] = idict
         state = {"elements": mestates,
                  "plots": plots}
         return state
 
-    def __setstate__(self, state):
+    def write_pipeline_state(self, state):
         self.setUpdatesEnabled(False)
         self.blockSignals(True)
         self.clear()
@@ -60,9 +60,9 @@ class PlotMatrix(QtWidgets.QWidget):
             ds_d = state["elements"][slot_id]
             for plot_id in ds_d:
                 el = self.get_matrix_element(slot_id, plot_id)
-                el_state = el.__getstate__()
+                el_state = el.read_pipeline_state()
                 el_state["active"] = ds_d[plot_id]
-                el.__setstate__(el_state)
+                el.write_pipeline_state(el_state)
         self.blockSignals(False)
         self.setUpdatesEnabled(True)
 
@@ -175,17 +175,17 @@ class PlotMatrix(QtWidgets.QWidget):
                     me.element_changed.connect(self.changed_element)
                     self.glo.addWidget(me, ii+1, jj)
         # make sure enabled/disabled is honored
-        dstate = self.data_matrix.__getstate__()
-        pstate = self.__getstate__()
+        dstate = self.data_matrix.read_pipeline_state()
+        pstate = self.read_pipeline_state()
         for slot_state in dstate["slots"]:
             slot_id = slot_state["identifier"]
             if slot_id not in dstate["slots used"]:
                 for plot_state in pstate["plots"]:
                     plot_id = plot_state["identifier"]
                     me = self.get_matrix_element(slot_id, plot_id)
-                    mstate = me.__getstate__()
+                    mstate = me.read_pipeline_state()
                     mstate["enabled"] = False
-                    me.__setstate__(mstate)
+                    me.write_pipeline_state(mstate)
 
     def get_matrix_element(self, dataset_id, plot_id):
         """Return matrix element matching dataset and plot identifiers"""
@@ -217,17 +217,17 @@ class PlotMatrix(QtWidgets.QWidget):
         ii = self.get_plot_index(plot_id)
         pw = self.plot_widgets[ii]
         if ret_index:
-            return pw.__getstate__(), ii
+            return pw.read_pipeline_state(), ii
         else:
-            return pw.__getstate__()
+            return pw.read_pipeline_state()
 
     @QtCore.pyqtSlot(str)
     def on_option_plot(self, option):
         """Plot option logic (remove, duplicate)"""
-        pw_state = self.sender().__getstate__()
+        pw_state = self.sender().read_pipeline_state()
         plot_id = pw_state["identifier"]
         plot_index = self.get_plot_index(plot_id)
-        state = self.__getstate__()
+        state = self.read_pipeline_state()
         if option == "remove":
             state["plots"].pop(plot_index)
             for ds_key in state["elements"]:
@@ -239,7 +239,7 @@ class PlotMatrix(QtWidgets.QWidget):
             new_state["layout"]["name"] = plot.name
             state["plots"].insert(plot_index+1, new_state)
             plot.__setstate__(new_state)
-        self.__setstate__(state)
+        self.write_pipeline_state(state)
         self.publish_matrix()
 
     def publish_matrix(self):
@@ -251,13 +251,13 @@ class PlotMatrix(QtWidgets.QWidget):
     def toggle_dataset_enable(self, enabled):
         sender = self.sender()
         sid = sender.identifier
-        state = self.__getstate__()
+        state = self.read_pipeline_state()
         for p_key in state["elements"][sid]:
             # update element widget
             me = self.get_matrix_element(sid, p_key)
-            mstate = me.__getstate__()
+            mstate = me.read_pipeline_state()
             mstate["enabled"] = enabled
-            me.__setstate__(mstate)
+            me.write_pipeline_state(mstate)
         self.publish_matrix()
 
     @QtCore.pyqtSlot()
@@ -271,7 +271,7 @@ class PlotMatrix(QtWidgets.QWidget):
         sender = self.sender()
         plot_id = sender.identifier
 
-        states = self.__getstate__()["elements"]
+        states = self.read_pipeline_state()["elements"]
         state = {}
         for slot_id in states:
             state[slot_id] = states[slot_id][plot_id]

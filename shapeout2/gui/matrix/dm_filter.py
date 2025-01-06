@@ -40,16 +40,16 @@ class MatrixFilter(QtWidgets.QWidget):
             # set tooltip/label
             self.update_content()
         else:
-            self.__setstate__(state)
+            self.write_pipeline_state(state)
 
-    def __getstate__(self):
+    def read_pipeline_state(self):
         state = {"enabled": self.enabled,
                  "identifier": self.identifier,
                  "name": self.name,
                  }
         return state
 
-    def __setstate__(self, state):
+    def write_pipeline_state(self, state):
         if state["identifier"] not in pipeline.Filter._instances:
             # Create a new filter with the identifier
             pipeline.Filter(identifier=state["identifier"])

@@ -49,6 +49,8 @@ def test_allow_to_set_manual_temperature_for_known_medium(qtbot):
     # add fake measurement
     path1 = make_dataset(medium=None, temp=23.5)
     mw.add_dataslot(paths=[path1])
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_slot)
     wsl = mw.widget_ana_view.widget_slot
 
     # 1. test whether we can actually select things in comboBox_temp
@@ -77,15 +79,18 @@ def test_empty_medium_string_should_offer_user_edit(qtbot):
     # add fake measurement
     path1 = make_dataset(medium=" ")
     mw.add_dataslot(paths=[path1])
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_slot)
     wsl = mw.widget_ana_view.widget_slot
     ds = mw.pipeline.slots[0].get_dataset()
     assert ds.config["setup"]["medium"] == " "
     assert wsl.comboBox_medium.currentData() == "other"
     assert not wsl.doubleSpinBox_visc.isReadOnly(), "Should be editable"
     assert wsl.doubleSpinBox_visc.isEnabled(), "Should be editable"
-    assert np.isnan(wsl.__getstate__()["emodulus"]["emodulus temperature"])
-    assert wsl.__getstate__()["emodulus"]["emodulus medium"] == "other"
-    assert wsl.__getstate__()["emodulus"]["emodulus scenario"] is None
+    assert np.isnan(wsl.read_pipeline_state()[
+                    "emodulus"]["emodulus temperature"])
+    assert wsl.read_pipeline_state()["emodulus"]["emodulus medium"] == "other"
+    assert wsl.read_pipeline_state()["emodulus"]["emodulus scenario"] is None
 
 
 def test_other_medium_viscosity_editable_issue_49(qtbot):
@@ -94,6 +99,8 @@ def test_other_medium_viscosity_editable_issue_49(qtbot):
     # add fake measurement
     path1 = make_dataset(medium=None)
     mw.add_dataslot(paths=[path1])
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_slot)
     wsl = mw.widget_ana_view.widget_slot
     ds = mw.pipeline.slots[0].get_dataset()
     assert "medium" not in ds.config["setup"], "sanity check (medium removed)"
@@ -127,6 +134,8 @@ def test_simple(qtbot):
                                equal_nan=True), "sanity check"
 
     mw.add_dataslot(paths=[path])
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_slot)
     wsl = mw.widget_ana_view.widget_slot
     idvm = wsl.comboBox_visc_model.findData("herold-2017")
     assert idvm >= 0
@@ -175,6 +184,8 @@ def test_switch_and_update_chip_region(qtbot):
                          chip_region="reservoir")
 
     slot_id1, slot_id2 = mw.add_dataslot(paths=[path1, path2])
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_slot)
     wsl = mw.widget_ana_view.widget_slot
 
     # select the first slot
@@ -219,6 +230,8 @@ def test_switch_and_update_medium(qtbot):
     path2 = make_dataset(medium="UserDefined", temp=22.5, temp_range=[22, 23])
 
     slot_id1, slot_id2 = mw.add_dataslot(paths=[path1, path2])
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_slot)
     wsl = mw.widget_ana_view.widget_slot
 
     # select the first slot
@@ -264,6 +277,8 @@ def test_user_defined_medium_should_work(qtbot):
     # add fake measurement
     path1 = make_dataset(medium="MyMedium")
     mw.add_dataslot(paths=[path1])
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_slot)
     wsl = mw.widget_ana_view.widget_slot
     ds = mw.pipeline.slots[0].get_dataset()
     assert ds.config["setup"]["medium"] == "MyMedium", "sanity check"
@@ -271,10 +286,12 @@ def test_user_defined_medium_should_work(qtbot):
     assert not wsl.doubleSpinBox_visc.isReadOnly(), "Should be editable"
     assert wsl.doubleSpinBox_visc.isEnabled(), "Should be editable"
     wsl.doubleSpinBox_visc.setValue(12.1)
-    assert wsl.__getstate__()["emodulus"]["emodulus viscosity"] == 12.1
-    assert np.isnan(wsl.__getstate__()["emodulus"]["emodulus temperature"])
-    assert wsl.__getstate__()["emodulus"]["emodulus medium"] == "MyMedium"
-    assert wsl.__getstate__()["emodulus"]["emodulus scenario"] is None
+    assert wsl.read_pipeline_state()["emodulus"]["emodulus viscosity"] == 12.1
+    assert np.isnan(wsl.read_pipeline_state()[
+                    "emodulus"]["emodulus temperature"])
+    assert wsl.read_pipeline_state(
+    )["emodulus"]["emodulus medium"] == "MyMedium"
+    assert wsl.read_pipeline_state()["emodulus"]["emodulus scenario"] is None
 
 
 def test_changeable_lut_selection(qtbot):
@@ -285,6 +302,8 @@ def test_changeable_lut_selection(qtbot):
     path1 = make_dataset(medium="CellCarrier", temp=22.5, temp_range=[22, 23])
 
     mw.add_dataslot(paths=[path1])
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_slot)
     wsl = mw.widget_ana_view.widget_slot
     ds = mw.pipeline.slots[0].get_dataset()
 
@@ -342,6 +361,8 @@ def test_viscosity_defaults_to_buyukurganci_2022(qtbot):
 
     mw.add_dataslot(paths=[path1])
     wsl = mw.widget_ana_view.widget_slot
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_slot)
     ds = mw.pipeline.slots[0].get_dataset()
 
     assert ds.config["setup"]["medium"] == "CellCarrier", "sanity check"

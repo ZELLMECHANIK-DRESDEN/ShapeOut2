@@ -322,7 +322,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                     invalid_pm.append((slot.identifier, plot.identifier))
         self.block_matrix.invalidate_elements(invalid_dm, invalid_pm)
         # Update AnalysisView
-        self.widget_ana_view.adopt_pipeline(pipeline_state)
+        self.widget_ana_view.set_pipeline(self.pipeline)
         # Update QuickView choices
         self.widget_quick_view.update_feature_choices()
         # update list of polygon filters in Quick View

@@ -47,6 +47,9 @@ class MetaPanel(QtWidgets.QWidget):
             nms = []
         return nms
 
+    def set_pipeline(self, pipeline):
+        self.pipeline_state = pipeline.__getstate__()
+
     def update_info_box(self, group_box, config, section):
         """Populate an individual group box with keyword-value pairs"""
         group_box.layout().setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)

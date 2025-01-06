@@ -6,6 +6,7 @@
  - enh: update icon theme
  - setup: pygments (for json formatting) is now an explicit dependency
  - setup: bump dclab to 0.62.9
+ - ref: simplify logic in Analysis View
 2.20.1
  - fix: regression TypeError when trying to plot contour data
 2.20.0

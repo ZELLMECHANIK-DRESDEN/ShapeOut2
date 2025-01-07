@@ -11,7 +11,7 @@ data_path = pathlib.Path(__file__).resolve().parent / ".." / "data"
 
 app = QApplication(sys.argv)
 
-QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
+QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.Language.C))
 
 mw = ShapeOut2()
 mw.settings.setValue("check for updates", 0)

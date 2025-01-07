@@ -1,7 +1,7 @@
 .. _index:
 
 
-.. image:: logo/shapeout2_h50.png
+.. figure:: logo/shapeout2_h50.png
 
 |
 

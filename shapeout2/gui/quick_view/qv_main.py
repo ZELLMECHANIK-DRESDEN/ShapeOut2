@@ -332,7 +332,7 @@ class QuickView(QtWidgets.QWidget):
         cellimg = self.get_event_image(ds, event, feat)
         self.display_img(feat, view, cellimg)
 
-    def get_event_image(self, ds, event, feat):
+    def get_event_image(self, ds, event, feat="image"):
         """Handle the image processing and contour processing for the event"""
         state = self.read_pipeline_state()
         cellimg = ds[feat][event]

@@ -9,7 +9,7 @@ from shapeout2.gui import dcor
 
 app = QApplication(sys.argv)
 
-QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
+QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.Language.C))
 
 mw = ShapeOut2()
 mw.settings.setValue("check for updates", 0)

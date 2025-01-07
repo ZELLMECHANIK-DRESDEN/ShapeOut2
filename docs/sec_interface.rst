@@ -47,7 +47,7 @@ plot
 
 Basic usage
 ===========
-.. image:: scrots/ui_main.png
+.. figure:: scrots/ui_main.png
     :target: _images/ui_main.png
     :scale: 20%
 
@@ -71,7 +71,7 @@ filters, or plots (left part) and allows to hide/show the
 
 Block Matrix
 ------------
-.. image:: scrots/ui_block_matrix.png
+.. figure:: scrots/ui_block_matrix.png
     :target: _images/ui_block_matrix.png
     :scale: 65%
 
@@ -119,41 +119,89 @@ plot windows as well as the :ref:`sec_quick_view` and Analysis View windows.
 
 Analysis View
 -------------
-The analysis view is separated into four tabs (see screenshots below).
+The analysis view consists of seven tabs that allow you to inspect the
+datasets loaded and to perform filtering and plotting actions.
 
-- The **Meta** tab displays all metadata of the selected dataset that
-  are stored in the original .rtdc file.
-- The **Dataset** tab allows to
-  specify additional metadata, such as unique colors used for plotting and
-  additional metadata for computing the Young's modulus or correcting
-  for fluorescence cross-talk. It also allows to specify fluorescence
-  channel labels that will then be used for labeling the axes of plots.
-- The **Filter** tab is used to modify the filters of the pipeline.
-  New box filters can be added by selecting *Choose box filters...*.
-  Polygon filters are created in the :ref:`sec_quick_view` window.
-- The **Plot** tab allows to specify all plotting parameters. Please
-  take special note of the *Division* option in the *Layout* section (defines
-  the arrangement of the subplots) and the *Marker hue* option in the
-  *Scatter plot* section (allows you the specify whether the scatter
-  data points are colored according to a kernel density estimate (KDE),
-  another feature dimension, or the dataset color specified in the
-  *Dataset* tab). In this example, contour plots are not used.
+Meta
+....
+The **Meta** tab displays all metadata of the selected dataset that
+are stored in the original .rtdc file. Here you can check and compare
+measurement and postprocessing parameters.
 
-.. image:: scrots/ui_ana_meta.png
+.. figure:: scrots/ui_ana_meta.png
     :target: _images/ui_ana_meta.png
-    :scale: 65%
 
-.. image:: scrots/ui_ana_slot.png
+    Meta tab in the Analysis View.
+
+Basins
+......
+The **Basins** tab yields insight into the basins that are loaded for
+a dataset. Find out more about basins in the
+:ref:`dclab documentation <dclab:sec_av_basins>`.
+
+.. figure:: scrots/ui_ana_basins.png
+    :target: _images/ui_ana_basins.png
+
+    Basins tab in the Analysis View.
+
+Tables
+......
+The **Tables** tab allows you to visualize additional telemetry recorded
+during the measurement. You can use it for quality control and to identify
+reasons for temporal trends within a dataset.
+
+.. figure:: scrots/ui_ana_tables.png
+    :target: _images/ui_ana_tables.png
+
+    Tables tab in the Analysis View.
+
+Logs
+....
+The **Logs** tab gives access to all logs stored in a dataset.
+
+.. figure:: scrots/ui_ana_logs.png
+    :target: _images/ui_ana_logs.png
+
+    Logs tab in the Analysis View.
+
+Dataset
+.......
+The **Dataset** tab allows to
+specify additional metadata, such as unique colors used for plotting and
+additional metadata for computing the Young's modulus or correcting
+for fluorescence cross-talk. It also allows to specify fluorescence
+channel labels that will then be used for labeling the axes of plots.
+
+.. figure:: scrots/ui_ana_slot.png
     :target: _images/ui_ana_slot.png
-    :scale: 65%
 
-.. image:: scrots/ui_ana_filter.png
+    Dataset tab in the Analysis View.
+
+Filter
+......
+The **Filter** tab is used to modify the filters of the pipeline.
+New box filters can be added by selecting *Choose box filters...*.
+Polygon filters are created in the :ref:`sec_quick_view` window.
+
+
+.. figure:: scrots/ui_ana_filter.png
     :target: _images/ui_ana_filter.png
-    :scale: 65%
 
-.. image:: scrots/ui_ana_plot.png
+    Filter tab in the Analysis View.
+
+Plot
+....
+The **Plot** tab allows to specify all plotting parameters. Please
+take special note of the *Division* option in the *Layout* section (defines
+the arrangement of the subplots) and the *Marker hue* option in the
+*Scatter plot* section (allows you the specify whether the scatter
+data points are colored according to a kernel density estimate (KDE),
+another feature dimension, or the dataset color specified in the
+*Dataset* tab). In this example, contour plots are not used.
+
+
+.. figure:: scrots/ui_ana_plot.png
     :target: _images/ui_ana_plot.png
-    :scale: 65%
 
 
 .. _sec_quick_view:
@@ -179,7 +227,7 @@ availability:
 - *orange*: The feature data must be computed before it can be displayed. The
   feature is an :ref:`ancillary feature <dclab:sec_features_ancillary>`.
 
-.. image:: scrots/ui_qv_settings.png
+.. figure:: scrots/ui_qv_settings.png
     :target: _images/ui_qv_settings.png
     :scale: 65%
 
@@ -189,7 +237,7 @@ the *Index* spin control. If available, the event image is shown alongside the
 fluorescence trace of the event. All features of the event are listed in a
 separate tab.
 
-.. image:: scrots/ui_qv_event.png
+.. figure:: scrots/ui_qv_event.png
     :target: _images/ui_qv_event.png
     :scale: 65%
 
@@ -197,6 +245,6 @@ The **Polygon Filter** panel allows you to create and modify polygon filters.
 When the panel is active you can move the mouse pointer across the scatter
 plot and the image of the event closest to the mouse pointer is displayed.
 
-.. image:: scrots/ui_qv_poly.png
+.. figure:: scrots/ui_qv_poly.png
     :target: _images/ui_qv_poly.png
     :scale: 65%

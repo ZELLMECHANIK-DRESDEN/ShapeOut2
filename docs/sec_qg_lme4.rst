@@ -56,13 +56,13 @@ To perform an LMM analysis, go to *Compute | Statistical significance* and
 set the groups (SSC: treatment; MG63: control) and repetitions (enumeration
 by date-time).
 
-.. image:: scrots/qg_lme4_init.png
+.. figure:: scrots/qg_lme4_init.png
     :target: _images/qg_lme4_init.png
 
 Make sure that the feature "Deformation" is selected and hit *Run R-lme4*. The
 results of the LMM analysis are shown in a new dialog.
 
-.. image:: scrots/qg_lme4_results.png
+.. figure:: scrots/qg_lme4_results.png
     :target: _images/qg_lme4_results.png
 
 The most important numbers are extracted from the report and are shown at
@@ -103,12 +103,12 @@ ten datasets (reservoir measurements in addition to the measurements above).
 As in the example above, go to *Compute | Statistical significance* and
 set the groups and repetitions.
 
-.. image:: scrots/qg_lme4_diff_init.png
+.. figure:: scrots/qg_lme4_diff_init.png
     :target: _images/qg_lme4_diff_init.png
 
 The results of the LMM analysis for differential deformation are:
 
-.. image:: scrots/qg_lme4_diff_results.png
+.. figure:: scrots/qg_lme4_diff_results.png
     :target: _images/qg_lme4_diff_results.png
 
 The p-value for the differential deformation is magnitudes lower than the

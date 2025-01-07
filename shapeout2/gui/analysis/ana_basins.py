@@ -49,7 +49,7 @@ class BasinsPanel(QtWidgets.QWidget):
                                  ds=ds)
 
     @QtCore.pyqtSlot(QtWidgets.QTreeWidgetItem, QtWidgets.QTreeWidgetItem)
-    def on_select_basin(self, current, previous):
+    def on_select_basin(self, current, previous=None):
         """Show the tables of the dataset in the right-hand list widget"""
         ds_idx = self.listWidget_dataset.currentRow()
         if current is not None and ds_idx >= 0:

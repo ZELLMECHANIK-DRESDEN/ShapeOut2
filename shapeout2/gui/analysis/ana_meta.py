@@ -58,6 +58,7 @@ class MetaPanel(QtWidgets.QWidget):
             item = group_box.layout().itemAt(ii).widget()
             if item is not None:
                 item.deleteLater()
+                item.setParent(None)
         # populate
         items = sort_config_section_items(section, config[section].items())
         if items:
@@ -81,6 +82,7 @@ class MetaPanel(QtWidgets.QWidget):
             group_box.show()
         else:
             group_box.hide()
+        self.update()
 
     def update_content(self, event=None, slot_index=None):
         if self.slot_ids:

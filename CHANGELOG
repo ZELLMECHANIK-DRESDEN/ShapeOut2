@@ -4,6 +4,7 @@
  - feat: implement showing dataset tables in the analysis view (#141)
  - enh: more Quick View default choices than "deform" and "area_um"
  - enh: update icon theme
+ - docs: document new features in Analysis View
  - setup: pygments (for json formatting) is now an explicit dependency
  - setup: bump dclab to 0.62.9
  - ref: simplify logic in Analysis View

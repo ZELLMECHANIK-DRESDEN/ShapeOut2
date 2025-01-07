@@ -22,7 +22,7 @@ covered by the :ref:`default features <dclab:sec_features>`.
 You can load and manage extensions via the *Edit | Preferences* dialog in the
 *Extensions* tab.
 
-.. image:: scrots/qg_extensions.png
+.. figure:: scrots/qg_extensions.png
     :target: _images/qg_extensions.png
 
 

@@ -1,6 +1,7 @@
 import collections
-import pathlib
 import importlib.resources
+import pathlib
+from typing import Dict, Literal, Tuple
 
 import dclab
 import numpy as np
@@ -327,85 +328,116 @@ class QuickView(QtWidgets.QWidget):
         self.comboBox_y.set_dataset(rtdc_ds)
         self.comboBox_z_hue.set_dataset(rtdc_ds)
 
-    def get_event_and_display(self, ds, event, feat, view):
-        """Convenience method to get the event image and display in one step"""
-        cellimg = self.get_event_image(ds, event, feat)
-        self.display_img(feat, view, cellimg)
-
     def get_event_image(self, ds, event, feat="image"):
         """Handle the image processing and contour processing for the event"""
         state = self.read_pipeline_state()
-        cellimg = ds[feat][event]
-        cellimg = self.display_image(ds, event, state, cellimg, feat)
-        cellimg = self.display_contour(ds, event, state, cellimg, feat)
-        return cellimg
-
-    def display_image(self, ds, event, state, cellimg, feat):
-        """Apply background, auto-contrast and format conversion"""
         if feat == "image":
-            # apply background correction
-            if "image_bg" in ds:
-                if state["event"]["image background"]:
-                    bgimg = ds["image_bg"][event].astype(np.int16)
-                    cellimg = cellimg.astype(np.int16)
-                    cellimg = cellimg - bgimg + int(np.mean(bgimg))
-            # automatic contrast
-            if state["event"]["image auto contrast"]:
-                vmin, vmax = cellimg.min(), cellimg.max()
-                cellimg = (cellimg - vmin) / (vmax - vmin) * 255
-            cellimg = self._convert_to_rgb(cellimg)
-            # clip and convert to int
-            cellimg = np.clip(cellimg, 0, 255)
-            cellimg = np.require(cellimg, np.uint8, 'C')
-
+            cell_img = self._prepare_event_image_image(ds, event, state)
         elif feat == "qpi_pha":
-            # colormap levels
-            if state["event"]["image auto contrast"]:
-                vmin, vmax = self._vmin_max_around_zero(cellimg)
-                if state["event"]["image contour"]:
-                    # offset required for auto-contrast with contour
-                    # two times the contrast range, divided by the cmap length
-                    # this essentially adds a cmap point for our contour
-                    offset = 2 * ((vmax - vmin) / len(self.cmap_pha.color))
-                    vmin = vmin - offset
-            else:
-                vmin, vmax = self.levels_qpi_pha
-            self.img_info[feat]["kwargs"]["levels"] = (vmin, vmax)
-
-            # update colormap
-            if state["event"]["image contour"]:
-                new_cmap = self.cmap_pha_with_black
-            else:
-                new_cmap = self.cmap_pha
-            if self.img_info[feat]["cmap"] != new_cmap:
-                self.img_info[feat]["cmap"] = new_cmap
-                # performance
-                self.img_info[feat]["cmap_changed"] = True
-
+            cell_img = self._prepare_event_image_qpi_pha(ds, event, state)
         elif feat == "qpi_amp":
-            if state["event"]["image auto contrast"]:
-                vmin, vmax = cellimg.min(), cellimg.max()
-            else:
-                vmin, vmax = self.levels_qpi_amp
-            self.img_info[feat]["kwargs"]["levels"] = (vmin, vmax)
-            # to get the correct contour colour it is easier to view the
-            # amplitude as an RGB image
-            cellimg = self._convert_to_rgb(cellimg)
+            cell_img = self._prepare_event_image_qpi_amp(ds, event, state)
+        else:
+            raise NotImplementedError(f"Image feature {feat} not implemented")
 
-        return cellimg
+        return cell_img
 
-    def _vmin_max_around_zero(self, cellimg):
-        vmin_abs, vmax_abs = np.abs(cellimg.min()), np.abs(cellimg.max())
+    def _prepare_event_image_image(self, ds, event, state):
+        cell_img = ds["image"][event]
+        # apply background correction
+        if "image_bg" in ds:
+            if state["event"]["image background"]:
+                bgimg = ds["image_bg"][event].astype(np.int16)
+                cell_img = cell_img.astype(np.int16)
+                cell_img = cell_img - bgimg + int(np.mean(bgimg))
+        # automatic contrast
+        if state["event"]["image auto contrast"]:
+            vmin, vmax = cell_img.min(), cell_img.max()
+            cell_img = (cell_img - vmin) / (vmax - vmin) * 255
+        cell_img = self._convert_to_rgb(cell_img)
+        # clip and convert to int
+        cell_img = np.clip(cell_img, 0, 255)
+        cell_img = np.require(cell_img, np.uint8, 'C')
+
+        cell_img = self._insert_contour_and_zoom(
+            cell_img,
+            cmap_levels=self.img_info["image"]["kwargs"]["levels"],
+            contour_style="red",
+            ds=ds,
+            event=event,
+            state=state)
+
+        return cell_img
+
+    def _prepare_event_image_qpi_amp(self, ds, event, state):
+        cell_img = ds["qpi_amp"][event]
+        if state["event"]["image auto contrast"]:
+            vmin, vmax = cell_img.min(), cell_img.max()
+        else:
+            vmin, vmax = self.levels_qpi_amp
+        self.img_info["qpi_amp"]["kwargs"]["levels"] = (vmin, vmax)
+        # to get the correct contour colour it is easier to view the
+        # amplitude as an RGB image
+        cell_img = self._convert_to_rgb(cell_img)
+
+        cell_img = self._insert_contour_and_zoom(
+            cell_img,
+            cmap_levels=self.img_info["qpi_amp"]["kwargs"]["levels"],
+            contour_style="red",
+            ds=ds,
+            event=event,
+            state=state)
+
+        return cell_img
+
+    def _prepare_event_image_qpi_pha(self, ds, event, state):
+        cell_img = ds["qpi_pha"][event]
+        # colormap levels
+        if state["event"]["image auto contrast"]:
+            vmin, vmax = self._vmin_max_around_zero(cell_img)
+            if state["event"]["image contour"]:
+                # offset required for auto-contrast with contour
+                # two times the contrast range, divided by the cmap length
+                # this essentially adds a cmap point for our contour
+                offset = 2 * ((vmax - vmin) / len(self.cmap_pha.color))
+                vmin = vmin - offset
+        else:
+            vmin, vmax = self.levels_qpi_pha
+        self.img_info["qpi_pha"]["kwargs"]["levels"] = (vmin, vmax)
+
+        # update colormap
+        if state["event"]["image contour"]:
+            new_cmap = self.cmap_pha_with_black
+        else:
+            new_cmap = self.cmap_pha
+        if self.img_info["qpi_pha"]["cmap"] != new_cmap:
+            self.img_info["qpi_pha"]["cmap"] = new_cmap
+            # performance
+            self.img_info["qpi_pha"]["cmap_changed"] = True
+
+        cell_img = self._insert_contour_and_zoom(
+            cell_img,
+            cmap_levels=self.img_info["qpi_pha"]["kwargs"]["levels"],
+            contour_style="lowest-level",
+            ds=ds,
+            event=event,
+            state=state)
+
+        return cell_img
+
+    def _vmin_max_around_zero(self, cell_img):
+        vmin_abs, vmax_abs = np.abs(cell_img.min()), np.abs(cell_img.max())
         v_largest = max(vmax_abs, vmin_abs)
         vmin, vmax = -v_largest, v_largest
         return vmin, vmax
 
-    def display_contour(self, ds, event, state, cellimg, feat):
-        """Add the contour to the image if requested"""
-        # Only load contour data if there is an image column.
-        # We don't know how big the images should be so we
-        # might run into trouble displaying random contours.
-        imkw = self.img_info[feat]["kwargs"]
+    def _insert_contour_and_zoom(self,
+                                 cell_img: np.ndarray,
+                                 cmap_levels: Tuple[float, float],
+                                 contour_style: Literal["red", "lowest-level"],
+                                 ds: dclab.rtdc_dataset.RTDCBase,
+                                 event: int,
+                                 state: Dict):
         if "mask" in ds and len(ds["mask"]) > event:
             mask = ds["mask"][event]
             if state["event"]["image contour"]:
@@ -413,34 +445,49 @@ class QuickView(QtWidgets.QWidget):
                 # whether this is kosher, please take a look at issue #76:
                 # https://github.com/DC-analysis/dclab/issues/76
                 cont = mask ^ binary_erosion(mask)
-                # set red contour pixel values in original image
-                if feat == "image" or feat == "qpi_amp":
-                    # for RGB images
-                    ch_red = imkw["levels"][1] * 0.7
-                    ch_other = int(imkw["levels"][0]) if \
-                        imkw["levels"][1] == 255 else imkw["levels"][0]
+                if contour_style == "red":
+                    # draw red contour for grayscale images
+                    ch_red = cmap_levels[1] * 0.7
+                    ch_other = int(cmap_levels[0]) if \
+                        cmap_levels[1] == 255 else cmap_levels[0]
                     # assign channel values for contour
-                    cellimg[cont, 0] = int(
-                        ch_red) if imkw["levels"][1] == 255 else ch_red
-                    cellimg[cont, 1] = ch_other
-                    cellimg[cont, 2] = ch_other
-                elif feat == "qpi_pha":
+                    cell_img[cont, 0] = int(
+                        ch_red) if cmap_levels[1] == 255 else ch_red
+                    cell_img[cont, 1] = ch_other
+                    cell_img[cont, 2] = ch_other
+                elif contour_style == "lowest-level":
                     # use the lowest value from the colormap
-                    cellimg[cont] = imkw["levels"][0]
+                    # (used for e.g. phase images)
+                    cell_img[cont] = cmap_levels[0]
 
             if state["event"]["image zoom"]:
-                cellimg = self.image_zoom(cellimg, mask)
+                cell_img = self.image_zoom(cell_img, mask)
 
-        return cellimg
+        return cell_img
+
+    def get_event_image_and_show(self, ds, event, feat, view):
+        """Convenience method for getting and showing event image"""
+        cell_img = self.get_event_image(ds, event, feat)
+        self.show_image(feat, view, cell_img)
+
+    def show_image(self, feat, view, cell_img):
+        self.img_info[feat][view].setImage(cell_img,
+                                           **self.img_info[feat]["kwargs"])
+        if (self.img_info[feat]["cmap"] is not None
+                # performance
+                and self.img_info[feat]["cmap_changed"]):
+            self.img_info[feat]["cmap_changed"] = False
+            self.img_info[feat][view].setColorMap(self.img_info[feat]["cmap"])
+        self.img_info[feat][view].show()
 
     @staticmethod
-    def _convert_to_rgb(cellimg):
-        cellimg = cellimg.reshape(
-            cellimg.shape[0], cellimg.shape[1], 1)
-        return np.repeat(cellimg, 3, axis=2)
+    def _convert_to_rgb(cell_img):
+        cell_img = cell_img.reshape(
+            cell_img.shape[0], cell_img.shape[1], 1)
+        return np.repeat(cell_img, 3, axis=2)
 
     @staticmethod
-    def image_zoom(cellimg, mask):
+    def image_zoom(cell_img, mask):
         xv, yv = np.where(mask)
         idminx = xv.min() - 5
         idminy = yv.min() - 5
@@ -451,7 +498,7 @@ class QuickView(QtWidgets.QWidget):
         shx, shy = mask.shape
         idmaxx = idmaxx if idmaxx < shx else shx
         idmaxy = idmaxy if idmaxy < shy else shy
-        return cellimg[idminx:idmaxx, idminy:idmaxy]
+        return cell_img[idminx:idmaxx, idminy:idmaxy]
 
     def get_statistics(self):
         if self.rtdc_ds is not None:
@@ -503,16 +550,6 @@ class QuickView(QtWidgets.QWidget):
             self.toolButton_event.setChecked(True)
             self.toolButton_event.toggled.emit(True)
 
-    def display_img(self, feat, view, cellimg):
-        self.img_info[feat][view].setImage(cellimg,
-                                           **self.img_info[feat]["kwargs"])
-        if (self.img_info[feat]["cmap"] is not None
-                # performance
-                and self.img_info[feat]["cmap_changed"]):
-            self.img_info[feat]["cmap_changed"] = False
-            self.img_info[feat][view].setColorMap(self.img_info[feat]["cmap"])
-        self.img_info[feat][view].show()
-
     @QtCore.pyqtSlot(QtCore.QPointF)
     def on_event_scatter_hover(self, pos):
         """Update the image view in the polygon widget """
@@ -537,17 +574,17 @@ class QuickView(QtWidgets.QWidget):
                 try:
                     # if we have qpi data, image might be a different shape
                     if "qpi_pha" in ds:
-                        self.get_event_and_display(
+                        self.get_event_image_and_show(
                             ds, event, "qpi_pha", view)
                         if "qpi_amp" in ds:
-                            self.get_event_and_display(
+                            self.get_event_image_and_show(
                                 ds, event, "qpi_amp", view)
                     elif "image" in ds:
-                        self.get_event_and_display(
+                        self.get_event_image_and_show(
                             ds, event, "image", view)
                 except IndexError:
                     # the plot got updated, and we still have the old data
-                    self.get_event_and_display(ds, 0, "image", view)
+                    self.get_event_image_and_show(ds, 0, "image", view)
 
     @QtCore.pyqtSlot(int)
     def on_event_scatter_spin(self, event):
@@ -820,11 +857,11 @@ class QuickView(QtWidgets.QWidget):
 
             # if we have qpi data, image might be a different shape
             if "qpi_pha" in ds:
-                self.get_event_and_display(ds, event, "qpi_pha", view)
+                self.get_event_image_and_show(ds, event, "qpi_pha", view)
                 if "qpi_amp" in ds:
-                    self.get_event_and_display(ds, event, "qpi_amp", view)
+                    self.get_event_image_and_show(ds, event, "qpi_amp", view)
             elif "image" in ds:
-                self.get_event_and_display(ds, event, "image", view)
+                self.get_event_image_and_show(ds, event, "image", view)
 
             self.groupBox_image.show()
 

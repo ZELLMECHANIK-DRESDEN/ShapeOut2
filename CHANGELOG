@@ -1,5 +1,6 @@
 2.21.1
  - fix: maximize image size in QuickView
+ - fix: colormap for QPI data only updating for one image view in QuickView
  - ref: QuickView code needed tidying up
 2.21.0
  - feat: implement showing dataset basins in the analysis view (#182)

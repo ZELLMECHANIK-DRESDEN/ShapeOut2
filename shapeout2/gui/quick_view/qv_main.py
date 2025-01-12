@@ -173,21 +173,24 @@ class QuickView(QtWidgets.QWidget):
                 "view_event": self.imageView_image,
                 "view_poly": self.imageView_image_poly,
                 "cmap": None,
-                "cmap_changed": False,
+                "cmap_changed": {"view_event": False,
+                                 "view_poly": False},
                 "kwargs": dict(autoLevels=False, levels=self.levels_image),
             },
             "qpi_pha": {
                 "view_event": self.imageView_image_pha,
                 "view_poly": self.imageView_image_poly_pha,
                 "cmap": self.cmap_pha,
-                "cmap_changed": False,
+                "cmap_changed": {"view_event": False,
+                                 "view_poly": False},
                 "kwargs": dict(autoLevels=False, levels=self.levels_qpi_pha),
             },
             "qpi_amp": {
                 "view_event": self.imageView_image_amp,
                 "view_poly": self.imageView_image_poly_amp,
                 "cmap": None,
-                "cmap_changed": False,
+                "cmap_changed": {"view_event": False,
+                                 "view_poly": False},
                 "kwargs": dict(autoLevels=False, levels=self.levels_qpi_amp),
             },
         }
@@ -421,7 +424,8 @@ class QuickView(QtWidgets.QWidget):
         if self.img_info["qpi_pha"]["cmap"] != new_cmap:
             self.img_info["qpi_pha"]["cmap"] = new_cmap
             # performance
-            self.img_info["qpi_pha"]["cmap_changed"] = True
+            self.img_info["qpi_pha"]["cmap_changed"]["view_poly"] = True
+            self.img_info["qpi_pha"]["cmap_changed"]["view_event"] = True
 
         cell_img = self._insert_contour_and_zoom(
             cell_img,
@@ -484,8 +488,8 @@ class QuickView(QtWidgets.QWidget):
 
         if (self.img_info[feat]["cmap"] is not None
                 # performance
-                and self.img_info[feat]["cmap_changed"]):
-            self.img_info[feat]["cmap_changed"] = False
+                and self.img_info[feat]["cmap_changed"][view]):
+            self.img_info[feat]["cmap_changed"][view] = False
             self.img_info[feat][view].setColorMap(self.img_info[feat]["cmap"])
         self.img_info[feat][view].show()
 

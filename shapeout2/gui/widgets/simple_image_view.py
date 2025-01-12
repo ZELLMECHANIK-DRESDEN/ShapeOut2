@@ -39,6 +39,13 @@ class SimpleImageView(pg.ImageView):
 class SimpleImageViewBox(SimpleViewBox):
     export = QtCore.pyqtSignal(str)
 
+    def autoRange(self, padding=0, *args, **kwargs):
+        super(SimpleImageViewBox, self).autoRange(padding=padding,
+                                                  *args,
+                                                  **kwargs)
+        self.setMouseEnabled(x=False, y=False)
+        self.setMenuEnabled(False)
+
     def raiseContextMenu(self, ev):
         menu = self.menu
         menu.clear()

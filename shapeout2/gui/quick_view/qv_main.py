@@ -328,7 +328,8 @@ class QuickView(QtWidgets.QWidget):
         self.comboBox_y.set_dataset(rtdc_ds)
         self.comboBox_z_hue.set_dataset(rtdc_ds)
 
-    ## Showing image data
+    # Showing image data
+    ####################
     def get_event_image(self, ds, event, feat="image"):
         """Handle the image processing and contour processing for the event"""
         state = self.read_pipeline_state()
@@ -480,6 +481,7 @@ class QuickView(QtWidgets.QWidget):
     def show_image(self, feat, view, cell_img):
         self.img_info[feat][view].setImage(cell_img,
                                            **self.img_info[feat]["kwargs"])
+
         if (self.img_info[feat]["cmap"] is not None
                 # performance
                 and self.img_info[feat]["cmap_changed"]):
@@ -501,7 +503,8 @@ class QuickView(QtWidgets.QWidget):
         idmaxy = idmaxy if idmaxy < shy else shy
         return cell_img[idminx:idmaxx, idminy:idmaxy]
 
-    ## Statistics
+    # Statistics
+    ############
     def get_statistics(self):
         if self.rtdc_ds is not None:
             features = [self.comboBox_x.currentData(),
@@ -523,7 +526,8 @@ class QuickView(QtWidgets.QWidget):
         else:
             return None, None
 
-    ## Scatter Plot
+    # Scatter Plot
+    ##############
     @QtCore.pyqtSlot(object, object)
     def on_event_scatter_clicked(self, plot, point):
         """User clicked on scatter plot
@@ -600,7 +604,8 @@ class QuickView(QtWidgets.QWidget):
         event = self.spinBox_event.value()
         self.show_event(event - 1)
 
-    ## Polygon Selection
+    # Polygon Selection
+    ###################
     @QtCore.pyqtSlot()
     def on_poly_create(self):
         """User wants to create a polygon filter"""
@@ -698,7 +703,8 @@ class QuickView(QtWidgets.QWidget):
         # add ROI
         self.widget_scatter.activate_poly_mode(pf.points)
 
-    ## Buttons
+    # Buttons
+    #########
     @QtCore.pyqtSlot()
     def on_stats2clipboard(self):
         """Copy the statistics as tsv data to the clipboard"""

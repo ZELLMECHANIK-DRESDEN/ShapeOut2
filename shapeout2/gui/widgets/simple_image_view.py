@@ -43,8 +43,6 @@ class SimpleImageViewBox(SimpleViewBox):
         super(SimpleImageViewBox, self).autoRange(padding=padding,
                                                   *args,
                                                   **kwargs)
-        self.setMouseEnabled(x=False, y=False)
-        self.setMenuEnabled(False)
 
     def raiseContextMenu(self, ev):
         menu = self.menu

@@ -420,6 +420,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
             self.toolButton_new_plot.setEnabled(True)
             self.block_matrix.toolButton_new_plot.setEnabled(True)
 
+        failed_paths = []
+
         slot_ids = []
         # Create Dataslot instance and update block matrix
         self.setUpdatesEnabled(False)
@@ -432,9 +434,19 @@ class ShapeOut2(QtWidgets.QMainWindow):
             # add a filter if we don't have one already
             if self.pipeline.num_filters == 0:
                 self.add_filter()
-            slot_id = self.pipeline.add_slot(path=path)
+            try:
+                slot_id = self.pipeline.add_slot(path=path)
+            except BaseException:
+                if len(paths) == 1:
+                    # Let the user know immediately
+                    raise
+                else:
+                    failed_paths.append(path)
+                continue
+
             self.block_matrix.add_dataset(slot_id=slot_id)
             slot_ids.append(slot_id)
+
         self.setUpdatesEnabled(True)
         self.repaint()
 
@@ -444,6 +456,17 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.widget_ana_view.widget_slot.update_content()
         # redraw
         self.block_matrix.update()
+
+        if failed_paths:
+            failed_text = ("The following files could not be loaded. You can "
+                           "open them individually to see the corresponding "
+                           "error message during loading.\n")
+            for path in failed_paths:
+                failed_text += f"- {path}\n"
+            QtWidgets.QMessageBox.warning(self,
+                                          "Failed to load some datasets",
+                                          failed_text)
+
         return slot_ids
 
     @QtCore.pyqtSlot()

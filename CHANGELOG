@@ -1,3 +1,5 @@
+2.21.2
+ - enh: when batch-loading datasets, allow individual files to fail
 2.21.1
  - fix: maximize image size in QuickView
  - fix: colormap for QPI data only updating for one image view in QuickView

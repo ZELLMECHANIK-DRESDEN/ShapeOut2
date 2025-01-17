@@ -89,6 +89,8 @@ class TablesPanel(QtWidgets.QWidget):
             if self._selected_table in table_names:
                 table_idx = table_names.index(self._selected_table)
                 self.listWidget_table_name.setCurrentRow(table_idx)
+            elif len(table_names):
+                self.listWidget_table_name.setCurrentRow(0)
 
     @QtCore.pyqtSlot(int)
     def on_select_table(self, table_index):
@@ -134,7 +136,9 @@ class TablesPanel(QtWidgets.QWidget):
         table_index = self.listWidget_table_name.currentRow()
         if ds_idx >= 0 and table_index >= 0:
             items = self.listWidget_table_graphs.selectedIndexes()
-            self._selected_graphs = [it.data() for it in items]
+            new_selection = [it.data() for it in items]
+            if new_selection:
+                self._selected_graphs = new_selection
             ds = self._pipeline.slots[ds_idx].get_dataset()
             table = ds.tables[list(ds.tables.keys())[table_index]]
             table_data = table[:]
@@ -147,7 +151,7 @@ class TablesPanel(QtWidgets.QWidget):
                 x_vals = {"name": "index",
                           "data": np.arange(len(table_data))}
 
-            for graph in self._selected_graphs:
+            for graph in new_selection:
                 graph_list.append({
                     "name": graph,
                     "data": table_data[graph].flatten(),
@@ -156,10 +160,13 @@ class TablesPanel(QtWidgets.QWidget):
                                                                  "black")
                                              )
                 })
-            # show the graph
-            self.show_graph(x_vals, graph_list)
-            self.show_raw_data(graph_list)
-            self.graphicsView.autoRange()
+            if new_selection:
+                # show the graph
+                self.show_graph(x_vals, graph_list)
+                self.show_raw_data(graph_list)
+                self.graphicsView.autoRange()
+            else:
+                self.graphicsView.clear()
         else:
             self.listWidget_table_graphs.clear()
 

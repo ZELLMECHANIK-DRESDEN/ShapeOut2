@@ -43,7 +43,7 @@ class LogPanel(QtWidgets.QWidget):
             if self._selected_log in log_names:
                 log_idx = log_names.index(self._selected_log)
                 self.listWidget_log_name.setCurrentRow(log_idx)
-            else:
+            elif len(log_names):
                 self.listWidget_log_name.setCurrentRow(0)
 
     @QtCore.pyqtSlot(int)

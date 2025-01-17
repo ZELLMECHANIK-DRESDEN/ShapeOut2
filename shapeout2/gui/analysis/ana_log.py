@@ -18,6 +18,7 @@ class LogPanel(QtWidgets.QWidget):
             uic.loadUi(path_ui, self)
         # current Shape-Out 2 pipeline
         self._pipeline = None
+        self._selected_log = None
         self.listWidget_dataset.currentRowChanged.connect(
             self.on_select_dataset)
         self.listWidget_log_name.currentRowChanged.connect(
@@ -34,8 +35,16 @@ class LogPanel(QtWidgets.QWidget):
         self.listWidget_log_name.clear()
         if ds_idx >= 0:
             ds = self._pipeline.slots[ds_idx].get_dataset()
-            for log in ds.logs:
+            log_names = list(ds.logs.keys())
+            for log in log_names:
                 self.listWidget_log_name.addItem(log)
+
+            # Apply previously selected log
+            if self._selected_log in log_names:
+                log_idx = log_names.index(self._selected_log)
+                self.listWidget_log_name.setCurrentRow(log_idx)
+            else:
+                self.listWidget_log_name.setCurrentRow(0)
 
     @QtCore.pyqtSlot(int)
     def on_select_log(self, log_index):

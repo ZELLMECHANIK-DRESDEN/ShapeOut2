@@ -471,15 +471,20 @@ class SlotPanel(QtWidgets.QWidget):
     def show_slot(self, slot_id):
         self.update_content(slot_index=self.slot_ids.index(slot_id))
 
-    def update_content(self, event=None, slot_index=None):
+    def update_content(self, slot_index=None, **kwargs):
         if self.slot_ids:
+            # remember the previous slot index and make sure it is sane
+            prev_index = self.comboBox_slots.currentIndex()
+            if prev_index is None or prev_index < 0:
+                prev_index = len(self.slot_ids) - 1
+
             self.setEnabled(True)
             # update combobox
             self.comboBox_slots.blockSignals(True)
-            if slot_index is None:
-                slot_index = self.comboBox_slots.currentIndex()
-                if slot_index > len(self.slot_ids) - 1 or slot_index < 0:
-                    slot_index = len(self.slot_ids) - 1
+            if slot_index is None or slot_index < 0:
+                slot_index = prev_index
+            slot_index = min(slot_index, len(self.slot_ids) - 1)
+
             self.comboBox_slots.clear()
             self.comboBox_slots.addItems(self.slot_names)
             self.comboBox_slots.setCurrentIndex(slot_index)
@@ -493,11 +498,7 @@ class SlotPanel(QtWidgets.QWidget):
 
     def write_slot(self):
         """Update the shapeout2.pipeline.Dataslot instance"""
-        # get current index
         slot_state = self.read_pipeline_state()
-        slot = self.pipeline.get_slot(slot_state["identifier"])
-        # This is important, otherwise update_content will not have the
-        # latest state.
-        slot.__setstate__(slot_state)
-        self.update_content()  # update slot combobox and visible fl names
+        # this signal will update the main pipeline which will trigger
+        # a call to `set_pipeline` and `update_content`.
         self.slot_changed.emit(slot_state)

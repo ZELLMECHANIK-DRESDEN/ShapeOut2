@@ -84,15 +84,15 @@ class MetaPanel(QtWidgets.QWidget):
             group_box.hide()
         self.update()
 
-    def update_content(self, event=None, slot_index=None):
+    def update_content(self, slot_index=None, **kwargs):
         if self.slot_ids:
             self.setEnabled(True)
             # update combobox
             self.comboBox_slots.blockSignals(True)
-            if slot_index is None:
-                slot_index = self.comboBox_slots.currentIndex()
-                if slot_index > len(self.slot_ids) - 1 or slot_index < 0:
-                    slot_index = len(self.slot_ids) - 1
+            if slot_index is None or slot_index < 0:
+                slot_index = max(0, self.comboBox_slots.currentIndex())
+            slot_index = min(slot_index, len(self.slot_ids) - 1)
+
             self.comboBox_slots.clear()
             self.comboBox_slots.addItems(self.slot_names)
             self.comboBox_slots.setCurrentIndex(slot_index)

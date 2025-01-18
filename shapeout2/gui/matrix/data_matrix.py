@@ -247,8 +247,12 @@ class DataMatrix(QtWidgets.QWidget):
 
     def changed_quickview(self):
         slot_index_qv, filt_index_qv = self.get_quickview_indices()
-        if slot_index_qv is not None and filt_index_qv is not None:
-            self.quickviewed.emit(slot_index_qv, filt_index_qv)
+        # events must be integer, use -1 to indicate None
+        if slot_index_qv is None:
+            slot_index_qv = -1
+        if filt_index_qv is None:
+            filt_index_qv = -1
+        self.quickviewed.emit(slot_index_qv, filt_index_qv)
 
     def enable_quickview(self, b=True):
         if b:

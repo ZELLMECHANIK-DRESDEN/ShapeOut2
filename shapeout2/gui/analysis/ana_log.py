@@ -102,7 +102,7 @@ class LogPanel(QtWidgets.QWidget):
     def set_pipeline(self, pipeline):
         self._pipeline = pipeline
 
-    def update_content(self, event=None, filt_index=None):
+    def update_content(self, slot_index=None, **kwargs):
         if self._pipeline and self._pipeline.slots:
             self.setEnabled(True)
             self.setUpdatesEnabled(False)
@@ -111,7 +111,10 @@ class LogPanel(QtWidgets.QWidget):
             for slot in self._pipeline.slots:
                 self.listWidget_dataset.addItem(slot.name)
             self.setUpdatesEnabled(True)
-            self.listWidget_dataset.setCurrentRow(0)
+            if slot_index is None or slot_index < 0:
+                slot_index = max(0, self.listWidget_dataset.currentRow())
+            slot_index = min(slot_index, self._pipeline.num_slots - 1)
+            self.listWidget_dataset.setCurrentRow(slot_index)
         else:
             self.setEnabled(False)
             self.listWidget_dataset.clear()

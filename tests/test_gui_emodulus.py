@@ -192,6 +192,9 @@ def test_switch_and_update_chip_region(qtbot):
     em1 = mw.block_matrix.get_widget(slot_id=slot_id1)
     em2 = mw.block_matrix.get_widget(slot_id=slot_id2)
     qtbot.mouseClick(em1.toolButton_modify, QtCore.Qt.MouseButton.LeftButton)
+    QtWidgets.QApplication.processEvents(
+        QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
+    assert wsl.comboBox_slots.currentIndex() == 0
     # set temperature manually
     idm = wsl.comboBox_temp.findData("manual")
     wsl.comboBox_temp.setCurrentIndex(idm)
@@ -207,6 +210,7 @@ def test_switch_and_update_chip_region(qtbot):
 
     # switch to the second (reservoir) measurement
     qtbot.mouseClick(em2.toolButton_modify, QtCore.Qt.MouseButton.LeftButton)
+    assert wsl.comboBox_slots.currentIndex() == 1
     assert not wsl.groupBox_emod.isVisible()
     # now switch back
     qtbot.mouseClick(em1.toolButton_modify, QtCore.Qt.MouseButton.LeftButton)

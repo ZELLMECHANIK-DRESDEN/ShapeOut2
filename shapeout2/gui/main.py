@@ -554,6 +554,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
         self.subwindows["analysis_view"] = sub
         # signals
         self.toolButton_ana_view.clicked.connect(sub.setVisible)
+        self.block_matrix.quickviewed.connect(
+            self.widget_ana_view.on_quickview)
         # applying a new filter triggers updating QuickView
         self.widget_ana_view.widget_filter.pushButton_apply.clicked.connect(
             self.on_quickview_refresh)
@@ -992,8 +994,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
 
     @widgets.show_wait_cursor
     @QtCore.pyqtSlot(int, int)
-    def on_quickview_show_dataset(self, slot_index, filt_index,
-                                  update_ana_filter=True):
+    def on_quickview_show_dataset(self,
+                                  slot_index: int,
+                                  filt_index: int,
+                                  update_ana_filter: bool = True):
         """Update QuickView dataset (User selected new dataset)
 
         Parameters
@@ -1008,6 +1012,8 @@ class ShapeOut2(QtWidgets.QMainWindow):
             the one where QuickView is currently set active. If
             False, nothing is changed.
         """
+        if slot_index < 0 or filt_index < 0:
+            return
         ds = self.pipeline.get_dataset(slot_index=slot_index,
                                        filt_index=filt_index,
                                        apply_filter=True)

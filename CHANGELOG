@@ -1,4 +1,5 @@
 2.21.2
+ - fix: signal race condition when editing filters in AnalysisView (#148)
  - enh: when batch-loading datasets, allow individual files to fail
  - enh: auto-select logs in AnalysisView
  - enh: improve table graph selection (remember graph, clear if unavailable)

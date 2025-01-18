@@ -250,16 +250,22 @@ class FilterPanel(QtWidgets.QWidget):
     def show_filter(self, filt_id):
         self.update_content(filt_index=self.filter_ids.index(filt_id))
 
-    def update_content(self, event=None, filt_index=None):
+    def update_content(self, filt_index=None, **kwargs):
         if self.filter_ids:
+            # remember the previous filter index and make sure it is sane
+            prev_index = self.comboBox_filters.currentIndex()
+            if prev_index is None or prev_index < 0:
+                prev_index = len(self.filter_ids) - 1
+
             self.setEnabled(True)
             self.update_polygon_filters(update_state=False)
             # update combobox
             self.comboBox_filters.blockSignals(True)
-            if filt_index is None:
-                filt_index = self.comboBox_filters.currentIndex()
-                if filt_index > len(self.filter_ids) - 1 or filt_index < 0:
-                    filt_index = len(self.filter_ids) - 1
+            if filt_index is None or filt_index < 0:
+                # fallback to previous filter index
+                filt_index = prev_index
+            filt_index = min(filt_index, len(self.filter_ids) - 1)
+
             self.comboBox_filters.clear()
             self.comboBox_filters.addItems(self.filter_names)
             self.comboBox_filters.setCurrentIndex(filt_index)
@@ -330,5 +336,6 @@ class FilterPanel(QtWidgets.QWidget):
         """Update the shapeout2.pipeline.Filter instance"""
         # get current index
         filter_state = self.read_pipeline_state()
+        # this signal will update the main pipeline which will trigger
+        # a call to `set_pipeline` and `update_content`.
         self.filter_changed.emit(filter_state)
-        self.update_content()  # update filter selection combobox

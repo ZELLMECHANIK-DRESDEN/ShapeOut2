@@ -578,16 +578,21 @@ class PlotPanel(QtWidgets.QWidget):
     def set_pipeline(self, pipeline):
         self._pipeline = pipeline
 
-    def update_content(self, event=None, plot_index=None):
+    def update_content(self, plot_index=None, **kwargs):
         if self.plot_ids:
+            # remember the previous plot index and make sure it is sane
+            prev_index = self.comboBox_plots.currentIndex()
+            if prev_index is None or prev_index < 0:
+                prev_index = len(self.plot_ids) - 1
+
             self.setEnabled(True)
             # update combobox
             self.comboBox_plots.blockSignals(True)
             # this also updates the combobox
-            if plot_index is None:
-                plot_index = self.comboBox_plots.currentIndex()
-                if plot_index > len(self.plot_ids) - 1 or plot_index < 0:
-                    plot_index = len(self.plot_ids) - 1
+            if plot_index is None or plot_index < 0:
+                plot_index = prev_index
+            plot_index = min(plot_index, len(self.plot_ids) - 1)
+
             self.comboBox_plots.clear()
             self.comboBox_plots.addItems(self.plot_names)
             self.comboBox_plots.setCurrentIndex(plot_index)
@@ -626,9 +631,7 @@ class PlotPanel(QtWidgets.QWidget):
     def write_plot(self):
         """Update the shapeout2.pipeline.Plot instance"""
         # get current index
-        plot_index = self.comboBox_plots.currentIndex()
-        plot = Plot.get_plot(identifier=self.plot_ids[plot_index])
         plot_state = self.read_pipeline_state()
-        plot.__setstate__(plot_state)
-        self.update_content()  # update plot selection combobox
+        # this signal will update the main pipeline which will trigger
+        # a call to `set_pipeline` and `update_content`.
         self.plot_changed.emit(plot_state)

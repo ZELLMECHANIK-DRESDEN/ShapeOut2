@@ -109,7 +109,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_plot">
       <attribute name="title">
@@ -117,7 +117,46 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
-        <widget class="SimplePlotWidget" name="graphicsView"/>
+        <widget class="QStackedWidget" name="stackedWidget_plot">
+         <widget class="QWidget" name="page_graph">
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="SimplePlotWidget" name="graphicsView_lines"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="page_image">
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="SimpleImageView" name="graphicsView_image"/>
+           </item>
+          </layout>
+         </widget>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -142,6 +181,11 @@
  <customwidgets>
   <customwidget>
    <class>SimplePlotWidget</class>
+   <extends>QGraphicsView</extends>
+   <header>shapeout2.gui.widgets</header>
+  </customwidget>
+  <customwidget>
+   <class>SimpleImageView</class>
    <extends>QGraphicsView</extends>
    <header>shapeout2.gui.widgets</header>
   </customwidget>

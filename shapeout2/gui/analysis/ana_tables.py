@@ -56,8 +56,8 @@ class TablesPanel(QtWidgets.QWidget):
         self._selected_graphs = []
         self.legend = pg.LegendItem((80, 60),
                                     offset=(40, 20))
-        self.legend.setParentItem(self.graphicsView.graphicsItem())
-        self.graphicsView.showGrid(True, True)
+        self.legend.setParentItem(self.graphicsView_lines.graphicsItem())
+        self.graphicsView_lines.showGrid(True, True)
         self.tabWidget.setCurrentIndex(0)
 
         self.listWidget_dataset.currentRowChanged.connect(
@@ -102,29 +102,34 @@ class TablesPanel(QtWidgets.QWidget):
             table = ds.tables[self._selected_table]
             names = table[:].dtype.names
 
-            self.listWidget_table_graphs.blockSignals(True)
-            self.listWidget_table_graphs.clear()
+            if names is not None:
+                self.stackedWidget_plot.setCurrentWidget(self.page_graph)
+                self.listWidget_table_graphs.blockSignals(True)
+                self.listWidget_table_graphs.clear()
+                # We have a rec-array, a list of graphs in the table
+                for ii, graph in enumerate(names):
+                    self.listWidget_table_graphs.addItem(graph)
+                    color = table.attrs.get(f"COLOR_{graph}",
+                                            FALLBACK_COLORS.get(graph,
+                                                                "black")
+                                            )
+                    self.listWidget_table_graphs.item(ii).setBackground(
+                        QtGui.QColor(color))
+                    self.listWidget_table_graphs.item(ii).setForeground(
+                        QtGui.QColor(get_foreground_for_background(color)))
 
-            for ii, graph in enumerate(names):
-                self.listWidget_table_graphs.addItem(graph)
-                color = table.attrs.get(f"COLOR_{graph}",
-                                        FALLBACK_COLORS.get(graph,
-                                                            "black")
-                                        )
-                self.listWidget_table_graphs.item(ii).setBackground(
-                    QtGui.QColor(color))
-                self.listWidget_table_graphs.item(ii).setForeground(
-                    QtGui.QColor(get_foreground_for_background(color)))
-
-            # Apply previously selected graphs
-            for graph in names:
-                if graph in list(self._selected_graphs):
-                    graph_index = names.index(graph)
-                    item = self.listWidget_table_graphs.item(graph_index)
-                    if item:
-                        item.setSelected(True)
-            self.listWidget_table_graphs.blockSignals(False)
-            self.on_select_graphs()
+                # Apply previously selected graphs
+                for graph in names:
+                    if graph in list(self._selected_graphs):
+                        graph_index = names.index(graph)
+                        item = self.listWidget_table_graphs.item(graph_index)
+                        if item:
+                            item.setSelected(True)
+                self.listWidget_table_graphs.blockSignals(False)
+                self.on_select_graphs()
+            else:
+                self.stackedWidget_plot.setCurrentWidget(self.page_image)
+                self.graphicsView_image.setImage(table[:])
         else:
             self.listWidget_table_name.clear()
             self.listWidget_table_graphs.clear()
@@ -164,9 +169,9 @@ class TablesPanel(QtWidgets.QWidget):
                 # show the graph
                 self.show_graph(x_vals, graph_list)
                 self.show_raw_data(graph_list)
-                self.graphicsView.autoRange()
+                self.graphicsView_lines.autoRange()
             else:
-                self.graphicsView.clear()
+                self.graphicsView_lines.clear()
         else:
             self.listWidget_table_graphs.clear()
 
@@ -174,10 +179,10 @@ class TablesPanel(QtWidgets.QWidget):
         self._pipeline = pipeline
 
     def show_graph(self, x_vals, graph_list):
-        self.graphicsView.clear()
+        self.graphicsView_lines.clear()
         self.legend.clear()
         for item in graph_list:
-            pl = self.graphicsView.plot(
+            pl = self.graphicsView_lines.plot(
                 pen={"color": item["color"],
                      "width": 2},
                 x=x_vals["data"],
@@ -186,7 +191,7 @@ class TablesPanel(QtWidgets.QWidget):
             )
 
             self.legend.addItem(pl, item["name"])
-        self.graphicsView.plotItem.setLabels(bottom=x_vals["name"])
+        self.graphicsView_lines.plotItem.setLabels(bottom=x_vals["name"])
 
     def show_raw_data(self, graph_list):
         text = "\t".join(it["name"] for it in graph_list)

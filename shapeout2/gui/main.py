@@ -437,7 +437,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
             try:
                 slot_id = self.pipeline.add_slot(path=path)
             except BaseException:
-                if len(paths) == 1:
+                if len(fnames) == 1:
                     # Let the user know immediately
                     raise
                 else:

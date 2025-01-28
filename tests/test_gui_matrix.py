@@ -49,6 +49,31 @@ def test_matrix_slots(qtbot):
     assert not mw.pipeline.is_element_active(slot_id2, filt_id)
 
 
+def test_matrix_filter_duplicate_issue_184(qtbot):
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+
+    # add a dataslot
+    path = pathlib.Path(__file__).parent / "data" / "calibration_beads_47.rtdc"
+    mw.add_dataslot(paths=[path])
+
+    assert len(mw.pipeline.slot_ids) == 1, "we added that"
+    assert len(mw.pipeline.filter_ids) == 1, "automatically added"
+
+    # duplicate the filter
+    fwid = mw.block_matrix.get_widget(
+        filt_plot_id=mw.pipeline.filters[0].identifier)
+    fwid.action_duplicate()
+
+    assert len(mw.pipeline.slot_ids) == 1, "initial"
+    assert len(mw.pipeline.filter_ids) == 2, "automatically added + duplicate"
+
+    # make sure that slot name is the same
+    assert mw.pipeline.slots[0].name == "calibration_beads"
+    assert mw.pipeline.filters[0].name == "Filter_1"
+    assert mw.pipeline.filters[1].name == "Filter_2"
+
+
 def test_matrix_slots_duplicate_issue_96(qtbot):
     mw = ShapeOut2()
     qtbot.addWidget(mw)

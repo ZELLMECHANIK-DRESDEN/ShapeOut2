@@ -414,7 +414,7 @@ class DataMatrix(QtWidgets.QWidget):
     @QtCore.pyqtSlot(str)
     def on_option_filter(self, option):
         """Filter option logic (remove, duplicate)"""
-        fw_state = self.sender().__getstate__()
+        fw_state = self.sender().read_pipeline_state()
         filt_id = fw_state["identifier"]
         filt_index = self.get_filter_index(filt_id)
         state = self.read_pipeline_state()

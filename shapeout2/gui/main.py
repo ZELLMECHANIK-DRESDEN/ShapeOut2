@@ -842,6 +842,7 @@ class ShapeOut2(QtWidgets.QMainWindow):
                         break
                 else:
                     break
+            self.show()
             self.reload_pipeline()
             self.setWindowTitle(
                 f"{pathlib.Path(path).name} [Shape-Out {version}]")

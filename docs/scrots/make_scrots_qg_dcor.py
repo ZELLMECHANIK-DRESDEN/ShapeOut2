@@ -2,7 +2,7 @@
 import sys
 import time
 
-from PyQt6 import QtCore
+from PyQt6 import QtCore, QtTest
 from PyQt6.QtWidgets import QApplication
 from shapeout2.gui.main import ShapeOut2
 from shapeout2.gui import dcor
@@ -22,10 +22,12 @@ dlg.lineEdit_search.setText("sorting")
 dlg.on_search()
 # Now the dialog searches in another thread. Wait a little
 # and only then take a screenshot.
-for _ in range(5):
-    time.sleep(.5)
-    if dlg.listWidget.count() < 5:
-        continue
+for _ in range(10):
+    QtTest.QTest.qWait(500)
+    if dlg.listWidget.count() > 10:
+        break
+else:
+    print("No search results")
 # force redraw of scrollbars
 dlg.listWidget.scrollToBottom()
 dlg.listWidget.scrollToTop()

@@ -1,6 +1,5 @@
 """Screenshots for quick guide dcor"""
 import sys
-import time
 
 from PyQt6 import QtCore, QtTest
 from PyQt6.QtWidgets import QApplication

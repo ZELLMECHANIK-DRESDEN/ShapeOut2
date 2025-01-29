@@ -6,6 +6,7 @@
  - fix: base automated plot size adjustment on minimal plot dimensions (#180)
  - docs: update screenshot scripts
  - enh: allow to change plot window size via edge handles (#51)
+ - setup: migrate pyqtgraph from 0.13.3 to 0.13.6 (#109)
 2.21.3
  - enh: support displaying unnamed table data
  - setup: bump dclab to 0.62.11

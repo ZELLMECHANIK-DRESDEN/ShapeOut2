@@ -13,11 +13,6 @@ class ShapeOutColorBarItem(pg.ColorBarItem):
         super(ShapeOutColorBarItem, self).__init__(
             colorMap=colorMap,
             # TODO: Removing `cmap=colorMap` results in grayscale colormaps.
-            # https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/109
-            # This does not make sense at all. But maybe some mysteries are
-            # meant to stay hidden indefinitely. Maybe in July 2022, when
-            # pyqtgraph drops the "cmap" argument, it will just work...
-            cmap=colorMap,
             *args, **kwargs)
 
         # show label on right side

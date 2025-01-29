@@ -3,6 +3,7 @@
  - fix: duplicate filters via block matrix results in AttributeError (#184)
  - fix: plot sizes chaotic due to improper use of setFixedSize (#176)
  - fix: plot size not set correctly when loading session
+ - fix: base automated plot size adjustment on minimal plot dimensions (#180)
  - enh: allow to change plot window size via edge handles (#51)
 2.21.3
  - enh: support displaying unnamed table data

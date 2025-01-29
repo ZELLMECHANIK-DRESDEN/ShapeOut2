@@ -281,8 +281,13 @@ class ShapeOut2(QtWidgets.QMainWindow):
                 # the plot was removed
                 continue
             else:
-                lay["size x"] += 200*(new_ncol-old_ncol)
-                lay["size y"] += 200*(new_nrow-old_nrow)
+                # we are aiming for a square plot aspect ratio
+                plot_width = lay["size x"] / new_ncol
+                plot_height = lay["size y"] / new_nrow
+                if plot_width < 200:
+                    lay["size x"] += 200 * (new_ncol - old_ncol)
+                if plot_height < 200:
+                    lay["size y"] += 200*(new_nrow-old_nrow)
         # set the new state of the pipeline
         self.pipeline.__setstate__(pipeline_state)
         # update BlockMatrix

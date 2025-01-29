@@ -1,6 +1,8 @@
 2.21.4
  - fix: incorrect path list check when loading broken dataset
  - fix: duplicate filters via block matrix results in AttributeError (#184)
+ - fix: plot sizes chaotic due to improper use of setFixedSize (#176)
+ - enh: allow to change plot window size via edge handles (#51)
 2.21.3
  - enh: support displaying unnamed table data
  - setup: bump dclab to 0.62.11

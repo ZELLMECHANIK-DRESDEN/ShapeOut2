@@ -54,6 +54,8 @@ class PipelinePlot(QtWidgets.QWidget):
         # used to avoid unnecessary plotting
         self._plot_data_hash = "unset"
 
+        self._window_decoration_size = (None, None)
+
         #: Contains the PipelinePlotItems
         self.plot_items = []
         self.pipeline = pipeline
@@ -85,10 +87,34 @@ class PipelinePlot(QtWidgets.QWidget):
         plot_data_hash = util.hashobj(tohash)
         if plot_data_hash == self._plot_data_hash:
             # do nothing
-            return
+            pass
         else:
             self._plot_data_hash = plot_data_hash
+            self.update_content_plot(plot_state, slot_states, dslist)
 
+        # Set size in the end (after layout is populated)
+        lay = plot_state["layout"]
+        wsize_x = lay["size x"] + (self._window_decoration_size[0] or 8)
+        wsize_y = lay["size y"] + (self._window_decoration_size[1] or 28)
+
+        parent.resize(QtCore.QSize(wsize_x, wsize_y))
+
+        if self._window_decoration_size[0] is None:
+            psize = self.parent().sizeHint()
+            csize = self.sizeHint()
+            if (psize.width() == wsize_x
+                and psize.height() == wsize_y
+                and psize.width() > csize.width()
+                    and psize.height() > csize.height()):
+                # We successfully set the size of the parent window. This
+                # means that we can now compute the window decoration size.
+                self._window_decoration_size = (
+                    psize.width() - csize.width(),
+                    psize.height() - csize.height())
+        self.plot_layout.updateGeometry()
+        self.update()
+
+    def update_content_plot(self, plot_state, slot_states, dslist):
         # abbreviations
         gen = plot_state["general"]
         lay = plot_state["layout"]
@@ -221,14 +247,6 @@ class PipelinePlot(QtWidgets.QWidget):
         # x-axis label
         self.plot_layout.nextRow()
         self.plot_layout.addLabel(labelx, col=1)
-
-        # Set size in the end (after layout is populated)
-        self.setMinimumSize(lay["size x"], lay["size y"])
-        self.setMaximumSize(lay["size x"], lay["size y"])
-        size_hint = self.parent().sizeHint()
-        parent.setMinimumSize(size_hint)
-        parent.setMaximumSize(size_hint)
-        self.plot_layout.updateGeometry()
 
 
 class PipelinePlotItem(SimplePlotItem):

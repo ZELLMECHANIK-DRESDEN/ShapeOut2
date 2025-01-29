@@ -502,11 +502,10 @@ class ShapeOut2(QtWidgets.QMainWindow):
                                             pipeline=self.pipeline,
                                             plot_id=plot_id)
             self.plots_changed.connect(pw.update_content)
-            pw.update_content()
             sub.setWidget(pw)
+            pw.update_content()
             self.mdiArea.addSubWindow(sub)
             self.subwindows_plots[plot_id] = sub
-            sub.setFixedSize(sub.sizeHint())
         sub.show()
 
     def closeEvent(self, event):

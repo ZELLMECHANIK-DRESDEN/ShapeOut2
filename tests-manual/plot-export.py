@@ -13,7 +13,7 @@ here = pathlib.Path(__file__).parent
 
 # instantiate Shape-Out
 app = QApplication(sys.argv)
-QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.C))
+QtCore.QLocale.setDefault(QtCore.QLocale(QtCore.QLocale.Language.C))
 mw = ShapeOut2()
 
 # load session

@@ -4,7 +4,7 @@
  - fix: plot sizes chaotic due to improper use of setFixedSize (#176)
  - fix: plot size not set correctly when loading session
  - fix: base automated plot size adjustment on minimal plot dimensions (#180)
- - docs: update screenshot scripts
+ - docs: update screenshot scripts and refresh screenshots
  - enh: allow to change plot window size via edge handles (#51)
  - setup: migrate pyqtgraph from 0.13.3 to 0.13.6 (#109)
 2.21.3

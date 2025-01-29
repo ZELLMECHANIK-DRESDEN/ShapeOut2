@@ -35,7 +35,6 @@ mw.reload_pipeline()
 mw.on_modify_slot(mw.pipeline.slot_ids[0])
 mw.widget_ana_view.repaint()
 wsl = mw.widget_ana_view.widget_slot
-wsl.comboBox_visc_model.setCurrentIndex(0)
 wsl.groupBox_emod.setFixedSize(420, 140)
 
 wsl.comboBox_medium.setCurrentIndex(

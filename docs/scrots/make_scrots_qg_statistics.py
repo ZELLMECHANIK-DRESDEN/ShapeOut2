@@ -1,7 +1,7 @@
 """Screenshots for quick guide statistics"""
 import sys
 
-from PyQt6 import QtCore, QtWidgets
+from PyQt6 import QtCore
 from PyQt6.QtWidgets import QApplication
 from shapeout2.gui.main import ShapeOut2
 from shapeout2.gui import compute

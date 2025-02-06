@@ -41,7 +41,7 @@ def get_foreground_for_background(color):
 class TablesPanel(QtWidgets.QWidget):
     """Tables panel widget
 
-    Visualizes tables stored in the .rtdc file
+    Visualize tables stored in the .rtdc file
     """
 
     def __init__(self, *args, **kwargs):
@@ -103,10 +103,12 @@ class TablesPanel(QtWidgets.QWidget):
             names = table[:].dtype.names
 
             if names is not None:
+                # We have a rec-array, a list of graphs in the table
+                self.listWidget_table_graphs.setEnabled(True)
                 self.stackedWidget_plot.setCurrentWidget(self.page_graph)
+                # Update list of graphs names
                 self.listWidget_table_graphs.blockSignals(True)
                 self.listWidget_table_graphs.clear()
-                # We have a rec-array, a list of graphs in the table
                 for ii, graph in enumerate(names):
                     self.listWidget_table_graphs.addItem(graph)
                     color = table.attrs.get(f"COLOR_{graph}",
@@ -128,9 +130,12 @@ class TablesPanel(QtWidgets.QWidget):
                 self.listWidget_table_graphs.blockSignals(False)
                 self.on_select_graphs()
             else:
+                self.listWidget_table_graphs.setEnabled(False)
+                self.listWidget_table_graphs.clear()
                 self.stackedWidget_plot.setCurrentWidget(self.page_image)
                 self.graphicsView_image.setImage(table[:])
         else:
+            self.listWidget_table_graphs.setEnabled(False)
             self.listWidget_table_name.clear()
             self.listWidget_table_graphs.clear()
 
@@ -147,31 +152,33 @@ class TablesPanel(QtWidgets.QWidget):
             ds = self._pipeline.slots[ds_idx].get_dataset()
             table = ds.tables[list(ds.tables.keys())[table_index]]
             table_data = table[:]
-            # assemble the graph list
-            graph_list = []
-            if "time" in table_data.dtype.names:
-                x_vals = {"name": "time",
-                          "data": table_data["time"].flatten()}
-            else:
-                x_vals = {"name": "index",
-                          "data": np.arange(len(table_data))}
+            names = table_data.dtype.names
+            if names is not None:
+                # assemble the graph list
+                graph_list = []
+                if "time" in names:
+                    x_vals = {"name": "time",
+                              "data": table_data["time"].flatten()}
+                else:
+                    x_vals = {"name": "index",
+                              "data": np.arange(len(table_data))}
 
-            for graph in new_selection:
-                graph_list.append({
-                    "name": graph,
-                    "data": table_data[graph].flatten(),
-                    "color": table.attrs.get(f"COLOR_{graph}",
-                                             FALLBACK_COLORS.get(graph,
-                                                                 "black")
-                                             )
-                })
-            if new_selection:
-                # show the graph
-                self.show_graph(x_vals, graph_list)
-                self.show_raw_data(graph_list)
-                self.graphicsView_lines.autoRange()
-            else:
-                self.graphicsView_lines.clear()
+                for graph in new_selection:
+                    graph_list.append({
+                        "name": graph,
+                        "data": table_data[graph].flatten(),
+                        "color": table.attrs.get(f"COLOR_{graph}",
+                                                 FALLBACK_COLORS.get(graph,
+                                                                     "black")
+                                                 )
+                    })
+                if new_selection:
+                    # show the graph
+                    self.show_graph(x_vals, graph_list)
+                    self.show_raw_data(graph_list)
+                    self.graphicsView_lines.autoRange()
+                else:
+                    self.graphicsView_lines.clear()
         else:
             self.listWidget_table_graphs.clear()
 

@@ -111,10 +111,10 @@ class TablesPanel(QtWidgets.QWidget):
                 self.listWidget_table_graphs.clear()
                 for ii, graph in enumerate(names):
                     self.listWidget_table_graphs.addItem(graph)
-                    color = table.attrs.get(f"COLOR_{graph}",
-                                            FALLBACK_COLORS.get(graph,
-                                                                "black")
-                                            )
+                    color = table.meta.get(f"COLOR_{graph}",
+                                           FALLBACK_COLORS.get(graph,
+                                                               "black")
+                                           )
                     self.listWidget_table_graphs.item(ii).setBackground(
                         QtGui.QColor(color))
                     self.listWidget_table_graphs.item(ii).setForeground(
@@ -153,7 +153,7 @@ class TablesPanel(QtWidgets.QWidget):
             table = ds.tables[list(ds.tables.keys())[table_index]]
             table_data = table[:]
             names = table_data.dtype.names
-            if names is not None:
+            if table.has_graphs():
                 # assemble the graph list
                 graph_list = []
                 if "time" in names:
@@ -167,10 +167,10 @@ class TablesPanel(QtWidgets.QWidget):
                     graph_list.append({
                         "name": graph,
                         "data": table_data[graph].flatten(),
-                        "color": table.attrs.get(f"COLOR_{graph}",
-                                                 FALLBACK_COLORS.get(graph,
-                                                                     "black")
-                                                 )
+                        "color": table.meta.get(f"COLOR_{graph}",
+                                                FALLBACK_COLORS.get(graph,
+                                                                    "black")
+                                                )
                     })
                 if new_selection:
                     # show the graph

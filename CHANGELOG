@@ -1,5 +1,7 @@
 2.21.5
  - fix: disable table graphs widget when an image-type table is shown
+ - fix: accessing table data from DCOR
+ - setup: bump dclab to 0.62.13
 2.21.4
  - fix: incorrect path list check when loading broken dataset
  - fix: duplicate filters via block matrix results in AttributeError (#184)

@@ -1,7 +1,10 @@
 import importlib.resources
 
 import dclab
-from dclab.features.emodulus.viscosity import KNOWN_MEDIA, SAME_MEDIA
+from dclab.features.emodulus.viscosity import (
+    KNOWN_MEDIA, SAME_MEDIA, get_viscosity
+)
+import numpy as np
 
 from PyQt6 import uic, QtCore, QtWidgets
 
@@ -41,22 +44,24 @@ class BulkActionEmodulus(QtWidgets.QDialog):
 
         self.comboBox_medium.addItem("Not defined", "undefined")
         self.comboBox_medium.addItem("Unchanged", "unchanged")
-
+        self.comboBox_medium.setCurrentIndex(
+            self.comboBox_medium.findData("unchanged"))
         self.comboBox_medium.currentIndexChanged.connect(self.on_cb_medium)
-        self.comboBox_medium.setCurrentIndex(self.comboBox_medium.count() - 1)
 
         self.comboBox_temp.clear()
         self.comboBox_temp.addItem("From feature", "feature")
         self.comboBox_temp.addItem("From meta data", "config")
         self.comboBox_temp.addItem("Manual", "manual")
+        self.comboBox_temp.setCurrentIndex(
+            self.comboBox_temp.findData("feature"))
         self.comboBox_temp.currentIndexChanged.connect(self.on_cb_temp)
-        self.comboBox_temp.setCurrentIndex(self.comboBox_temp.count() - 1)
 
         self.comboBox_visc_model.clear()
         self.comboBox_visc_model.addItem("buyukurganci-2022",
                                          "buyukurganci-2022")
         self.comboBox_visc_model.addItem("herold-2017", "herold-2017")
-        self.comboBox_visc_model.setCurrentIndex(0)
+        self.comboBox_visc_model.setCurrentIndex(
+            self.comboBox_visc_model.findData("buyukurganci-2022"))
         self.comboBox_visc_model.currentIndexChanged.connect(self.on_cb_medium)
 
         self.comboBox_lut.clear()
@@ -72,11 +77,17 @@ class BulkActionEmodulus(QtWidgets.QDialog):
             QtWidgets.QDialogButtonBox.StandardButton.Ok)
         btn_ok.clicked.connect(self.on_ok)
 
+        # spin control
+        self.doubleSpinBox_temp.valueChanged.connect(self.on_cb_temp)
+
+        self.on_cb_medium()
+
     @QtCore.pyqtSlot()
     def on_ok(self):
         self.set_emodulus_properties()
         self.update_ui()
 
+    @QtCore.pyqtSlot()
     def on_cb_medium(self):
         """User changed medium"""
         medium = self.comboBox_medium.currentData()
@@ -90,14 +101,20 @@ class BulkActionEmodulus(QtWidgets.QDialog):
             self.comboBox_visc_model.setEnabled(False)
         self.on_cb_temp()
 
+    @QtCore.pyqtSlot()
     def on_cb_temp(self):
         """User changed temperature"""
         temp = self.comboBox_temp.currentData()
 
         if not self.comboBox_temp.isEnabled() or temp in ["feature", "config"]:
             self.doubleSpinBox_temp.setEnabled(False)
+            self.doubleSpinBox_temp.setValue(np.nan)
         else:
             self.doubleSpinBox_temp.setEnabled(True)
+            if np.isnan(self.doubleSpinBox_temp.value()):
+                self.doubleSpinBox_temp.setValue(23)
+
+        self.update_viscosity()
 
     @show_wait_cursor
     @QtCore.pyqtSlot()
@@ -158,3 +175,26 @@ class BulkActionEmodulus(QtWidgets.QDialog):
         """Update all relevant parts of the main user interface"""
         state = self.pipeline.__getstate__()
         self.pipeline_changed.emit(state)
+
+    def update_viscosity(self):
+        """Update viscosity shown"""
+        temp = self.comboBox_temp.currentData()
+
+        if not self.comboBox_temp.isEnabled() or temp in ["feature", "config"]:
+            self.doubleSpinBox_visc.setValue(np.nan)
+            self.doubleSpinBox_visc.setToolTip("unique values per dataset")
+        else:
+            # update the viscosity value shown in the spin control
+            medium = self.comboBox_medium.currentData()
+            if medium in KNOWN_MEDIA:
+                visc = get_viscosity(
+                    temperature=self.doubleSpinBox_temp.value(),
+                    medium=medium,
+                    model=self.comboBox_visc_model.currentData(),
+                )
+                tooltip = "valid for 0.16 µL/s flow rate and 20 µm channel"
+            else:
+                visc = np.nan
+                tooltip = ""
+            self.doubleSpinBox_visc.setValue(visc)
+            self.doubleSpinBox_visc.setToolTip(tooltip)

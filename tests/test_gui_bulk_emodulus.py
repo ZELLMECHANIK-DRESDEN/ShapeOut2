@@ -164,6 +164,39 @@ def test_viscosity(qtbot):
         assert "emodulus viscosity model" not in ds.config["calculation"]
 
 
+def test_viscosity_compute(qtbot):
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+
+    # add custom dataslot
+    path = make_dataset(medium="other")
+    mw.add_dataslot(paths=[path])
+    mw.add_dataslot(paths=[path])
+
+    # create bulk action dialog manually
+    dlg = bulk.BulkActionEmodulus(mw, pipeline=mw.pipeline)
+    dlg.comboBox_medium.setCurrentIndex(
+        dlg.comboBox_medium.findData("0.59% MC-PBS"))
+    dlg.comboBox_temp.setCurrentIndex(dlg.comboBox_temp.findData("manual"))
+    assert dlg.doubleSpinBox_temp.value() == 23
+    assert dlg.doubleSpinBox_visc.value() == 3.57
+
+    dlg.doubleSpinBox_temp.setValue(24.5)
+    assert dlg.doubleSpinBox_temp.value() == 24.5
+    assert dlg.doubleSpinBox_visc.value() == 3.51
+    dlg.on_ok()
+
+    for slot in mw.pipeline.slots:
+        ds = slot.get_dataset()
+        assert "emodulus" in ds
+        assert ds.config["setup"]["medium"] == "other"
+        assert ds.config["calculation"]["emodulus lut"] == "LE-2D-FEM-19"
+        assert ds.config["calculation"]["emodulus medium"] == "0.59% MC-PBS"
+        assert ds.config["calculation"]["emodulus temperature"] == 24.5
+        assert ds.config["calculation"]["emodulus viscosity model"] \
+            == "buyukurganci-2022"
+
+
 def test_wrong_medium_viscosity(qtbot):
     """Deliberately set wrong visosity"""
     mw = ShapeOut2()

@@ -1,7 +1,6 @@
 import dclab
 from PyQt6 import QtCore, QtGui, QtWidgets
 
-
 #: These are features only visible in developer mode
 HIDDEN_FEATURES = []
 for ii in range(10):
@@ -100,6 +99,10 @@ class FeatureComboBox(QtWidgets.QComboBox):
         # based on self.default_choices in the end.
         idx_cur = self.currentIndex()
 
+        # Remember user selection. If it exists in ds_feats, the selection
+        # will persist even if the user switches the dataset.
+        feat_cur = self.currentData(self.data_role)
+
         blocked = self.signalsBlocked()  # remember block state
         self.blockSignals(True)
 
@@ -114,13 +117,23 @@ class FeatureComboBox(QtWidgets.QComboBox):
             item.setToolTip(tip)
             model.appendRow(item)
 
-        if idx_cur < 0:  # no selection made by user
-            # Use the first available feature in `default_choices`
+        if feat_cur and feat_cur in ds_feats:
+            # If the previous selection exists in the new feature list, set it.
+            idx_cur = self.findData(feat_cur)
+        else:
+            # If the previous selection does not exist in the new feature list,
+            # select the first available feature in `default_choices`
+            idx_cur = -1
+
+        if idx_cur < 0:
+            # If no selection made by user, select the first available feature
+            # in `default_choices`
             for choice in self.default_choices:
                 idx_choice = self.findData(choice)
                 if idx_choice >= 0:
                     idx_cur = idx_choice
                     break
+
         self.setCurrentIndex(idx_cur)
 
         # set previous selection

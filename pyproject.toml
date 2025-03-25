@@ -27,7 +27,7 @@ classifiers = [
     'Programming Language :: Python :: 3',
     'Intended Audience :: Science/Research',
 ]
-license = {text = "GPL v3"}
+license = "GPL-3.0-or-later"
 dependencies = [
     "fcswrite>=0.5.1",
     "dclab[dcor,http,s3]>=0.62.13",

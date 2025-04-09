@@ -14,8 +14,7 @@
    <string>Data export</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="office-chart-ring">
-    <normaloff>.</normaloff>.</iconset>
+   <iconset theme="office-chart-ring"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -33,7 +32,7 @@
         <string>&lt;a href=&quot;https://shapeout2.readthedocs.io/en/stable/sec_qg_export_data.html&quot;&gt;Help&lt;a&gt;</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
        </property>
        <property name="openExternalLinks">
         <bool>true</bool>
@@ -88,7 +87,7 @@
        </property>
       </widget>
      </item>
-     <item alignment="Qt::AlignRight">
+     <item>
       <widget class="QRadioButton" name="radioButton_rtdc">
        <property name="toolTip">
         <string>Standard RT-DC file format.</string>
@@ -104,7 +103,7 @@
        </property>
       </widget>
      </item>
-     <item alignment="Qt::AlignRight">
+     <item>
       <widget class="QRadioButton" name="radioButton_fcs">
        <property name="toolTip">
         <string>Flow Cytometry Standard version 3.0</string>
@@ -114,13 +113,20 @@
        </property>
       </widget>
      </item>
-     <item alignment="Qt::AlignRight">
+     <item>
       <widget class="QRadioButton" name="radioButton_tsv">
        <property name="toolTip">
         <string>text file for custom analysis</string>
        </property>
        <property name="text">
         <string>tab-separated values (*.tsv)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_avi">
+       <property name="text">
+        <string>Video file</string>
        </property>
       </widget>
      </item>
@@ -141,58 +147,175 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Storage strategy:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="comboBox_storage">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <item>
-         <property name="text">
-          <string>No basins: Store only the selected feature data (legacy behavior)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>With basins: Store features, refer to the original file (recommended)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Basins only: Do not store features, refer to original file (fast)</string>
-         </property>
-        </item>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="BulkList" name="bulklist_features" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+    <widget class="QStackedWidget" name="stackedWidget">
+     <property name="currentIndex">
+      <number>1</number>
      </property>
+     <widget class="QWidget" name="page_features">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Storage strategy:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_storage">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <item>
+            <property name="text">
+             <string>No basins: Store only the selected feature data (legacy behavior)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>With basins: Store features, refer to the original file (recommended)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Basins only: Do not store features, refer to original file (fast)</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="BulkList" name="bulklist_features" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_video">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Choose the video export settings below. Note that using (even) uncompressed codecs results in information loss (expect grayscale value differences up to 5). You should use exported videos for presentation purposes only.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Format</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="comboBox_format">
+           <item>
+            <property name="text">
+             <string>AVI</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>MOV</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>MP4</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Codec</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="comboBox_codec">
+           <item>
+            <property name="text">
+             <string>Uncompressed</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>H264</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
      </property>
     </widget>
    </item>

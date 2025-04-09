@@ -29,8 +29,7 @@ classifiers = [
 ]
 license = "GPL-3.0-or-later"
 dependencies = [
-    "fcswrite>=0.5.1",
-    "dclab[dcor,http,s3]>=0.62.13",
+    "dclab[dcor,export,http,s3]>=0.62.17",
     "h5py>=2.8.0",
     "numpy>=1.21",  # CVE-2021-33430
     "pygments",

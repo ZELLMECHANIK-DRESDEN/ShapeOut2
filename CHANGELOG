@@ -1,4 +1,5 @@
-2.21.6
+2.22.0
+ - feat: export image data as video
  - fix: persist feature selection in QuickView when switching data slots (#206)
  - docs: properly employ license GPL-3.0-or-later
 2.21.5

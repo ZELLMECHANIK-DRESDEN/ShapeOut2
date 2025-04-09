@@ -19,6 +19,8 @@ class ExportData(QtWidgets.QDialog):
         with importlib.resources.as_file(ref) as path_ui:
             uic.loadUi(path_ui, self)
 
+        self.features = []
+
         # output path
         self._path = None
         # Get output path
@@ -51,9 +53,35 @@ class ExportData(QtWidgets.QDialog):
         self.radioButton_fcs.clicked.connect(self.on_radio)
         self.radioButton_rtdc.clicked.connect(self.on_radio)
         self.radioButton_tsv.clicked.connect(self.on_radio)
+        self.radioButton_avi.clicked.connect(self.on_radio)
         # storage strategy selection
         self.comboBox_storage.currentIndexChanged.connect(
             self.on_storage_strategy)
+
+        self.comboBox_format.clear()
+        self.comboBox_format.addItem("MKV", "mkv")
+        self.comboBox_format.addItem("AVI", "avi")
+        self.comboBox_format.addItem("MOV", "mov")
+
+        self.comboBox_codec.clear()
+        self.comboBox_codec.addItem("H264 (high quality, fast export)",
+                                    {"pixel_format": "yuv420p",
+                                     "codec": "libx264",
+                                     "codec_options": {'preset': 'ultrafast',
+                                                       'crf': '0'}})
+        self.comboBox_codec.addItem("H264 (high quality, small file size)",
+                                    {"pixel_format": "yuv420p",
+                                     "codec": "libx264",
+                                     "codec_options": {'preset': 'slow',
+                                                       'crf': '0'}})
+        self.comboBox_codec.addItem("H264 (lossy compression)",
+                                    {"pixel_format": "yuv420p",
+                                     "codec": "libx264",
+                                     "codec_options": {'preset': 'slow',
+                                                       'crf': '7'}})
+        self.comboBox_codec.addItem("RAW (huge files)",
+                                    {"pixel_format": "yuv420p",
+                                     "codec": "rawvideo"})
 
     @property
     def file_format(self):
@@ -61,6 +89,8 @@ class ExportData(QtWidgets.QDialog):
             return "fcs"
         elif self.radioButton_rtdc.isChecked():
             return "rtdc"
+        elif self.radioButton_avi.isChecked():
+            return self.comboBox_format.currentData()
         else:
             return "tsv"
 
@@ -94,6 +124,9 @@ class ExportData(QtWidgets.QDialog):
         # get features
         if self.storage_strategy == "only-basins":
             # This case will also only happen for the .rtdc format
+            features = []
+        elif self.radioButton_avi.isChecked():
+            # We are only exporting images
             features = []
         else:
             features = self.bulklist_features.get_selection()
@@ -140,12 +173,18 @@ class ExportData(QtWidgets.QDialog):
                     features=[ff for ff in features if ff in ds.features],
                     meta_data={"Shape-Out version": version},
                     override=False)
-            else:
+            elif self.file_format == "tsv":
                 ds.export.tsv(
                     path=path,
                     features=[ff for ff in features if ff in ds.features],
                     meta_data={"Shape-Out version": version},
                     override=False)
+            elif self.radioButton_avi.isChecked():
+                ds.export.avi(
+                    path=path,
+                    **self.comboBox_codec.currentData(),
+                )
+
             if prog.wasCanceled():
                 break
             prog.setValue(slot_index + 1)
@@ -206,12 +245,17 @@ class ExportData(QtWidgets.QDialog):
 
     @QtCore.pyqtSlot()
     def on_radio(self):
-        self.update_feature_list()
         self.widget_storage_strategy.setEnabled(self.file_format == "rtdc")
         # set storage strategy based on file format
         strategy = "with-basins" if self.file_format == "rtdc" else "no-basins"
         self.comboBox_storage.setCurrentIndex(
             self.comboBox_storage.findData(strategy))
+
+        if self.radioButton_avi.isChecked():
+            self.stackedWidget.setCurrentWidget(self.page_video)
+        else:
+            self.update_feature_list()
+            self.stackedWidget.setCurrentWidget(self.page_features)
 
     @QtCore.pyqtSlot()
     def on_select_features_innate(self):

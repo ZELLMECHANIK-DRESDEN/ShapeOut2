@@ -12,7 +12,8 @@ and export the result to a file. For instance, Shape-Out can export your DC data
 file format or to tab-separated values (.tsv) files for data analysis in other
 software. If you export to the .rtdc file format, you will stay in the DC
 ecosystem, allowing you to make use of dclab and Shape-Out or other software
-that can interface with HDF5 data.
+that can interface with HDF5 data. Since Shape-Out 2.22.0, it is also possible
+to export event images as a video file.
 
 .. _qg_export_data:
 .. figure:: scrots/qg_export_data.png

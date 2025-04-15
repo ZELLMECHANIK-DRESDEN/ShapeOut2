@@ -1,6 +1,7 @@
 import copy
 
 import dclab
+from dclab.kde import methods as kdem
 import numpy as np
 
 from ..util import hashobj
@@ -21,7 +22,7 @@ DEFAULT_STATE = {
         "axis x": "area_um",
         "axis y": "deform",
         "isoelastics": True,  # display isoelasticity lines
-        "kde": "histogram",  # see dclab.kde_methods.methods
+        "kde": "histogram",  # see dclab.kde.methods.methods
         "range x": [0, 0],  # equal means no preference
         "range y": [0, 0],
         "scale x": "linear",
@@ -51,7 +52,7 @@ DEFAULT_STATE = {
     }
 }
 
-_kde_methods = sorted(dclab.kde_methods.methods.keys())
+_kde_methods = sorted(kdem.methods.keys())
 _kde_methods.remove("none")  # does not make sense here
 
 STATE_OPTIONS = {

@@ -2,6 +2,7 @@ import copy
 import importlib.resources
 
 import dclab
+import dclab.kde.methods
 import numpy as np
 from PyQt6 import uic, QtCore, QtWidgets
 
@@ -342,7 +343,7 @@ class PlotPanel(QtWidgets.QWidget):
     def _set_contour_spacing_auto(self, axis_x=None, axis_y=None):
         """automatically set the contour spacing
 
-        - uses :func:`dclab.kde_methods.bin_width_percentile`
+        - uses :func:`dclab.kde.methods.bin_width_percentile`
         - uses _set_contour_spacing
 
         Not to be confused with `on_spacing_auto`!
@@ -371,7 +372,7 @@ class PlotPanel(QtWidgets.QWidget):
                             a=ds[axis],
                             feat=axis,
                             scale=scaleCombo.currentData(),
-                            method=dclab.kde_methods.bin_width_percentile,
+                            method=dclab.kde.methods.bin_width_percentile,
                         )
                         spacings.append(spa)
                     spacings_xy.append(np.min(spacings))

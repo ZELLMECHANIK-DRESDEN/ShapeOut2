@@ -232,7 +232,7 @@ class ExportData(QtWidgets.QDialog):
 
         if exporter.failed_tasks:
             info_string = "\n".join(
-                [f"- {kw["path"]}" for _, kw in exporter.failed_tasks])
+                [f"- {kw['path']}" for _, kw in exporter.failed_tasks])
             QtWidgets.QMessageBox.critical(
                 self, f"Error exporting {len(exporter.failed_tasks)} objects",
                 f"Could not export to the following paths:\n{info_string}")

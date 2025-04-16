@@ -1,7 +1,9 @@
-import pathlib
 import importlib.resources
+import logging
+import pathlib
+import traceback
 
-from PyQt6 import uic, QtCore, QtWidgets
+from PyQt6 import uic, QtCore, QtTest, QtWidgets
 
 import dclab
 
@@ -10,6 +12,9 @@ from ..widgets.feature_combobox import HIDDEN_FEATURES
 
 from ...util import get_valid_filename
 from ..._version import version
+
+
+logger = logging.getLogger(__name__)
 
 
 class ExportData(QtWidgets.QDialog):
@@ -130,18 +135,26 @@ class ExportData(QtWidgets.QDialog):
             features = []
         else:
             features = self.bulklist_features.get_selection()
-        pend = len(self.pipeline.slots)
+
+        # create dummy progress dialog
         prog = QtWidgets.QProgressDialog("Exporting...", "Abort", 1,
-                                         pend, self)
+                                         10, self)
         prog.setWindowTitle("Data Export")
         prog.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
         prog.setMinimumDuration(0)
-        prog.setValue(0)
+        prog.setAutoClose(True)
         QtWidgets.QApplication.processEvents(
             QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
 
+        # correct dialog maximum
+        prog.setValue(0)
         slots_n_paths = self.get_export_filenames()
-        prog.setMaximum(len(slots_n_paths))  # correct dialog maximum
+        pend = len(slots_n_paths) * 100
+        prog.setMaximum(pend)
+        QtWidgets.QApplication.processEvents(
+            QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
+
+        tasks = []
 
         for slot_index, path in slots_n_paths:
             ds = self.pipeline.get_dataset(slot_index)
@@ -159,38 +172,70 @@ class ExportData(QtWidgets.QDialog):
                      + f"They are not exported to .{self.file_format}!")
                 )
             if self.file_format == "rtdc":
-                ds.export.hdf5(
-                    path=path,
-                    features=[ff for ff in features if ff in ds.features],
-                    logs=True,
-                    tables=True,
-                    basins=self.storage_strategy != "no-basins",
-                    meta_prefix="",
-                    override=False)
+                tasks.append((
+                    ds.export.hdf5,
+                    dict(path=path,
+                         features=[ff for ff in features if ff in ds.features],
+                         logs=True,
+                         tables=True,
+                         basins=self.storage_strategy != "no-basins",
+                         meta_prefix="",
+                         override=False)
+                ))
             elif self.file_format == "fcs":
-                ds.export.fcs(
-                    path=path,
-                    features=[ff for ff in features if ff in ds.features],
-                    meta_data={"Shape-Out version": version},
-                    override=False)
+                tasks.append((
+                    ds.export.fcs,
+                    dict(path=path,
+                         features=[ff for ff in features if ff in ds.features],
+                         meta_data={"Shape-Out version": version},
+                         override=False)
+                ))
             elif self.file_format == "tsv":
-                ds.export.tsv(
-                    path=path,
-                    features=[ff for ff in features if ff in ds.features],
-                    meta_data={"Shape-Out version": version},
-                    override=False)
+                tasks.append((
+                    ds.export.tsv,
+                    dict(path=path,
+                         features=[ff for ff in features if ff in ds.features],
+                         meta_data={"Shape-Out version": version},
+                         override=False)
+                ))
             elif self.radioButton_avi.isChecked():
-                ds.export.avi(
-                    path=path,
-                    **self.comboBox_codec.currentData(),
-                )
+                tasks.append((
+                    ds.export.avi,
+                    dict(path=path,
+                         **self.comboBox_codec.currentData())
+                ))
 
-            if prog.wasCanceled():
-                break
-            prog.setValue(slot_index + 1)
+        logger.info(f"Exporting {len(tasks)} objects")
+
+        exporter = ExportThread(self, tasks)
+        exporter.communicate_progress.connect(prog.setValue)
+        exporter.communicate_message.connect(prog.setLabelText)
+        prog.canceled.connect(exporter.request_abort)
+        exporter.start()
+
+        while True:
             QtWidgets.QApplication.processEvents(
                 QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
+            QtTest.QTest.qWait(500)
+            if prog.wasCanceled() or exporter.isFinished():
+                # This will break the loop but possibly keep the exporter
+                # alive. We hope that the exporter will eventually be
+                # terminated.
+                break
+
         prog.setValue(pend)
+
+        if prog.wasCanceled():
+            exporter.terminate()
+        else:
+            exporter.wait()
+
+        if exporter.failed_tasks:
+            info_string = "\n".join(
+                [f"- {kw["path"]}" for _, kw in exporter.failed_tasks])
+            QtWidgets.QMessageBox.critical(
+                self, f"Error exporting {len(exporter.failed_tasks)} objects",
+                f"Could not export to the following paths:\n{info_string}")
 
     def get_export_filenames(self):
         """Compute names for exporting data, avoiding overriding anything
@@ -297,3 +342,53 @@ class ExportData(QtWidgets.QDialog):
         labels = [dclab.dfn.get_feature_label(feat) for feat in self.features]
         self.bulklist_features.set_items(self.features, labels)
         self.on_select_features_innate()
+
+
+class ExportAbortError(BaseException):
+    """Used for aborting data export via progress_callback"""
+    pass
+
+
+class ExportThread(QtCore.QThread):
+    communicate_progress = QtCore.pyqtSignal(int)
+    communicate_message = QtCore.pyqtSignal(str)
+
+    def __init__(self, parent, tasks):
+        super(ExportThread, self).__init__(parent)
+        self.abort = False
+        self.tasks = tasks
+        self.current_path = None
+        self.tasks_done = []
+        self.failed_tasks = []
+
+    def progress_callback(self, progress, message):
+        cur_pos = int((len(self.tasks_done) + progress) * 100)
+        self.communicate_progress.emit(cur_pos)
+        self.communicate_message.emit(f"{self.current_path.name} ({message})")
+        if self.abort:
+            raise ExportAbortError("User aborted")
+
+    def run(self):
+        for ii in range(len(self.tasks)):
+            if self.abort:
+                break
+            func, kwargs = self.tasks.pop(0)
+            self.current_path = pathlib.Path(kwargs["path"])
+            try:
+                func(progress_callback=self.progress_callback, **kwargs)
+            except ExportAbortError:
+                # remove current path
+                self.current_path.unlink(missing_ok=True)
+                break
+            except BaseException:
+                # remove current path
+                self.current_path.unlink(missing_ok=True)
+                logger.error(traceback.format_exc())
+                self.failed_tasks.append((func, kwargs))
+                continue
+            finally:
+                self.tasks_done.append((func, kwargs))
+
+    @QtCore.pyqtSlot()
+    def request_abort(self):
+        self.abort = True

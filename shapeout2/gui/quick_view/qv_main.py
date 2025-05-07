@@ -77,11 +77,11 @@ class QuickView(QtWidgets.QWidget):
         self.toolButton_settings.toggled.connect(self.on_tool)
 
         # polygon filter signals
-        self.label_poly_create.hide()
-        self.label_poly_modify.hide()
-        self.pushButton_poly_save.hide()
-        self.pushButton_poly_cancel.hide()
-        self.pushButton_poly_delete.hide()
+        self.label_poly_create.setVisible(False)
+        self.label_poly_modify.setVisible(False)
+        self.pushButton_poly_save.setVisible(False)
+        self.pushButton_poly_cancel.setVisible(False)
+        self.pushButton_poly_delete.setVisible(False)
         self.pushButton_poly_create.clicked.connect(self.on_poly_create)
         self.pushButton_poly_save.clicked.connect(self.on_poly_done_save)
         self.pushButton_poly_cancel.clicked.connect(self.on_poly_done_cancel)
@@ -150,7 +150,7 @@ class QuickView(QtWidgets.QWidget):
         }
         for key in self.trace_plots:
             self.graphicsView_trace.addItem(self.trace_plots[key])
-            self.trace_plots[key].hide()
+            self.trace_plots[key].setVisible(False)
 
         self.graphicsView_trace.plotItem.setLabels(
             left="Fluorescence [a.u.]", bottom="Event time [µs]")
@@ -294,13 +294,23 @@ class QuickView(QtWidgets.QWidget):
     def _set_initial_ui(self):
         self._hover_ds_id = None
         self._hover_event_idx = None
+        # events label
+        self.label_noevents.setVisible(False)
+        self.enable_interface(False)
+
+    def enable_interface(self, value):
         # Initially, only show the info about how QuickView works
-        self.widget_tool.setEnabled(False)
-        self.widget_scatter.hide()
-        # show the how-to label
-        self.label_howto.show()
-        # hide the no events label
-        self.label_noevents.hide()
+        self.widget_tool.setEnabled(value)
+        self.widget_scatter.setVisible(value)
+        # stacked widget
+        self.stackedWidget.setEnabled(value)
+        # how-to label
+        self.label_howto.setVisible(not value)
+
+        if not value:
+            self.imageView_image.setImage(np.full((10, 10), 200))
+            self.imageView_image_amp.setImage(np.full((10, 10), 200))
+            self.imageView_image_pha.setImage(np.full((10, 10), 200))
 
     @property
     def rtdc_ds(self):
@@ -491,7 +501,7 @@ class QuickView(QtWidgets.QWidget):
                 and self.img_info[feat]["cmap_changed"][view]):
             self.img_info[feat]["cmap_changed"][view] = False
             self.img_info[feat][view].setColorMap(self.img_info[feat]["cmap"])
-        self.img_info[feat][view].show()
+        self.img_info[feat][view].setVisible(True)
 
     @staticmethod
     def image_zoom(cell_img, mask):
@@ -555,7 +565,7 @@ class QuickView(QtWidgets.QWidget):
         # events come from remote locations.
         #
         # `self.on_tool` (`self.toolButton_event`) takes care of this:
-        # self.widget_scatter.select.show()
+        # self.widget_scatter.select.setVisible(True)
         if not self.toolButton_event.isChecked():
             # emulate mouse toggle
             self.toolButton_event.setChecked(True)
@@ -581,7 +591,7 @@ class QuickView(QtWidgets.QWidget):
                 self._hover_event_idx = event
                 view = "view_poly"
                 for key in self.img_info.keys():
-                    self.img_info[key][view].hide()
+                    self.img_info[key][view].setVisible(False)
 
                 try:
                     # if we have qpi data, image might be a different shape
@@ -855,6 +865,9 @@ class QuickView(QtWidgets.QWidget):
             If set to None, the index from `self.spinBox_event`
             will be used.
         """
+        if self.rtdc_ds is None:
+            return
+
         # dataset
         ds = self.rtdc_ds
         self._dataset_event_plot_indices_cache[
@@ -873,11 +886,11 @@ class QuickView(QtWidgets.QWidget):
         if self.tabWidget_event.currentIndex() == 0:
             # update image
             state = self.read_pipeline_state()
-            self.groupBox_image.hide()
+            self.groupBox_image.setVisible(False)
 
             view = "view_event"
             for key in self.img_info.keys():
-                self.img_info[key][view].hide()
+                self.img_info[key][view].setVisible(False)
 
             # if we have qpi data, image might be a different shape
             if "qpi_pha" in ds:
@@ -887,7 +900,7 @@ class QuickView(QtWidgets.QWidget):
             elif "image" in ds:
                 self.get_event_image_and_show(ds, event, "image", view)
 
-            self.groupBox_image.show()
+            self.groupBox_image.setVisible(True)
 
             if "trace" in ds:
                 # remove legend items
@@ -916,7 +929,7 @@ class QuickView(QtWidgets.QWidget):
                         range_fl[0] = min(range_fl[0], tracey.min())
                         range_fl[1] = max(range_fl[1], tracey.max())
                         self.trace_plots[key].setData(fltime, tracey)
-                        self.trace_plots[key].show()
+                        self.trace_plots[key].setVisible(True)
                         if state["event"]["trace zoom"]:
                             flpos = ds["{}_pos".format(flid)][event]
                             flwidth = ds["{}_width".format(flid)][event]
@@ -933,14 +946,14 @@ class QuickView(QtWidgets.QWidget):
                         self.legend_trace.addItem(self.trace_plots[key], ln)
                         self.legend_trace.update()
                     else:
-                        self.trace_plots[key].hide()
+                        self.trace_plots[key].setVisible(False)
                 self.graphicsView_trace.setXRange(*range_t[:2], padding=0)
                 if range_fl[0] != range_fl[1]:
                     self.graphicsView_trace.setYRange(*range_fl, padding=.01)
                 self.graphicsView_trace.setLimits(xMin=0, xMax=fltime[-1])
-                self.groupBox_trace.show()
+                self.groupBox_trace.setVisible(True)
             else:
-                self.groupBox_trace.hide()
+                self.groupBox_trace.setVisible(False)
         else:
             # only use computed features (speed)
             fcands = ds.features_local
@@ -971,17 +984,15 @@ class QuickView(QtWidgets.QWidget):
                 identifier=f"child-of-{rtdc_ds.identifier}")
         event_count = self.rtdc_ds.config["experiment"]["event count"]
         if event_count == 0:
-            self.widget_scatter.hide()
-            self.widget_tool.setEnabled(False)
-            self.label_noevents.show()
+            self.enable_interface(False)
+            self.label_noevents.setVisible(True)
             self.on_tool(collapse=True)
             return
         else:
             # make things visible
-            self.label_noevents.hide()
-            self.label_howto.hide()
-            self.widget_scatter.show()
-            self.widget_tool.setEnabled(True)
+            self.enable_interface(True)
+            self.label_noevents.setVisible(False)
+
         # get the state
         state = self.read_pipeline_state()
         plot = state["plot"]
@@ -1017,8 +1028,8 @@ class QuickView(QtWidgets.QWidget):
         # scatter plot
         self.plot()
         # reset image view
-        self.groupBox_image.hide()
-        self.groupBox_trace.hide()
+        self.groupBox_image.setVisible(False)
+        self.groupBox_trace.setVisible(False)
         # this only updates the size of the tools (because there is no
         # sender)
         self.on_tool()

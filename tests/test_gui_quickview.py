@@ -55,6 +55,96 @@ def test_clear_session_issue_25(qtbot):
     mw.on_action_clear()
 
 
+def test_duplicate_polygon_filter_issue_148(qtbot):
+    """https://github.com/ZELLMECHANIK-DRESDEN/ShapeOut2/issues/148
+
+    A duplicate polygon filter was created (that could not be deleted).
+    """
+    mw = ShapeOut2()
+    qtbot.addWidget(mw)
+
+    # add a dataslot
+    path = datapath / "calibration_beads_47.rtdc"
+    filt_id = mw.add_filter()
+    slot_ids = mw.add_dataslot(paths=[path])
+
+    assert len(mw.pipeline.slot_ids) == 1, "we added that"
+    assert len(mw.pipeline.filter_ids) == 1, "automatically added"
+
+    # activate a dataslot
+    slot_id = slot_ids[0]
+    em = mw.block_matrix.get_widget(slot_id, filt_id)
+    qtbot.mouseClick(em, QtCore.Qt.MouseButton.LeftButton,
+                     QtCore.Qt.KeyboardModifier.ShiftModifier)
+
+    em = mw.block_matrix.get_widget(slot_id, filt_id)
+    qtbot.mouseClick(em, QtCore.Qt.MouseButton.LeftButton)
+
+    # did that work?
+    assert mw.toolButton_quick_view.isChecked()
+
+    # Add a polygon filter
+    assert len(dclab.PolygonFilter.instances) == 0
+    qv = mw.widget_quick_view
+    qtbot.mouseClick(qv.toolButton_poly, QtCore.Qt.MouseButton.LeftButton)
+    qtbot.mouseClick(qv.pushButton_poly_create,
+                     QtCore.Qt.MouseButton.LeftButton)
+    # three positions (not sure how to do this with mouse clicks)
+    points = [[22, 0.01],
+              [30, 0.01],
+              [30, 0.014],
+              ]
+    qv.widget_scatter.set_poly_points(points)
+    qtbot.mouseClick(qv.pushButton_poly_save, QtCore.Qt.MouseButton.LeftButton)
+    # did that work?
+    assert len(dclab.PolygonFilter.instances) == 1
+    pf = dclab.PolygonFilter.instances[0]
+    assert np.allclose(pf.points, points)
+
+    # Add the polygon filter to the first filter
+    fe = mw.block_matrix.get_widget(filt_plot_id=filt_id)
+    qtbot.mouseClick(fe.toolButton_modify, QtCore.Qt.MouseButton.LeftButton)
+    fv = mw.widget_ana_view.widget_filter
+    mw.widget_ana_view.tabWidget.setCurrentWidget(
+        mw.widget_ana_view.tab_filter)
+    cb = fv._polygon_checkboxes[pf.unique_id]
+    assert not cb.isChecked()
+    assert cb.isEnabled()
+    assert cb.isVisible()
+    qtbot.mouseClick(cb, QtCore.Qt.MouseButton.LeftButton)
+    assert cb.isChecked()
+    qtbot.mouseClick(fv.pushButton_apply, QtCore.Qt.MouseButton.LeftButton)
+    # Did that work?
+    ds = mw.pipeline.get_dataset(slot_index=0, filt_index=0,
+                                 apply_filter=True)
+    assert np.sum(ds.filter.all) == 15
+
+    # To reproduce the bug, modify the polygon filter in QuickView, uncheck it
+    # in the filter widget, and hit "Save" in QuickView.
+    # Hit modify
+    qv.comboBox_poly.setCurrentIndex(1)
+    # Uncheck checkbox
+    cb = fv._polygon_checkboxes[pf.unique_id]
+    assert cb.isChecked()
+    qtbot.mouseClick(cb, QtCore.Qt.MouseButton.LeftButton)
+    qtbot.mouseClick(fv.pushButton_apply, QtCore.Qt.MouseButton.LeftButton)
+    assert not cb.isChecked()
+
+    # Make sure we only have one polygon filter
+    assert len(dclab.PolygonFilter.instances) == 1, "this worked before"
+    # "Polygon Filter X" and "Choose..." selection
+    assert qv.comboBox_poly.count() == 2
+
+    # Now hit "Save" if it is visible (it should not be visible)
+    if qv.pushButton_poly_save.isVisible():
+        qtbot.mouseClick(qv.pushButton_poly_save,
+                         QtCore.Qt.MouseButton.LeftButton)
+
+    # Check again
+    # "Polygon Filter X" and "Choose..." selection
+    assert qv.comboBox_poly.count() == 2
+
+
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')  # 0-div in kde-methods
 @pytest.mark.filterwarnings('ignore::shapeout2.pipeline.core.'
                             + 'EmptyDatasetWarning')

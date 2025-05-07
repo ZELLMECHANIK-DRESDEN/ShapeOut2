@@ -83,9 +83,9 @@ class QuickView(QtWidgets.QWidget):
         self.pushButton_poly_cancel.hide()
         self.pushButton_poly_delete.hide()
         self.pushButton_poly_create.clicked.connect(self.on_poly_create)
-        self.pushButton_poly_save.clicked.connect(self.on_poly_done)
-        self.pushButton_poly_cancel.clicked.connect(self.on_poly_done)
-        self.pushButton_poly_delete.clicked.connect(self.on_poly_done)
+        self.pushButton_poly_save.clicked.connect(self.on_poly_done_save)
+        self.pushButton_poly_cancel.clicked.connect(self.on_poly_done_cancel)
+        self.pushButton_poly_delete.clicked.connect(self.on_poly_done_delete)
         self.comboBox_poly.currentIndexChanged.connect(self.on_poly_modify)
         self.update_polygon_panel()
 
@@ -636,7 +636,7 @@ class QuickView(QtWidgets.QWidget):
         self.update()
 
     @QtCore.pyqtSlot()
-    def on_poly_done(self):
+    def on_poly_done(self, mode="none"):
         """User is done creating or modifying a polygon filter"""
         self.pushButton_poly_create.setEnabled(True)
         self.label_poly_create.setVisible(False)
@@ -644,37 +644,6 @@ class QuickView(QtWidgets.QWidget):
         self.pushButton_poly_save.setVisible(False)
         self.pushButton_poly_cancel.setVisible(False)
         self.pushButton_poly_delete.setVisible(False)
-        if self.sender() == self.pushButton_poly_delete:
-            # delete the polygon filter
-            idp = self.comboBox_poly.currentData()
-            if idp is not None:
-                # There is a polygon filter that we want to delete
-                self.polygon_filter_about_to_be_deleted.emit(idp)
-                dclab.PolygonFilter.remove(idp)
-                mode = "modify"
-            else:
-                mode = "none"
-        elif self.sender() == self.pushButton_poly_save:
-            # save the polygon filter
-            points = self.widget_scatter.get_poly_points()
-            name = self.lineEdit_poly.text()
-            inverted = self.checkBox_poly.isChecked()
-            axes = self.widget_scatter.xax, self.widget_scatter.yax
-            # determine whether to create a new polygon filter or whether
-            # to update an existing one.
-            idp = self.comboBox_poly.currentData()
-            if idp is None:
-                dclab.PolygonFilter(axes=axes, points=points, name=name,
-                                    inverted=inverted)
-                mode = "create"
-            else:
-                pf = dclab.PolygonFilter.get_instance_from_id(idp)
-                pf.name = name
-                pf.inverted = inverted
-                pf.points = points
-                mode = "modify"
-        else:
-            mode = "none"
         # remove the PolyLineRoi
         self.widget_scatter.activate_scatter_mode()
         self.update_polygon_panel()
@@ -682,6 +651,45 @@ class QuickView(QtWidgets.QWidget):
             self.polygon_filter_created.emit()
         elif mode == "modify":
             self.polygon_filter_modified.emit()
+
+    @QtCore.pyqtSlot()
+    def on_poly_done_delete(self):
+        # delete the polygon filter
+        idp = self.comboBox_poly.currentData()
+        if idp is not None:
+            # There is a polygon filter that we want to delete
+            self.polygon_filter_about_to_be_deleted.emit(idp)
+            dclab.PolygonFilter.remove(idp)
+            mode = "modify"
+        else:
+            mode = "none"
+        self.on_poly_done(mode)
+
+    @QtCore.pyqtSlot()
+    def on_poly_done_cancel(self):
+        self.on_poly_done()
+
+    @QtCore.pyqtSlot()
+    def on_poly_done_save(self):
+        # save the polygon filter
+        points = self.widget_scatter.get_poly_points()
+        name = self.lineEdit_poly.text()
+        inverted = self.checkBox_poly.isChecked()
+        axes = self.widget_scatter.xax, self.widget_scatter.yax
+        # determine whether to create a new polygon filter or whether
+        # to update an existing one.
+        idp = self.comboBox_poly.currentData()
+        if idp is None:
+            dclab.PolygonFilter(axes=axes, points=points, name=name,
+                                inverted=inverted)
+            mode = "create"
+        else:
+            pf = dclab.PolygonFilter.get_instance_from_id(idp)
+            pf.name = name
+            pf.inverted = inverted
+            pf.points = points
+            mode = "modify"
+        self.on_poly_done(mode)
 
     @QtCore.pyqtSlot()
     def on_poly_modify(self):
@@ -1031,8 +1039,14 @@ class QuickView(QtWidgets.QWidget):
             self.comboBox_y.update_feature_list()
             self.comboBox_z_hue.update_feature_list()
 
+    @QtCore.pyqtSlot()
     def update_polygon_panel(self):
         """Update polygon filter combobox etc."""
+        if self.label_poly_modify.isVisible():
+            # User is currently modifying a polygon filter (issue 148).
+            # We discard the user's changes.
+            self.on_poly_done_cancel()
+
         pfts = dclab.PolygonFilter.instances
         self.comboBox_poly.blockSignals(True)
         self.comboBox_poly.clear()

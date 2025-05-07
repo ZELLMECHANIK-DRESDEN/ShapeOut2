@@ -4,7 +4,7 @@ import importlib.resources
 import warnings
 
 import dclab
-from dclab import kde_contours
+from dclab.kde import contours as kdec
 import numpy as np
 from PyQt6 import uic, QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
@@ -620,7 +620,7 @@ def compute_contours(plot_state, rtdc_ds):
         warnings.warn("Contour not possible; spacing may be too large!",
                       ContourSpacingTooLarge)
         return []
-    plev = kde_contours.get_quantile_levels(
+    plev = kdec.get_quantile_levels(
         density=density,
         x=x,
         y=y,
@@ -633,7 +633,7 @@ def compute_contours(plot_state, rtdc_ds):
         # make sure that the contour levels are not at the boundaries
         if not (np.allclose(level, 0, atol=1e-12, rtol=0)
                 or np.allclose(level, 1, atol=1e-12, rtol=0)):
-            cc = kde_contours.find_contours_level(
+            cc = kdec.find_contours_level(
                 density, x=x, y=y, level=level)
             contours.append(cc)
     return contours

@@ -1,4 +1,6 @@
 """Facilitate caching of plot data"""
+from dclab.kde import KernelDensityEstimator
+
 from . import util
 
 
@@ -18,7 +20,8 @@ def get_contour_data(rtdc_ds, xax, yax, xacc, yacc, xscale, yscale,
         x, y, den = cache_data[shash]
     else:
         # compute scatter plot data
-        x, y, den = rtdc_ds.get_kde_contour(
+        kde_instance = KernelDensityEstimator(rtdc_ds=rtdc_ds)
+        x, y, den = kde_instance.get_contour(
             xax=xax,
             yax=yax,
             xacc=xacc,

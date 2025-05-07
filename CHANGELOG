@@ -3,6 +3,7 @@
  - fix: persist feature selection in QuickView when switching data slots (#206)
  - fix: show correct progress during data export (#138)
  - docs: properly employ license GPL-3.0-or-later
+ - ref: fix deprecation warnings
  - setup: bump dclab to 0.63.0
 2.21.5
  - fix: disable table graphs widget when an image-type table is shown

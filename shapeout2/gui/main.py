@@ -1019,9 +1019,14 @@ class ShapeOut2(QtWidgets.QMainWindow):
         """
         if slot_index < 0 or filt_index < 0:
             return
-        ds = self.pipeline.get_dataset(slot_index=slot_index,
-                                       filt_index=filt_index,
-                                       apply_filter=True)
+        try:
+            ds = self.pipeline.get_dataset(slot_index=slot_index,
+                                           filt_index=filt_index,
+                                           apply_filter=True)
+        except IndexError:
+            # There is no such slot.
+            return
+
         slot = self.pipeline.slots[slot_index]
         # update quick view subwindow
         self.widget_quick_view.show_rtdc(ds, slot)

@@ -92,7 +92,7 @@ def test_get_hash_flag():
         pipe_config = ds.config.get("pipeline", {})
         dcnum_hash = pipe_config.get("dcnum hash", None)
         hash_set.add(dcnum_hash)
-        expected.append(f"Pipeline: {dcnum_hash[:4]}" if dcnum_hash else None)
+        expected.append(f"Pipeline {dcnum_hash[:4]}" if dcnum_hash else None)
         rtdc_ds_list.append(ds)
 
     assert len(hash_set) == 2
@@ -120,7 +120,7 @@ def test_get_hash_flag_datasets_without_hash():
         pipe_config = ds.config.get("pipeline", {})
         dcnum_hash = pipe_config.get("dcnum hash", None)
         hash_set.add(dcnum_hash)
-        expected.append(f"Pipeline: {dcnum_hash[:4]}" if dcnum_hash else None)
+        expected.append(f"Pipeline {dcnum_hash[:4]}" if dcnum_hash else None)
         rtdc_ds_list.append(ds)
 
     assert len(hash_set) == 1
@@ -146,7 +146,7 @@ def test_get_hash_flag_dataset_with_hash():
         pipe_config = ds.config.get("pipeline", {})
         dcnum_hash = pipe_config.get("dcnum hash", None)
         hash_set.add(dcnum_hash)
-        expected.append(f"Pipeline: {dcnum_hash[:4]}" if dcnum_hash else None)
+        expected.append(f"Pipeline {dcnum_hash[:4]}" if dcnum_hash else None)
         rtdc_ds_list.append(ds)
 
     assert len(hash_set) == 2
@@ -159,4 +159,4 @@ def test_get_hash_flag_dataset_with_hash():
 
     assert results[0] is None
     assert results[1] is None
-    assert results[2] == "Pipeline: 1d01"
+    assert results[2] == "Pipeline 1d01"

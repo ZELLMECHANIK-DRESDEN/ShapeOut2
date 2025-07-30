@@ -787,7 +787,7 @@ def get_hash_flag(hash_set, rtdc_ds):
     dcnum_hash = pipe_config.get("dcnum hash", None)
     # use the first `req_hash_len` characters of the hash
     short_hash = dcnum_hash[:req_hash_len] if dcnum_hash else None
-    return f"Pipeline: {short_hash}" if short_hash else None
+    return f"Pipeline {short_hash}" if short_hash else None
 
 
 linestyles = {
